@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🏆 Ranking – {{ contest.name }}</h2>
+<table border="1" cellpadding="6">
+  <tr><th>#</th><th>User</th><th>Score</th><th>Total Time</th></tr>
+  {% for r in ranks %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ r.user__username }}</td>
+    <td>{{ r.score }}</td>
+    <td>{{ r.total_time|floatformat:2 }}s</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="4">No accepted submissions yet.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
