@@ -1,44 +1,60 @@
-import subprocess, tempfile, os
+import subprocess, tempfile, os, textwrap, shlex
 
-def run_submission(language, source_code):
+COMPILERS = {
+    'cpp': {
+        'src': 'main.cpp',
+        'compile': lambda tmp, src: ["g++", src, "-O2", "-std=c++17", "-pipe", "-o", os.path.join(tmp, "main")],
+        'run':      lambda tmp: [os.path.join(tmp, "main")],
+    },
+    'python': {
+        'src': 'main.py',
+        'compile': None,
+        'run':      lambda tmp: ["python3", os.path.join(tmp, "main.py")],
+    },
+    'pypy': {
+        'src': 'main.py',
+        'compile': None,
+        'run':      lambda tmp: ["pypy3", os.path.join(tmp, "main.py")],
+    },
+    'java': {
+        'src': 'Main.java',
+        'compile': lambda tmp, src: ["javac", src],
+        'run':      lambda tmp: ["java", "-cp", tmp, "Main"],
+    },
+}
+
+
+def run_program(language: str, source_code: str, input_data: str, time_limit: int = 5):
+    if language not in COMPILERS:
+        return ("Unsupported language", 0.0)
+    cfg = COMPILERS[language]
+
     with tempfile.TemporaryDirectory() as tmp:
-        src_path = os.path.join(tmp, {
-            "cpp": "main.cpp",
-            "python": "main.py",
-            "pypy": "main.py",
-            "java": "Main.java"
-        }[language])
-
-        with open(src_path, "w") as f:
+        src_path = os.path.join(tmp, cfg['src'])
+        with open(src_path, 'w') as f:
             f.write(source_code)
 
-        # Command theo ngôn ngữ
-        if language == "cpp":
-            exe = os.path.join(tmp, "main")
-            compile_cmd = ["g++", src_path, "-O2", "-std=c++17", "-o", exe]
-            run_cmd = [exe]
-        elif language == "python":
-            compile_cmd = None
-            run_cmd = ["python3", src_path]
-        elif language == "pypy":
-            compile_cmd = None
-            run_cmd = ["pypy3", src_path]
-        elif language == "java":
-            compile_cmd = ["javac", src_path]
-            run_cmd = ["java", "-cp", tmp, "Main"]
-        else:
-            return "Unsupported language"
+        # compile if needed
+        if cfg['compile']:
+            try:
+                c = subprocess.run(cfg['compile'](tmp, src_path), capture_output=True, text=True, timeout=30)
+                if c.returncode != 0:
+                    return ("Compilation Error:\n" + c.stderr, 0.0)
+            except subprocess.TimeoutExpired:
+                return ("Compilation Time Limit Exceeded", 0.0)
 
+        # run
         try:
-            if compile_cmd:
-                subprocess.run(compile_cmd, check=True, capture_output=True, text=True, timeout=10)
-            run = subprocess.run(run_cmd, capture_output=True, text=True, timeout=5)
-            if run.returncode != 0:
-                return f"❌ Runtime Error:\n{run.stderr}"
-            return run.stdout or "(No output)"
-        except subprocess.CalledProcessError as e:
-            return f"❌ Compilation Error:\n{e.stderr}"
+            r = subprocess.run(
+                cfg['run'](tmp),
+                input=input_data,
+                capture_output=True,
+                text=True,
+                timeout=time_limit,
+                env={"PYTHONUNBUFFERED":"1","JAVA_TOOL_OPTIONS":"-Xmx256m"},
+            )
+            if r.returncode != 0:
+                return ("Runtime Error:\n" + r.stderr, 0.0)
+            return (r.stdout, r.stderr)
         except subprocess.TimeoutExpired:
-            return "⏰ Time Limit Exceeded"
-        except Exception as e:
-            return f"⚠️ Error: {e}"
+            return ("Time Limit Exceeded", 0.0)
