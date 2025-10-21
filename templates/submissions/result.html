@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Submissions</h2>
+{% if result %}
+  <p><b>Verdict:</b> {{ result.verdict }} | <b>Time:</b> {{ result.exec_time }}s</p>
+{% endif %}
+<table border="1" cellpadding="6">
+  <tr><th>When</th><th>Problem</th><th>Language</th><th>Verdict</th><th>Time</th></tr>
+  {% for s in subs %}
+  <tr>
+    <td>{{ s.created_at }}</td>
+    <td>{{ s.problem.code }}</td>
+    <td>{{ s.language }}</td>
+    <td>{{ s.verdict }}</td>
+    <td>{{ s.exec_time }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="5">No submissions yet.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
