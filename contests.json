@@ -1,0 +1,15 @@
+[
+  {
+    "model": "contests.contest",
+    "pk": 1,
+    "fields": {
+      "title": "Mini Contest #1",
+      "description": "Gồm 3 bài lập trình trong 90 phút (Python, C++, Java)",
+      "start_time": "2025-10-22T08:00:00Z",
+      "end_time": "2025-10-22T09:30:00Z",
+      "is_active": true,
+      "problems": [1, 2, 3],
+      "created_by": 1
+    }
+  }
+]
