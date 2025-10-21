@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Submit: {{ problem.code }} – {{ problem.title }}</h2>
+<form method="post">{% csrf_token %}
+  <label>Language:</label>
+  <select name="language">
+    <option value="cpp">C++ (g++)</option>
+    <option value="python">Python 3</option>
+    <option value="pypy">PyPy 3</option>
+    <option value="java">Java</option>
+  </select>
+  <br><br>
+  <textarea name="source" style="width:100%;height:320px" required>// write your code here</textarea>
+  <br>
+  <button>Submit</button>
+</form>
+{% endblock %}
