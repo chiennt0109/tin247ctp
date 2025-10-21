@@ -4,14 +4,14 @@ from django.shortcuts import render
 
 
 def home(request):
-return render(request, "home.html")
+    return render(request, "home.html")  # phải thụt vào 4 khoảng trắng
 
 
 urlpatterns = [
-path("", home, name="home"),
-path("admin/", admin.site.urls),
-path("accounts/", include("accounts.urls")),
-path("problems/", include("problems.urls")),
-path("submissions/", include("submissions.urls")),
-path("contests/", include("contests.urls")),
+    path("", home, name="home"),
+    path("admin/", admin.site.urls),
+    path("accounts/", include("accounts.urls")),
+    path("problems/", include("problems.urls")),
+    path("submissions/", include("submissions.urls")),
+    path("contests/", include("contests.urls")),
 ]
