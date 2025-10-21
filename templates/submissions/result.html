@@ -1,21 +1,81 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>My Submissions</h2>
-{% if result %}
-  <p><b>Verdict:</b> {{ result.verdict }} | <b>Time:</b> {{ result.exec_time }}s</p>
-{% endif %}
-<table border="1" cellpadding="6">
-  <tr><th>When</th><th>Problem</th><th>Language</th><th>Verdict</th><th>Time</th></tr>
-  {% for s in subs %}
-  <tr>
-    <td>{{ s.created_at }}</td>
-    <td>{{ s.problem.code }}</td>
-    <td>{{ s.language }}</td>
-    <td>{{ s.verdict }}</td>
-    <td>{{ s.exec_time }}</td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="5">No submissions yet.</td></tr>
-  {% endfor %}
-</table>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả chấm bài</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #fafafa; padding: 40px; }
+        .verdict-accepted { color: green; font-weight: bold; }
+        .verdict-wrong { color: red; font-weight: bold; }
+        pre { background-color: #f0f0f0; padding: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    {% if result %}
+    <div class="card shadow-sm p-4 mb-3">
+        <h3>🧩 Kết quả chấm bài</h3>
+        <p><strong>Bài:</strong> {{ problem.title }}</p>
+        <p><strong>Ngôn ngữ:</strong> {{ result.language|upper }}</p>
+        <p><strong>Verdict:</strong>
+            {% if result.verdict == "Accepted" %}
+                <span class="verdict-accepted">✅ {{ result.verdict }}</span>
+            {% else %}
+                <span class="verdict-wrong">❌ {{ result.verdict }}</span>
+            {% endif %}
+        </p>
+        <p><strong>Thời gian chạy:</strong> {{ result.exec_time|floatformat:2 }} giây</p>
+
+        {% if passed is not None %}
+        <p><strong>Test Passed:</strong> {{ passed }} / {{ passed|add:failed }}</p>
+        {% endif %}
+
+        <a href="/problems/" class="btn btn-secondary mt-3">⬅️ Quay lại danh sách bài</a>
+    </div>
+
+    {% elif subs %}
+    <div class="card shadow-sm p-4">
+        <h3>📜 Lịch sử nộp bài của bạn</h3>
+        <table class="table mt-3 table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Bài</th>
+                    <th>Ngôn ngữ</th>
+                    <th>Kết quả</th>
+                    <th>Thời gian</th>
+                    <th>Ngày</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in subs %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ s.problem.title }}</td>
+                    <td>{{ s.language|upper }}</td>
+                    <td>
+                        {% if s.verdict == "Accepted" %}
+                            <span class="verdict-accepted">✅ Accepted</span>
+                        {% else %}
+                            <span class="verdict-wrong">{{ s.verdict }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ s.exec_time|floatformat:2 }}s</td>
+                    <td>{{ s.created_at|date:"H:i d/m/Y" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-center">Chưa có bài nộp nào.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="alert alert-info">Không có dữ liệu để hiển thị.</div>
+    {% endif %}
+
+</div>
+</body>
+</html>
