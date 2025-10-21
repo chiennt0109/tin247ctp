@@ -1,5 +1,6 @@
 # Generated manually for Render (initial migration)
 from django.db import migrations, models
+import django.db.models.deletion
 
 class Migration(migrations.Migration):
     initial = True
@@ -35,7 +36,7 @@ class Migration(migrations.Migration):
                 ('submitted_at', models.DateTimeField(auto_now_add=True)),
                 ('status', models.CharField(default='Pending', max_length=20)),
                 ('result', models.TextField(blank=True)),
-                ('problem', models.ForeignKey(on_delete=models.deletion.CASCADE, to='judge.problem')),
+                ('problem', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='judge.problem')),
             ],
         ),
     ]
