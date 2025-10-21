@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mini OJ</title>
+    <style>body{font-family:system-ui,Arial;margin:24px} nav a{margin-right:12px}</style>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+  <a href="/problems/">Problems</a>
+  <a href="/contests/">Contests</a>
+  {% if request.user.is_authenticated %}
+    <span>Hi, {{ request.user.username }}</span>
+    <a href="/accounts/logout/">Logout</a>
+  {% else %}
+    <a href="/accounts/login/">Login</a>
+    <a href="/accounts/signup/">Sign up</a>
+  {% endif %}
+</nav>
+<hr>
+{% block content %}{% endblock %}
+</body>
+</html>
