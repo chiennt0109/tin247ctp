@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ p.code }} – {{ p.title }}</h2>
+<pre style="white-space:pre-wrap">{{ p.statement }}</pre>
+<p><b>Limits:</b> {{ p.time_limit }}s, {{ p.memory_limit }}MB</p>
+<p><a href="/submissions/{{ p.id }}/submit/">Submit solution</a></p>
+{% endblock %}
