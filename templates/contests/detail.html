@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ contest.name }}</h2>
+<p>{{ contest.start_time }} – {{ contest.end_time }}</p>
+<h3>Problems</h3>
+<ul>
+  {% for p in contest.problems.all %}
+    <li><a href="/problems/{{ p.id }}/">{{ p.code }} – {{ p.title }}</a></li>
+  {% empty %}
+    <li>No problems assigned.</li>
+  {% endfor %}
+</ul>
+<p><a href="/contests/{{ contest.id }}/rank/">🏆 View Ranking</a></p>
+{% endblock %}
