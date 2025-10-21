@@ -1,39 +1,42 @@
 from problems.models import TestCase
 from .run_code import run_program
 import time
-import traceback
 
 
 def normalize(s: str) -> str:
+    """Chuẩn hóa output để so sánh công bằng"""
     return (s or "").strip().replace('\r\n', '\n').rstrip()
 
 
 def grade_submission(submission):
+    """
+    Chấm từng test, tính thời gian, đếm số test đúng/sai.
+    Trả về (verdict, total_time, passed, failed)
+    """
     problem = submission.problem
     testcases = TestCase.objects.filter(problem=problem)
     total_time = 0.0
+    passed, failed = 0, 0
 
-    for tc in testcases:
-        try:
-            start = time.time()
-            out, _ = run_program(
-                submission.language,
-                submission.source_code,
-                tc.input_data,
-                time_limit=problem.time_limit
-            )
-            elapsed = max(0.0, time.time() - start)
-            total_time += elapsed
+    if not testcases.exists():
+        return ("No Test Cases", 0.0, 0, 0)
 
-            if out in ("Time Limit Exceeded",) or out.startswith("Compilation Error") or out.startswith("Runtime Error"):
-                return (out, total_time)
+    for i, tc in enumerate(testcases, start=1):
+        start = time.time()
+        out, _ = run_program(submission.language, submission.source_code, tc.input_data, time_limit=problem.time_limit)
+        elapsed = max(0.0, time.time() - start)
+        total_time += elapsed
 
-            if normalize(out) != normalize(tc.expected_output):
-                return ("Wrong Answer", total_time)
+        # Kiểm tra lỗi biên dịch/chạy
+        if any(out.startswith(err) for err in ["Time Limit", "Compilation", "Runtime", "API Error", "Internal Error"]):
+            failed += 1
+            return (out, total_time, passed, failed)
 
-        except Exception as e:
-            print("❌ Error in grade_submission():", e)
-            traceback.print_exc()
-            return (f"Internal Error: {e}", total_time)
+        # So sánh kết quả
+        if normalize(out) == normalize(tc.expected_output):
+            passed += 1
+        else:
+            failed += 1
 
-    return ("Accepted", total_time)
+    verdict = "Accepted" if failed == 0 else f"Passed {passed}/{passed+failed}"
+    return (verdict, total_time, passed, failed)
