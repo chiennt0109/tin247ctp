@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Contests</h2>
+<ul>
+  {% for c in contests %}
+  <li><a href="/contests/{{ c.id }}/">{{ c.name }}</a> ({{ c.start_time }} – {{ c.end_time }})</li>
+  {% empty %}
+  <li>No contests yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
