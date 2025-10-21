@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Login</h2>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Login</button></form>
+<p>Or <a href="/accounts/signup/">sign up</a></p>
+{% endblock %}
