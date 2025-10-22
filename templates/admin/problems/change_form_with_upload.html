@@ -8,8 +8,10 @@
   </button>
 
   <div id="testcase-section" style="display:none;">
-    {{ block.super }}
+    <div id="testcase-content" style="margin-top:10px; text-align:center;">⏳ Chưa tải test case...</div>
   </div>
+
+  {{ block.super }}
 
   {% if show_upload_button %}
   <hr>
@@ -26,51 +28,69 @@
 document.addEventListener("DOMContentLoaded", function() {
   const btn = document.getElementById("toggle-tests-btn");
   const section = document.getElementById("testcase-section");
+  const content = document.getElementById("testcase-content");
   let visible = false;
+  let loaded = false;
+  let currentPage = 1;
 
   btn.addEventListener("click", () => {
     visible = !visible;
     section.style.display = visible ? "block" : "none";
     btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
+
+    if (visible && !loaded) loadPage(currentPage);
   });
+
+  function loadPage(page) {
+    content.innerHTML = "⏳ Đang tải...";
+    fetch(`${window.location.pathname}load_tests/?page=${page}`)
+      .then(res => res.json())
+      .then(data => {
+        if (page === 1) content.innerHTML = data.html;
+        else content.insertAdjacentHTML("beforeend", data.html);
+
+        loaded = true;
+        if (data.has_next) {
+          const moreBtn = document.getElementById("load-more-tests");
+          if (moreBtn) {
+            moreBtn.addEventListener("click", () => {
+              currentPage = data.next_page;
+              moreBtn.disabled = true;
+              moreBtn.textContent = "⏳ Đang tải...";
+              loadPage(currentPage);
+              moreBtn.remove();
+            });
+          }
+        }
+      })
+      .catch(() => {
+        content.innerHTML = "<p style='color:red;'>⚠️ Không thể tải test case.</p>";
+      });
+  }
 });
 </script>
 
-<!-- ✅ Markdown Editor giữ nguyên -->
+<!-- Markdown Editor giữ nguyên -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const textarea = document.querySelector("#id_statement");
   if (textarea) {
-    const mde = new SimpleMDE({
+    new SimpleMDE({
       element: textarea,
       spellChecker: false,
       autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
       renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
-      toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|",
-                "link", "image", "table", "code", "|", "preview", "side-by-side", "fullscreen", "|", "guide"],
-      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown...\n\n## Input\n## Output\n```cpp\nint main() {}\n```"
+      toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
+                "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
+      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
     });
   }
 });
 </script>
 
 <style>
-.container {
-  max-width: 1000px;
-}
-.CodeMirror, .editor-toolbar {
-  border-radius: 6px;
-}
-.editor-toolbar {
-  background-color: #f8f9fa;
-}
-.editor-preview {
-  background: #fff;
-  padding: 1em;
-  line-height: 1.6;
-}
 #toggle-tests-btn {
   background-color: #3c8dbc;
   color: white;
@@ -80,8 +100,14 @@ document.addEventListener("DOMContentLoaded", function() {
   cursor: pointer;
   font-size: 14px;
 }
-#toggle-tests-btn:hover {
-  background-color: #337ab7;
+#toggle-tests-btn:hover { background-color: #337ab7; }
+#load-more-tests {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
 }
+#load-more-tests:hover { background-color: #e6e6e6; }
 </style>
 {% endblock %}
