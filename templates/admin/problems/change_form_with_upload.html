@@ -1,9 +1,12 @@
 {% extends "admin/change_form.html" %}
+
 {% block submit_buttons_top %}
   {{ block.super }}
+  {% if original %}
   <div style="margin-top:10px;">
-    <a class="button" href="{% url 'admin:upload_tests' problem_id=original.id %}">
+    <a class="button" href="/admin/problems/problem/{{ original.id }}/upload_tests/">
       📦 Upload Test ZIP
     </a>
   </div>
+  {% endif %}
 {% endblock %}
