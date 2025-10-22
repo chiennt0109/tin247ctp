@@ -1,3 +1,4 @@
+# app/problems/admin.py
 from django.contrib import admin
 from django import forms
 from django.shortcuts import redirect, render
@@ -26,10 +27,9 @@ class TestCaseInline(admin.TabularInline):
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "time_limit", "memory_limit")
     search_fields = ("code", "title")
-    inlines = [TestCaseInline]  # Cho phép thêm test thủ công trực tiếp
-    change_form_template = "admin/problems/change_form_with_upload.html"  # Template tùy chỉnh có nút upload ZIP
+    inlines = [TestCaseInline]
+    change_form_template = "admin/problems/change_form_with_upload.html"
 
-    # Tạo URL riêng cho chức năng upload
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
@@ -37,7 +37,6 @@ class ProblemAdmin(admin.ModelAdmin):
         ]
         return my_urls + urls
 
-    # Xử lý upload .zip
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
 
