@@ -15,7 +15,6 @@
     }
     .btn-primary { background-color: #4a90e2; border: none; }
     .btn-primary:hover { background-color: #357ab8; }
-    select { border-radius: 6px !important; }
   </style>
 </head>
 
@@ -23,7 +22,7 @@
 <div class="container">
   <div class="card p-4">
     <h2 class="mb-3">🚀 Nộp bài: {{ problem.title }}</h2>
-    <p><strong>⏱ Giới hạn thời gian:</strong> {{ problem.time_limit }}s</p>
+    <p><strong>⏱ Giới hạn thời gian:</strong> {{ problem.time_limit }} giây</p>
 
     {% if error %}
       <div class="alert alert-danger">{{ error }}</div>
@@ -32,7 +31,7 @@
     <form method="POST" id="submitForm">
       {% csrf_token %}
 
-      <!-- Chọn ngôn ngữ -->
+      <!-- Ngôn ngữ -->
       <div class="mb-3">
         <label for="language" class="form-label">Ngôn ngữ lập trình</label>
         <select class="form-select" id="language" name="language" required onchange="changeMode()">
@@ -48,8 +47,9 @@
       <div class="mb-3">
         <label class="form-label">Mã nguồn</label>
         <div id="editor"># Viết code của bạn tại đây...</div>
-        <!-- ⚠️ sửa lại: không dùng hidden mà ẩn bằng CSS -->
-        <textarea name="source" id="source" style="display:none;" required></textarea>
+
+        <!-- textarea ẩn, KHÔNG required để tránh lỗi -->
+        <textarea name="source" id="source" style="display:none;"></textarea>
       </div>
 
       <button type="submit" class="btn btn-primary">💾 Nộp bài</button>
@@ -63,7 +63,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/ext-language_tools.js"></script>
 
 <script>
-  // Khởi tạo editor
+  // Khởi tạo Ace Editor
   const editor = ace.edit("editor");
   editor.setTheme("ace/theme/monokai");
   editor.session.setMode("ace/mode/python");
@@ -75,7 +75,7 @@
     wrap: true,
   });
 
-  // Đổi ngôn ngữ highlight theo lựa chọn
+  // Tự đổi màu syntax theo ngôn ngữ
   function changeMode() {
     const lang = document.getElementById("language").value;
     if (lang === "cpp") editor.session.setMode("ace/mode/c_cpp");
@@ -83,10 +83,11 @@
     else editor.session.setMode("ace/mode/python");
   }
 
-  // Copy nội dung code khi submit form
+  // Khi submit: kiểm tra code + ngôn ngữ
   document.getElementById("submitForm").addEventListener("submit", function(e) {
     const code = editor.getValue().trim();
     const lang = document.getElementById("language").value;
+
     if (!lang) {
       e.preventDefault();
       alert("⚠️ Bạn chưa chọn ngôn ngữ!");
@@ -97,6 +98,8 @@
       alert("⚠️ Bạn chưa nhập mã nguồn!");
       return false;
     }
+
+    // Gán code vào textarea để gửi lên server
     document.getElementById("source").value = code;
   });
 </script>
