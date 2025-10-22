@@ -2,8 +2,18 @@
 {% load i18n %}
 
 {% block inline_field_sets %}
-  <h2 style="color: darkred; margin: 10px 0;">
-    🔍 DÒNG THỬ: Đây là nội dung thêm vào từ template override (change_form_with_upload.html)
-  </h2>
+  <div style="margin: 10px 0; padding: 8px; background: #fff8e1; border-left: 4px solid #ffb300;">
+    <h2 style="margin: 0; color: #d32f2f;">🔍 DÒNG THỬ: Template override hoạt động!</h2>
+    {% if original %}
+      <p>
+        <a class="button" href="{% url 'admin:upload_tests' original.id %}" style="margin-top:8px; display:inline-block;">
+          📦 Upload Test ZIP
+        </a>
+      </p>
+    {% else %}
+      <p><em>Hãy lưu Problem trước khi upload test.</em></p>
+    {% endif %}
+  </div>
+
   {{ block.super }}
 {% endblock %}
