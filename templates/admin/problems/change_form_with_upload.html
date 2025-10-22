@@ -3,7 +3,13 @@
 
 {% block content %}
 <div class="container">
-  {{ block.super }}
+  <button id="toggle-tests-btn" class="button" type="button" style="margin-bottom:10px;">
+    👁 Hiện danh sách test case
+  </button>
+
+  <div id="testcase-section" style="display:none;">
+    {{ block.super }}
+  </div>
 
   {% if show_upload_button %}
   <hr>
@@ -16,9 +22,21 @@
   {% endif %}
 </div>
 
-<!-- ============================================================
-🧩 SimpleMDE Markdown Editor for Problem.statement
-============================================================ -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const btn = document.getElementById("toggle-tests-btn");
+  const section = document.getElementById("testcase-section");
+  let visible = false;
+
+  btn.addEventListener("click", () => {
+    visible = !visible;
+    section.style.display = visible ? "block" : "none";
+    btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
+  });
+});
+</script>
+
+<!-- ✅ Markdown Editor giữ nguyên -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
@@ -29,18 +47,10 @@ document.addEventListener("DOMContentLoaded", function() {
       element: textarea,
       spellChecker: false,
       autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
-      renderingConfig: {
-        singleLineBreaks: false,
-        codeSyntaxHighlighting: true
-      },
-      toolbar: [
-        "bold", "italic", "heading", "|",
-        "quote", "unordered-list", "ordered-list", "|",
-        "link", "image", "table", "code", "|",
-        "preview", "side-by-side", "fullscreen", "|",
-        "guide"
-      ],
-      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown...\n\nVí dụ:\n## Input\n## Output\n```cpp\nint main() {}\n```"
+      renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
+      toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|",
+                "link", "image", "table", "code", "|", "preview", "side-by-side", "fullscreen", "|", "guide"],
+      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown...\n\n## Input\n## Output\n```cpp\nint main() {}\n```"
     });
   }
 });
@@ -60,6 +70,18 @@ document.addEventListener("DOMContentLoaded", function() {
   background: #fff;
   padding: 1em;
   line-height: 1.6;
+}
+#toggle-tests-btn {
+  background-color: #3c8dbc;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+#toggle-tests-btn:hover {
+  background-color: #337ab7;
 }
 </style>
 {% endblock %}
