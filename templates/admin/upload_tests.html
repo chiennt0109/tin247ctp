@@ -1,11 +1,64 @@
 {% extends "admin/base_site.html" %}
+{% load i18n static %}
+
 {% block content %}
-<h1>Upload Testcases cho bài {{ problem.code }}</h1>
-<form method="post" enctype="multipart/form-data">
+<h1>📦 Upload Test Cases cho {{ problem.title }}</h1>
+<p>Chọn tệp .zip chứa các file <code>.inp</code> và <code>.out</code>.</p>
+
+<form id="uploadForm" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit" class="button default">Upload</button>
+
+  <button type="submit" class="button btn btn-success">🚀 Upload</button>
 </form>
-<br>
-<a href="/admin/problems/problem/{{ problem.id }}/change/">← Quay lại Problem</a>
+
+<!-- Progress bar -->
+<div id="progressContainer" style="margin-top: 20px; display: none;">
+  <label>Đang tải lên...</label>
+  <div style="width: 100%; background-color: #eee; border-radius: 4px;">
+    <div id="progressBar" style="width: 0%; height: 20px; background-color: #4caf50; text-align: center; color: white;">
+      0%
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  const bar = document.getElementById("progressBar");
+  const container = document.getElementById("progressContainer");
+
+  xhr.open("POST", "", true);
+  xhr.upload.addEventListener("loadstart", function () {
+    container.style.display = "block";
+    bar.style.width = "0%";
+    bar.textContent = "0%";
+  });
+  xhr.upload.addEventListener("progress", function (e) {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      bar.style.width = percent + "%";
+      bar.textContent = percent + "%";
+    }
+  });
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      bar.style.backgroundColor = "#2196F3";
+      bar.textContent = "✅ Hoàn tất!";
+      setTimeout(() => {
+        window.location.href = "{{ request.path|slice:':-13' }}change/";
+      }, 1200);
+    } else {
+      alert("❌ Lỗi khi upload test. Vui lòng thử lại.");
+      bar.style.backgroundColor = "red";
+    }
+  };
+  xhr.send(data);
+});
+</script>
+
+<a href="/admin/problems/problem/{{ problem.id }}/change/" style="display:block; margin-top:15px;">← Quay lại Problem</a>
 {% endblock %}
