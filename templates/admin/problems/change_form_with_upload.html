@@ -1,130 +1,75 @@
-{% extends "admin/change_form.html" %}
+{% extends "admin/base_site.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container">
 
-  <!-- 🧩 Nút ẩn/hiện danh sách test -->
-  <button id="toggle-tests-btn" class="button" type="button" style="margin-bottom:10px;">
-    👁 Hiện danh sách test case
-  </button>
+  <!-- Markdown field -->
+  <h2>🧾 Problem Information</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ adminform.form.as_p }}
+    <input type="submit" class="default" value="💾 Lưu thay đổi">
+  </form>
 
-  <!-- Khu vực chứa danh sách test (AJAX load) -->
+  <!-- Nút hiện test -->
+  <hr>
+  <button id="toggle-tests-btn" class="button">👁 Hiện danh sách test case</button>
   <div id="testcase-section" style="display:none;">
-    <div id="testcase-content" style="margin-top:10px; text-align:center;">⏳ Chưa tải test case...</div>
+    <div id="testcase-content" style="text-align:center;margin-top:10px;">⏳ Chưa tải test case...</div>
   </div>
 
-  <!-- 🧾 Form chính (chứa các trường Problem + Inline khác) -->
-  {{ block.super }}
-
-  <!-- 📦 Upload ZIP test case -->
+  <!-- Upload ZIP -->
   {% if show_upload_button %}
   <hr>
   <h3>📦 Upload ZIP Test Cases</h3>
-  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data" style="margin-top: 1em;">
+  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <p>
-      <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:8px;">
-    </p>
+    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
     <button type="submit" class="default btn btn-success">⬆️ Upload và Import</button>
   </form>
   {% endif %}
 </div>
 
-<!-- ============================================================
-🧩 SCRIPT: AJAX tải test + SimpleMDE Markdown Editor
-============================================================ -->
+<!-- Scripts -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Ẩn/hiện danh sách test case
+document.addEventListener("DOMContentLoaded", () => {
+  // Markdown
+  const t = document.querySelector("#id_statement");
+  if (t) new SimpleMDE({element:t, spellChecker:false, autosave:{enabled:true,delay:1000,uniqueId:"statement"}});
+
+  // Test AJAX
   const btn = document.getElementById("toggle-tests-btn");
   const section = document.getElementById("testcase-section");
   const content = document.getElementById("testcase-content");
-  let visible = false;
-  let loaded = false;
-  let currentPage = 1;
-
-  btn.addEventListener("click", () => {
-    visible = !visible;
-    section.style.display = visible ? "block" : "none";
-    btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
-
-    if (visible && !loaded) loadPage(currentPage);
-  });
-
-  // Hàm AJAX tải test theo trang
-  function loadPage(page) {
-    content.innerHTML = "⏳ Đang tải...";
-    fetch(`${window.location.pathname}load_tests/?page=${page}`)
-      .then(res => res.json())
-      .then(data => {
-        if (page === 1) content.innerHTML = data.html;
-        else content.insertAdjacentHTML("beforeend", data.html);
-
-        loaded = true;
-        if (data.has_next) {
-          const moreBtn = document.getElementById("load-more-tests");
-          if (moreBtn) {
-            moreBtn.addEventListener("click", () => {
-              currentPage = data.next_page;
-              moreBtn.disabled = true;
-              moreBtn.textContent = "⏳ Đang tải...";
-              loadPage(currentPage);
-              moreBtn.remove();
-            });
-          }
-        }
-      })
-      .catch(() => {
-        content.innerHTML = "<p style='color:red;'>⚠️ Không thể tải test case.</p>";
-      });
-  }
-
-  // SimpleMDE Markdown Editor cho trường Statement
-  const textarea = document.querySelector("#id_statement");
-  if (textarea) {
-    new SimpleMDE({
-      element: textarea,
-      spellChecker: false,
-      autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
-      renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
-      toolbar: [
-        "bold", "italic", "heading", "|",
-        "quote", "unordered-list", "ordered-list", "|",
-        "link", "image", "table", "code", "|",
-        "preview", "side-by-side", "fullscreen", "|",
-        "guide"
-      ],
-      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
-    });
+  let loaded=false,page=1;
+  btn.onclick=()=>{
+    const show = section.style.display==="none";
+    section.style.display = show?"block":"none";
+    btn.textContent = show?"🙈 Ẩn danh sách test case":"👁 Hiện danh sách test case";
+    if(show && !loaded) load(page);
+  };
+  function load(p){
+    content.innerHTML="⏳ Đang tải...";
+    fetch(`${window.location.pathname}load_tests/?page=${p}`)
+    .then(r=>r.json()).then(d=>{
+      content.innerHTML = p===1?d.html:content.innerHTML+d.html;
+      loaded=true;
+      if(d.has_next){
+        const b=document.getElementById("load-more-tests");
+        if(b){b.onclick=()=>{b.remove();load(d.next_page);};}
+      }
+    }).catch(()=>{content.innerHTML="⚠️ Lỗi tải test";});
   }
 });
 </script>
 
-<!-- SimpleMDE assets -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
-<!-- Một chút CSS tinh chỉnh -->
 <style>
-.container { max-width: 1000px; }
-#toggle-tests-btn {
-  background-color: #3c8dbc;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-}
-#toggle-tests-btn:hover { background-color: #337ab7; }
-#load-more-tests {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-#load-more-tests:hover { background-color: #e6e6e6; }
+.container{max-width:900px;margin:auto;font-family:sans-serif;}
+#toggle-tests-btn{background:#3c8dbc;color:white;padding:6px 12px;border:none;border-radius:5px;cursor:pointer;}
+#toggle-tests-btn:hover{background:#337ab7;}
+#load-more-tests{margin-top:10px;padding:6px 10px;border:1px solid #ccc;border-radius:5px;cursor:pointer;}
 </style>
 {% endblock %}
