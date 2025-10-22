@@ -3,20 +3,23 @@
 
 {% block content %}
 <div class="container">
+  <h2>{{ original.code }} – {{ original.title }}</h2>
 
-  <!-- Markdown field -->
-  <h2>🧾 Problem Information</h2>
-  <form method="post" enctype="multipart/form-data">
+  <!-- Form chính -->
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {{ adminform.form.as_p }}
-    <input type="submit" class="default" value="💾 Lưu thay đổi">
+    <div class="submit-row">
+      <input type="submit" value="💾 Lưu thay đổi" class="default">
+    </div>
   </form>
 
   <!-- Nút hiện test -->
   <hr>
   <button id="toggle-tests-btn" class="button">👁 Hiện danh sách test case</button>
+  <span id="test-status" style="margin-left:10px;color:gray;">⏳ Kiểm tra test...</span>
   <div id="testcase-section" style="display:none;">
-    <div id="testcase-content" style="text-align:center;margin-top:10px;">⏳ Chưa tải test case...</div>
+    <div id="testcase-content" style="margin-top:10px; text-align:center;">⏳ Chưa tải test case...</div>
   </div>
 
   <!-- Upload ZIP -->
@@ -31,37 +34,82 @@
   {% endif %}
 </div>
 
-<!-- Scripts -->
+<!-- SimpleMDE -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Markdown
-  const t = document.querySelector("#id_statement");
-  if (t) new SimpleMDE({element:t, spellChecker:false, autosave:{enabled:true,delay:1000,uniqueId:"statement"}});
 
-  // Test AJAX
+<script>
+document.addEventListener("DOMContentLoaded", function() {
   const btn = document.getElementById("toggle-tests-btn");
   const section = document.getElementById("testcase-section");
   const content = document.getElementById("testcase-content");
-  let loaded=false,page=1;
-  btn.onclick=()=>{
-    const show = section.style.display==="none";
-    section.style.display = show?"block":"none";
-    btn.textContent = show?"🙈 Ẩn danh sách test case":"👁 Hiện danh sách test case";
-    if(show && !loaded) load(page);
-  };
-  function load(p){
-    content.innerHTML="⏳ Đang tải...";
-    fetch(`${window.location.pathname}load_tests/?page=${p}`)
-    .then(r=>r.json()).then(d=>{
-      content.innerHTML = p===1?d.html:content.innerHTML+d.html;
-      loaded=true;
-      if(d.has_next){
-        const b=document.getElementById("load-more-tests");
-        if(b){b.onclick=()=>{b.remove();load(d.next_page);};}
+  const status = document.getElementById("test-status");
+  let visible = false, loaded = false, currentPage = 1;
+
+  // ✅ Kiểm tra nhanh có test không
+  fetch(`${window.location.pathname}has_tests/`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.count > 0) {
+        status.textContent = `✅ ${d.count} test case`;
+        status.style.color = "green";
+      } else {
+        status.textContent = "⚠️ Chưa có test case";
+        status.style.color = "red";
       }
-    }).catch(()=>{content.innerHTML="⚠️ Lỗi tải test";});
+    })
+    .catch(() => {
+      status.textContent = "❔ Không kiểm tra được";
+      status.style.color = "gray";
+    });
+
+  // Toggle hiển thị test
+  btn.addEventListener("click", () => {
+    visible = !visible;
+    section.style.display = visible ? "block" : "none";
+    btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
+    if (visible && !loaded) loadPage(currentPage);
+  });
+
+  // AJAX load test
+  function loadPage(page) {
+    content.innerHTML = "⏳ Đang tải...";
+    fetch(`${window.location.pathname}load_tests/?page=${page}`)
+      .then(res => res.json())
+      .then(data => {
+        if (page === 1) content.innerHTML = data.html;
+        else content.insertAdjacentHTML("beforeend", data.html);
+        loaded = true;
+        if (data.has_next) {
+          const moreBtn = document.getElementById("load-more-tests");
+          if (moreBtn) {
+            moreBtn.addEventListener("click", () => {
+              currentPage = data.next_page;
+              moreBtn.disabled = true;
+              moreBtn.textContent = "⏳ Đang tải...";
+              loadPage(currentPage);
+              moreBtn.remove();
+            });
+          }
+        }
+      })
+      .catch(() => {
+        content.innerHTML = "<p style='color:red;'>⚠️ Lỗi tải test case</p>";
+      });
+  }
+
+  // ✅ Markdown Editor
+  const textarea = document.querySelector("#id_statement");
+  if (textarea) {
+    new SimpleMDE({
+      element: textarea,
+      spellChecker: false,
+      autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
+      renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
+      toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
+                "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
+      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
+    });
   }
 });
 </script>
@@ -71,5 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
 #toggle-tests-btn{background:#3c8dbc;color:white;padding:6px 12px;border:none;border-radius:5px;cursor:pointer;}
 #toggle-tests-btn:hover{background:#337ab7;}
 #load-more-tests{margin-top:10px;padding:6px 10px;border:1px solid #ccc;border-radius:5px;cursor:pointer;}
+#load-more-tests:hover{background:#eee;}
 </style>
 {% endblock %}
