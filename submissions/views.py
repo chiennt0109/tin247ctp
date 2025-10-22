@@ -4,10 +4,8 @@ from problems.models import Problem
 from .models import Submission
 from judge.grader import grade_submission
 
-
 @login_required
 def submit(request, problem_id):
-    """Trang nộp bài cho 1 problem"""
     problem = get_object_or_404(Problem, id=problem_id)
     ctx = {'problem': problem, 'result': None}
 
@@ -15,10 +13,12 @@ def submit(request, problem_id):
         lang = request.POST.get('language')
         code = request.POST.get('source')
 
+        # Kiểm tra đầu vào
         if not lang or not code:
-            ctx['error'] = "Vui lòng chọn ngôn ngữ và nhập mã nguồn!"
+            ctx['error'] = "Bạn cần chọn ngôn ngữ và nhập mã nguồn!"
             return render(request, 'submissions/submit.html', ctx)
 
+        # Tạo Submission mới
         sub = Submission.objects.create(
             user=request.user,
             problem=problem,
@@ -27,18 +27,17 @@ def submit(request, problem_id):
         )
 
         # Gọi hàm chấm bài
-        verdict, exec_time, passed, failed = grade_submission(sub)
+        verdict, exec_time, passed, total = grade_submission(sub)
 
+        # Lưu kết quả
         sub.verdict = verdict
         sub.exec_time = exec_time
+        sub.passed_tests = passed
+        sub.total_tests = total
         sub.save()
 
-        ctx.update({
-            'result': sub,
-            'passed': passed,
-            'failed': failed
-        })
-
+        ctx['result'] = sub
+        ctx['submissions'] = Submission.objects.filter(user=request.user, problem=problem).order_by('-created_at')
         return render(request, 'submissions/result.html', ctx)
 
     return render(request, 'submissions/submit.html', ctx)
@@ -46,6 +45,5 @@ def submit(request, problem_id):
 
 @login_required
 def my_submissions(request):
-    """Liệt kê các submission của user"""
     subs = Submission.objects.filter(user=request.user).select_related('problem').order_by('-created_at')
-    return render(request, 'submissions/result.html', {'subs': subs})
+    return render(request, 'submissions/result.html', {'submissions': subs})
