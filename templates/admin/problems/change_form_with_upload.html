@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="container">
+  <!-- Toggle hiển/ẩn và chỉ tải test khi cần -->
   <button id="toggle-tests-btn" class="button" type="button" style="margin-bottom:10px;">
     👁 Hiện danh sách test case
   </button>
@@ -11,6 +12,7 @@
     <div id="testcase-content" style="margin-top:10px; text-align:center;">⏳ Chưa tải test case...</div>
   </div>
 
+  <!-- Form gốc của Django admin -->
   {{ block.super }}
 
   {% if show_upload_button %}
@@ -37,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
     visible = !visible;
     section.style.display = visible ? "block" : "none";
     btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
-
     if (visible && !loaded) loadPage(currentPage);
   });
 
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-<!-- Markdown Editor giữ nguyên -->
+<!-- ✅ SimpleMDE Markdown editor cho Statement (client-side, không cần pip) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
@@ -91,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <style>
+.container { max-width: 1000px; }
 #toggle-tests-btn {
   background-color: #3c8dbc;
   color: white;
