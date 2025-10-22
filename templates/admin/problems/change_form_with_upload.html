@@ -1,12 +1,9 @@
 {% extends "admin/change_form.html" %}
 
 {% block submit_buttons_top %}
-  {{ block.super }}
-  {% if original %}
-  <div style="margin-top:10px;">
-    <a class="button" href="/admin/problems/problem/{{ original.id }}/upload_tests/">
-      📦 Upload Test ZIP
-    </a>
-  </div>
-  {% endif %}
+{{ block.super }}
+<div style="background:yellow; padding:10px; margin-top:10px;">
+⚙️ <b>ĐANG DÙNG TEMPLATE override: admin/problems/change_form_with_upload.html</b><br>
+Nếu bạn thấy dòng này → Django đã nhận template ✅
+</div>
 {% endblock %}
