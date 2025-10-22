@@ -3,31 +3,40 @@
 
 {% block content %}
 <div class="container">
-  <!-- Toggle hiển/ẩn và chỉ tải test khi cần -->
+
+  <!-- 🧩 Nút ẩn/hiện danh sách test -->
   <button id="toggle-tests-btn" class="button" type="button" style="margin-bottom:10px;">
     👁 Hiện danh sách test case
   </button>
 
+  <!-- Khu vực chứa danh sách test (AJAX load) -->
   <div id="testcase-section" style="display:none;">
     <div id="testcase-content" style="margin-top:10px; text-align:center;">⏳ Chưa tải test case...</div>
   </div>
 
-  <!-- Form gốc của Django admin -->
+  <!-- 🧾 Form chính (chứa các trường Problem + Inline khác) -->
   {{ block.super }}
 
+  <!-- 📦 Upload ZIP test case -->
   {% if show_upload_button %}
   <hr>
   <h3>📦 Upload ZIP Test Cases</h3>
   <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data" style="margin-top: 1em;">
     {% csrf_token %}
-    <p><input type="file" name="zip_file" accept=".zip" required></p>
+    <p>
+      <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:8px;">
+    </p>
     <button type="submit" class="default btn btn-success">⬆️ Upload và Import</button>
   </form>
   {% endif %}
 </div>
 
+<!-- ============================================================
+🧩 SCRIPT: AJAX tải test + SimpleMDE Markdown Editor
+============================================================ -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+  // Ẩn/hiện danh sách test case
   const btn = document.getElementById("toggle-tests-btn");
   const section = document.getElementById("testcase-section");
   const content = document.getElementById("testcase-content");
@@ -39,9 +48,11 @@ document.addEventListener("DOMContentLoaded", function() {
     visible = !visible;
     section.style.display = visible ? "block" : "none";
     btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
+
     if (visible && !loaded) loadPage(currentPage);
   });
 
+  // Hàm AJAX tải test theo trang
   function loadPage(page) {
     content.innerHTML = "⏳ Đang tải...";
     fetch(`${window.location.pathname}load_tests/?page=${page}`)
@@ -68,14 +79,8 @@ document.addEventListener("DOMContentLoaded", function() {
         content.innerHTML = "<p style='color:red;'>⚠️ Không thể tải test case.</p>";
       });
   }
-});
-</script>
 
-<!-- ✅ SimpleMDE Markdown editor cho Statement (client-side, không cần pip) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
+  // SimpleMDE Markdown Editor cho trường Statement
   const textarea = document.querySelector("#id_statement");
   if (textarea) {
     new SimpleMDE({
@@ -83,14 +88,24 @@ document.addEventListener("DOMContentLoaded", function() {
       spellChecker: false,
       autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
       renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
-      toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
-                "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
+      toolbar: [
+        "bold", "italic", "heading", "|",
+        "quote", "unordered-list", "ordered-list", "|",
+        "link", "image", "table", "code", "|",
+        "preview", "side-by-side", "fullscreen", "|",
+        "guide"
+      ],
       placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
     });
   }
 });
 </script>
 
+<!-- SimpleMDE assets -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<!-- Một chút CSS tinh chỉnh -->
 <style>
 .container { max-width: 1000px; }
 #toggle-tests-btn {
