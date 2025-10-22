@@ -48,7 +48,8 @@
       <div class="mb-3">
         <label class="form-label">Mã nguồn</label>
         <div id="editor"># Viết code của bạn tại đây...</div>
-        <textarea name="source" id="source" hidden required></textarea>
+        <!-- ⚠️ sửa lại: không dùng hidden mà ẩn bằng CSS -->
+        <textarea name="source" id="source" style="display:none;" required></textarea>
       </div>
 
       <button type="submit" class="btn btn-primary">💾 Nộp bài</button>
@@ -83,8 +84,20 @@
   }
 
   // Copy nội dung code khi submit form
-  document.getElementById("submitForm").addEventListener("submit", function() {
-    document.getElementById("source").value = editor.getValue();
+  document.getElementById("submitForm").addEventListener("submit", function(e) {
+    const code = editor.getValue().trim();
+    const lang = document.getElementById("language").value;
+    if (!lang) {
+      e.preventDefault();
+      alert("⚠️ Bạn chưa chọn ngôn ngữ!");
+      return false;
+    }
+    if (code.length === 0) {
+      e.preventDefault();
+      alert("⚠️ Bạn chưa nhập mã nguồn!");
+      return false;
+    }
+    document.getElementById("source").value = code;
   });
 </script>
 </body>
