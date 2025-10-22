@@ -10,7 +10,13 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from .models import Problem, TestCase
 
-
+# ✅ INLINE định nghĩa trước khi dùng
+class TestCaseInline(admin.TabularInline):
+    model = TestCase
+    extra = 1
+    fields = ("input_data", "expected_output")
+    verbose_name = "Test case"
+    verbose_name_plural = "Danh sách test case"
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "time_limit", "memory_limit")
