@@ -1,26 +1,21 @@
 <table class="table">
   <thead>
-    <tr>
-      <th>#</th>
-      <th>Input</th>
-      <th>Expected Output</th>
-    </tr>
+    <tr><th>#</th><th>Input</th><th>Output</th></tr>
   </thead>
   <tbody>
     {% for t in testcases %}
       <tr>
         <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-        <td><pre style="white-space: pre-wrap;">{{ t.input_data|truncatechars:200 }}</pre></td>
-        <td><pre style="white-space: pre-wrap;">{{ t.expected_output|truncatechars:200 }}</pre></td>
+        <td><pre style="white-space:pre-wrap">{{ t.input_data|truncatechars:200 }}</pre></td>
+        <td><pre style="white-space:pre-wrap">{{ t.expected_output|truncatechars:200 }}</pre></td>
       </tr>
     {% empty %}
-      <tr><td colspan="3">Chưa có test case nào.</td></tr>
+      <tr><td colspan="3">Chưa có test case nào</td></tr>
     {% endfor %}
   </tbody>
 </table>
-
 {% if page_obj.has_next %}
-  <div style="text-align:center; margin-top:10px;">
-    <button id="load-more-tests" class="button">⬇️ Tải thêm</button>
+  <div style="text-align:center;">
+    <button id="load-more-tests">⬇️ Tải thêm</button>
   </div>
 {% endif %}
