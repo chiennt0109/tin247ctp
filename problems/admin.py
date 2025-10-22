@@ -65,9 +65,9 @@ class ProblemAdmin(admin.ModelAdmin):
     # ------------------------------------------------------------
     # ⚙️ Hàm xử lý upload ZIP
     # ------------------------------------------------------------
-        def upload_tests(self, request, problem_id):
+    def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
-
+    
         if request.method == "POST":
             form = UploadTestZipForm(request.POST, request.FILES)
             if form.is_valid():
@@ -77,11 +77,10 @@ class ProblemAdmin(admin.ModelAdmin):
                     with open(zip_path, "wb") as f:
                         for chunk in zip_file.chunks():
                             f.write(chunk)
-
-                    # Giải nén toàn bộ file .zip vào thư mục tạm
+    
                     with zipfile.ZipFile(zip_path, "r") as zip_ref:
                         zip_ref.extractall(tmpdir)
-
+    
                     imported = 0
                     skipped = 0
                     for root, _, files in os.walk(tmpdir):
@@ -90,10 +89,8 @@ class ProblemAdmin(admin.ModelAdmin):
                             ext = ext.lower()
                             if ext not in [".inp", ".in", ".txt"]:
                                 continue
-
+    
                             inp_path = os.path.join(root, filename)
-
-                            # tìm file output ứng với input này (.out / .ans / .txt)
                             candidates = [
                                 os.path.join(root, name + ".out"),
                                 os.path.join(root, name + ".ans"),
@@ -103,14 +100,13 @@ class ProblemAdmin(admin.ModelAdmin):
                             if not out_path:
                                 skipped += 1
                                 continue
-
-                            # đọc nội dung input / output
+    
                             try:
                                 with open(inp_path, encoding="utf-8") as fi:
                                     inp_data = fi.read().strip()
                                 with open(out_path, encoding="utf-8") as fo:
                                     out_data = fo.read().strip()
-
+    
                                 TestCase.objects.create(
                                     problem=problem,
                                     input_data=inp_data,
@@ -120,20 +116,21 @@ class ProblemAdmin(admin.ModelAdmin):
                             except Exception as e:
                                 print(f"⚠️ Error reading {filename}: {e}")
                                 skipped += 1
-
+    
                 messages.success(
                     request,
                     f"✅ Đã import {imported} test case cho {problem.code}. "
                     f"⏩ Bỏ qua {skipped} file không hợp lệ hoặc thiếu cặp .out/.ans.",
                 )
                 return redirect(f"/admin/problems/problem/{problem.id}/change/")
-
+    
         else:
             form = UploadTestZipForm()
-
+    
         return render(
             request,
             "admin/upload_tests.html",
             {"form": form, "problem": problem},
         )
+
 
