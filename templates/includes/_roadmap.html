@@ -1,37 +1,22 @@
 <section id="roadmap" class="relative py-16 bg-gradient-to-br from-white via-sky-50 to-indigo-50">
-  <div class="max-w-7xl mx-auto px-6 text-center relative z-10">
-    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">📘 Lộ trình học lập trình chuyên Tin</h2>
-    <p class="text-gray-700 text-lg mb-12">
-      Hệ thống 7 giai đoạn từ cơ bản đến chuyên sâu cho C++, Python, PyPy và Java
-    </p>
+  <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
+    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">📘 Lộ trình học lập trình</h2>
+    <p class="text-gray-700 text-lg mb-12">Từng bước từ con số 0 ✨</p>
 
+    <!-- Danh sách giai đoạn -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-      {% for stage, desc, topics, goals, tag, color in stages %}
-        <div class="p-6 rounded-2xl shadow-md bg-gradient-to-br from-white to-{{ color }}-50 hover:shadow-xl transition">
-          <h3 class="text-lg font-bold text-gray-900 mb-2">{{ stage }}</h3>
-          <p class="text-gray-700 text-sm mb-3">{{ desc }}</p>
-
-          <div class="mb-3">
-            <h4 class="font-semibold text-gray-800 mb-1">🎯 Kiến thức trọng tâm:</h4>
-            <ul class="list-disc ml-5 text-sm text-gray-600">
-              {% for t in topics %}
-                <li>{{ t }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-
-          <div class="mb-4">
-            <h4 class="font-semibold text-gray-800 mb-1">🏁 Mục tiêu cần đạt:</h4>
-            <ul class="list-disc ml-5 text-sm text-gray-600">
-              {% for g in goals %}
-                <li>{{ g }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-
-          <a href="/problems/tag/{{ tag }}/"
-             class="inline-block mt-2 px-4 py-2 bg-gradient-to-r from-{{ color }}-200 to-{{ color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
-             💡 Luyện tập ngay
+      {% for s in stages %}
+        <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-{{ s.color }}-50 hover:shadow-xl transition">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">{{ s.stage }}</h3>
+          <p class="text-gray-700 text-sm mb-3">{{ s.desc }}</p>
+          <ul class="text-gray-600 text-sm list-disc ml-5 mb-4">
+            {% for ex in s.examples %}
+              <li>{{ ex }}</li>
+            {% endfor %}
+          </ul>
+          <a href="/problems/tag/{{ s.tag }}/"
+             class="inline-block px-4 py-2 bg-gradient-to-r from-{{ s.color }}-200 to-{{ s.color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
+             💡 Làm bài
           </a>
         </div>
       {% endfor %}
@@ -48,9 +33,15 @@
   <div class="absolute inset-0 bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 animate-gradient opacity-40"></div>
 
   <style>
-    @keyframes gradientMove { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
-    .animate-gradient { background-size:200% 200%; animation: gradientMove 18s ease infinite; }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradientMove 18s ease infinite;
+    }
     a { text-decoration: none !important; }
-    ul li { margin-bottom: 4px; }
   </style>
 </section>
