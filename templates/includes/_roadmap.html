@@ -1,27 +1,44 @@
 <section id="roadmap" class="relative py-16 bg-gradient-to-br from-white via-sky-50 to-indigo-50">
   <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
-    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">📘 Lộ trình học lập trình</h2>
-    <p class="text-gray-700 text-lg mb-12">Từng bước từ con số 0 ✨</p>
+
+    <!-- Tiêu đề -->
+    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
+      📘 Lộ trình học lập trình
+    </h2>
+    <p class="text-gray-700 text-lg mb-12">
+      Từng bước chinh phục các kỹ năng lập trình & thuật toán từ cơ bản đến chuyên sâu ✨
+    </p>
 
     <!-- Danh sách giai đoạn -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-      {% for s in stages %}
-        <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-{{ s.color }}-50 hover:shadow-xl transition">
-          <h3 class="text-xl font-bold text-gray-900 mb-2">{{ s.stage }}</h3>
-          <p class="text-gray-700 text-sm mb-3">{{ s.desc }}</p>
-          <ul class="text-gray-600 text-sm list-disc ml-5 mb-4">
-            {% for ex in s.examples %}
-              <li>{{ ex }}</li>
-            {% endfor %}
-          </ul>
-          <a href="/problems/tag/{{ s.tag }}/"
-             class="inline-block px-4 py-2 bg-gradient-to-r from-{{ s.color }}-200 to-{{ s.color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
-             💡 Làm bài
-          </a>
-        </div>
+      {% for stage, desc, examples, tag, color in stages %}
+      <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-{{ color }}-50 hover:shadow-xl transition transform hover:-translate-y-1">
+        
+        <!-- Tiêu đề có đánh số tự động -->
+        <h3 data-index="{{ forloop.counter }}" class="text-xl font-bold text-gray-900 mb-2">
+          {{ stage }}
+        </h3>
+
+        <!-- Mô tả -->
+        <p class="text-gray-700 text-sm mb-3">{{ desc }}</p>
+
+        <!-- Danh sách nội dung tiêu biểu -->
+        <ul class="text-gray-600 text-sm list-disc ml-5 mb-4">
+          {% for ex in examples %}
+          <li>{{ ex }}</li>
+          {% endfor %}
+        </ul>
+
+        <!-- Nút truy cập -->
+        <a href="/problems/tag/{{ tag }}/"
+           class="inline-block px-4 py-2 bg-gradient-to-r from-{{ color }}-200 to-{{ color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
+           💡 Làm bài
+        </a>
+      </div>
       {% endfor %}
     </div>
 
+    <!-- Nút xem chi tiết toàn bộ -->
     <div class="text-center mt-12">
       <a href="/roadmap/detail/"
          class="inline-block px-6 py-3 bg-gradient-to-r from-sky-200 to-indigo-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition transform no-underline">
@@ -30,6 +47,7 @@
     </div>
   </div>
 
+  <!-- Hiệu ứng nền -->
   <div class="absolute inset-0 bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 animate-gradient opacity-40"></div>
 
   <style>
@@ -42,6 +60,23 @@
       background-size: 200% 200%;
       animation: gradientMove 18s ease infinite;
     }
+
+    /* Hiển thị số thứ tự tròn trước tiêu đề */
+    #roadmap h3::before {
+      content: attr(data-index);
+      display: inline-block;
+      background-color: #2563eb;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border-radius: 9999px;
+      width: 1.6rem;
+      height: 1.6rem;
+      text-align: center;
+      line-height: 1.6rem;
+      margin-right: 0.5rem;
+    }
+
     a { text-decoration: none !important; }
   </style>
 </section>
