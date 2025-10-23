@@ -40,14 +40,44 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+  // =========================
+  // Lấy CSRF token
+  // =========================
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  // =========================
+  // Lấy các phần tử cần thao tác
+  // =========================
   const btn = document.getElementById("toggle-tests-btn");
   const section = document.getElementById("testcase-section");
   const content = document.getElementById("testcase-content");
   const status = document.getElementById("test-status");
   let visible = false, loaded = false, currentPage = 1;
 
-  // ✅ Kiểm tra nhanh có test không
-  fetch(`${window.location.pathname}has_tests/`)
+  // =========================
+  // Chuẩn hóa URL base (có / ở cuối)
+  // =========================
+  let base = window.location.pathname;
+  if (!base.endsWith("/")) base += "/";
+
+  // =========================
+  // Kiểm tra nhanh có test không
+  // =========================
+  fetch(`${base}has_tests/`, { headers: { "X-CSRFToken": csrftoken } })
     .then(r => r.json())
     .then(d => {
       if (d.count > 0) {
@@ -63,22 +93,31 @@ document.addEventListener("DOMContentLoaded", function() {
       status.style.color = "gray";
     });
 
-  // Toggle hiển thị test
+  // =========================
+  // Toggle hiển thị test case
+  // =========================
   btn.addEventListener("click", () => {
     visible = !visible;
     section.style.display = visible ? "block" : "none";
     btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
+
+    // Nếu bật lần đầu → load luôn test
     if (visible && !loaded) loadPage(currentPage);
   });
 
-  // AJAX load test
+  // =========================
+  // AJAX tải test theo trang
+  // =========================
   function loadPage(page) {
+    content.style.display = "block"; // Đảm bảo hiển thị
     content.innerHTML = "⏳ Đang tải...";
-    fetch(`${window.location.pathname}load_tests/?page=${page}`)
+    fetch(`${base}load_tests/?page=${page}`, {
+      headers: { "X-CSRFToken": csrftoken }
+    })
       .then(res => res.json())
       .then(data => {
-        if (page === 1) content.innerHTML = data.html;
-        else content.insertAdjacentHTML("beforeend", data.html);
+        console.log("✅ Đã tải test:", data); // DEBUG
+        content.innerHTML = data.html; // Hiển thị bảng test
         loaded = true;
         if (data.has_next) {
           const moreBtn = document.getElementById("load-more-tests");
@@ -93,12 +132,15 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       })
-      .catch(() => {
-        content.innerHTML = "<p style='color:red;'>⚠️ Lỗi tải test case</p>";
+      .catch(err => {
+        console.error("❌ Lỗi tải test:", err);
+        content.innerHTML = "<p style='color:red;'>⚠️ Không thể tải test case.</p>";
       });
   }
 
-  // ✅ Markdown Editor
+  // =========================
+  // SimpleMDE Markdown Editor
+  // =========================
   const textarea = document.querySelector("#id_statement");
   if (textarea) {
     new SimpleMDE({
@@ -113,6 +155,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 </script>
+
 
 <style>
 .container{max-width:900px;margin:auto;font-family:sans-serif;}
