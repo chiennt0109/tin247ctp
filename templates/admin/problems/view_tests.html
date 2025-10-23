@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h2>📄 {{ problem.code }} – {{ problem.title }}</h2>
+<p><b>Tổng số test:</b> {{ testcases|length }}</p>
+<hr>
+<table class="table">
+  <thead>
+    <tr><th>#</th><th>Input</th><th>Output</th></tr>
+  </thead>
+  <tbody>
+    {% for t in testcases %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.input_data|truncatechars:500 }}</pre></td>
+      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.expected_output|truncatechars:500 }}</pre></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">⚠️ Chưa có test case nào</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
