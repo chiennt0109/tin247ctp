@@ -16,12 +16,17 @@
 
   <!-- Link xem test -->
   <hr>
-  <h3>👁 Kiểm tra test case</h3>
-  <p>
-    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">
-      Mở danh sách test trong tab mới
-    </a>
-  </p>
+    <h3>👁 Kiểm tra test case</h3>
+  {% if original and original.id %}
+    <p>
+      <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">
+        Mở danh sách test trong tab mới
+      </a>
+    </p>
+  {% else %}
+    <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
+  {% endif %}
+
 
   <!-- Upload ZIP -->
   {% if show_upload_button %}
