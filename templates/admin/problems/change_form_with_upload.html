@@ -14,13 +14,14 @@
     </div>
   </form>
 
-  <!-- Nút hiện test -->
+  <!-- Link xem test -->
   <hr>
-  <button id="toggle-tests-btn" class="button">👁 Hiện danh sách test case</button>
-  <span id="test-status" style="margin-left:10px;color:gray;">⏳ Kiểm tra test...</span>
-  <div id="testcase-section" style="display:none;">
-    <div id="testcase-content" style="margin-top:10px; text-align:center;">⏳ Chưa tải test case...</div>
-  </div>
+  <h3>👁 Kiểm tra test case</h3>
+  <p>
+    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">
+      Mở danh sách test trong tab mới
+    </a>
+  </p>
 
   <!-- Upload ZIP -->
   {% if show_upload_button %}
@@ -37,110 +38,8 @@
 <!-- SimpleMDE -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // =========================
-  // Lấy CSRF token
-  // =========================
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-  const csrftoken = getCookie('csrftoken');
-
-  // =========================
-  // Lấy các phần tử cần thao tác
-  // =========================
-  const btn = document.getElementById("toggle-tests-btn");
-  const section = document.getElementById("testcase-section");
-  const content = document.getElementById("testcase-content");
-  const status = document.getElementById("test-status");
-  let visible = false, loaded = false, currentPage = 1;
-
-  // =========================
-  // Chuẩn hóa URL base (có / ở cuối)
-  // =========================
-  let base = window.location.pathname;
-  if (!base.endsWith("/")) base += "/";
-
-  // =========================
-  // Kiểm tra nhanh có test không
-  // =========================
-  fetch(`${base}has_tests/`, { headers: { "X-CSRFToken": csrftoken } })
-    .then(r => r.json())
-    .then(d => {
-      if (d.count > 0) {
-        status.textContent = `✅ ${d.count} test case`;
-        status.style.color = "green";
-      } else {
-        status.textContent = "⚠️ Chưa có test case";
-        status.style.color = "red";
-      }
-    })
-    .catch(() => {
-      status.textContent = "❔ Không kiểm tra được";
-      status.style.color = "gray";
-    });
-
-  // =========================
-  // Toggle hiển thị test case
-  // =========================
-  btn.addEventListener("click", () => {
-    visible = !visible;
-    section.style.display = visible ? "block" : "none";
-    btn.textContent = visible ? "🙈 Ẩn danh sách test case" : "👁 Hiện danh sách test case";
-
-    // Nếu bật lần đầu → load luôn test
-    if (visible && !loaded) loadPage(currentPage);
-  });
-
-  // =========================
-  // AJAX tải test theo trang
-  // =========================
-  function loadPage(page) {
-    content.style.display = "block"; // Đảm bảo hiển thị
-    content.innerHTML = "⏳ Đang tải...";
-    fetch(`${base}load_tests/?page=${page}`, {
-      headers: { "X-CSRFToken": csrftoken }
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log("✅ Đã tải test:", data); // DEBUG
-        content.innerHTML = data.html; // Hiển thị bảng test
-        loaded = true;
-        if (data.has_next) {
-          const moreBtn = document.getElementById("load-more-tests");
-          if (moreBtn) {
-            moreBtn.addEventListener("click", () => {
-              currentPage = data.next_page;
-              moreBtn.disabled = true;
-              moreBtn.textContent = "⏳ Đang tải...";
-              loadPage(currentPage);
-              moreBtn.remove();
-            });
-          }
-        }
-      })
-      .catch(err => {
-        console.error("❌ Lỗi tải test:", err);
-        content.innerHTML = "<p style='color:red;'>⚠️ Không thể tải test case.</p>";
-      });
-  }
-
-  // =========================
-  // SimpleMDE Markdown Editor
-  // =========================
   const textarea = document.querySelector("#id_statement");
   if (textarea) {
     new SimpleMDE({
@@ -156,12 +55,16 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-
 <style>
 .container{max-width:900px;margin:auto;font-family:sans-serif;}
-#toggle-tests-btn{background:#3c8dbc;color:white;padding:6px 12px;border:none;border-radius:5px;cursor:pointer;}
-#toggle-tests-btn:hover{background:#337ab7;}
-#load-more-tests{margin-top:10px;padding:6px 10px;border:1px solid #ccc;border-radius:5px;cursor:pointer;}
-#load-more-tests:hover{background:#eee;}
+a.button{
+  display:inline-block;
+  background:#3c8dbc;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+  text-decoration:none;
+}
+a.button:hover{background:#337ab7;}
 </style>
 {% endblock %}
