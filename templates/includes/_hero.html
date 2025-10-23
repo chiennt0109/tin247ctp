@@ -1,32 +1,49 @@
-<section class="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-sky-500 text-white py-20">
-  <div class="max-w-5xl mx-auto px-6 text-center">
-    <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 drop-shadow-md">
+<section class="relative overflow-hidden py-20 text-center text-gray-900 bg-gradient-to-r from-indigo-100 via-sky-50 to-indigo-100">
+  <div class="max-w-5xl mx-auto px-6 relative z-10">
+
+    <!-- Tiêu đề chính -->
+    <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 text-indigo-700 drop-shadow">
       💻 Chuyên Trần Phú IT-Contest OJ
     </h1>
-    <p class="text-lg sm:text-xl mb-8 text-indigo-100 drop-shadow">
-      Nơi học sinh rèn luyện tư duy thuật toán, lập trình và sáng tạo công nghệ 🚀
+    <p class="text-lg sm:text-xl mb-8 text-gray-700 font-medium">
+      Rèn luyện tư duy, khám phá thuật toán – khơi nguồn sáng tạo công nghệ 🚀
     </p>
 
+    <!-- Nút hành động -->
     <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
       <a href="/problems/"
-         class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 font-semibold text-white rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
+         class="px-6 py-3 bg-gradient-to-r from-sky-600 to-indigo-600 font-semibold text-white rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
          🧩 Làm bài tập
       </a>
       <a href="/contests/"
-         class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 font-semibold text-white rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
+         class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 font-semibold text-white rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
          🏆 Tham gia kỳ thi
       </a>
       <a href="#roadmap"
-         class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 font-semibold text-white rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
+         class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 font-semibold text-white rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
          📘 Lộ trình học
       </a>
     </div>
   </div>
 
-  <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-indigo-600 to-transparent"></div>
+  <!-- Hiệu ứng nền chuyển động -->
+  <div class="absolute inset-0 bg-gradient-to-r from-sky-200 via-indigo-100 to-purple-200 animate-gradient-slow opacity-60"></div>
 
   <style>
-    section { position: relative; overflow: hidden; }
-    a { text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+    /* Hiệu ứng gradient động */
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animate-gradient-slow {
+      background-size: 200% 200%;
+      animation: gradientMove 15s ease infinite;
+    }
+
+    /* Giúp chữ nổi bật hơn */
+    h1, p, a {
+      text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
   </style>
 </section>
