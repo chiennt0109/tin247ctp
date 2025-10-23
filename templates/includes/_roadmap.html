@@ -1,159 +1,43 @@
-<section class="py-10 bg-gradient-to-b from-sky-50 via-indigo-50 to-white">
-  <div class="max-w-5xl mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center text-indigo-700 mb-10">
-      🌟 Lộ trình học lập trình từ con số 0 đến nâng cao
+<section class="py-14 bg-gradient-to-b from-white via-indigo-50 to-sky-50 border-t border-indigo-100">
+  <div class="max-w-6xl mx-auto px-6 sm:px-8">
+    <h2 class="text-3xl sm:text-4xl font-bold text-center text-indigo-700 mb-12">
+      🌈 Lộ trình học lập trình – Từng bước vững chắc
     </h2>
 
-    <div class="relative border-l-4 border-sky-400 pl-6 space-y-10">
-      
-      <!-- 1 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">1️⃣ Làm quen với lập trình</h3>
-        <p class="text-gray-700 mt-1">Hiểu “chương trình là gì”, viết lệnh đầu tiên, chạy và thấy kết quả trên màn hình.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>In “Hello World”</li>
-          <li>Nhập và xuất dữ liệu</li>
-          <li>Giải thích lỗi biên dịch</li>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Các khối lộ trình -->
+      {% for stage, color, title, desc, items, tag in [
+        (1, "sky", "Cơ bản", "Học nhập, xuất, điều kiện, vòng lặp, tư duy logic.", ["Hello World", "If–Else, For, While"], "basic"),
+        (2, "emerald", "Thuật toán cơ bản", "Làm quen sắp xếp, tìm kiếm, hai con trỏ.", ["Bubble Sort", "Binary Search"], "logic"),
+        (3, "indigo", "Cấu trúc dữ liệu", "Học mảng, chuỗi, Stack, Queue, Map, Set.", ["Stack – kiểm tra ngoặc", "Queue – hàng đợi"], "datastructure"),
+        (4, "amber", "Đệ quy & Quay lui", "Tư duy chia nhỏ bài toán, sinh tổ hợp.", ["N-Queens", "Sinh tổ hợp"], "backtracking"),
+        (5, "violet", "Quy hoạch động", "Lưu kết quả để tối ưu tốc độ giải.", ["LIS", "Knapsack", "Fibonacci"], "dp"),
+        (6, "green", "Cây & Đồ thị", "Hiểu cây, đồ thị, duyệt DFS, BFS, MST.", ["Tree traversal", "Dijkstra, Kruskal"], "graph"),
+        (7, "pink", "Ôn luyện chuyên đề", "Giải đề HSG, OLP, tổng hợp kỹ thuật.", ["Bài tổng hợp Graph + DP"], "practice"),
+        (8, "blue", "Dự án cá nhân", "Tạo sản phẩm thực tế nhỏ: app, quiz, mini game.", ["Mini Project"], "project")
+      ] %}
+      <div class="bg-white rounded-2xl shadow-sm border border-{{ color }}-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-{{ color }}-500 text-white font-bold mr-3">{{ stage }}</span>
+          <h3 class="text-lg font-semibold text-{{ color }}-600">{{ title }}</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">{{ desc }}</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          {% for i in items %}<li>{{ i }}</li>{% endfor %}
         </ul>
+        <a href="/problems/tag/{{ tag }}/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-{{ color }}-500 to-{{ color }}-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
       </div>
+      {% endfor %}
+    </div>
 
-      <!-- 2 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">2️⃣ Học tư duy logic</h3>
-        <p class="text-gray-700 mt-1">Tập suy nghĩ như máy tính, học dùng điều kiện và vòng lặp.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>If–else, for, while</li>
-          <li>Bài tập: số chẵn/lẻ, bảng cửu chương</li>
-        </ul>
-      </div>
-
-      <!-- 3 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">3️⃣ Làm chủ dữ liệu</h3>
-        <p class="text-gray-700 mt-1">Làm quen với biến, mảng, chuỗi — nền tảng xử lý dữ liệu.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Tìm min/max, tính tổng</li>
-          <li>Đếm ký tự trong chuỗi</li>
-          <li>Sắp xếp danh sách</li>
-        </ul>
-      </div>
-
-      <!-- 4 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">4️⃣ Thực hành thuật toán cơ bản</h3>
-        <p class="text-gray-700 mt-1">Bước đầu học cách giải bài toán: sắp xếp, tìm kiếm, duyệt dữ liệu.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Bubble Sort, Binary Search</li>
-          <li>Bài tập: tìm số lớn thứ hai, đếm tần suất</li>
-        </ul>
-      </div>
-
-      <!-- 5 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">5️⃣ Hai con trỏ (Two Pointers)</h3>
-        <p class="text-gray-700 mt-1">Học kỹ thuật giúp xử lý mảng hiệu quả, giảm độ phức tạp.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Tìm cặp có tổng bằng X</li>
-          <li>Đếm đoạn con thỏa điều kiện</li>
-          <li>Hiểu “sliding window”</li>
-        </ul>
-      </div>
-
-      <!-- 6 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">6️⃣ Cấu trúc dữ liệu cơ bản</h3>
-        <p class="text-gray-700 mt-1">Hiểu Stack, Queue, Set, Map — các “hộp công cụ” quan trọng.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Stack: kiểm tra dấu ngoặc</li>
-          <li>Queue: mô phỏng hàng đợi</li>
-          <li>Map: đếm tần suất ký tự</li>
-        </ul>
-      </div>
-
-      <!-- 7 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">7️⃣ Giải thuật nền tảng</h3>
-        <p class="text-gray-700 mt-1">Bước vào các thuật toán phổ biến: đệ quy, backtracking, quy hoạch động.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>DFS, BFS, đệ quy cơ bản</li>
-          <li>Bài: sinh tổ hợp, dãy con</li>
-        </ul>
-      </div>
-
-      <!-- 8 -->
-      <div>
-        <h3 class="text-xl font-semibold text-sky-600">8️⃣ Dự án nhỏ</h3>
-        <p class="text-gray-700 mt-1">Áp dụng kiến thức để tạo sản phẩm nhỏ giúp hiểu sâu hơn.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Làm trò chơi đoán số</li>
-          <li>Viết chương trình quiz nhỏ</li>
-          <li>Tạo web HTML/CSS cơ bản</li>
-        </ul>
-      </div>
-
-      <!-- 9 -->
-      <div>
-        <h3 class="text-xl font-semibold text-emerald-600">9️⃣ Quy hoạch động (DP)</h3>
-        <p class="text-gray-700 mt-1">Chia bài toán lớn thành các bài nhỏ, lưu kết quả để tối ưu.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Balo, LIS, đường đi ngắn nhất</li>
-          <li>Hiểu trạng thái và công thức chuyển</li>
-        </ul>
-      </div>
-
-      <!-- 10 -->
-      <div>
-        <h3 class="text-xl font-semibold text-emerald-600">🔟 Cấu trúc Cây (Tree)</h3>
-        <p class="text-gray-700 mt-1">Khám phá cây — cấu trúc quan trọng trong lập trình và đời sống.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Node, root, leaf</li>
-          <li>Duyệt cây: Pre/In/Post-order</li>
-          <li>Tính chiều cao, tổng giá trị</li>
-        </ul>
-      </div>
-
-      <!-- 11 -->
-      <div>
-        <h3 class="text-xl font-semibold text-emerald-600">1️⃣1️⃣ Đồ thị (Graph) cơ bản</h3>
-        <p class="text-gray-700 mt-1">Hiểu mối quan hệ giữa các điểm – học cách mô hình hóa mạng lưới.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>DFS, BFS</li>
-          <li>Đếm thành phần liên thông</li>
-          <li>Biểu diễn danh sách kề</li>
-        </ul>
-      </div>
-
-      <!-- 12 -->
-      <div>
-        <h3 class="text-xl font-semibold text-emerald-600">1️⃣2️⃣ Thuật toán đồ thị nâng cao</h3>
-        <p class="text-gray-700 mt-1">Các thuật toán mạnh để tìm đường đi tối ưu và kết nối hiệu quả.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Dijkstra, Bellman-Ford, Floyd</li>
-          <li>Prim, Kruskal – cây khung nhỏ nhất (MST)</li>
-        </ul>
-      </div>
-
-      <!-- 13 -->
-      <div>
-        <h3 class="text-xl font-semibold text-emerald-600">1️⃣3️⃣ Cấu trúc cây nâng cao</h3>
-        <p class="text-gray-700 mt-1">Làm chủ các công cụ mạnh mẽ trong bài toán nâng cao.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Segment Tree, Fenwick Tree (BIT)</li>
-          <li>Trie – tìm kiếm xâu nhanh</li>
-        </ul>
-      </div>
-
-      <!-- 14 -->
-      <div>
-        <h3 class="text-xl font-semibold text-emerald-600">1️⃣4️⃣ Ôn luyện & dự án cá nhân</h3>
-        <p class="text-gray-700 mt-1">Tổng hợp toàn bộ kiến thức, làm bài thi và sáng tạo sản phẩm.</p>
-        <ul class="list-disc ml-5 text-gray-600 mt-2">
-          <li>Giải đề HSG, OLP</li>
-          <li>Dự án mini: quản lý thư viện, quiz, game</li>
-          <li>Thực hành trên hệ thống DMOJ 💻</li>
-        </ul>
-      </div>
-
+    <div class="text-center mt-12">
+      <a href="/roadmap/detail/"
+         class="inline-block px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-lg font-medium shadow hover:opacity-90 transition">
+         🔍 Xem chi tiết lộ trình
+      </a>
     </div>
   </div>
 </section>
