@@ -4,21 +4,52 @@ from django.shortcuts import render
 
 def home(request):
     stages = [
-        ('Bắt đầu', 'Làm quen lập trình và tư duy logic cơ bản.', ['Nhập xuất', 'Vòng lặp', 'Điều kiện'], 'basic', 'sky'),
-        ('Hai con trỏ', 'Tư duy tìm kiếm nhanh, tối ưu hoá dãy và mảng.', ['Hai con trỏ', 'Sliding Window', 'Prefix sum'], 'twopointers', 'indigo'),
-        ('Cấu trúc dữ liệu', 'Hiểu và áp dụng các cấu trúc dữ liệu phổ biến.', ['Stack & Queue', 'Linked List', 'Set & Map'], 'datastructures', 'amber'),
-        ('Thuật toán cơ bản', 'Các kỹ thuật tìm kiếm, sắp xếp, đệ quy.', ['Sort', 'Search', 'Recursion'], 'algorithms', 'emerald'),
-        ('Đệ quy & Quay lui', 'Học cách chia nhỏ vấn đề và sinh nghiệm.', ['Quay lui', 'Nhánh cận', 'Sinh tổ hợp'], 'backtracking', 'pink'),
-        ('Quy hoạch động', 'Tư duy tối ưu hóa bài toán phức tạp.', ['DP cơ bản', 'Knapsack', 'Dãy con tăng'], 'dp', 'purple'),
-        ('Chia để trị', 'Kỹ thuật xử lý nhanh với chia nhỏ dữ liệu.', ['Merge sort', 'Binary search', 'Divide & conquer'], 'divideconquer', 'teal'),
-        ('Đồ thị cơ bản', 'Làm quen với đỉnh, cạnh và các thuật toán duyệt.', ['DFS', 'BFS', 'Connected Components'], 'graph', 'orange'),
-        ('Đồ thị nâng cao', 'Giải quyết các bài toán khó với Graph nâng cao.', ['Dijkstra', 'Floyd', 'Toposort'], 'graphadv', 'rose'),
-        ('Cây & nhị phân', 'Nắm vững cây nhị phân và ứng dụng.', ['Tree traversal', 'Binary Search Tree', 'Segment Tree'], 'tree', 'green'),
-        ('Cây nâng cao', 'Hiểu cấu trúc và ứng dụng cây phức tạp.', ['Fenwick Tree', 'HLD', 'Trie'], 'treeadv', 'lime'),
-        ('Lý thuyết số', 'Các bài toán về chia hết, ước, modulo.', ['GCD/LCM', 'Modulo', 'Sieve of Eratosthenes'], 'math', 'cyan'),
-        ('Chuỗi & Xử lý ký tự', 'Kỹ thuật thao tác chuỗi và pattern.', ['KMP', 'Hash String', 'Z-function'], 'string', 'fuchsia'),
-        ('Nâng cao & Ứng dụng', 'Vận dụng tổng hợp và phát triển kỹ năng.', ['Bài thi', 'Tối ưu code', 'Phân tích độ phức tạp'], 'advanced', 'stone'),
+        ('Giai đoạn 1: Làm quen lập trình & tư duy thuật toán',
+         'Bắt đầu làm quen với lập trình và tư duy máy tính.',
+         ['Cấu trúc chương trình, biến, kiểu dữ liệu, điều kiện, vòng lặp, nhập xuất'],
+         ['Hiểu cách máy tính xử lý lệnh', 'Viết được chương trình đơn giản', 'Hình thành tư duy thuật toán cơ bản'],
+         'basic', 'sky'),
+
+        ('Giai đoạn 2: Kỹ năng lập trình & xử lý dữ liệu',
+         'Phát triển kỹ năng xử lý dữ liệu và tổ chức chương trình.',
+         ['Mảng 1D/2D', 'Chuỗi ký tự', 'Hàm (truyền tham trị/tham chiếu)', 'Đọc/ghi file', 'Thống kê dữ liệu'],
+         ['Xử lý dữ liệu có cấu trúc', 'Chia nhỏ bài toán thành hàm', 'Lưu trữ và truy xuất thông tin có hệ thống'],
+         'data', 'indigo'),
+
+        ('Giai đoạn 3: Thuật toán cơ bản',
+         'Làm chủ các thuật toán nền tảng trong lập trình.',
+         ['Tìm kiếm tuyến tính/nhị phân', 'Sắp xếp cơ bản (Selection/Insertion/Bubble/Quick/Merge)',
+          'Đệ quy', 'Độ phức tạp', 'Chia để trị'],
+         ['Thiết kế & cài đặt thuật toán', 'Đánh giá hiệu quả chương trình', 'Tối ưu cơ bản'],
+         'algo', 'amber'),
+
+        ('Giai đoạn 4: Cấu trúc dữ liệu nâng cao',
+         'Nắm vững các cấu trúc dữ liệu quan trọng.',
+         ['Stack', 'Queue/Deque', 'Linked List', 'Set/Map/Dictionary', 'Priority Queue/Heap', 'Hash Table'],
+         ['Chọn cấu trúc dữ liệu phù hợp', 'Cài đặt & vận dụng vào bài toán thực tế', 'Phân biệt tuyến tính & phi tuyến tính'],
+         'ds', 'emerald'),
+
+        ('Giai đoạn 5: Thuật toán nâng cao',
+         'Kỹ thuật giải bài toán tối ưu.',
+         ['Quy hoạch động (DP: Knapsack, LIS, Count Ways)', 'Backtracking', 'Nhánh cận', 'Memoization', 'Chia để trị nâng cao'],
+         ['Mô hình hóa trạng thái & chuyển trạng thái', 'Giảm độ phức tạp thời gian/không gian', 'Giải bài toán tối ưu hiệu quả'],
+         'adv', 'pink'),
+
+        ('Giai đoạn 6: Đồ thị và cây',
+         'Cấu trúc đồ thị/cây và các thuật toán quan trọng.',
+         ['Biểu diễn đồ thị (ma trận/danh sách kề)', 'DFS/BFS/Connected Components',
+          'Dijkstra/Bellman-Ford/Floyd-Warshall', 'Tree/BST/LCA',
+          'Segment Tree/Fenwick/Trie/Union-Find', 'Toposort/MST (Prim, Kruskal)/Euler'],
+         ['Hiểu bản chất đồ thị/cây', 'Duyệt, tìm đường, phân tích quan hệ dữ liệu', 'Dùng cấu trúc cây xử lý bài phức tạp'],
+         'graph', 'purple'),
+
+        ('Giai đoạn 7: Lập trình chuyên nghiệp & tư duy thi đấu',
+         'Tổng hợp & tối ưu hoá năng lực lập trình thuật toán.',
+         ['OOP (C++/Java)', 'Bitmask', 'Binary Search on Answer', 'Greedy + DP', 'Tối ưu I/O', 'Debug & kiểm thử'],
+         ['Viết chương trình tối ưu & rõ ràng', 'Kết hợp nhiều kỹ thuật trong một bài', 'Tư duy linh hoạt khi gặp bài mới'],
+         'pro', 'stone'),
     ]
+
     return render(request, "home.html", {"stages": stages})
 
 urlpatterns = [
