@@ -5,32 +5,143 @@
     </h2>
 
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Các khối lộ trình -->
-      {% for stage, color, title, desc, items, tag in [
-        (1, "sky", "Cơ bản", "Học nhập, xuất, điều kiện, vòng lặp, tư duy logic.", ["Hello World", "If–Else, For, While"], "basic"),
-        (2, "emerald", "Thuật toán cơ bản", "Làm quen sắp xếp, tìm kiếm, hai con trỏ.", ["Bubble Sort", "Binary Search"], "logic"),
-        (3, "indigo", "Cấu trúc dữ liệu", "Học mảng, chuỗi, Stack, Queue, Map, Set.", ["Stack – kiểm tra ngoặc", "Queue – hàng đợi"], "datastructure"),
-        (4, "amber", "Đệ quy & Quay lui", "Tư duy chia nhỏ bài toán, sinh tổ hợp.", ["N-Queens", "Sinh tổ hợp"], "backtracking"),
-        (5, "violet", "Quy hoạch động", "Lưu kết quả để tối ưu tốc độ giải.", ["LIS", "Knapsack", "Fibonacci"], "dp"),
-        (6, "green", "Cây & Đồ thị", "Hiểu cây, đồ thị, duyệt DFS, BFS, MST.", ["Tree traversal", "Dijkstra, Kruskal"], "graph"),
-        (7, "pink", "Ôn luyện chuyên đề", "Giải đề HSG, OLP, tổng hợp kỹ thuật.", ["Bài tổng hợp Graph + DP"], "practice"),
-        (8, "blue", "Dự án cá nhân", "Tạo sản phẩm thực tế nhỏ: app, quiz, mini game.", ["Mini Project"], "project")
-      ] %}
-      <div class="bg-white rounded-2xl shadow-sm border border-{{ color }}-100 hover:shadow-md transition p-6 flex flex-col">
+
+      <!-- 1️⃣ Cơ bản -->
+      <div class="bg-white rounded-2xl shadow-sm border border-sky-100 hover:shadow-md transition p-6 flex flex-col">
         <div class="flex items-center mb-3">
-          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-{{ color }}-500 text-white font-bold mr-3">{{ stage }}</span>
-          <h3 class="text-lg font-semibold text-{{ color }}-600">{{ title }}</h3>
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-sky-500 text-white font-bold mr-3">1</span>
+          <h3 class="text-lg font-semibold text-sky-600">Cơ bản</h3>
         </div>
-        <p class="text-gray-600 text-sm flex-grow">{{ desc }}</p>
+        <p class="text-gray-600 text-sm flex-grow">Học nhập, xuất, điều kiện, vòng lặp, tư duy logic.</p>
         <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
-          {% for i in items %}<li>{{ i }}</li>{% endfor %}
+          <li>Hello World</li>
+          <li>If–Else, For, While</li>
         </ul>
-        <a href="/problems/tag/{{ tag }}/"
-           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-{{ color }}-500 to-{{ color }}-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+        <a href="/problems/tag/basic/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
            💡 Làm bài
         </a>
       </div>
-      {% endfor %}
+
+      <!-- 2️⃣ Thuật toán cơ bản -->
+      <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-emerald-500 text-white font-bold mr-3">2</span>
+          <h3 class="text-lg font-semibold text-emerald-600">Thuật toán cơ bản</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Làm quen sắp xếp, tìm kiếm, hai con trỏ.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Bubble Sort</li>
+          <li>Binary Search</li>
+        </ul>
+        <a href="/problems/tag/logic/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
+      <!-- 3️⃣ Cấu trúc dữ liệu -->
+      <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-500 text-white font-bold mr-3">3</span>
+          <h3 class="text-lg font-semibold text-indigo-600">Cấu trúc dữ liệu</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Học mảng, chuỗi, Stack, Queue, Map, Set.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Stack – kiểm tra ngoặc</li>
+          <li>Queue – mô phỏng hàng đợi</li>
+        </ul>
+        <a href="/problems/tag/datastructure/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
+      <!-- 4️⃣ Đệ quy & Quay lui -->
+      <div class="bg-white rounded-2xl shadow-sm border border-amber-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-amber-500 text-white font-bold mr-3">4</span>
+          <h3 class="text-lg font-semibold text-amber-600">Đệ quy & Quay lui</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Tư duy chia nhỏ bài toán, thử và quay lui để tìm nghiệm đúng.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Sinh tổ hợp, hoán vị</li>
+          <li>Bài toán N-Queens</li>
+        </ul>
+        <a href="/problems/tag/backtracking/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
+      <!-- 5️⃣ Quy hoạch động -->
+      <div class="bg-white rounded-2xl shadow-sm border border-violet-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-violet-500 text-white font-bold mr-3">5</span>
+          <h3 class="text-lg font-semibold text-violet-600">Quy hoạch động</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Lưu trạng thái, tái sử dụng kết quả để tối ưu hiệu năng.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Balo (Knapsack)</li>
+          <li>Dãy con tăng dài nhất (LIS)</li>
+        </ul>
+        <a href="/problems/tag/dp/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
+      <!-- 6️⃣ Cây & Đồ thị -->
+      <div class="bg-white rounded-2xl shadow-sm border border-green-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-green-500 text-white font-bold mr-3">6</span>
+          <h3 class="text-lg font-semibold text-green-600">Cây & Đồ thị</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Hiểu cấu trúc cây, đồ thị, thuật toán duyệt cơ bản.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Tree traversal</li>
+          <li>DFS, BFS, Kruskal</li>
+        </ul>
+        <a href="/problems/tag/graph/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
+      <!-- 7️⃣ Ôn luyện chuyên đề -->
+      <div class="bg-white rounded-2xl shadow-sm border border-pink-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-pink-500 text-white font-bold mr-3">7</span>
+          <h3 class="text-lg font-semibold text-pink-600">Ôn luyện chuyên đề</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Tổng hợp các kỹ thuật trong bài luyện tập và đề thi học sinh giỏi.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Graph + DP</li>
+          <li>Các bài luyện tập kết hợp</li>
+        </ul>
+        <a href="/problems/tag/practice/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
+      <!-- 8️⃣ Dự án cá nhân -->
+      <div class="bg-white rounded-2xl shadow-sm border border-blue-100 hover:shadow-md transition p-6 flex flex-col">
+        <div class="flex items-center mb-3">
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-blue-500 text-white font-bold mr-3">8</span>
+          <h3 class="text-lg font-semibold text-blue-600">Dự án cá nhân</h3>
+        </div>
+        <p class="text-gray-600 text-sm flex-grow">Áp dụng kiến thức để tạo sản phẩm thực tế như quiz, app nhỏ hoặc game.</p>
+        <ul class="text-gray-500 text-sm list-disc ml-5 mt-2">
+          <li>Mini Project</li>
+          <li>Ứng dụng giải toán, quiz</li>
+        </ul>
+        <a href="/problems/tag/project/"
+           class="mt-4 text-sm inline-block px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-md shadow hover:opacity-90 transition self-start">
+           💡 Làm bài
+        </a>
+      </div>
+
     </div>
 
     <div class="text-center mt-12">
