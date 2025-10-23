@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import path, reverse
+from django.utils.html import format_html
 from .models import Problem, TestCase
 
 
@@ -21,12 +22,22 @@ class UploadTestZipForm(forms.Form):
 # ============================================================
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ("code", "title", "time_limit", "memory_limit")
+    list_display = ("code", "title", "time_limit", "memory_limit", "view_tests_link")
     search_fields = ("code", "title")
     change_form_template = "admin/problems/change_form_with_upload.html"
 
     # -------------------------------
-    # URL con dưới /admin/problems/problem/<id>/
+    # Liên kết xem test
+    # -------------------------------
+    def view_tests_link(self, obj):
+        return format_html(
+            '<a href="{}" target="_blank">👁 Xem test</a>',
+            reverse("admin:view_tests", args=[obj.id])
+        )
+    view_tests_link.short_description = "Test cases"
+
+    # -------------------------------
+    # URL bổ sung
     # -------------------------------
     def get_urls(self):
         urls = super().get_urls()
@@ -34,24 +45,14 @@ class ProblemAdmin(admin.ModelAdmin):
             path("<int:problem_id>/upload_tests/",
                  self.admin_site.admin_view(self.upload_tests),
                  name="upload_tests"),
-            path("<int:problem_id>/load_tests/",
-                 self.admin_site.admin_view(self.load_tests),
-                 name="load_tests"),
-            path("<int:problem_id>/has_tests/",
-                 self.admin_site.admin_view(self.has_tests),
-                 name="has_tests"),
+            path("<int:problem_id>/view_tests/",
+                 self.admin_site.admin_view(self.view_tests),
+                 name="view_tests"),
         ]
         return my_urls + urls
 
     # -------------------------------
-    # Truyền biến vào template
-    # -------------------------------
-    def change_view(self, request, object_id, form_url="", extra_context=None):
-        extra_context = {"show_upload_button": True}
-        return super().change_view(request, object_id, form_url, extra_context)
-
-    # -------------------------------
-    # ⚙️ Upload ZIP testcases
+    # Upload ZIP testcases
     # -------------------------------
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
@@ -103,27 +104,12 @@ class ProblemAdmin(admin.ModelAdmin):
         return render(request, "admin/upload_tests.html", {"form": form, "problem": problem})
 
     # -------------------------------
-    # ⚙️ AJAX load testcases có phân trang
+    # Trang xem test case
     # -------------------------------
-    def load_tests(self, request, problem_id):
-        page = int(request.GET.get("page", 1))
-        per_page = 20
+    def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
-        testcases = TestCase.objects.filter(problem=problem).order_by("id")
-        paginator = Paginator(testcases, per_page)
-        page_obj = paginator.get_page(page)
-        html = render_to_string("admin/problems/testcase_list_partial.html",
-                                {"testcases": page_obj, "page_obj": page_obj},
-                                request=request)
-        return JsonResponse({
-            "html": html,
-            "has_next": page_obj.has_next(),
-            "next_page": page + 1 if page_obj.has_next() else None
+        testcases = TestCase.objects.filter(problem=problem)
+        return render(request, "admin/problems/view_tests.html", {
+            "problem": problem,
+            "testcases": testcases,
         })
-
-    # -------------------------------
-    # ⚙️ API kiểm tra số test case
-    # -------------------------------
-    def has_tests(self, request, problem_id):
-        count = TestCase.objects.filter(problem_id=problem_id).count()
-        return JsonResponse({"count": count})
