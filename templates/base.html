@@ -50,6 +50,21 @@
       font-weight: 600;
       letter-spacing: 0.3px;
     }
+    #roadmap h3::before {
+      content: attr(data-index);
+      display: inline-block;
+      background-color: #2563eb;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border-radius: 9999px;
+      width: 1.6rem;
+      height: 1.6rem;
+      text-align: center;
+      line-height: 1.6rem;
+      margin-right: 0.5rem;
+    }
+
   </style>
 
   {% block extra_head %}{% endblock %}
