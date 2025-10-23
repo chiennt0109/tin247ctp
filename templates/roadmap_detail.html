@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="py-14 bg-gradient-to-b from-white via-sky-50 to-indigo-50">
+  <div class="max-w-5xl mx-auto px-6">
+    <h1 class="text-3xl sm:text-4xl font-bold text-center text-indigo-700 mb-12">
+      🌟 Lộ trình học lập trình chi tiết – Chuyên Trần Phú IT Contest OJ
+    </h1>
+
+    <div class="relative border-l-4 border-indigo-300 pl-6 space-y-12">
+
+      {% for stage, color, title, desc, items, tag in [
+        (1, "sky", "Làm quen với lập trình",
+          "Bắt đầu viết chương trình đầu tiên và hiểu cách máy tính hoạt động.",
+          ["In 'Hello World'", "Nhập & xuất dữ liệu", "Giải thích lỗi biên dịch"],
+          "basic"),
+        (2, "emerald", "Tư duy logic & cấu trúc điều khiển",
+          "Hiểu điều kiện, vòng lặp và cách mô phỏng tư duy qua chương trình.",
+          ["if–else, for, while", "Bảng cửu chương", "Tổng dãy số"],
+          "logic"),
+        (3, "indigo", "Cấu trúc dữ liệu cơ bản",
+          "Học cách tổ chức dữ liệu bằng mảng, chuỗi, Stack, Queue, Set, Map.",
+          ["Tìm kiếm, sắp xếp", "Stack – kiểm tra ngoặc", "Queue – mô phỏng hàng đợi"],
+          "datastructure"),
+        (4, "amber", "Hai con trỏ & tối ưu thuật toán",
+          "Xử lý hiệu quả mảng và chuỗi, tối ưu độ phức tạp.",
+          ["Tìm cặp có tổng X", "Đếm đoạn con hợp lệ", "Sliding window"],
+          "twopointers"),
+        (5, "pink", "Đệ quy & Quay lui (Backtracking)",
+          "Giải bài toán bằng thử – sai – quay lui để tìm nghiệm đúng.",
+          ["Sinh tổ hợp, hoán vị", "Bài toán N-Queens", "Sudoku Solver"],
+          "backtracking"),
+        (6, "violet", "Quy hoạch động (Dynamic Programming)",
+          "Giải bài toán tối ưu bằng cách lưu trạng thái và tái sử dụng kết quả.",
+          ["Balo (Knapsack)", "Dãy con tăng dài nhất (LIS)", "Fibonacci tối ưu"],
+          "dp"),
+        (7, "green", "Cấu trúc Cây (Tree)",
+          "Khám phá cấu trúc phân cấp dữ liệu – từ node, root, leaf đến duyệt cây.",
+          ["Duyệt Pre/In/Post-order", "Tính chiều cao cây", "Tìm tổ tiên chung (LCA)"],
+          "tree"),
+        (8, "blue", "Đồ thị (Graph) cơ bản",
+          "Hiểu cách biểu diễn mối quan hệ giữa các nút và duyệt đồ thị.",
+          ["DFS, BFS", "Đếm thành phần liên thông", "Kiểm tra chu trình"],
+          "graph"),
+        (9, "amber", "Thuật toán đồ thị nâng cao",
+          "Tìm đường đi ngắn nhất, cây khung nhỏ nhất, và các thuật toán trên đồ thị có trọng số.",
+          ["Dijkstra, Bellman-Ford", "Prim, Kruskal – MST", "Chu trình Euler & Hamilton"],
+          "graph-advanced"),
+        (10, "emerald", "Cấu trúc cây nâng cao",
+          "Làm quen Segment Tree, Fenwick Tree (BIT), Trie – công cụ mạnh trong contest.",
+          ["Segment Tree – truy vấn tổng", "Fenwick Tree – BIT", "Trie – tìm kiếm chuỗi"],
+          "segmenttree"),
+        (11, "violet", "Phân tích độ phức tạp & tối ưu hóa",
+          "Đánh giá tốc độ, phân tích Big-O, chọn giải pháp phù hợp.",
+          ["Big-O Notation", "So sánh giải pháp", "Tối ưu vòng lặp & bộ nhớ"],
+          "complexity"),
+        (12, "pink", "Giải thuật nâng cao (Greedy, Divide & Conquer)",
+          "Nắm vững các kỹ thuật giải nhanh, chia để trị, tham lam.",
+          ["QuickSort, MergeSort", "Greedy Scheduling", "Binary Search nâng cao"],
+          "advanced"),
+        (13, "indigo", "Ôn luyện chuyên đề",
+          "Tổng hợp kiến thức, luyện tập theo từng nhóm bài thi học sinh giỏi.",
+          ["Luyện tập Graph + DP", "Kết hợp nhiều kỹ thuật", "Đề thi OLP"],
+          "practice"),
+        (14, "green", "Dự án cá nhân & sáng tạo",
+          "Áp dụng kiến thức để tạo sản phẩm thực tế hoặc bài dự thi.",
+          ["Mini project: game, quiz, app nhỏ", "Trình giải toán tự động", "Phân tích dữ liệu"],
+          "project")
+      ] %}
+      <div class="group relative fade">
+        <div class="absolute -left-4 top-1.5 w-8 h-8 bg-{{ color }}-500 rounded-full shadow flex items-center justify-center text-white font-bold">
+          {{ stage }}
+        </div>
+        <div class="bg-white rounded-xl shadow hover:shadow-md transition p-5">
+          <div class="flex items-center justify-between flex-wrap">
+            <h3 class="text-lg font-semibold text-{{ color }}-600">{{ title }}</h3>
+            <a href="/problems/tag/{{ tag }}/"
+               class="text-sm px-3 py-1 bg-gradient-to-r from-{{ color }}-500 to-{{ color }}-600 text-white rounded-md shadow hover:opacity-90 transition">
+               💡 Làm bài luyện tập
+            </a>
+          </div>
+          <p class="text-gray-700 text-sm mt-1">{{ desc }}</p>
+          <ul class="list-disc ml-5 text-gray-600 text-sm mt-2">
+            {% for i in items %}<li>{{ i }}</li>{% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-14">
+      <a href="/problems/"
+         class="inline-block px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-lg font-medium shadow hover:opacity-90 transition">
+         🚀 Bắt đầu luyện tập ngay trên DMOJ Mini
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+.fade {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s ease-out forwards;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
