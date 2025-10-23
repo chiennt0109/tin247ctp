@@ -1,25 +1,35 @@
-{# templates/includes/_roadmap.html #}
 <section id="roadmap" class="relative py-16 bg-gradient-to-br from-white via-sky-50 to-indigo-50">
   <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
-    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">📘 Lộ trình học lập trình</h2>
-
-    <p class="text-gray-700 text-lg mb-12">
-      Từng bước từ con số 0 ✨
-    </p>
+    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">🌈 Lộ trình học lập trình – 14 giai đoạn</h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-      {% for stage, desc, items, tag, color in stages %}
-      <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-sky-50 hover:shadow-xl transition">
+      {% for stage, desc, examples, tag, color in [
+        ('Làm quen với lập trình', 'Hiểu chương trình là gì, viết lệnh đầu tiên, chạy và xem kết quả.', ['In "Hello World"', 'Nhập & xuất dữ liệu'], 'beginner', 'sky'),
+        ('Cấu trúc điều khiển & tư duy logic', 'Học If–Else, For, While, tư duy logic và thuật toán cơ bản.', ['If–Else, For, While', 'Bài tập tính toán, mô phỏng'], 'logic', 'indigo'),
+        ('Cấu trúc dữ liệu cơ bản', 'Làm quen mảng, chuỗi, danh sách, stack, queue, set, map.', ['Sắp xếp và tìm kiếm', 'Ứng dụng stack và queue'], 'datastruct', 'amber'),
+        ('Hai con trỏ & cửa sổ trượt', 'Giải bài toán tối ưu bằng hai con trỏ và kỹ thuật cửa sổ trượt.', ['Tìm cặp có tổng bằng X', 'Đếm đoạn con hợp lệ'], 'twopointers', 'teal'),
+        ('Đệ quy & chia để trị', 'Tư duy chia nhỏ vấn đề và giải quyết bằng đệ quy.', ['Đệ quy cơ bản', 'Merge Sort, Quick Sort'], 'recursion', 'pink'),
+        ('Quy hoạch động (DP)', 'Tối ưu hóa với trạng thái và bài toán con.', ['Dãy con tăng dài nhất', 'Balo, chia mảnh'], 'dp', 'purple'),
+        ('Sinh & quay lui (Backtracking)', 'Sinh nghiệm và tìm nghiệm thỏa điều kiện.', ['Liệt kê tổ hợp, hoán vị', 'Giải Sudoku'], 'backtrack', 'rose'),
+        ('Đồ thị cơ bản', 'Tìm hiểu đỉnh, cạnh và duyệt đồ thị.', ['DFS, BFS', 'Đếm thành phần liên thông'], 'graph', 'emerald'),
+        ('Đồ thị nâng cao', 'Áp dụng thuật toán đồ thị phức tạp hơn.', ['Dijkstra, Floyd–Warshall', 'Toposort'], 'graphadv', 'orange'),
+        ('Cây & cấu trúc nhị phân', 'Hiểu cấu trúc cây, duyệt và ứng dụng.', ['Duyệt cây nhị phân', 'Binary Search Tree'], 'tree', 'green'),
+        ('Cây nâng cao', 'Ứng dụng cây nâng cao để tối ưu truy vấn.', ['Segment Tree', 'Fenwick Tree (BIT)'], 'treeadv', 'lime'),
+        ('Lý thuyết số', 'Các bài toán toán học trong lập trình.', ['Ước, bội, modulo', 'Thuật toán Euclid'], 'math', 'cyan'),
+        ('Chuỗi & xử lý ký tự', 'Hiểu và áp dụng các thuật toán chuỗi.', ['KMP, Z-Function', 'Hash String'], 'string', 'fuchsia'),
+        ('Nâng cao & thi đấu', 'Tổng hợp và áp dụng trong các kỳ thi.', ['Tối ưu độ phức tạp', 'Phân tích bài khó'], 'advanced', 'stone')
+      ] %}
+      <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-{{ color }}-50 hover:shadow-xl transition">
         <h3 class="text-xl font-bold text-gray-900 mb-2">{{ stage }}</h3>
         <p class="text-gray-700 text-sm mb-3">{{ desc }}</p>
         <ul class="text-gray-600 text-sm list-disc ml-5 mb-4">
-          {% for i in items %}
-            <li>{{ i }}</li>
+          {% for ex in examples %}
+          <li>{{ ex }}</li>
           {% endfor %}
         </ul>
         <a href="/problems/tag/{{ tag }}/"
            class="inline-block px-4 py-2 bg-gradient-to-r from-{{ color }}-200 to-{{ color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
-           💡 Làm bài
+           💡 Làm bài luyện tập
         </a>
       </div>
       {% endfor %}
@@ -36,8 +46,15 @@
   <div class="absolute inset-0 bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 animate-gradient opacity-40"></div>
 
   <style>
-    @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .animate-gradient { background-size:200% 200%; animation:gradientMove 18s ease infinite; }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradientMove 18s ease infinite;
+    }
     a { text-decoration: none !important; }
   </style>
 </section>
