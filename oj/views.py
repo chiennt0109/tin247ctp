@@ -1,6 +1,6 @@
 # path: app/views.py
 from django.shortcuts import render
-from judge.run_code import run_submission
+from judge.run_code import run_program as run_submission
 
 
 # ==========================================================
