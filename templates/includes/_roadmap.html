@@ -1,49 +1,63 @@
-<section id="roadmap" class="py-20 bg-gradient-to-b from-white via-sky-50 to-indigo-50">
-  <div class="max-w-5xl mx-auto px-6">
+<section id="roadmap" class="relative py-16 bg-gradient-to-br from-white via-sky-50 to-indigo-50">
+  <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
+    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">📘 Lộ trình học lập trình</h2>
 
-    <!-- 🧭 Tiêu đề chính -->
-    <h2 class="text-3xl sm:text-4xl font-bold text-center text-indigo-700 mb-12 drop-shadow-sm">
-      🌈 Lộ trình học lập trình – 14 giai đoạn
-    </h2>
+    <p class="text-gray-700 text-lg mb-12">
+      Từng bước từ con số 0 ✨
+    </p>
 
-    <!-- 🧩 Timeline chứa 14 giai đoạn -->
-    <div class="relative border-l-4 border-indigo-300 pl-8 space-y-10">
-      {% include "includes/roadmap_stages.html" %}
+    <!-- Danh sách giai đoạn -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+      {% for stage, desc, items, tag, color in [
+        ('Bắt đầu', 'Làm quen lập trình và tư duy logic cơ bản.', ['Nhập xuất', 'Vòng lặp', 'Điều kiện'], 'basic', 'sky'),
+        ('Hai con trỏ', 'Tư duy tìm kiếm nhanh, tối ưu hoá dãy và mảng.', ['Hai con trỏ', 'Sliding Window', 'Prefix sum'], 'twopointers', 'indigo'),
+        ('Cấu trúc dữ liệu', 'Hiểu và áp dụng các cấu trúc dữ liệu phổ biến.', ['Stack & Queue', 'Linked List', 'Set & Map'], 'datastructures', 'amber'),
+        ('Thuật toán cơ bản', 'Các kỹ thuật tìm kiếm, sắp xếp, đệ quy.', ['Sort', 'Search', 'Recursion'], 'algorithms', 'emerald'),
+        ('Đệ quy & Quay lui', 'Học cách chia nhỏ vấn đề và sinh nghiệm.', ['Quay lui', 'Nhánh cận', 'Sinh tổ hợp'], 'backtracking', 'pink'),
+        ('Quy hoạch động', 'Tư duy tối ưu hóa bài toán phức tạp.', ['DP cơ bản', 'Knapsack', 'Dãy con tăng'], 'dp', 'purple'),
+        ('Chia để trị', 'Kỹ thuật xử lý nhanh với chia nhỏ dữ liệu.', ['Merge sort', 'Binary search', 'Divide & conquer'], 'divideconquer', 'teal'),
+        ('Đồ thị cơ bản', 'Làm quen với đỉnh, cạnh và các thuật toán duyệt.', ['DFS', 'BFS', 'Connected Components'], 'graph', 'orange'),
+        ('Đồ thị nâng cao', 'Giải quyết các bài toán khó với Graph nâng cao.', ['Dijkstra', 'Floyd', 'Toposort'], 'graphadv', 'rose'),
+        ('Cây & nhị phân', 'Nắm vững cây nhị phân và ứng dụng.', ['Tree traversal', 'Binary Search Tree', 'Segment Tree'], 'tree', 'green'),
+        ('Cây nâng cao', 'Hiểu cấu trúc và ứng dụng cây phức tạp.', ['Fenwick Tree', 'HLD', 'Trie'], 'treeadv', 'lime'),
+        ('Lý thuyết số', 'Các bài toán về chia hết, ước, modulo.', ['GCD/LCM', 'Modulo', 'Sieve of Eratosthenes'], 'math', 'cyan'),
+        ('Chuỗi & Xử lý ký tự', 'Kỹ thuật thao tác chuỗi và pattern.', ['KMP', 'Hash String', 'Z-function'], 'string', 'fuchsia'),
+        ('Nâng cao & Ứng dụng', 'Vận dụng tổng hợp và phát triển kỹ năng.', ['Bài thi', 'Tối ưu code', 'Phân tích độ phức tạp'], 'advanced', 'stone')
+      ] %}
+      <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-sky-50 hover:shadow-xl transition">
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ stage }}</h3>
+        <p class="text-gray-700 text-sm mb-3">{{ desc }}</p>
+        <ul class="text-gray-600 text-sm list-disc ml-5 mb-4">
+          {% for i in items %}<li>{{ i }}</li>{% endfor %}
+        </ul>
+        <a href="/problems/tag/{{ tag }}/"
+           class="inline-block px-4 py-2 bg-gradient-to-r from-{{ color }}-200 to-{{ color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
+           💡 Làm bài
+        </a>
+      </div>
+      {% endfor %}
     </div>
 
-    <!-- 🚀 Nút tổng luyện tập -->
-    <div class="text-center mt-16">
-      <a href="/problems/"
-         class="inline-block px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md drop-shadow-md hover:opacity-90 transition">
-        🚀 Bắt đầu luyện tập ngay
+    <div class="text-center mt-12">
+      <a href="/roadmap/detail/"
+         class="inline-block px-6 py-3 bg-gradient-to-r from-sky-200 to-indigo-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition transform no-underline">
+         🔍 Xem toàn bộ lộ trình
       </a>
     </div>
   </div>
 
-  <!-- 🌟 Hiệu ứng nhẹ -->
+  <div class="absolute inset-0 bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 animate-gradient opacity-40"></div>
+
   <style>
-    .fade {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 0.6s ease-out forwards;
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    @keyframes fadeUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradientMove 18s ease infinite;
     }
-
-    /* Hiệu ứng khi hover mỗi khối roadmap */
-    .fade:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-      transition: all 0.2s ease-in-out;
-    }
-
-    /* Tăng độ rõ chữ trên nền sáng */
-    a, h2, h3 {
-      text-shadow: 0 1px 2px rgba(0,0,0,0.15);
-    }
+    a { text-decoration: none !important; }
   </style>
 </section>
