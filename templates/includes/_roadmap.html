@@ -6,43 +6,7 @@
     </p>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-      {% for stage, desc, topics, goals, tag, color in [
-        ('Giai đoạn 1: Làm quen lập trình & tư duy thuật toán',
-         'Bắt đầu làm quen với lập trình và tư duy máy tính.',
-         ['Cấu trúc chương trình, biến, kiểu dữ liệu, điều kiện, vòng lặp, nhập xuất'],
-         ['Hiểu cách máy tính xử lý lệnh, viết được chương trình đơn giản, hình thành tư duy thuật toán cơ bản'],
-         'basic', 'sky'),
-        ('Giai đoạn 2: Kỹ năng lập trình & xử lý dữ liệu',
-         'Phát triển kỹ năng xử lý dữ liệu và tổ chức chương trình.',
-         ['Mảng, chuỗi ký tự, hàm, đọc ghi file, thống kê dữ liệu'],
-         ['Xử lý được dữ liệu có cấu trúc, chia nhỏ bài toán, hiểu cách lưu trữ và truy xuất thông tin'],
-         'data', 'indigo'),
-        ('Giai đoạn 3: Thuật toán cơ bản',
-         'Làm chủ các thuật toán nền tảng trong lập trình.',
-         ['Tìm kiếm, sắp xếp, đệ quy, độ phức tạp, chia để trị'],
-         ['Biết thiết kế và cài đặt thuật toán, đánh giá hiệu quả chương trình, tối ưu cơ bản'],
-         'algo', 'amber'),
-        ('Giai đoạn 4: Cấu trúc dữ liệu nâng cao',
-         'Nắm vững các cấu trúc dữ liệu quan trọng.',
-         ['Stack, Queue, Deque, Linked List, Set, Map, Heap, Hash Table'],
-         ['Hiểu và chọn cấu trúc dữ liệu phù hợp, cài đặt và vận dụng trong bài toán thực tế'],
-         'ds', 'emerald'),
-        ('Giai đoạn 5: Thuật toán nâng cao',
-         'Tiếp cận và rèn luyện các kỹ thuật giải bài toán tối ưu.',
-         ['Quy hoạch động (DP), Backtracking, Nhánh cận, Chia để trị nâng cao'],
-         ['Giải được bài toán có tính tối ưu, viết thuật toán hiệu quả, giảm độ phức tạp'],
-         'adv', 'pink'),
-        ('Giai đoạn 6: Đồ thị và cây',
-         'Khám phá cấu trúc đồ thị và cây trong lập trình thuật toán.',
-         ['DFS, BFS, Dijkstra, Kruskal, Segment Tree, Fenwick Tree, Trie, LCA'],
-         ['Hiểu bản chất đồ thị và cây, duyệt và phân tích quan hệ dữ liệu, xử lý bài toán phức tạp'],
-         'graph', 'purple'),
-        ('Giai đoạn 7: Lập trình chuyên nghiệp & tư duy thi đấu',
-         'Tổng hợp và tối ưu hoá năng lực lập trình thuật toán.',
-         ['OOP, Bitmask, Binary Search on Answer, Greedy + DP, tối ưu I/O, debug'],
-         ['Viết được chương trình tối ưu, rõ ràng, kết hợp nhiều kỹ thuật, có tư duy linh hoạt và sáng tạo'],
-         'pro', 'stone')
-      ] %}
+      {% for stage, desc, topics, goals, tag, color in stages %}
         <div class="p-6 rounded-2xl shadow-md bg-gradient-to-br from-white to-{{ color }}-50 hover:shadow-xl transition">
           <h3 class="text-lg font-bold text-gray-900 mb-2">{{ stage }}</h3>
           <p class="text-gray-700 text-sm mb-3">{{ desc }}</p>
@@ -84,15 +48,8 @@
   <div class="absolute inset-0 bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 animate-gradient opacity-40"></div>
 
   <style>
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .animate-gradient {
-      background-size: 200% 200%;
-      animation: gradientMove 18s ease infinite;
-    }
+    @keyframes gradientMove { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
+    .animate-gradient { background-size:200% 200%; animation: gradientMove 18s ease infinite; }
     a { text-decoration: none !important; }
     ul li { margin-bottom: 4px; }
   </style>
