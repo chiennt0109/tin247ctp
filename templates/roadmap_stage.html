@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="fw-bold mb-3">{{ stage.title }}</h2>
+  <p class="text-secondary mb-4">{{ stage.intro }}</p>
+
+  <div class="row">
+    <div class="col-md-5">
+      <h5 class="fw-bold mb-3">📘 Danh sách bài tập</h5>
+      <ul class="list-group">
+        {% for t, desc in stage.topics %}
+        <li class="list-group-item">
+          <b>{{ t }}</b><br>
+          <small>{{ desc }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="col-md-7">
+      <h5 class="fw-bold mb-3">💻 Trình soạn thảo code</h5>
+      <form id="codeForm" class="mb-3">
+        <select class="form-select mb-2" name="language" id="language">
+          <option value="python">Python</option>
+          <option value="pypy">PyPy</option>
+          <option value="cpp">C++</option>
+          <option value="java">Java</option>
+        </select>
+        <textarea id="source" name="source" class="form-control mb-2" rows="10" placeholder="Nhập mã nguồn của bạn..."></textarea>
+        <textarea id="input" name="input" class="form-control mb-2" rows="3" placeholder="Input (tùy chọn)"></textarea>
+        <button type="button" id="runBtn" class="btn btn-primary w-100">▶️ Chạy thử</button>
+      </form>
+
+      <div class="card">
+        <div class="card-header bg-light fw-bold">Kết quả</div>
+        <div class="card-body">
+          <pre id="result" class="text-dark" style="min-height:120px;">(Kết quả sẽ hiển thị tại đây)</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById("runBtn").addEventListener("click", function () {
+  const formData = new FormData(document.getElementById("codeForm"));
+  fetch("/roadmap/run/", {
+    method: "POST",
+    body: formData,
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      const res = document.getElementById("result");
+      if (data.result) res.textContent = data.result;
+      else if (data.error) res.textContent = "❌ " + data.error;
+    })
+    .catch((err) => {
+      document.getElementById("result").textContent = "⚠️ Lỗi khi gửi yêu cầu: " + err;
+    });
+});
+</script>
+{% endblock %}
