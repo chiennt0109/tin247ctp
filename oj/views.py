@@ -1,6 +1,7 @@
 # path: oj/views.py
 from django.shortcuts import render
-
+from django.http import JsonResponse
+from judge.run_code import run_program
 
 # ==========================================================
 # 🌈 Trang chủ – Lộ trình học lập trình (14 giai đoạn)
@@ -107,3 +108,32 @@ def home(request):
         ),
     ]
     return render(request, "home.html", {"stages": stages})
+# 🌱 Trang chi tiết từng giai đoạn (VD: Giai đoạn 1)
+def roadmap_stage(request, stage_id):
+    STAGE_CONTENT = {
+        1: {
+            "title": "🧩 Giai đoạn 1: Làm quen với lập trình và tư duy máy tính",
+            "intro": "Bước khởi đầu làm quen với cách máy tính hoạt động, viết chương trình đầu tiên và rèn luyện tư duy thuật toán cơ bản.",
+            "topics": [
+                ("In chuỗi đơn giản", "Viết chương trình in ra: Hello, World!"),
+                ("Tính tổng hai số", "Nhập hai số nguyên a, b. In ra tổng a + b."),
+                ("Điều kiện cơ bản", "Nhập một số n. In ra 'Even' nếu n chẵn, 'Odd' nếu n lẻ."),
+                ("Vòng lặp for", "Nhập n. In ra các số từ 1 đến n trên cùng một dòng."),
+            ],
+        }
+    }
+    stage = STAGE_CONTENT.get(stage_id)
+    if not stage:
+        return render(request, "404.html", {"message": "Không tìm thấy giai đoạn này."})
+    return render(request, "roadmap_stage.html", {"stage": stage})
+
+
+# 💻 API chạy code trực tuyến
+def run_code_online(request):
+    if request.method == "POST":
+        language = request.POST.get("language", "python")
+        source = request.POST.get("source", "")
+        input_data = request.POST.get("input", "")
+        output, _ = run_program(language, source, input_data)
+        return JsonResponse({"result": output})
+    return JsonResponse({"error": "Invalid request"}, status=400)
