@@ -8,10 +8,10 @@
     <div class="col-md-5">
       <h5 class="fw-bold mb-3">📘 Danh sách bài tập</h5>
       <ul class="list-group">
-        {% for t, desc in stage.topics %}
+        {% for t in stage.topics %}
         <li class="list-group-item">
-          <b>{{ t }}</b><br>
-          <small>{{ desc }}</small>
+          <b>{{ t.title }}</b><br>
+          <small>{{ t.summary }}</small>
         </li>
         {% endfor %}
       </ul>
