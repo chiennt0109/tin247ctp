@@ -52,22 +52,22 @@ def home(request):
          ["Dijkstra, Bellman-Ford", "Floyd-Warshall", "Toposort", "MST: Kruskal, Prim"],
          "graphadv", "green"),
 
-        ("Giai đoạn 11️⃣: Cây & Cấu trúc dữ liệu nâng cao",
+        ("Giai đoạn 1️⃣1️⃣: Cây & Cấu trúc dữ liệu nâng cao",
          "Sử dụng cây và cấu trúc nâng cao để tối ưu hóa thuật toán.",
          ["Cây nhị phân, BST, AVL", "Segment Tree, Fenwick Tree", "Union-Find, Trie"],
          "tree", "lime"),
 
-        ("Giai đoạn 12️⃣: Lý thuyết số & Toán trong lập trình",
+        ("Giai đoạn 1️⃣2️⃣: Lý thuyết số & Toán trong lập trình",
          "Trang bị công cụ toán học để xử lý các bài toán số học và thuật toán.",
          ["Ước chung lớn nhất (GCD)", "Modulo", "Phân tích thừa số", "Sàng Eratosthenes"],
          "math", "cyan"),
 
-        ("Giai đoạn 13️⃣: Chuỗi & Xử lý ký tự",
+        ("Giai đoạn 1️⃣3️⃣: Chuỗi & Xử lý ký tự",
          "Áp dụng kỹ thuật xử lý chuỗi để giải quyết bài toán văn bản và pattern matching.",
          ["KMP, Z-Algorithm", "Rolling Hash", "Palindrome, Substring", "Pattern matching"],
          "string", "fuchsia"),
 
-        ("Giai đoạn 14️⃣: Luyện thi & dự án tổng hợp",
+        ("Giai đoạn 1️⃣4️⃣: Luyện thi & dự án tổng hợp",
          "Rèn luyện kỹ năng thi HSG, OI, hoặc phỏng vấn lập trình với bài tổng hợp đa kỹ thuật.",
          ["Bài tổng hợp (DP + Graph)", "Tối ưu độ phức tạp", "Lập trình hướng đối tượng", "Phân tích & debug"],
          "advanced", "stone"),
