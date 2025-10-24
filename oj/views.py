@@ -2,7 +2,101 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from judge.run_code import run_program
-
+import os
+# =============================
+# DANH SÁCH GIAI ĐOẠN LUYỆN TẬP
+# =============================
+STAGES = [
+    {
+        "id": 1,
+        "title": "Giai đoạn 1: Làm quen với thuật toán và cấu trúc cơ bản",
+        "summary": "Khởi đầu hành trình với biến, vòng lặp, và tư duy thuật toán đơn giản. Giai đoạn này giúp bạn làm quen với cách phân tích bài toán và viết chương trình cơ bản.",
+        "topics": [
+            {
+                "title": "1.1. Biến, kiểu dữ liệu và nhập xuất",
+                "summary": "Hiểu cách khai báo biến, nhập và xuất dữ liệu trong C++ và Python.",
+                "lang_support": ["C++", "Python"],
+                "more_url": "/stages/1/topic/1",
+                "sample_cpp": """#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << a + b << endl;
+    return 0;
+}""",
+                "sample_py": """a, b = map(int, input().split())
+print(a + b)"""
+            },
+            {
+                "title": "1.2. Cấu trúc điều kiện (if / else)",
+                "summary": "Phân nhánh quyết định trong chương trình – nền tảng cho mọi thuật toán phức tạp.",
+                "lang_support": ["C++", "Python"],
+                "more_url": "/stages/1/topic/2",
+                "sample_cpp": """#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int n; cin >> n;
+    if (n % 2 == 0) cout << "Even";
+    else cout << "Odd";
+}""",
+                "sample_py": """n = int(input())
+print("Even" if n % 2 == 0 else "Odd")"""
+            },
+            {
+                "title": "1.3. Vòng lặp for / while",
+                "summary": "Tự động hoá các thao tác lặp, xử lý dãy số, tính tổng, đếm và nhiều hơn nữa.",
+                "lang_support": ["C++", "Python"],
+                "more_url": "/stages/1/topic/3",
+                "sample_cpp": """#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int n, sum = 0; cin >> n;
+    for (int i = 1; i <= n; i++) sum += i;
+    cout << sum;
+}""",
+                "sample_py": """n = int(input())
+print(sum(range(1, n + 1)))"""
+            },
+            {
+                "title": "1.4. Bài tập thực hành: Tổng các số chẵn",
+                "summary": "Luyện tập viết vòng lặp, tính tổng có điều kiện, và xuất kết quả.",
+                "lang_support": ["C++", "Python"],
+                "more_url": "/stages/1/topic/4",
+                "sample_cpp": """#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int n, s = 0;
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+        if (i % 2 == 0) s += i;
+    cout << s;
+}""",
+                "sample_py": """n = int(input())
+print(sum(i for i in range(1, n + 1) if i % 2 == 0))"""
+            },
+        ],
+    },
+    # --- GIAI ĐOẠN 2..14 (KHUNG SẴN SÀNG MỞ RỘNG) ---
+    {
+        "id": 2,
+        "title": "Giai đoạn 2: Mảng và chuỗi ký tự",
+        "summary": "Làm quen với cấu trúc dữ liệu tuyến tính đầu tiên – mảng và chuỗi. Xử lý dữ liệu hàng loạt, đếm, tìm kiếm, đảo ngược, nối chuỗi, v.v.",
+        "topics": [],
+    },
+    {"id": 3, "title": "Giai đoạn 3: Hàm và tư duy chia nhỏ bài toán", "summary": "", "topics": []},
+    {"id": 4, "title": "Giai đoạn 4: Đệ quy và nguyên lý quay lui", "summary": "", "topics": []},
+    {"id": 5, "title": "Giai đoạn 5: Cấu trúc dữ liệu ngăn xếp & hàng đợi", "summary": "", "topics": []},
+    {"id": 6, "title": "Giai đoạn 6: Sắp xếp và tìm kiếm", "summary": "", "topics": []},
+    {"id": 7, "title": "Giai đoạn 7: Mảng hai chiều và xử lý ma trận", "summary": "", "topics": []},
+    {"id": 8, "title": "Giai đoạn 8: Kỹ thuật duyệt đồ thị (DFS/BFS)", "summary": "", "topics": []},
+    {"id": 9, "title": "Giai đoạn 9: Quy hoạch động (Dynamic Programming)", "summary": "", "topics": []},
+    {"id": 10, "title": "Giai đoạn 10: Chia để trị (Divide and Conquer)", "summary": "", "topics": []},
+    {"id": 11, "title": "Giai đoạn 11: Tham lam (Greedy)", "summary": "", "topics": []},
+    {"id": 12, "title": "Giai đoạn 12: Cấu trúc dữ liệu nâng cao (Set, Map, Heap...)", "summary": "", "topics": []},
+    {"id": 13, "title": "Giai đoạn 13: Đồ thị có trọng số, cây khung, Dijkstra", "summary": "", "topics": []},
+    {"id": 14, "title": "Giai đoạn 14: Ôn tập tổng hợp & các bài thi chuyên", "summary": "", "topics": []},
+]
 # ==========================================================
 # 🌈 Trang chủ – Lộ trình học lập trình (14 giai đoạn)
 # ==========================================================
@@ -110,30 +204,33 @@ def home(request):
     return render(request, "home.html", {"stages": stages})
 # 🌱 Trang chi tiết từng giai đoạn (VD: Giai đoạn 1)
 def roadmap_stage(request, stage_id):
-    STAGE_CONTENT = {
-        1: {
-            "title": "🧩 Giai đoạn 1: Làm quen với lập trình và tư duy máy tính",
-            "intro": "Bước khởi đầu làm quen với cách máy tính hoạt động, viết chương trình đầu tiên và rèn luyện tư duy thuật toán cơ bản.",
-            "topics": [
-                ("In chuỗi đơn giản", "Viết chương trình in ra: Hello, World!"),
-                ("Tính tổng hai số", "Nhập hai số nguyên a, b. In ra tổng a + b."),
-                ("Điều kiện cơ bản", "Nhập một số n. In ra 'Even' nếu n chẵn, 'Odd' nếu n lẻ."),
-                ("Vòng lặp for", "Nhập n. In ra các số từ 1 đến n trên cùng một dòng."),
-            ],
-        }
-    }
-    stage = STAGE_CONTENT.get(stage_id)
+    """Trang chi tiết 1 giai đoạn"""
+    stage = next((s for s in STAGES if s["id"] == stage_id), None)
     if not stage:
-        return render(request, "404.html", {"message": "Không tìm thấy giai đoạn này."})
-    return render(request, "roadmap_stage.html", {"stage": stage})
+        return render(request, "oj/not_found.html", {"message": "Không tìm thấy giai đoạn này."})
+
+    # tìm prev / next
+    idx = STAGES.index(stage)
+    prev_stage = STAGES[idx - 1] if idx > 0 else None
+    next_stage = STAGES[idx + 1] if idx < len(STAGES) - 1 else None
+
+    context = {
+        "stage": stage,
+        "prev_stage": prev_stage,
+        "next_stage": next_stage,
+    }
+    return render(request, "oj/roadmap_stage.html", context)
 
 
-# 💻 API chạy code trực tuyến
 def run_code_online(request):
+    """Form chạy code trực tiếp trong trang"""
     if request.method == "POST":
-        language = request.POST.get("language", "python")
-        source = request.POST.get("source", "")
+        language = request.POST.get("language", "")
+        code = request.POST.get("code", "")
         input_data = request.POST.get("input", "")
-        output, _ = run_program(language, source, input_data)
-        return JsonResponse({"result": output})
-    return JsonResponse({"error": "Invalid request"}, status=400)
+        try:
+            output = run_program(language, code, input_data)
+        except Exception as e:
+            output = f"Lỗi khi chạy code: {str(e)}"
+        return JsonResponse({"output": output})
+    return JsonResponse({"error": "Invalid request"})
