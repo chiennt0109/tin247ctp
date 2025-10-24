@@ -219,7 +219,7 @@ def roadmap_stage(request, stage_id):
         "prev_stage": prev_stage,
         "next_stage": next_stage,
     }
-    return render(request, "oj/roadmap_stage.html", context)
+    return render(request, "roadmap_stage.html", context)
 
 
 def run_code_online(request):
