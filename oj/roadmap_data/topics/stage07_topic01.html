@@ -1,0 +1,118 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu backtracking là gì: ta xây dựng lời giải dần dần theo từng bước.</li>
+  <li>Biết sinh ra tất cả các hoán vị (permutation) 1..n.</li>
+  <li>Biết sinh ra tổ hợp (combination) k phần tử từ n phần tử.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Tư duy quay lui cơ bản</h2>
+<p>
+Ta xây dựng lời giải dần dần. Mỗi bước:
+</p>
+<ol>
+  <li>Thử chọn một giá trị hợp lệ tiếp theo.</li>
+  <li>Đệ quy sang bước tiếp theo.</li>
+  <li>Quay lui (bỏ lựa chọn đó đi) để thử lựa chọn khác.</li>
+</ol>
+
+<p>Ý tưởng này lặp đi lặp lại trong TỔNG HỢP, THỬ NGHIỆM, và GIẢI ĐỀ THI HSG.</p>
+
+<hr>
+
+<h2>💻 Ví dụ 1: sinh hoán vị 1..n</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int n;
+vector&lt;int&gt; cur;
+vector&lt;int&gt; used;
+
+void backtrack() {
+    if ((int)cur.size() == n) {
+        for (int x : cur) cout &lt;&lt; x &lt;&lt; " ";
+        cout &lt;&lt; "\n";
+        return;
+    }
+    for (int val = 1; val &lt;= n; val++) {
+        if (!used[val]) {
+            used[val] = 1;
+            cur.push_back(val);
+            backtrack();
+            cur.pop_back();
+            used[val] = 0;
+        }
+    }
+}
+
+int main() {
+    cin &gt;&gt; n;
+    used.assign(n+1, 0);
+    backtrack();
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>n = int(input())
+cur = []
+used = [False]*(n+1)
+
+def backtrack():
+    if len(cur) == n:
+        print(*cur)
+        return
+    for val in range(1, n+1):
+        if not used[val]:
+            used[val] = True
+            cur.append(val)
+            backtrack()
+            cur.pop()
+            used[val] = False
+
+backtrack()</code></pre>
+
+<hr>
+
+<h2>💻 Ví dụ 2: sinh tổ hợp C(n, k)</h2>
+<p>Chỉ chọn đúng k phần tử tăng dần, không lặp lại.</p>
+
+<h4>Python (tổ hợp)</h4>
+<pre><code>n, k = map(int, input().split())
+cur = []
+
+def backtrack(start):
+    if len(cur) == k:
+        print(*cur)
+        return
+    for val in range(start, n+1):
+        cur.append(val)
+        backtrack(val+1)
+        cur.pop()
+
+backtrack(1)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>In tất cả các hoán vị của [1..n] theo thứ tự từ điển.</li>
+  <li>In tất cả tổ hợp k phần tử từ [1..n].</li>
+  <li>In tất cả chuỗi nhị phân độ dài n (gồm 0 và 1).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu cho chuỗi nhị phân</b></summary>
+  <pre><code>n = int(input())
+cur = []
+def backtrack():
+    if len(cur) == n:
+        print("".join(cur))
+        return
+    for bit in ["0","1"]:
+        cur.append(bit)
+        backtrack()
+        cur.pop()
+backtrack()</code></pre>
+</details>
