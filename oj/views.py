@@ -37,11 +37,25 @@ def roadmap_stage(request, stage_id):
     return render(request, "roadmap_stage.html", {"stage": stage, "prev_stage": prev_stage, "next_stage": next_stage})
 
 def topic_detail(request, stage_id, topic_index):
+    # Tìm stage theo ID
     stage = next((s for s in STAGES if s["id"] == stage_id), None)
-    if not stage or topic_index > len(stage["topics"]):
+    if not stage:
+        return render(request, "oj/not_found.html", {"message": "Không tìm thấy giai đoạn này."})
+
+    # Kiểm tra index topic hợp lệ
+    topics = stage.get("topics", [])
+    if topic_index < 1 or topic_index > len(topics):
         return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung chi tiết."})
-    topic = stage["topics"][topic_index - 1]
-    return render(request, "topic_detail.html", {"topic": topic, "stage": stage})
+
+    # Lấy topic tương ứng
+    topic = topics[topic_index - 1]
+
+    # Trả về trang chi tiết
+    return render(request, "topic_detail.html", {
+        "stage": stage,
+        "topic": topic
+    })
+
 
 def run_code_online(request):
     if request.method == "POST":
