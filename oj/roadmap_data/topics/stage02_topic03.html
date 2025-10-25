@@ -1,0 +1,136 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu hàm là gì và tại sao phải dùng hàm.</li>
+  <li>Biết cách định nghĩa và gọi hàm trong C++ và Python.</li>
+  <li>Hiểu sự khác nhau giữa truyền tham trị (copy giá trị) và tham chiếu (tham chiếu trực tiếp đến biến gốc) trong C++.</li>
+  <li>Biết cách viết hàm tính toán cụ thể: ví dụ hàm tính tổng mảng.</li>
+</ul>
+
+<hr>
+
+<h2>1. Hàm là gì?</h2>
+<p>Hàm là một “khối lệnh có tên”, giúp tránh lặp lại code và làm chương trình rõ ràng hơn.</p>
+
+<hr>
+
+<h2>2. Cú pháp hàm trong C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int cong(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    cout &lt;&lt; cong(3, 5);
+    return 0;
+}
+</code></pre>
+
+<hr>
+
+<h2>3. Cú pháp hàm trong Python</h2>
+<pre><code>def cong(a, b):
+    return a + b
+
+print(cong(3, 5))
+</code></pre>
+
+<hr>
+
+<h2>4. Truyền tham trị vs tham chiếu (C++)</h2>
+<h3>Truyền tham trị (by value)</h3>
+<pre><code>void tangLen_Value(int x) {
+    x = x + 1;
+}
+
+int main() {
+    int a = 10;
+    tangLen_Value(a);
+    cout &lt;&lt; a; // vẫn là 10
+}
+</code></pre>
+
+<h3>Truyền tham chiếu (by reference)</h3>
+<pre><code>void tangLen_Ref(int &amp;x) {
+    x = x + 1;
+}
+
+int main() {
+    int a = 10;
+    tangLen_Ref(a);
+    cout &lt;&lt; a; // giờ là 11
+}
+</code></pre>
+
+<p><b>Ghi nhớ:</b> Python không có ký hiệu &amp; nhưng list, dict là kiểu truyền tham chiếu ngầm.</p>
+
+<hr>
+
+<h2>5. Hàm tính tổng mảng</h2>
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>long long sumArray(const vector&lt;int&gt;&amp; a) {
+    long long s = 0;
+    for (int x : a) s += x;
+    return s;
+}
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+    cout &lt;&lt; sumArray(a);
+}
+</code></pre>
+</td>
+<td>
+<pre><code>def sum_array(a):
+    s = 0
+    for x in a:
+        s += x
+    return s
+
+n = int(input())
+arr = list(map(int, input().split()))
+print(sum_array(arr))
+</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>🧩 Bài tập tự luyện</h2>
+<ol>
+  <li>Viết hàm <code>max3(a,b,c)</code> trả về số lớn nhất trong ba số.</li>
+  <li>Viết hàm <code>is_prime(n)</code> kiểm tra n có phải số nguyên tố.</li>
+  <li>Viết hàm <code>reverse_string(s)</code> trả về chuỗi đảo ngược.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý C++ cho is_prime</b></summary>
+  <pre><code>bool is_prime(int n) {
+    if (n &lt; 2) return false;
+    for (int i = 2; i * i &lt;= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}
+</code></pre>
+</details>
+
+<details>
+  <summary><b>🐍 Gợi ý Python cho reverse_string</b></summary>
+  <pre><code>def reverse_string(s):
+    return s[::-1]
+</code></pre>
+</details>
+
+<p class="text-info text-center mt-3 fw-bold">
+➡ Tiếp theo: Đọc / Ghi file để xử lý dữ liệu từ .INP, .OUT như bài thi thật.
+</p>
