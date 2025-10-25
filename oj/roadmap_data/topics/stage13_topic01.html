@@ -1,0 +1,78 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cơ chế tìm mẫu (pattern matching) trong chuỗi.</li>
+  <li>Biết cách hoạt động của thuật toán KMP và Z-Algorithm.</li>
+  <li>So sánh tốc độ giữa tìm kiếm tuyến tính và KMP.</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Giới thiệu bài toán</h2>
+<p>Cho chuỗi <code>T</code> (văn bản) và chuỗi <code>P</code> (mẫu).  
+Tìm mọi vị trí <i>i</i> sao cho <code>T[i..i+|P|-1] = P</code>.</p>
+
+<hr>
+
+<h2>📘 2️⃣ Thuật toán KMP</h2>
+<p>KMP tính trước mảng <code>LPS</code> (Longest Prefix Suffix) để khi lệch không cần quay lại toàn bộ mẫu.</p>
+
+<h4>🌿 C++</h4>
+<pre><code>vector&lt;int&gt; buildLPS(string p){
+    int n=p.size(); vector&lt;int&gt; lps(n);
+    for(int i=1,len=0;i&lt;n;){
+        if(p[i]==p[len]) lps[i++]=++len;
+        else if(len) len=lps[len-1];
+        else lps[i++]=0;
+    }
+    return lps;
+}</code></pre>
+
+<h4>🌿 Python</h4>
+<pre><code>def build_lps(p):
+    n=len(p);lps=[0]*n;length=0;i=1
+    while i&lt;n:
+        if p[i]==p[length]:
+            length+=1;lps[i]=length;i+=1
+        elif length: length=lps[length-1]
+        else: i+=1
+    return lps</code></pre>
+
+<hr>
+
+<h2>📘 3️⃣ Z-Algorithm (tìm mẫu bằng Z-array)</h2>
+<p>
+Z-Algorithm tạo mảng Z[i] = độ dài đoạn khớp giữa T[i..] và T.  
+Ứng dụng: tìm P trong T bằng cách nối <code>P#$T</code>.
+</p>
+
+<pre><code>def Z_algorithm(s):
+    n=len(s);Z=[0]*n;l=r=0
+    for i in range(1,n):
+        if i&lt;=r: Z[i]=min(r-i+1,Z[i-l])
+        while i+Z[i]&lt;n and s[Z[i]]==s[i+Z[i]]:
+            Z[i]+=1
+        if i+Z[i]-1&gt;r: l=i;r=i+Z[i]-1
+    return Z
+print(Z_algorithm("aabxaayaab"))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>In tất cả vị trí xuất hiện của P trong T bằng KMP.</li>
+  <li>So sánh thời gian chạy giữa KMP và tìm tuyến tính cho n = 10⁶.</li>
+  <li>Sử dụng Z-Algorithm để đếm số lần P xuất hiện trong T.</li>
+</ol>
+
+<details><summary><b>💡 Lời giải 1</b></summary>
+<pre><code>t="ababcababcabc"; p="ababc"
+lps=build_lps(p)
+i=j=0
+while i&lt;len(t):
+    if t[i]==p[j]: i+=1; j+=1
+    if j==len(p):
+        print("found at",i-j)
+        j=lps[j-1]
+    elif i&lt;len(t) and t[i]!=p[j]:
+        j=lps[j-1] if j else i+1</code></pre>
+</details>
