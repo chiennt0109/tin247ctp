@@ -1,0 +1,60 @@
+<h2>🎯 Mục tiêu</h2>
+<ul>
+  <li>Hiểu nguyên lý băm (Rolling Hash) để so sánh chuỗi nhanh.</li>
+  <li>Biết công thức tính hash con substring O(1).</li>
+  <li>Ứng dụng trong tìm kiếm văn bản, kiểm tra chuỗi đối xứng.</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Công thức cơ bản</h2>
+<p>Với chuỗi S = s₁s₂...sₙ:</p>
+<pre><code>hash[i] = (hash[i-1] × BASE + ord(s[i])) mod MOD</code></pre>
+<p>
+Đoạn [l,r] có hash:
+<code>H(l,r) = hash[r] − hash[l−1]×BASE^{r−l+1}</code> (mod MOD)
+</p>
+
+<h4>🌿 Python</h4>
+<pre><code>BASE=131; MOD=10**9+7
+def build_hash(s):
+    n=len(s)
+    pw=[1]*(n+1); h=[0]*(n+1)
+    for i in range(1,n+1):
+        pw[i]=pw[i-1]*BASE%MOD
+        h[i]=(h[i-1]*BASE+ord(s[i-1]))%MOD
+    return pw,h
+def get_hash(l,r,pw,h):
+    return (h[r]-h[l-1]*pw[r-l+1]%MOD+MOD)%MOD
+s="abracadabra"
+pw,h=build_hash(s)
+print(get_hash(1,3,pw,h),get_hash(8,10,pw,h))</code></pre>
+
+<h4>🌿 C++</h4>
+<pre><code>const long long BASE=131,MOD=1e9+7;
+vector&lt;long long&gt; pw,hashP;
+void build(string s){
+    int n=s.size();
+    pw.assign(n+1,1); hashP.assign(n+1,0);
+    for(int i=1;i&lt;=n;i++){
+        pw[i]=pw[i-1]*BASE%MOD;
+        hashP[i]=(hashP[i-1]*BASE+s[i-1])%MOD;
+    }
+}
+long long getH(int l,int r){
+    return (hashP[r]-hashP[l-1]*pw[r-l+1]%MOD+MOD)%MOD;
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập</h2>
+<ol>
+  <li>Viết hàm so sánh hai chuỗi con có bằng nhau bằng Rolling Hash.</li>
+  <li>Tìm số chuỗi con khác nhau trong S.</li>
+  <li>Kiểm tra chuỗi đối xứng bằng hash thuận và nghịch.</li>
+</ol>
+
+<details><summary><b>💡 Gợi ý bài 3</b></summary>
+<pre><code># Tạo hash thuận và hash đảo chuỗi
+# so sánh H_f(l,r) == H_b(n-r+1,n-l+1)</code></pre>
+</details>
