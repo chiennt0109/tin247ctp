@@ -230,7 +230,11 @@ def run_code_online(request):
         input_data = request.POST.get("input", "")
         try:
             output = run_program(language, code, input_data)
+            # Đảm bảo chỉ trả về chuỗi, không tuple
+            if isinstance(output, (list, tuple)):
+                output = output[0]
         except Exception as e:
             output = f"Lỗi khi chạy code: {str(e)}"
-        return JsonResponse({"output": output})
+        return JsonResponse({"output": str(output).strip()})
     return JsonResponse({"error": "Invalid request"})
+
