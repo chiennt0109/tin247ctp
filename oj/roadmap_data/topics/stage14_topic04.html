@@ -1,0 +1,75 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết chiến lược làm bài tối ưu: lấy chắc điểm trước, tối ưu sau.</li>
+  <li>Biết phân loại bài: bài A/B/C/D kiểu gì.</li>
+  <li>Biết khi nào nên bỏ bài (để quay lại sau).</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Phân loại bài trong 1 contest chuẩn</h2>
+<p>Thường sẽ có cấu trúc như sau:</p>
+<ul>
+  <li><b>Bài A:</b> Dễ, chỉ cần if/for/string, đọc đề là code được. Ăn điểm nền tảng.</li>
+  <li><b>Bài B:</b> Cần 1 ý tưởng thuật toán cơ bản (tham lam, DP 1D, BFS,...).</li>
+  <li><b>Bài C:</b> Dùng cấu trúc dữ liệu hoặc thuật toán nặng hơn (Segment Tree, Dijkstra, DP 2D...).</li>
+  <li><b>Bài D:</b> Khó, tổng hợp, chống-cheat tư duy. Nhiều khi không ai AC full đâu, đừng hoảng.</li>
+</ul>
+
+<p>
+👉 Nghĩa là: <b>đừng lao vào bài C/D đầu tiên</b> dù nghe có vẻ “thú vị hơn”.  
+Lấy sạch điểm dễ trước. Điểm dễ = huy chương.
+</p>
+
+<hr>
+
+<h2>📗 2️⃣ Chiến lược thời gian trong phòng thi</h2>
+<ol>
+  <li><b>5-10 phút đầu:</b> Lướt toàn bộ đề, phân loại độ khó, ghi chú nhanh (trên giấy nháp).</li>
+  <li><b>45-60 phút đầu:</b> Giải chắc chắn các bài A/B. Ưu tiên code sạch, không bug. Test kỹ input lẻ.</li>
+  <li><b>Phần giữa:</b> Nhảy sang bài C. Nếu sau ~20-30 phút vẫn tịt ý tưởng → <b>đổi bài khác</b>.</li>
+  <li><b>Cuối cùng:</b> Quay lại bài C/D để tối ưu, thêm heuristic, thêm case phụ.</li>
+  <li><b>5 phút cuối:</b> test lại input cỡ nhỏ đặc biệt (0, 1, n=1, trùng lặp...).</li>
+</ol>
+
+<hr>
+
+<h2>📘 3️⃣ Checklist trước khi nộp</h2>
+<ul>
+  <li>Có đọc hết input chưa? (nhiều bạn quên đọc m dòng dữ liệu cuối 😅)</li>
+  <li>Biến có thể tràn int không? (dùng long long / int64)</li>
+  <li>Có in đúng format khoảng trắng/xuống dòng chưa?</li>
+  <li>Đã xoá debug chưa?</li>
+</ul>
+
+<hr>
+
+<h2>📗 4️⃣ Mini tool sắp xếp độ ưu tiên bài</h2>
+
+<h4>🌿 Python minh hoạ</h4>
+<pre><code>problems = [
+    (1,"Bài A: dễ, code nhanh, ăn điểm nền tảng"),
+    (2,"Bài B: tham lam / BFS / sort"),
+    (3,"Bài C: DP 2D / Dijkstra / Segment Tree"),
+    (4,"Bài D: kết hợp nhiều mảng + trick"),
+]
+problems.sort()
+for _,desc in problems:
+    print(desc)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Lấy một đề thi cũ. Hãy phân loại A / B / C / D theo độ khó thay vì thứ tự đề bài.</li>
+  <li>Viết checklist nộp bài cho riêng em (bao gồm lỗi hay gặp của em).</li>
+  <li>Luyện "bỏ bài đúng lúc": đặt timer 25 phút. Nếu chưa ra ý tưởng, em phải đổi bài khác. Ghi lại cảm giác.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Vì sao luyện bỏ bài?</b></summary>
+  <pre><code>Trong thi thật, 1 bài khó có thể hút hết 2 giờ.
+Trong lúc đó em bỏ lỡ 30 điểm dễ ở bài còn lại.
+Huy chương không hỏi "em giải bài hardest chưa",
+huy chương chỉ đọc tổng điểm.</code></pre>
+</details>
