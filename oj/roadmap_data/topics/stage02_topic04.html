@@ -1,0 +1,93 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu vì sao cần đọc / ghi file thay vì chỉ nhập tay.</li>
+  <li>Biết cách đọc dữ liệu từ file đầu vào (.INP).</li>
+  <li>Biết cách ghi kết quả ra file đầu ra (.OUT).</li>
+</ul>
+
+<hr>
+
+<h2>1. Tại sao phải dùng file?</h2>
+<p>Trong các kỳ thi lập trình, dữ liệu đầu vào / đầu ra thường nằm trong file:
+<br><code>BAI1.INP</code> chứa dữ liệu, <code>BAI1.OUT</code> chứa kết quả.</p>
+
+<hr>
+
+<h2>2. Cách đọc / ghi file trong C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    ifstream fin("BAI1.INP");   // mở file để đọc
+    ofstream fout("BAI1.OUT");  // mở file để ghi
+
+    int a, b;
+    fin &gt;&gt; a &gt;&gt; b;              // đọc 2 số
+    fout &lt;&lt; (a + b);             // ghi kết quả
+
+    return 0;
+}
+</code></pre>
+
+<p><b>Lưu ý:</b> File .INP và .OUT nằm cùng thư mục chạy chương trình.</p>
+
+<hr>
+
+<h2>3. Cách đọc / ghi file trong Python</h2>
+<pre><code>fin = open("BAI1.INP", "r")
+fout = open("BAI1.OUT", "w")
+
+a, b = map(int, fin.read().split())
+fout.write(str(a + b))
+
+fin.close()
+fout.close()
+</code></pre>
+
+<hr>
+
+<h2>4. Bài mẫu kiểu đề thi thật</h2>
+<p><b>Đề:</b> <code>SUM.INP</code> chứa hai số a, b. Hãy tạo <code>SUM.OUT</code> ghi tổng a+b.</p>
+
+<details>
+  <summary><b>💻 Lời giải mẫu C++</b></summary>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    ifstream fin("SUM.INP");
+    ofstream fout("SUM.OUT");
+    long long a, b;
+    fin &gt;&gt; a &gt;&gt; b;
+    fout &lt;&lt; (a + b);
+    return 0;
+}
+</code></pre>
+</details>
+
+<details>
+  <summary><b>🐍 Lời giải mẫu Python</b></summary>
+  <pre><code>fin = open("SUM.INP", "r")
+fout = open("SUM.OUT", "w")
+
+nums = fin.read().split()
+a = int(nums[0])
+b = int(nums[1])
+fout.write(str(a + b))
+
+fin.close()
+fout.close()
+</code></pre>
+</details>
+
+<hr>
+
+<h2>🧩 Bài tập tự luyện</h2>
+<ol>
+  <li><b>PRODUCT.INP</b> chứa hai số nguyên. Ghi ra <b>PRODUCT.OUT</b> giá trị a*b.</li>
+  <li><b>MAXNUM.INP</b> chứa nhiều số, ghi ra <b>MAXNUM.OUT</b> số lớn nhất.</li>
+  <li><b>COUNTZERO.INP</b> chứa ma trận R×C, ghi ra <b>COUNTZERO.OUT</b> số phần tử bằng 0.</li>
+</ol>
+
+<p class="text-center text-info fw-bold mt-3">
+➡ Đây là bước đầu để làm bài thi tự động chấm bằng file.
+</p>
