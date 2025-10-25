@@ -1,4 +1,4 @@
-<section class="relative overflow-hidden py-20 text-center bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50">
+<section class="relative overflow-hidden py-20 text-center bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50 z-0">
   <div class="max-w-5xl mx-auto px-6 relative z-10">
 
     <!-- Tiêu đề -->
@@ -10,7 +10,6 @@
       Học tập – Rèn luyện vì ngày mai lập nghiệp 🚀
     </p>
 
-    <!-- Nút hành động -->
     <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
       <a href="/problems/"
          class="px-6 py-3 bg-gradient-to-r from-sky-200 to-indigo-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition transform no-underline">
@@ -27,11 +26,10 @@
     </div>
   </div>
 
-  <!-- Nền động nhẹ -->
-  <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50"></div>
+  <!-- ✅ Nền động nằm dưới, không đè -->
+  <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50 z-0"></div>
 
   <style>
-    /* Hiệu ứng gradient động */
     @keyframes gradientMove {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -41,15 +39,7 @@
       background-size: 200% 200%;
       animation: gradientMove 15s ease infinite;
     }
-
-    /* Xóa gạch chân cho toàn bộ thẻ a */
-    a {
-      text-decoration: none !important;
-    }
-
-    /* Loại bỏ bóng chữ để chữ đen rõ ràng */
-    h1, p, a {
-      text-shadow: none;
-    }
+    a { text-decoration: none !important; }
+    h1, p, a { text-shadow: none; }
   </style>
 </section>
