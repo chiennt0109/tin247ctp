@@ -116,6 +116,27 @@
     .btn-zalo:hover {
       background: #1e40af;
     }
+    /* Đảm bảo Navbar nổi lên trên hero section */
+    .oj-navbar {
+      position: relative;
+      z-index: 50 !important;
+    }
+    
+    /* Giới hạn overlay của hero trong section thôi, không tràn ra ngoài */
+    section.relative {
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    section.relative .absolute {
+      z-index: 0;
+    }
+    section.relative .relative {
+      position: relative;
+      z-index: 10;
+    }
+
   </style>
 
   {% block extra_head %}{% endblock %}
