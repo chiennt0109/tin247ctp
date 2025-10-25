@@ -33,7 +33,7 @@
     <p class="text-muted mb-4">{{ stage.summary }}</p>
 
     <div class="row">
-      <!-- ======================= CỘT TRÁI – DANH SÁCH CHỦ ĐỀ ======================= -->
+      <!-- ======================= CỘT TRÁI ======================= -->
       <div class="col-md-4 border-end">
         <h5 class="fw-semibold text-secondary mb-3">📘 Các mục trong giai đoạn</h5>
         <div id="topic-list">
@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <!-- ======================= CỘT PHẢI – HIỂN THỊ NỘI DUNG + EDITOR ======================= -->
+      <!-- ======================= CỘT PHẢI ======================= -->
       <div class="col-md-8 ps-4">
         <div id="topic-content">
           <h5 class="fw-bold text-primary">Chọn một mục ở bên trái để xem nội dung chi tiết 👈</h5>
@@ -56,7 +56,7 @@
 
         <hr class="my-4">
 
-        <!-- ======================= KHUNG EDITOR DUY NHẤT ======================= -->
+        <!-- ======================= KHUNG EDITOR ======================= -->
         <h5 class="fw-bold text-secondary mb-3">🧮 Thực hành – Viết và chạy code</h5>
         <form id="run-form" class="mb-3">
           {% csrf_token %}
@@ -91,7 +91,6 @@
       </div>
     </div>
 
-    <!-- ======================= ĐIỀU HƯỚNG GIAI ĐOẠN ======================= -->
     <div class="d-flex justify-content-between my-5">
       {% if prev_stage %}
         <a href="/roadmap/stage/{{ prev_stage.id }}/" class="btn btn-outline-secondary">⬅️ {{ prev_stage.title }}</a>
@@ -116,12 +115,10 @@
 
     let currentIndex = -1;
 
-    // Khi click 1 mục lý thuyết
     topicList.addEventListener("click", (e) => {
       const item = e.target.closest(".topic-item");
       if (!item) return;
 
-      // Xóa active cũ, thêm active mới
       topicList.querySelectorAll(".topic-item").forEach(i => i.classList.remove("active"));
       item.classList.add("active");
 
@@ -130,7 +127,10 @@
       if (!t) return;
 
       topicContent.innerHTML = `
-        <h4 class="fw-bold text-primary mb-2">${t.title}</h4>
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="fw-bold text-primary mb-2">${t.title}</h4>
+          <a href="${t.more_url}" class="btn btn-outline-primary btn-sm">📖 Xem chi tiết</a>
+        </div>
         <p>${t.summary}</p>
         <div class="row">
           <div class="col-md-6">
@@ -144,13 +144,11 @@
         </div>
       `;
 
-      // Reset code theo ví dụ của ngôn ngữ hiện tại
       const lang = document.getElementById("language").value;
       codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
       outputBox.textContent = "";
     });
 
-    // Nút Reset về ví dụ mẫu
     resetBtn.addEventListener("click", () => {
       if (currentIndex >= 0) {
         const t = topics[currentIndex];
@@ -160,7 +158,6 @@
       }
     });
 
-    // Gửi code AJAX
     document.getElementById("run-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = new FormData(e.target);
@@ -168,7 +165,7 @@
       try {
         const resp = await fetch("/roadmap/run/", { method: "POST", body: data });
         const res = await resp.json();
-        outputBox.textContent = res.output || ("⚠️ Lỗi: " + (res.error || "Không xác định"));
+        outputBox.textContent = (res.output || res.error || "").trim();
       } catch (err) {
         outputBox.textContent = "❌ Lỗi khi gửi yêu cầu: " + err;
       }
