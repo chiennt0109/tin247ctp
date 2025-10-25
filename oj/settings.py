@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from urllib.parse import urlparse
 
+# === PATHS ===
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === SECURITY ===
@@ -9,29 +10,38 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-change-me")
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = ["*"]
 
-# === APPLICATIONS ===
+# === INSTALLED APPS ===
 INSTALLED_APPS = [
+    # Django core
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # custom apps
+
+    # Custom apps
     "accounts",
     "problems",
     "submissions",
     "contests",
+
+    # Allauth for social login
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.github",
 ]
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+
+SITE_ID = 1
+
 # === MIDDLEWARE ===
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ⚡ static on Render
+    "whitenoise.middleware.WhiteNoiseMiddleware",   # ⚡ static trên Render
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -40,7 +50,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# === URL / WSGI ===
 ROOT_URLCONF = "oj.urls"
+WSGI_APPLICATION = "oj.wsgi.application"
 
 # === TEMPLATES ===
 TEMPLATES = [
@@ -59,10 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "oj.wsgi.application"
-
-# === DATABASE ===
-# Render cung cấp DATABASE_URL môi trường, nhưng ta fallback sang giá trị thủ công
+# === DATABASE (Render PostgreSQL) ===
 if "DATABASE_URL" in os.environ:
     result = urlparse(os.environ["DATABASE_URL"])
     DATABASES = {
@@ -87,21 +96,35 @@ else:
         }
     }
 
+# === AUTH / LOGIN ===
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+
 # === STATIC FILES ===
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# === TIME & LANGUAGE ===
+# === LANGUAGE / TIME ===
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Bangkok"
 USE_I18N = True
 USE_TZ = True
 
-# === DEFAULTS ===
+# === DEFAULT ===
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
