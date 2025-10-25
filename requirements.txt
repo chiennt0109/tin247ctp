@@ -3,3 +3,4 @@ gunicorn
 psycopg2-binary
 whitenoise
 requests
+django-allauth>=0.63.3
