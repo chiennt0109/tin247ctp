@@ -1,0 +1,76 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Sinh ra tất cả số nguyên tố ≤ N rất nhanh.</li>
+  <li>Áp dụng để trả lời truy vấn kiểu “bao nhiêu số nguyên tố ≤ X?”.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Ý tưởng thuật toán sàng</h2>
+<p>
+Ban đầu giả sử tất cả các số đều là nguyên tố.<br>
+Bắt đầu từ p = 2:<br>
+Nếu p còn được đánh dấu là nguyên tố, ta <b>xóa (đánh dấu không nguyên tố)</b> tất cả bội số của p: p², p²+p, p²+2p, ...  
+Đi tiếp với p+1.
+</p>
+
+<p>Độ phức tạp: xấp xỉ O(n log log n), rất nhanh trong thực tế.</p>
+
+<hr>
+
+<h2>💻 Python</h2>
+<pre><code>n = int(input())
+isPrime = [True]*(n+1)
+isPrime[0] = isPrime[1] = False
+p = 2
+while p*p <= n:
+    if isPrime[p]:
+        for j in range(p*p, n+1, p):
+            isPrime[j] = False
+    p += 1
+primes = [i for i in range(2,n+1) if isPrime[i]]
+print(primes)</code></pre>
+
+<h2>💻 C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    int n;cin>>n;
+    vector<int> isPrime(n+1,1);
+    isPrime[0]=isPrime[1]=0;
+    for(int p=2;p*p<=n;p++){
+        if(isPrime[p]){
+            for(int j=p*p;j<=n;j+=p)
+                isPrime[j]=0;
+        }
+    }
+    for(int i=2;i<=n;i++)
+        if(isPrime[i]) cout&lt;&lt;i&lt;&lt;" ";
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Đếm có bao nhiêu số nguyên tố ≤ n.</li>
+  <li>In phân tích nguyên tố của một số n (ví dụ 84 = 2² × 3 × 7).</li>
+  <li>Tìm cặp nguyên tố sinh đôi (p, p+2).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 2: Phân tích thừa số</b></summary>
+  <pre><code>def factorize(n, primes):
+    res = []
+    for p in primes:
+        if p*p > n: break
+        cnt=0
+        while n%p==0:
+            n//=p
+            cnt+=1
+        if cnt>0:
+            res.append((p,cnt))
+    if n>1:
+        res.append((n,1))
+    return res
+</code></pre>
+</details>
