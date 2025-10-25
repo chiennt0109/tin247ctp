@@ -12,5 +12,7 @@ urlpatterns = [
     # 🌈 Lộ trình học
     path("roadmap/stage/<int:stage_id>/", views.roadmap_stage, name="roadmap_stage"),
     path("roadmap/run/", views.run_code_online, name="run_code_online"),  # Ajax chạy code
+    path("stages/<int:stage_id>/topic/<int:topic_index>/", views.topic_detail, name="topic_detail"),
+
 ]
 
