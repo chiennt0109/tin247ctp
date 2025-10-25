@@ -1,0 +1,59 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu khái niệm <b>đệ quy</b>: hàm tự gọi lại chính nó.</li>
+  <li>Nắm được hai phần quan trọng của hàm đệ quy: <b>điều kiện dừng</b> và <b>lời gọi lại</b>.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Giải thích</h2>
+<p>Một hàm đệ quy có dạng:</p>
+
+<pre><code>// C++
+returnType function(parameters) {
+    if (điều kiện dừng) return kết_quả;
+    return function(tham_số_thay_đổi);
+}</code></pre>
+
+<p>Nếu không có điều kiện dừng, chương trình sẽ gọi vô hạn và <b>tràn stack</b>.</p>
+
+<hr>
+
+<h2>💻 Ví dụ: Giai thừa n!</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int factorial(int n){
+    if(n==0) return 1;
+    return n * factorial(n-1);
+}
+int main(){
+    int n;cin>>n;
+    cout<<factorial(n);
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>def factorial(n):
+    if n == 0:
+        return 1
+    return n * factorial(n - 1)
+print(factorial(int(input())))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính giai thừa của n (n!).</li>
+  <li>Tính tổng từ 1 đến n bằng đệ quy.</li>
+  <li>Tính Fibonaci thứ n (Fₙ = Fₙ₋₁ + Fₙ₋₂).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+def fib(n):
+    if n <= 1: return n
+    return fib(n - 1) + fib(n - 2)
+print(fib(6))</code></pre>
+</details>
