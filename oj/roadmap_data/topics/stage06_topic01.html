@@ -1,0 +1,61 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu tư tưởng ghi nhớ kết quả (memoization) trong quy hoạch động.</li>
+  <li>So sánh tốc độ giữa Fibonacci thường và có nhớ kết quả.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>Bài toán Fibonacci là ví dụ kinh điển của đệ quy lặp lại nhiều lần:</p>
+<pre><code>F(n) = F(n-1) + F(n-2), với F(0)=0, F(1)=1</code></pre>
+
+<p>Khi không nhớ kết quả, các lời gọi trùng lặp sẽ khiến chương trình cực kỳ chậm.  
+👉 Giải pháp: lưu các giá trị đã tính để dùng lại.</p>
+
+<hr>
+
+<h2>💻 Thực hành</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+vector&lt;long long&gt; f(100, -1);
+long long fib(int n){
+    if(n&lt;=1) return n;
+    if(f[n]!=-1) return f[n];
+    return f[n]=fib(n-1)+fib(n-2);
+}
+int main(){
+    int n;cin&gt;&gt;n;
+    cout&lt;&lt;fib(n);
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>from functools import lru_cache
+@lru_cache(None)
+def fib(n):
+    if n&lt;=1: return n
+    return fib(n-1)+fib(n-2)
+print(fib(int(input())))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính Fibonacci bằng đệ quy không nhớ.</li>
+  <li>Tính Fibonacci bằng memoization.</li>
+  <li>Đếm số lần gọi hàm trong hai cách trên để so sánh tốc độ.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+cnt=0
+def fib(n):
+    global cnt
+    cnt+=1
+    if n&lt;=1: return n
+    return fib(n-1)+fib(n-2)
+print(fib(10),"calls=",cnt)</code></pre>
+</details>
