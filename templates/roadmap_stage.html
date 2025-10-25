@@ -5,17 +5,20 @@
   <title>{{ stage.title }}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    body { background-color: #f8fafc; }
     pre { white-space: pre-wrap; font-size: 0.95rem; }
-    .code-box { font-family: "Fira Code", monospace; }
-    .topic-block:hover { background-color: #f8fafc; transition: 0.3s; }
-    .section-header { border-left: 5px solid #0d6efd; padding-left: 10px; }
     textarea { font-family: "Fira Code", monospace; font-size: 0.95rem; }
-    #output-box { min-height: 100px; max-height: 400px; overflow-y: auto; }
+    .topic-item { cursor: pointer; border-left: 4px solid transparent; }
+    .topic-item:hover { background-color: #f1f5f9; }
+    .topic-item.active { background-color: #e0f2fe; border-left-color: #0d6efd; }
+    #output-box { min-height: 120px; max-height: 400px; overflow-y: auto; }
+    .section-header { border-left: 5px solid #0d6efd; padding-left: 10px; }
+    .code-box { font-family: "Fira Code", monospace; font-size: 0.9rem; }
   </style>
 </head>
 
-<body class="bg-light">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
     <div class="container">
       <a class="navbar-brand fw-bold" href="/">🏫 IT Contest OJ</a>
       <ul class="navbar-nav ms-auto">
@@ -25,69 +28,73 @@
     </div>
   </nav>
 
-  <main class="container bg-white shadow-sm p-4 rounded">
-    <h2 class="fw-bold text-primary mb-2">{{ stage.title }}</h2>
+  <main class="container bg-white shadow-sm rounded p-4">
+    <h3 class="fw-bold text-primary">{{ stage.title }}</h3>
     <p class="text-muted mb-4">{{ stage.summary }}</p>
 
-    <!-- ========================== PHẦN LÝ THUYẾT ========================== -->
-    <h4 class="section-header mt-5 mb-3">📘 Lý thuyết & ví dụ</h4>
-    {% for topic in stage.topics %}
-      <div class="card mb-3 topic-block">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="fw-bold text-primary">{{ topic.title }}</h5>
-            <a href="{{ topic.more_url }}" class="btn btn-link btn-sm text-decoration-none">Chi tiết »</a>
+    <div class="row">
+      <!-- ======================= CỘT TRÁI – DANH SÁCH CHỦ ĐỀ ======================= -->
+      <div class="col-md-4 border-end">
+        <h5 class="fw-semibold text-secondary mb-3">📘 Các mục trong giai đoạn</h5>
+        <div id="topic-list">
+          {% for topic in stage.topics %}
+            <div class="p-2 topic-item" data-index="{{ forloop.counter0 }}">
+              <span class="fw-semibold text-primary">{{ topic.title }}</span><br>
+              <small class="text-muted">{{ topic.summary|truncatechars:60 }}</small>
+            </div>
+          {% empty %}
+            <p class="text-muted fst-italic">Chưa có nội dung cho giai đoạn này.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- ======================= CỘT PHẢI – HIỂN THỊ NỘI DUNG + EDITOR ======================= -->
+      <div class="col-md-8 ps-4">
+        <div id="topic-content">
+          <h5 class="fw-bold text-primary">Chọn một mục ở bên trái để xem nội dung chi tiết 👈</h5>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- ======================= KHUNG EDITOR DUY NHẤT ======================= -->
+        <h5 class="fw-bold text-secondary mb-3">🧮 Thực hành – Viết và chạy code</h5>
+        <form id="run-form" class="mb-3">
+          {% csrf_token %}
+          <div class="row mb-2">
+            <div class="col-md-4">
+              <label class="form-label">Ngôn ngữ</label>
+              <select id="language" name="language" class="form-select form-select-sm">
+                <option value="cpp">C++</option>
+                <option value="python">Python</option>
+                <option value="pypy">PyPy</option>
+              </select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Input (nếu có)</label>
+              <textarea id="input-data" name="input" rows="2" class="form-control" placeholder="Nhập dữ liệu test..."></textarea>
+            </div>
           </div>
-          <p>{{ topic.summary }}</p>
+
+          <label class="form-label fw-semibold">💻 Code của bạn</label>
+          <textarea id="source-code" name="code" rows="12" class="form-control" placeholder="Nhập code tại đây..."></textarea>
+
+          <div class="text-end mt-3">
+            <button type="button" id="reset-btn" class="btn btn-outline-secondary btn-sm me-2">↩️ Reset ví dụ</button>
+            <button type="submit" class="btn btn-success btn-lg">▶ Chạy code</button>
+          </div>
+        </form>
+
+        <div>
+          <h6 class="fw-bold text-secondary">📤 Kết quả:</h6>
+          <pre id="output-box" class="bg-dark text-light p-3 rounded"></pre>
         </div>
       </div>
-    {% empty %}
-      <p class="text-muted fst-italic">Chưa có nội dung cho giai đoạn này.</p>
-    {% endfor %}
-
-    <!-- ========================== PHẦN THỰC HÀNH ========================== -->
-    <h4 class="section-header mt-5 mb-3">🧮 Thực hành – Viết & chạy code</h4>
-
-    <form id="run-form" class="mt-3">
-      {% csrf_token %}
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label class="form-label">Ngôn ngữ</label>
-          <select name="language" id="language" class="form-select">
-            <option value="cpp">C++</option>
-            <option value="python">Python</option>
-            <option value="pypy">PyPy</option>
-          </select>
-        </div>
-        <div class="col-md-8">
-          <label class="form-label">Input (nếu có)</label>
-          <textarea id="input-data" name="input" rows="2" class="form-control" placeholder="Nhập dữ liệu test..."></textarea>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-semibold">💻 Code của bạn</label>
-        <textarea id="source-code" name="code" rows="10" class="form-control"
-                  placeholder="#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    int a, b; cin >> a >> b;\n    cout << a + b;\n}">
-        </textarea>
-      </div>
-
-      <div class="text-end mb-3">
-        <button type="submit" class="btn btn-success btn-lg px-4">▶ Chạy code</button>
-      </div>
-    </form>
-
-    <div class="mt-3">
-      <h5 class="fw-bold text-secondary">📤 Kết quả:</h5>
-      <pre id="output-box" class="bg-dark text-light p-3 rounded"></pre>
     </div>
 
-    <!-- ========================== ĐIỀU HƯỚNG ========================== -->
+    <!-- ======================= ĐIỀU HƯỚNG GIAI ĐOẠN ======================= -->
     <div class="d-flex justify-content-between my-5">
       {% if prev_stage %}
         <a href="/roadmap/stage/{{ prev_stage.id }}/" class="btn btn-outline-secondary">⬅️ {{ prev_stage.title }}</a>
-      {% else %}
-        <span></span>
       {% endif %}
       {% if next_stage %}
         <a href="/roadmap/stage/{{ next_stage.id }}/" class="btn btn-primary">{{ next_stage.title }} ➡️</a>
@@ -100,19 +107,66 @@
   </footer>
 
   <script>
-    // Xử lý gửi code AJAX
-    document.getElementById("run-form").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = new FormData(form);
-      const outputBox = document.getElementById("output-box");
-      outputBox.textContent = "⏳ Đang chạy code...";
+    const topics = {{ stage.topics|safe }};
+    const topicList = document.getElementById("topic-list");
+    const topicContent = document.getElementById("topic-content");
+    const codeBox = document.getElementById("source-code");
+    const resetBtn = document.getElementById("reset-btn");
+    const outputBox = document.getElementById("output-box");
 
+    let currentIndex = -1;
+
+    // Khi click 1 mục lý thuyết
+    topicList.addEventListener("click", (e) => {
+      const item = e.target.closest(".topic-item");
+      if (!item) return;
+
+      // Xóa active cũ, thêm active mới
+      topicList.querySelectorAll(".topic-item").forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+
+      currentIndex = parseInt(item.dataset.index);
+      const t = topics[currentIndex];
+      if (!t) return;
+
+      topicContent.innerHTML = `
+        <h4 class="fw-bold text-primary mb-2">${t.title}</h4>
+        <p>${t.summary}</p>
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="text-danger fw-semibold">💻 C++</h6>
+            <pre class="border rounded bg-light p-3 code-box">${t.sample_cpp}</pre>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-success fw-semibold">🐍 Python</h6>
+            <pre class="border rounded bg-light p-3 code-box">${t.sample_py}</pre>
+          </div>
+        </div>
+      `;
+
+      // Reset code theo ví dụ của ngôn ngữ hiện tại
+      const lang = document.getElementById("language").value;
+      codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
+      outputBox.textContent = "";
+    });
+
+    // Nút Reset về ví dụ mẫu
+    resetBtn.addEventListener("click", () => {
+      if (currentIndex >= 0) {
+        const t = topics[currentIndex];
+        const lang = document.getElementById("language").value;
+        codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
+        outputBox.textContent = "";
+      }
+    });
+
+    // Gửi code AJAX
+    document.getElementById("run-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      outputBox.textContent = "⏳ Đang chạy code...";
       try {
-        const resp = await fetch("/roadmap/run/", {
-          method: "POST",
-          body: data,
-        });
+        const resp = await fetch("/roadmap/run/", { method: "POST", body: data });
         const res = await resp.json();
         outputBox.textContent = res.output || ("⚠️ Lỗi: " + (res.error || "Không xác định"));
       } catch (err) {
