@@ -18,19 +18,18 @@
       font-family: 'Inter', system-ui, sans-serif;
       color: #111827;
       overflow-x: hidden;
-      /* vì navbar sẽ fixed ở trên cùng */
-      padding-top: 64px; /* chiều cao navbar ~56px + 8px buffer */
+      padding-top: 64px; /* vì navbar fixed */
     }
 
-    /* NAVBAR LUÔN TRÊN CÙNG, KHÔNG AI ĐÈ NỮA */
+    /* ✅ Navbar */
     .oj-navbar {
       background-color: #ffffff !important;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      position: fixed;        /* 🔥 đổi từ sticky -> fixed */
+      position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      z-index: 99999 !important; /* cao hơn mọi thứ khác */
+      z-index: 99999 !important;
     }
 
     .oj-navbar .navbar-brand {
@@ -39,17 +38,13 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 1.05rem;
-      line-height: 1.2;
-      white-space: nowrap;
+      font-size: 1.1rem;
     }
 
     .oj-navbar .nav-link {
       color: #111827 !important;
       font-weight: 500;
       transition: color 0.2s ease;
-      opacity: 1 !important;
-      visibility: visible !important;
     }
 
     .oj-navbar .nav-link:hover {
@@ -61,11 +56,24 @@
       box-shadow: none !important;
     }
 
-    .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2817,24,39,0.9%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    /* ép Bootstrap override Tailwind */
+    .navbar-collapse {
+      display: flex !important;
+      flex-basis: auto !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
 
-    /* Footer */
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        display: none !important;
+      }
+      .navbar-collapse.show {
+        display: block !important;
+      }
+    }
+
+    /* ✅ Footer */
     footer {
       font-size: 0.9rem;
       margin-top: 3rem;
@@ -74,11 +82,12 @@
       background: #f3f4f6;
     }
 
-    /* Popup liên hệ */
+    /* ✅ Popup liên hệ */
     #hotline-popup .bg-white {
       background: rgba(255, 255, 255, 0.96) !important;
       box-shadow: 0 -8px 24px rgba(0,0,0,0.2) !important;
     }
+
     #hotline-popup .popup-item:hover {
       background-color: #f9fafb;
     }
@@ -108,15 +117,14 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarNav">
-
-        <!-- trái -->
+        <!-- Trái -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a class="nav-link" href="/problems/">Problems</a></li>
           <li class="nav-item"><a class="nav-link" href="/contests/">Contests</a></li>
           <li class="nav-item"><a class="nav-link" href="/roadmap/">Roadmap</a></li>
         </ul>
 
-        <!-- phải (auth) -->
+        <!-- Phải -->
         <ul class="navbar-nav ms-auto align-items-center">
           {% if user.is_authenticated %}
             <li class="nav-item me-2">
@@ -134,17 +142,16 @@
             </li>
           {% endif %}
         </ul>
-
       </div>
     </div>
   </nav>
 
-  <!-- nội dung chính -->
+  <!-- 🌈 Nội dung -->
   <main class="flex-grow">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- footer -->
+  <!-- 📘 Footer -->
   <footer class="text-center">
     <div>
       <strong>Elearning CodePath</strong> – CTP Online Judge<br>
