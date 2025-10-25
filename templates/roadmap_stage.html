@@ -1,62 +1,174 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container py-5">
-  <h2 class="fw-bold mb-3">{{ stage.title }}</h2>
-  <p class="text-secondary mb-4">{{ stage.intro }}</p>
+<!-- path: templates/roadmap_stage.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    pre { white-space: pre-wrap; font-size: 0.95rem; }
+    .code-sample { font-family: "Fira Code", monospace; }
+    .topic-block:hover { background-color: #f8fafc; transition: 0.3s; }
+    .section-header { border-left: 5px solid #0d6efd; padding-left: 10px; }
+  </style>
+</head>
 
-  <div class="row">
-    <div class="col-md-5">
-      <h5 class="fw-bold mb-3">📘 Danh sách bài tập</h5>
-      <ul class="list-group">
-        {% for t in stage.topics %}
-        <li class="list-group-item">
-          <b>{{ t.title }}</b><br>
-          <small>{{ t.summary }}</small>
-        </li>
-        {% endfor %}
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">🏫 IT Contest OJ</a>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a href="/problems/" class="nav-link">Problems</a></li>
+        <li class="nav-item"><a href="/contests/" class="nav-link">Contests</a></li>
       </ul>
     </div>
+  </nav>
 
-    <div class="col-md-7">
-      <h5 class="fw-bold mb-3">💻 Trình soạn thảo code</h5>
-      <form id="codeForm" class="mb-3">
-        <select class="form-select mb-2" name="language" id="language">
-          <option value="python">Python</option>
-          <option value="pypy">PyPy</option>
-          <option value="cpp">C++</option>
-          <option value="java">Java</option>
-        </select>
-        <textarea id="source" name="source" class="form-control mb-2" rows="10" placeholder="Nhập mã nguồn của bạn..."></textarea>
-        <textarea id="input" name="input" class="form-control mb-2" rows="3" placeholder="Input (tùy chọn)"></textarea>
-        <button type="button" id="runBtn" class="btn btn-primary w-100">▶️ Chạy thử</button>
-      </form>
+  <main class="container bg-white shadow-sm p-4 rounded">
+    <h2 class="fw-bold text-primary mb-2">{{ title }}</h2>
+    <p class="text-muted mb-4">{{ desc }}</p>
 
-      <div class="card">
-        <div class="card-header bg-light fw-bold">Kết quả</div>
-        <div class="card-body">
-          <pre id="result" class="text-dark" style="min-height:120px;">(Kết quả sẽ hiển thị tại đây)</pre>
+    <!-- ========== Chọn ngôn ngữ ========== -->
+    <div class="mb-4">
+      <span class="me-2 fw-semibold">💬 Chọn ngôn ngữ hiển thị:</span>
+      <button class="btn btn-sm btn-primary" id="btn-cpp">C++</button>
+      <button class="btn btn-sm btn-outline-primary" id="btn-py">Python</button>
+    </div>
+
+    <!-- ========== PHẦN LÝ THUYẾT ========== -->
+    <h4 class="section-header mt-5 mb-3">📘 Lý thuyết</h4>
+    {% for topic in topics %}
+    <div class="card mb-4 topic-block">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="fw-bold text-primary">{{ topic.name }}</h5>
+          <a href="{{ topic.more_url }}" class="btn btn-link btn-sm text-decoration-none">Chi tiết »</a>
+        </div>
+        <p>{{ topic.summary }}</p>
+
+        <div class="code-sample border rounded p-3 bg-light mb-2" data-lang="cpp">
+          <pre><code>{{ topic.cpp_code }}</code></pre>
+        </div>
+        <div class="code-sample border rounded p-3 bg-light mb-2 d-none" data-lang="py">
+          <pre><code>{{ topic.py_code }}</code></pre>
         </div>
       </div>
     </div>
-  </div>
-</div>
+    {% empty %}
+    <p class="text-muted fst-italic">Chưa có nội dung cho giai đoạn này.</p>
+    {% endfor %}
 
-<script>
-document.getElementById("runBtn").addEventListener("click", function () {
-  const formData = new FormData(document.getElementById("codeForm"));
-  fetch("/roadmap/run/", {
-    method: "POST",
-    body: formData,
-  })
-    .then((r) => r.json())
-    .then((data) => {
-      const res = document.getElementById("result");
-      if (data.result) res.textContent = data.result;
-      else if (data.error) res.textContent = "❌ " + data.error;
-    })
-    .catch((err) => {
-      document.getElementById("result").textContent = "⚠️ Lỗi khi gửi yêu cầu: " + err;
-    });
-});
-</script>
-{% endblock %}
+    <!-- ========== PHẦN THỰC HÀNH ========== -->
+    <h4 class="section-header mt-5 mb-3">🧮 Thực hành</h4>
+    {% for task in practice_tasks %}
+    <div class="card mb-4">
+      <div class="card-header fw-semibold">{{ task.title }}</div>
+      <div class="card-body">
+        <p>{{ task.desc }}</p>
+
+        <div><b>Ví dụ input:</b>
+          <pre class="bg-light p-2 border rounded">{{ task.ex_input }}</pre>
+        </div>
+        <div><b>Ví dụ output mong đợi:</b>
+          <pre class="bg-light p-2 border rounded">{{ task.ex_output }}</pre>
+        </div>
+
+        <div class="code-sample border rounded p-3 bg-light mb-2" data-lang="cpp">
+          <pre><code>{{ task.cpp_solution }}</code></pre>
+        </div>
+        <div class="code-sample border rounded p-3 bg-light mb-2 d-none" data-lang="py">
+          <pre><code>{{ task.py_solution }}</code></pre>
+        </div>
+
+        <!-- Form chạy code -->
+        <form method="post" action="/roadmap/run/" class="mt-3" onsubmit="return runCode(this);">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label">Ngôn ngữ</label>
+            <select name="language" class="form-select form-select-sm" required>
+              <option value="cpp">C++</option>
+              <option value="python">Python</option>
+              <option value="pypy">PyPy</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Code của bạn</label>
+            <textarea name="source" rows="6" class="form-control" placeholder="Nhập code của bạn..."></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Input test</label>
+            <textarea name="stdin" rows="3" class="form-control">{{ task.ex_input }}</textarea>
+          </div>
+          <button type="submit" class="btn btn-success btn-sm">▶ Chạy thử</button>
+        </form>
+
+        <div class="mt-3">
+          <pre id="output-box" class="bg-dark text-light p-3 rounded d-none"></pre>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted fst-italic">Chưa có bài thực hành cho giai đoạn này.</p>
+    {% endfor %}
+
+    <!-- ========== PHẦN LUYỆN TẬP ========== -->
+    <h4 class="section-header mt-5 mb-3">🏋️ Luyện tập</h4>
+    <p>Hãy thử sức với các bài tập thực tế trong hệ thống!</p>
+    <a href="/problems/tag/{{ tag }}/" class="btn btn-outline-primary">🧩 Xem danh sách bài luyện tập</a>
+
+    <!-- ========== Nút điều hướng giai đoạn ========== -->
+    <div class="d-flex justify-content-between my-5">
+      {% if prev_id %}
+        <a class="btn btn-outline-secondary" href="/roadmap/stage/{{ prev_id }}/">⬅️ Giai đoạn trước</a>
+      {% else %}
+        <span></span>
+      {% endif %}
+      {% if next_id %}
+        <a class="btn btn-primary" href="/roadmap/stage/{{ next_id }}/">Giai đoạn tiếp theo ➡️</a>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="text-center mt-5 mb-3 text-muted small">
+    © 2025 Chuyên Trần Phú - IT Contest OJ
+  </footer>
+
+  <script>
+    // Chuyển ngôn ngữ hiển thị
+    const btnCpp = document.getElementById("btn-cpp");
+    const btnPy = document.getElementById("btn-py");
+    function showLang(lang) {
+      document.querySelectorAll(".code-sample").forEach(block => {
+        if (block.getAttribute("data-lang") === lang) block.classList.remove("d-none");
+        else block.classList.add("d-none");
+      });
+      if (lang === "cpp") {
+        btnCpp.classList.replace("btn-outline-primary", "btn-primary");
+        btnPy.classList.replace("btn-primary", "btn-outline-primary");
+      } else {
+        btnPy.classList.replace("btn-outline-primary", "btn-primary");
+        btnCpp.classList.replace("btn-primary", "btn-outline-primary");
+      }
+    }
+    btnCpp.addEventListener("click", () => showLang("cpp"));
+    btnPy.addEventListener("click", () => showLang("py"));
+    showLang("cpp");
+
+    // Gửi code chạy thử mà không reload trang
+    async function runCode(form) {
+      const data = new FormData(form);
+      const resp = await fetch(form.action, { method: "POST", body: data });
+      const res = await resp.json();
+      const box = form.parentElement.querySelector("#output-box");
+      if (res.output) {
+        box.classList.remove("d-none");
+        box.textContent = res.output;
+      } else {
+        box.classList.remove("d-none");
+        box.textContent = "⚠️ Lỗi: " + (res.error || "Không xác định");
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>
