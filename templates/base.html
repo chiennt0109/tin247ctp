@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}CTP Online Judge{% endblock %}</title>
 
-  <!-- Bootstrap trước -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Tailwind sau, tắt preflight để không reset Bootstrap -->
+  <!-- Tailwind (không reset Bootstrap) -->
   <script>
     tailwind = { config: { corePlugins: { preflight: false } } };
   </script>
@@ -17,67 +17,44 @@
   <style>
     body {
       background-color: #f9fafb;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       color: #111827;
       overflow-x: hidden;
     }
 
-    /* ========== NAVBAR ========== */
+    /* ✅ Navbar fix: luôn hiển thị text đen trên nền trắng */
     .oj-navbar {
-      background-color: #111827; /* slate-900 kiểu VSCode dark */
-      border-bottom: 1px solid #1f2937;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      background-color: #ffffff !important;
+      border-bottom: 1px solid #e5e7eb;
     }
-
     .oj-navbar-brand {
-      color: #fff !important;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-
-    /* link nav tự định nghĩa riêng, không dựa .nav-link mặc định */
-    .oj-nav-link {
-      color: #f8fafc !important;           /* trắng */
-      font-weight: 500;
-      font-size: 0.95rem;
-      padding: .5rem .75rem;
-      display: block;
+      font-weight: 700;
+      color: #111827 !important;
       text-decoration: none !important;
     }
-    .oj-nav-link:hover,
-    .oj-nav-link:focus {
-      color: #93c5fd !important;           /* xanh nhạt */
-      text-decoration: underline !important;
-    }
-
-    .oj-username {
-      color: #f8fafc !important;
+    .oj-nav-link {
+      color: #1f2937 !important;
       font-weight: 500;
-      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
     }
-
+    .oj-nav-link:hover {
+      color: #2563eb !important;
+      text-decoration: underline;
+    }
+    .oj-username {
+      color: #111827 !important;
+      font-weight: 500;
+    }
     .oj-logout-btn {
-      border-color: #e5e7eb !important;
-      color: #e5e7eb !important;
+      border-color: #2563eb !important;
+      color: #2563eb !important;
       font-weight: 600;
     }
     .oj-logout-btn:hover {
-      background-color: #e5e7eb !important;
-      color: #111827 !important;
+      background-color: #2563eb !important;
+      color: #fff !important;
     }
 
-    /* burger icon sáng */
-    .navbar-toggler {
-      border-color: rgba(255,255,255,0.4) !important;
-    }
-    .navbar-toggler-icon {
-      filter: invert(1) brightness(200%);
-    }
-
-    /* ========== FOOTER ========== */
     footer {
       background: #f3f4f6;
       color: #4b5563;
@@ -86,40 +63,58 @@
       margin-top: 4rem;
     }
 
-    footer a {
-      color: #2563eb;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* ========== HOTLINE BUTTON ANIMATION ========== */
     @keyframes ringPulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(37,99,235,0.4);
-      }
-      50% {
-        transform: scale(1.08);
-        box-shadow: 0 0 0 10px rgba(37,99,235,0);
-      }
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+      50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(37,99,235,0); }
     }
-    .animate-ring {
-      animation: ringPulse 2.5s infinite ease-in-out;
-    }
+    .animate-ring { animation: ringPulse 2.5s infinite ease-in-out; }
 
-    /* popup card text */
-    .support-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #1f2937; /* gray-800 */
-      margin-bottom: 0;
+    /* Popup liên hệ */
+    .popup-card {
+      width: 320px;
+      background: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e5e7eb;
+      padding: 1.25rem 1.5rem;
     }
-    .support-desc {
-      color: #6b7280; /* gray-500 */
-      font-size: 0.8rem;
+    .popup-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #f9fafb;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .popup-item img {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+    }
+    .popup-item p {
       margin: 0;
+      line-height: 1.2;
+    }
+    .popup-item .title {
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .popup-item .desc {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+    .btn-zalo {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      width: 100%;
+      transition: all 0.3s;
+    }
+    .btn-zalo:hover {
+      background: #1e40af;
     }
   </style>
 
@@ -128,32 +123,24 @@
 
 <body class="min-h-screen flex flex-col">
 
-  <!-- ================== NAVBAR ================== -->
+  <!-- 🧭 Navbar -->
   <nav class="oj-navbar navbar navbar-expand-lg">
     <div class="container">
-      <a class="oj-navbar-brand navbar-brand" href="/">
-        <span>🏫</span>
-        <span>CTP OJ</span>
-      </a>
-
+      <a class="oj-navbar-brand" href="/">🏫 CTP OJ</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarNav">
-        <!-- left links -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a class="oj-nav-link" href="/problems/">Problems</a></li>
           <li class="nav-item"><a class="oj-nav-link" href="/contests/">Contests</a></li>
           <li class="nav-item"><a class="oj-nav-link" href="/roadmap/">Roadmap</a></li>
         </ul>
 
-        <!-- right auth -->
         <ul class="navbar-nav ms-auto align-items-lg-center">
           {% if user.is_authenticated %}
-            <li class="nav-item me-lg-2 mb-2 mb-lg-0">
-              <span class="oj-username d-block">👤 {{ user.username }}</span>
-            </li>
+            <li class="nav-item me-2"><span class="oj-username">👤 {{ user.username }}</span></li>
             <li class="nav-item">
               <form method="post" action="/accounts/logout/" style="display:inline;">
                 {% csrf_token %}
@@ -161,155 +148,89 @@
               </form>
             </li>
           {% else %}
-            <li class="nav-item">
-              <a class="oj-nav-link" href="/accounts/login/">Login</a>
-            </li>
+            <li class="nav-item"><a class="oj-nav-link" href="/accounts/login/">Login</a></li>
           {% endif %}
         </ul>
       </div>
     </div>
   </nav>
-  <!-- ================== /NAVBAR ================== -->
 
-  <!-- ================== PAGE CONTENT ================== -->
-  <main class="flex-grow">
-    {% block content %}{% endblock %}
-  </main>
-  <!-- ================== /PAGE CONTENT ================== -->
+  <!-- 🌈 Nội dung -->
+  <main class="flex-grow">{% block content %}{% endblock %}</main>
 
-  <!-- ================== FOOTER ================== -->
+  <!-- 📘 Footer -->
   <footer class="text-center">
     <div>
-      Nguyễn Trung Chiến - THPT chuyên Trần Phú<br />
+      Nguyễn Trung Chiến - THPT chuyên Trần Phú<br>
       <small>© 2025 Mini OJ | Powered by Django</small>
     </div>
   </footer>
-  <!-- ================== /FOOTER ================== -->
 
-  <!-- ================== HOTLINE FLOATING ================== -->
+  <!-- ☎️ Hotline -->
+  <button id="hotline-btn"
+          class="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition duration-300 ring-4 ring-blue-300/40 animate-ring border-0"
+          style="width:60px; height:60px; z-index:9999;"
+          aria-label="Liên hệ">📞</button>
 
-  <!-- nút nổi góc phải -->
-  <button
-    id="hotline-btn"
-    class="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-blue-700 transition duration-300 ring-4 ring-blue-300/40 animate-ring border-0"
-    style="width:60px; height:60px; z-index:9999;"
-    aria-label="Liên hệ">
-    📞
-  </button>
+  <div id="hotline-overlay"
+       class="hidden fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm z-[9998] transition-opacity duration-300"></div>
 
-  <!-- overlay nền mờ -->
-  <div
-    id="hotline-overlay"
-    class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-[9998] transition-opacity duration-200">
-  </div>
+  <div id="hotline-popup"
+       class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 popup-card transition-all duration-300 transform scale-95 opacity-0 z-[9999]">
 
-  <!-- popup trung tâm -->
-  <div
-    id="hotline-popup"
-    class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl p-5 w-80 border border-gray-200 transition-all duration-200 transform scale-95 opacity-0 z-[9999]"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="hotline-title">
-    
-    <!-- header popup -->
     <div class="d-flex justify-content-between align-items-start mb-3">
       <div>
-        <div id="hotline-title" class="fw-semibold text-dark" style="font-size:1rem;">
-          Liên hệ & Ủng hộ 💖
-        </div>
-        <div class="text-muted" style="font-size:.8rem;">
-          Kết nối, chia sẻ và lan tỏa tinh thần học tập!
-        </div>
+        <h6 class="fw-bold mb-0 text-gray-800">Liên hệ & Ủng hộ 💖</h6>
+        <small class="text-gray-500">Chia sẻ tinh thần học tập cùng thầy Chiến</small>
       </div>
-      <button
-        id="close-popup"
-        class="btn btn-sm btn-light border-0 text-secondary fw-bold"
-        style="line-height:1; font-size:1rem;">
-        ×
-      </button>
+      <button id="close-popup" class="btn btn-sm btn-light border-0 text-gray-500 fw-bold">×</button>
     </div>
 
-    <!-- các gói ủng hộ -->
-    <div class="mb-3">
-      <div class="d-flex align-items-start mb-3 p-2 rounded" style="background-color:#f9fafb;">
-        <div class="me-3 flex-shrink-0">
-          <!-- bạn có thể thay ảnh bát phở thật -->
-          <img src="https://i.imgur.com/3b3Gv4x.png"
-               alt="Phở"
-               class="rounded shadow-sm border"
-               width="48"
-               height="48" />
-        </div>
-        <div>
-          <p class="support-title">Học trò tri ân</p>
-          <p class="support-desc">🍜 Một bát phở ấm lòng dành cho thầy.</p>
-        </div>
-      </div>
-
-      <div class="d-flex align-items-start p-2 rounded" style="background-color:#f9fafb;">
-        <div class="me-3 flex-shrink-0">
-          <!-- bạn có thể thay ảnh ly cà phê thật -->
-          <img src="https://i.imgur.com/lLHzf6T.png"
-               alt="Cà phê"
-               class="rounded shadow-sm border"
-               width="48"
-               height="48" />
-        </div>
-        <div>
-          <p class="support-title">Bạn bè ủng hộ</p>
-          <p class="support-desc">☕ Một ly cà phê chia sẻ động lực.</p>
-        </div>
+    <div class="popup-item">
+      <img src="https://i.imgur.com/3b3Gv4x.png" alt="Phở">
+      <div>
+        <p class="title">Học trò tri ân</p>
+        <p class="desc">🍜 Một bát phở ấm lòng</p>
       </div>
     </div>
 
-    <!-- QR code -->
-    <div class="text-center mb-3">
-      <!-- thay src bằng QR thật (Zalo / banking) -->
-      <img
-        src="https://i.imgur.com/hOTMJ6R.png"
-        alt="QR Zalo"
-        class="mx-auto rounded-3 shadow-sm border"
-        width="160"
-        height="160" />
-      <div class="text-muted mt-2" style="font-size:.8rem;">
-        📱 Quét mã QR để kết nối Zalo
+    <div class="popup-item">
+      <img src="https://i.imgur.com/lLHzf6T.png" alt="Cafe">
+      <div>
+        <p class="title">Bạn bè ủng hộ</p>
+        <p class="desc">☕ Một ly cà phê chia sẻ</p>
       </div>
     </div>
 
-    <!-- nút zalo -->
-    <div class="text-center">
-      <a href="https://zalo.me/0934353569"
-         target="_blank"
-         class="btn btn-primary w-100 fw-semibold">
-        Nhắn Zalo
-      </a>
+    <div class="text-center my-3">
+      <img src="https://i.imgur.com/hOTMJ6R.png" alt="QR Zalo"
+           class="mx-auto rounded shadow-sm border" width="150" height="150">
+      <small class="text-gray-600 d-block mt-2">📱 Quét mã để kết nối Zalo</small>
     </div>
+
+    <a href="https://zalo.me/0934353569" target="_blank" class="btn btn-zalo">Nhắn qua Zalo</a>
   </div>
 
-  <!-- ================== /HOTLINE FLOATING ================== -->
-
-  <!-- SCRIPTS -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const hotlineBtn   = document.getElementById('hotline-btn');
-    const overlay      = document.getElementById('hotline-overlay');
-    const popup        = document.getElementById('hotline-popup');
-    const closePopup   = document.getElementById('close-popup');
+    const hotlineBtn = document.getElementById('hotline-btn');
+    const popup = document.getElementById('hotline-popup');
+    const overlay = document.getElementById('hotline-overlay');
+    const closePopup = document.getElementById('close-popup');
 
     function openPopup() {
       overlay.classList.remove('hidden');
       popup.classList.remove('hidden');
-      // transition in
       requestAnimationFrame(() => {
-        popup.classList.add('opacity-100','scale-100');
-        popup.classList.remove('opacity-0','scale-95');
+        popup.classList.add('scale-100','opacity-100');
+        popup.classList.remove('scale-95','opacity-0');
       });
     }
 
     function closeAll() {
-      popup.classList.remove('opacity-100','scale-100');
-      popup.classList.add('opacity-0','scale-95');
-      // wait for transition then hide
+      popup.classList.remove('scale-100','opacity-100');
+      popup.classList.add('scale-95','opacity-0');
       setTimeout(() => {
         overlay.classList.add('hidden');
         popup.classList.add('hidden');
@@ -317,8 +238,8 @@
     }
 
     hotlineBtn.addEventListener('click', openPopup);
-    closePopup.addEventListener('click', closeAll);
     overlay.addEventListener('click', closeAll);
+    closePopup.addEventListener('click', closeAll);
   </script>
 </body>
 </html>
