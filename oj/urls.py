@@ -3,17 +3,13 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    # 🌐 Trang chủ
     path("", views.home, name="home"),
-
-    # ⚙️ Admin
     path("admin/", admin.site.urls),
 
-    # 👤 Tài khoản & Allauth
-    path("accounts/", include("allauth.urls")),  # Thêm dòng này ✅
-    path("accounts/", include("accounts.urls")),  # App riêng nếu có view custom
+    # 🧩 Hệ thống tài khoản
+    path("accounts/", include("allauth.urls")),  # ✅ dùng allauth thay vì accounts.urls
 
-    # 🧩 Các module chính
+    # 🧠 Ứng dụng chính
     path("problems/", include("problems.urls")),
     path("submissions/", include("submissions.urls")),
     path("contests/", include("contests.urls")),
