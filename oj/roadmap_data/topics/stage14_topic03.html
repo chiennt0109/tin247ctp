@@ -1,0 +1,91 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết cách tìm lỗi nhanh trong phòng thi (không có debugger xịn).</li>
+  <li>Viết code rõ ràng đủ để sửa trong 5 phút cuối.</li>
+  <li>Tránh bug ngớ ngẩn (off-by-one, overflow, quên reset mảng).</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Nguyên tắc vàng khi debug trong thi</h2>
+<ul>
+  <li><b>In trạng thái trung gian</b>: In ra biến quan trọng ở từng bước duyệt.</li>
+  <li><b>Test case tự nghĩ ra</b>: Không chỉ dựa test mẫu của đề.</li>
+  <li><b>So sánh lời giải brute-force với lời giải tối ưu</b> trên input nhỏ tự sinh.</li>
+</ul>
+
+<hr>
+
+<h2>📗 2️⃣ Ví dụ debug trong C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+#define dbg(x) cerr &lt;&lt; #x &lt;&lt; " = " &lt;&lt; x &lt;&lt; "\\n";
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n;cin&gt;&gt;n;
+    vector&lt;int&gt; a(n);
+    for(int i=0;i&lt;n;i++) cin&gt;&gt;a[i];
+
+    sort(a.begin(),a.end());
+
+    dbg(n);        // kiểm tra kích thước
+    dbg(a[0]);     // phần tử nhỏ nhất
+    dbg(a.back()); // phần tử lớn nhất
+
+    cout&lt;&lt;a.back()-a[0]&lt;&lt;"\\n";
+}
+</code></pre>
+
+<p>
+Chú ý: in debug bằng <code>cerr</code> thay vì <code>cout</code> để không phá format output bài.
+</p>
+
+<hr>
+
+<h2>📗 3️⃣ Debug trong Python</h2>
+<pre><code>import sys
+
+def dbg(name, val):
+    print(f"[DBG] {name} = {val}", file=sys.stderr)
+
+n = int(sys.stdin.readline())
+arr = list(map(int, sys.stdin.readline().split()))
+arr.sort()
+
+dbg("n", n)
+dbg("arr_min", arr[0])
+dbg("arr_max", arr[-1])
+
+print(arr[-1] - arr[0])
+</code></pre>
+
+<hr>
+
+<h2>📘 4️⃣ Code sạch = code dễ cứu mạng lúc 5 phút cuối</h2>
+<ul>
+  <li>Đặt tên biến có nghĩa (<code>timeToReach</code> thay vì <code>t1</code>).</li>
+  <li>Viết hàm phụ cho mỗi ý tưởng (đừng nhét tất cả vào <code>main()</code> 200 dòng).</li>
+  <li>Comment nhanh ý tưởng ngay trước khi code, không comment lan man.</li>
+</ul>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Viết lại lời giải gần đây nhất của bạn thành phiên bản có hàm rõ ràng + debug macro.</li>
+  <li>Tự tạo 1 test phản ví dụ (counterexample) làm vỡ code hiện tại của bạn.</li>
+  <li>Ghi xuống ít nhất 3 lỗi hay gặp của bản thân (và cách check tự động).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 2</b></summary>
+  <pre><code>Counterexample = input nhỏ nhưng có edge case:
+- n = 1
+- tất cả giá trị bằng nhau
+- đồ thị không liên thông
+- số âm, số 0
+- modulo sát ngưỡng (10^9+7 - 1)</code></pre>
+</details>
