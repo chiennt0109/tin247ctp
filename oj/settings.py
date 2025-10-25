@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 from urllib.parse import urlparse
 
-# === PATHS ===
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === SECURITY ===
@@ -10,7 +9,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-change-me")
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = ["*"]
 
-# === INSTALLED APPS ===
+# === APPLICATIONS ===
 INSTALLED_APPS = [
     # Django core
     "django.contrib.admin",
@@ -20,28 +19,44 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Custom apps
-    "accounts",
-    "problems",
-    "submissions",
-    "contests",
-
-    # Allauth for social login
+    # Allauth (Đăng nhập Google, Facebook, GitHub)
     "django.contrib.sites",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    "allauth.socialaccount.providers.facebook",
-    "allauth.socialaccount.providers.github",
+    # "allauth.socialaccount.providers.facebook",
+    # "allauth.socialaccount.providers.github",
+
+    # Apps của bạn
+    "accounts",
+    "problems",
+    "submissions",
+    "contests",
 ]
 
 SITE_ID = 1
 
+# === AUTH CONFIG ===
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"  # hoặc "optional" nếu muốn
+ACCOUNT_LOGOUT_ON_GET = True
+
 # === MIDDLEWARE ===
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # ⚡ static trên Render
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -50,9 +65,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# === URL / WSGI ===
 ROOT_URLCONF = "oj.urls"
-WSGI_APPLICATION = "oj.wsgi.application"
 
 # === TEMPLATES ===
 TEMPLATES = [
@@ -71,7 +84,9 @@ TEMPLATES = [
     },
 ]
 
-# === DATABASE (Render PostgreSQL) ===
+WSGI_APPLICATION = "oj.wsgi.application"
+
+# === DATABASE ===
 if "DATABASE_URL" in os.environ:
     result = urlparse(os.environ["DATABASE_URL"])
     DATABASES = {
@@ -96,35 +111,16 @@ else:
         }
     }
 
-# === AUTH / LOGIN ===
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
-]
-
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
-
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_LOGOUT_ON_GET = True
-ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
-
 # === STATIC FILES ===
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# === LANGUAGE / TIME ===
-LANGUAGE_CODE = "en-us"
+# === TIME & LANGUAGE ===
+LANGUAGE_CODE = "vi"
 TIME_ZONE = "Asia/Bangkok"
 USE_I18N = True
 USE_TZ = True
 
-# === DEFAULT ===
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
