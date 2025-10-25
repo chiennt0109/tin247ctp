@@ -11,32 +11,29 @@
 
     <!-- Danh sách giai đoạn -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-      {% for stage, desc, examples, tag, color in stages %}
-      <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-{{ color }}-50 hover:shadow-xl transition transform hover:-translate-y-1">
-        
-        <!-- Tiêu đề có đánh số tự động -->
+      {% for s in stages %}
+      <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-white to-{{ s.color|default:'sky' }}-50 hover:shadow-xl transition transform hover:-translate-y-1">
         <h3 class="text-xl font-bold text-gray-900 mb-2">
-          {{ stage }}
+          {{ s.title|default:s.0 }}
         </h3>
-
-        <!-- Mô tả -->
-        <p class="text-gray-700 text-sm mb-3">{{ desc }}</p>
-
-        <!-- Danh sách nội dung tiêu biểu -->
-        <ul class="text-gray-600 text-sm list-disc ml-5 mb-4">
-          {% for ex in examples %}
-          <li>{{ ex }}</li>
-          {% endfor %}
+        <p class="text-gray-700 text-sm mb-3">{{ s.summary|default:s.1 }}</p>
+        <ul class="list-disc pl-5 text-gray-600 text-sm mb-3">
+          {% if s.topics %}
+            {% for t in s.topics %}
+              <li>{{ t.title }}</li>
+            {% endfor %}
+          {% elif s.examples %}
+            {% for e in s.examples %}
+              <li>{{ e }}</li>
+            {% endfor %}
+          {% endif %}
         </ul>
-
-        <!-- Nút truy cập -->
-        <a href="/roadmap/stage/{{ forloop.counter }}/"
-           class="inline-block px-4 py-2 bg-gradient-to-r from-{{ color }}-200 to-{{ color }}-300 text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition transform no-underline">
-           💡 Làm bài
+        <a href="/roadmap/stage/{{ s.id }}/" class="text-indigo-600 hover:underline font-semibold">
+          ➡️ Xem chi tiết
         </a>
-
       </div>
-      {% endfor %}
+    {% endfor %}
+
     </div>
 
     <!-- Nút xem chi tiết toàn bộ -->
