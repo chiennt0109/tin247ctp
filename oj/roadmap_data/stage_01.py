@@ -2,7 +2,7 @@
 
 STAGE_1 = {
     "id": 1,
-    "title": "Giai đoạn 1: Làm quen với thuật toán và cấu trúc cơ bản",
+    "title": "🧩 Giai đoạn 1: Làm quen với thuật toán và cấu trúc cơ bản",
     "summary": "Khởi đầu hành trình với biến, vòng lặp, và tư duy thuật toán đơn giản.",
     "topics": [
         {
