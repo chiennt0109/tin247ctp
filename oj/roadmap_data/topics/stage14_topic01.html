@@ -1,0 +1,87 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết ước lượng thuật toán có chạy kịp hay không trong giới hạn đề.</li>
+  <li>Biết vì sao cần tối ưu từ O(n³) → O(n²) → O(n log n).</li>
+  <li>Hiểu mối quan hệ giữa thời gian chạy và bộ nhớ.</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Vì sao phải quan tâm đến độ phức tạp?</h2>
+<p>
+Trong đề thi lập trình, input có thể rất lớn (ví dụ n = 200&nbsp;000).  
+Nếu em viết thuật toán O(n²), thì với n = 200&nbsp;000:
+</p>
+<p>
+n² = 200&nbsp;000 × 200&nbsp;000 = 40&nbsp;000&nbsp;000&nbsp;000 (40 tỷ vòng lặp) ⟶ không thể chạy kịp.
+</p>
+
+<p>
+Kinh nghiệm thi:  
+<b>~10⁸ phép toán trong 1s bằng C++</b> là ngưỡng thô thường dùng để ước lượng.  
+Python thì chậm hơn nhiều, nên với Python phải cố gắng O(n log n) hoặc O(n).
+</p>
+
+<hr>
+
+<h2>📘 2️⃣ Ví dụ tối ưu hoá: tính tổng mọi subarray</h2>
+
+<p>Bài toán: Cho mảng a[0..n-1], tính tổng của tất cả các đoạn con (subarray).</p>
+
+<h4>❌ Cách chậm O(n³)</h4>
+<pre><code>// C++
+long long brute_force_sum(const vector&lt;int&gt;&amp; a){
+    long long ans=0;
+    for(int i=0;i&lt;a.size();i++)
+        for(int j=i;j&lt;a.size();j++)
+            for(int k=i;k&lt;=j;k++)
+                ans+=a[k];
+    return ans;
+}
+</code></pre>
+
+<h4>✅ Cải tiến O(n²) với prefix sum</h4>
+<pre><code>// C++
+long long prefix_sum_optimized(const vector&lt;int&gt;&amp; a){
+    int n=a.size();
+    vector&lt;long long&gt; pref(n+1,0);
+    for(int i=0;i&lt;n;i++) pref[i+1]=pref[i]+a[i];
+    long long ans=0;
+    for(int i=0;i&lt;n;i++)
+        for(int j=i;j&lt;n;j++)
+            ans+=pref[j+1]-pref[i];
+    return ans;
+}
+</code></pre>
+
+<p>Ta thay vòng lặp trong cùng (O(n)) bằng truy vấn tổng đoạn O(1).</p>
+
+<hr>
+
+<h2>📗 3️⃣ Bộ nhớ cũng là rào cản</h2>
+<p>
+Nếu em tạo mảng 2D kích thước 5000 × 5000 số nguyên 64-bit:
+</p>
+<p>
+5000 × 5000 = 25&nbsp;000&nbsp;000 phần tử  
+25 triệu × 8 byte ≈ 200 MB → có thể vượt limit bộ nhớ đề (thường 64MB / 256MB).
+</p>
+
+<p>
+Tức là: không chỉ thời gian, mà cả RAM cũng có giới hạn thi.
+</p>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Với n = 10⁵, thuật toán O(n²) có chạy được không? Giải thích.</li>
+  <li>Viết lại một thuật toán chậm em từng làm (ví dụ đếm tần suất ký tự bằng vòng lặp lồng) thành phiên bản O(n).</li>
+  <li>Xác định độ phức tạp đoạn code em vừa nộp hôm qua (thói quen tự đánh giá trước khi submit).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý câu 1</b></summary>
+  <pre><code>n = 100000
+n^2 = 10^10 = mười tỷ bước → quá lớn trừ khi có trick đặc biệt / pruning.</code></pre>
+</details>
