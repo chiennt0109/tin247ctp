@@ -2,6 +2,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from judge.run_code import run_program
+from django.utils.safestring import mark_safe
+from django.conf import settings
 
 # Import toàn bộ stage
 from .roadmap_data.stage_01 import STAGE_1
@@ -31,10 +33,25 @@ def roadmap_stage(request, stage_id):
     stage = next((s for s in STAGES if s["id"] == stage_id), None)
     if not stage:
         return render(request, "oj/not_found.html", {"message": "Không tìm thấy giai đoạn này."})
+
+    # ✅ NẾU topic có html_file → tự động đọc và gán vào topic["detail"]
+    for topic in stage.get("topics", []):
+        html_file = topic.get("html_file")
+        if html_file:
+            full_path = os.path.join(settings.BASE_DIR, "oj", html_file)
+            if os.path.exists(full_path):
+                with open(full_path, "r", encoding="utf-8") as f:
+                    topic["detail"] = mark_safe(f.read())
+
     idx = STAGES.index(stage)
     prev_stage = STAGES[idx - 1] if idx > 0 else None
     next_stage = STAGES[idx + 1] if idx < len(STAGES) - 1 else None
-    return render(request, "roadmap_stage.html", {"stage": stage, "prev_stage": prev_stage, "next_stage": next_stage})
+
+    return render(request, "roadmap_stage.html", {
+        "stage": stage,
+        "prev_stage": prev_stage,
+        "next_stage": next_stage
+    })
 
 def topic_detail(request, stage_id, topic_index):
     # Tìm stage theo ID
