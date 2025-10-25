@@ -1,0 +1,50 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết cách duyệt mảng và thực hiện các phép tính tổng, max, min.</li>
+  <li>Vận dụng vòng lặp và điều kiện để xử lý dữ liệu.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>Ta có thể duyệt mảng bằng vòng lặp để cộng dồn giá trị hoặc tìm phần tử lớn nhất, nhỏ nhất.</p>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int sum = 0, mx = a[0], mn = a[0];
+    for (int x : a) {
+        sum += x;
+        mx = max(mx, x);
+        mn = min(mn, x);
+    }
+    cout << "Tong=" << sum << " Max=" << mx << " Min=" << mn;
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>n = int(input())
+a = list(map(int, input().split()))
+print("Tong =", sum(a), "Max =", max(a), "Min =", min(a))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính tổng các số dương trong mảng.</li>
+  <li>Tìm phần tử lớn nhất và nhỏ nhất của mảng.</li>
+  <li>Tính trung bình cộng của các phần tử.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+a = list(map(int, input().split()))
+positive = [x for x in a if x > 0]
+print("Tong so duong =", sum(positive))
+print("Max =", max(a), "Min =", min(a))
+print("Trung binh =", sum(a)/len(a))</code></pre>
+</details>
