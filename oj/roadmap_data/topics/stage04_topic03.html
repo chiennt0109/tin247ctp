@@ -1,0 +1,42 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết cách đảo ngược, xoay và tìm mẫu trong dãy số.</li>
+  <li>Luyện tư duy xử lý chuỗi và quy luật.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>Ta có thể dùng <code>reverse()</code>, <code>rotate()</code> hoặc slicing trong Python để thao tác dãy số.</p>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    reverse(a.begin(), a.end());
+    for (int x : a) cout << x << " ";
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>a = list(map(int, input().split()))
+print("Dao nguoc:", a[::-1])
+print("Xoay 1 vi tri:", a[1:] + a[:1])</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Đảo ngược dãy số.</li>
+  <li>Xoay dãy sang phải k vị trí.</li>
+  <li>Cho chuỗi s, kiểm tra xem có đối xứng (palindrome) hay không.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+s = input("Nhap chuoi: ")
+print("Chuoi doi xung" if s == s[::-1] else "Khong doi xung")</code></pre>
+</details>
