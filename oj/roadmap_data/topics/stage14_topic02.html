@@ -1,0 +1,82 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Đọc đề và nhận ra "bài này là loại gì?".</li>
+  <li>Kết hợp nhiều mảng kiến thức trong 1 bài (thường là bài Bài 3/Bài 4 trong đề thi).</li>
+  <li>Quản lý trạng thái, ràng buộc, và điều kiện tối ưu.</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Kiểu bài thi rất hay ra</h2>
+<p>Ví dụ: "Cho đồ thị có n đỉnh, m cạnh, mỗi cạnh có trọng số w.  
+Em phải đi từ 1 đến n sao cho tổng chi phí nhỏ nhất,  
+<b>nhưng</b> không được dùng quá K cạnh đắt (w &gt; L)."  
+</p>
+
+<p>Đây không còn chỉ là Dijkstra nữa. Vì ngoài khoảng cách, ta còn theo dõi <b>số cạnh đắt đã dùng</b>.  
+Đó chính là <b>DP trên đồ thị (stateful shortest path)</b>.</p>
+
+<hr>
+
+<h2>📗 2️⃣ Ý tưởng lời giải</h2>
+<ul>
+  <li>Trạng thái: <code>dist[node][bad]</code> = chi phí tối thiểu để đến đỉnh <code>node</code> khi đã dùng <code>bad</code> cạnh đắt.</li>
+  <li>Dùng hàng đợi ưu tiên (Dijkstra trên trạng thái mở rộng).</li>
+</ul>
+
+<h4>🌿 Python mô phỏng ý tưởng</h4>
+<pre><code>import heapq
+INF = 10**18
+n,m,K,L = map(int,input().split())
+g=[[] for _ in range(n+1)]
+for _ in range(m):
+    u,v,w=map(int,input().split())
+    g[u].append((v,w))
+    g[v].append((u,w))
+
+dist=[[INF]*(K+1) for _ in range(n+1)]
+dist[1][0]=0
+pq=[(0,1,0)]  # (cost,node,bad_used)
+
+while pq:
+    cost,u,bad = heapq.heappop(pq)
+    if cost!=dist[u][bad]: continue
+    for v,w in g[u]:
+        nb = bad + (1 if w>L else 0)
+        if nb<=K:
+            nc = cost + w
+            if nc < dist[v][nb]:
+                dist[v][nb]=nc
+                heapq.heappush(pq,(nc,v,nb))
+
+ans = min(dist[n])
+print(ans if ans<INF else -1)</code></pre>
+
+<p>
+Điểm quan trọng:  
+đây là <b>Graph + DP trạng thái + ràng buộc toán</b> (số cạnh đắt ≤ K).
+</p>
+
+<hr>
+
+<h2>📘 3️⃣ Bài luyện tương tự</h2>
+<ol>
+  <li>Đi qua tất cả điểm bắt buộc (subset DP trên đồ thị nhỏ).</li>
+  <li>Đếm số đường đi thỏa điều kiện chia hết (graph + modular DP).</li>
+  <li>Tối đa hóa điểm thưởng thay vì tối thiểu hóa chi phí (đảo chiều tư duy).</li>
+</ol>
+
+<hr>
+
+<h2>🧩 Bài tập thi thử</h2>
+<ol>
+  <li>Viết lại lời giải trên bằng C++ với priority_queue.</li>
+  <li>Nếu K = 0 thì thuật toán rút gọn thành gì?</li>
+  <li>Nếu L = 0 (mọi cạnh đều "đắt"), đề trở thành bài toán kinh điển nào?</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý câu 2</b></summary>
+  <pre><code>K = 0 nghĩa là không được đi qua cạnh đắt.
+→ Chỉ chạy Dijkstra trên các cạnh w ≤ L.</code></pre>
+</details>
