@@ -1,0 +1,68 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cách tìm đường đi ngắn nhất trong đồ thị có trọng số.</li>
+  <li>Phân biệt Dijkstra (chỉ trọng số dương) và Bellman-Ford (có thể có âm).</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<ul>
+  <li><b>Dijkstra</b>: Duyệt dần từ đỉnh xuất phát, luôn chọn đỉnh có khoảng cách nhỏ nhất chưa xét.</li>
+  <li><b>Bellman-Ford</b>: Lặp qua tất cả cạnh n−1 lần, cập nhật d[u]+w &lt; d[v] → giảm d[v].</li>
+</ul>
+
+<hr>
+
+<h2>💻 Dijkstra – C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    int n,m; cin&gt;&gt;n&gt;&gt;m;
+    vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj(n+1);
+    for(int i=0;i&lt;m;i++){
+        int u,v,w;cin&gt;&gt;u&gt;&gt;v&gt;&gt;w;
+        adj[u].push_back({v,w});
+    }
+    vector&lt;int&gt; dist(n+1,1e9); dist[1]=0;
+    priority_queue&lt;pair&lt;int,int&gt;,vector&lt;pair&lt;int,int&gt;&gt;,greater&lt;&gt;&gt; pq;
+    pq.push({0,1});
+    while(!pq.empty()){
+        auto [d,u]=pq.top(); pq.pop();
+        if(d!=dist[u]) continue;
+        for(auto [v,w]:adj[u])
+            if(dist[v]&gt;d+w){
+                dist[v]=d+w;
+                pq.push({dist[v],v});
+            }
+    }
+    for(int i=1;i&lt;=n;i++) cout&lt;&lt;dist[i]&lt;&lt;" ";
+}</code></pre>
+
+<h2>💻 Bellman-Ford – Python</h2>
+<pre><code>n,m=map(int,input().split())
+edges=[tuple(map(int,input().split())) for _ in range(m)]
+INF=10**9
+dist=[INF]*(n+1)
+dist[1]=0
+for _ in range(n-1):
+    for u,v,w in edges:
+        if dist[u]+w&lt;dist[v]:
+            dist[v]=dist[u]+w
+print(dist[1:])</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính đường đi ngắn nhất từ 1 đến mọi đỉnh bằng Dijkstra.</li>
+  <li>Phát hiện chu trình âm bằng Bellman-Ford.</li>
+  <li>In đường đi cụ thể từ 1 đến n.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý phát hiện chu trình âm</b></summary>
+  <pre><code>for u,v,w in edges:
+    if dist[u]+w&lt;dist[v]:
+        print("Có chu trình âm")</code></pre>
+</details>
