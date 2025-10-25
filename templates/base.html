@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Chuyên Trần Phú IT Contest OJ{% endblock %}</title>
+  <title>{% block title %}Elearning CodePath – CTP Online Judge{% endblock %}</title>
 
   <!-- ✅ TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,7 @@
       overflow-x: hidden;
     }
 
-    /* ✅ Navbar luôn nổi trên hero */
+    /* ✅ Navbar */
     .oj-navbar {
       background-color: #ffffff !important;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -28,33 +28,30 @@
       top: 0;
       z-index: 10000 !important;
     }
-    .oj-navbar .nav-link {
-      color: #111827 !important;
-      font-weight: 500;
-      transition: color 0.2s ease;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .oj-navbar .nav-link:hover {
-      color: #2563eb !important;
-    }
+
     .oj-navbar .navbar-brand {
       font-weight: 700;
       color: #1e3a8a !important;
       display: flex;
       align-items: center;
       gap: 6px;
+      font-size: 1.1rem;
     }
 
-    /* ✅ Fix Tailwind override */
-    .navbar-light .navbar-nav .nav-link,
-    .navbar .nav-link {
+    .oj-navbar .nav-link {
       color: #111827 !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: relative !important;
-      z-index: 10001 !important;
+      font-weight: 500;
+      transition: color 0.2s ease;
     }
+
+    .oj-navbar .nav-link:hover {
+      color: #2563eb !important;
+    }
+
+    .navbar-toggler {
+      border: none !important;
+    }
+
     .navbar-toggler-icon {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2817,24,39,0.9%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
     }
@@ -73,9 +70,11 @@
       background: rgba(255, 255, 255, 0.96) !important;
       box-shadow: 0 -8px 24px rgba(0,0,0,0.2) !important;
     }
+
     #hotline-popup .popup-item:hover {
       background-color: #f9fafb;
     }
+
     #hotline-btn {
       background: linear-gradient(135deg, #2563eb, #1e3a8a);
       padding: 12px 18px;
@@ -91,34 +90,39 @@
   <!-- 🧭 Navbar -->
   <nav class="oj-navbar navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a class="oj-navbar-brand navbar-brand" href="/">
-        <span>🏫</span><span>CTP OJ</span>
+      <a class="navbar-brand" href="/">
+        💻 <strong>Elearning</strong> <span class="text-primary">CodePath</span>
       </a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarNav">
+        <!-- 🌐 Left links -->
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a class="nav-link" href="/problems/">Problems</a></li>
           <li class="nav-item"><a class="nav-link" href="/contests/">Contests</a></li>
           <li class="nav-item"><a class="nav-link" href="/roadmap/">Roadmap</a></li>
         </ul>
 
-        <ul class="navbar-nav ms-auto align-items-lg-center">
+        <!-- 👤 Right Auth -->
+        <ul class="navbar-nav ms-auto align-items-center">
           {% if user.is_authenticated %}
-            <li class="nav-item me-lg-2 mb-2 mb-lg-0">
-              <span class="text-gray-800 fw-semibold">👤 {{ user.username }}</span>
+            <li class="nav-item me-2">
+              <span class="fw-semibold text-gray-800">👤 {{ user.username }}</span>
             </li>
             <li class="nav-item">
               <form method="post" action="/accounts/logout/" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-dark">Logout</button>
+                <button type="submit" class="btn btn-sm btn-outline-dark px-3 py-1">Logout</button>
               </form>
             </li>
           {% else %}
-            <li class="nav-item"><a class="nav-link" href="/accounts/login/">Login</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/accounts/login/">🔐 Login</a>
+            </li>
           {% endif %}
         </ul>
       </div>
@@ -133,9 +137,9 @@
   <!-- 📘 Footer -->
   <footer class="text-center">
     <div>
-      Nguyễn Trung Chiến - THPT chuyên Trần Phú<br>
-      Liên hệ: 0934353569<br>
-      <small>© 2025 Mini Contest OJ | Powered by Django</small>
+      <strong>Elearning CodePath</strong> – CTP Online Judge<br>
+      Nguyễn Trung Chiến – THPT chuyên Trần Phú<br>
+      <small>© 2025 | Powered by Django</small>
     </div>
   </footer>
 
@@ -158,22 +162,22 @@
 
       <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
 
-      <div class="text-center mb-3">
-        <h5 class="font-bold text-gray-800 mb-1">Liên hệ 💖</h5>
-        
-      </div>
-
-      <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">        
+      
+      <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">
+        <img src="https://i.imgur.com/3b3Gv4x.png" width="40" height="40" class="rounded me-3">
         <div>
-          <div>
-          <p class="fw-semibold mb-0 text-gray-800">Bạn bè ủng hộ</p>
-          <small class="text-gray-500">🍜 Một bát phở ấm lòng</small>
-        </div>
           <p class="fw-semibold mb-0 text-gray-800">Học trò tri ân</p>
           <small class="text-gray-500">☕ Một ly cà phê sẻ chia</small>
         </div>
       </div>
-      
+
+      <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">
+        <img src="https://i.imgur.com/lLHzf6T.png" width="40" height="40" class="rounded me-3">
+        <div>
+          <p class="fw-semibold mb-0 text-gray-800">Bạn bè ủng hộ</p>
+          <small class="text-gray-500">🍜 Một bát phở ấm lòng</small>
+        </div>
+      </div>
 
       <div class="text-center my-3">
         <img src="{% static 'images/qr_bank.jpg' %}" alt="QR Ngân hàng"
@@ -184,7 +188,7 @@
       <a href="https://zalo.me/0934353569" target="_blank"
          class="btn w-100 text-white fw-semibold shadow-sm py-2"
          style="background: linear-gradient(to right, #00a8ff, #0077cc); border-radius:12px;">
-         💬 Nhắn qua Zalo
+         💬 Liên hệ Zalo nhé!
       </a>
 
       <div class="text-center mt-3">
@@ -201,6 +205,7 @@
     const popup = document.getElementById('hotline-popup');
     const overlay = document.getElementById('hotline-overlay');
     const close = document.getElementById('close-popup');
+
     function openPopup() {
       overlay.classList.remove('hidden');
       popup.classList.remove('hidden');
@@ -209,6 +214,7 @@
         popup.classList.remove('translate-y-full');
       }, 10);
     }
+
     function closePopup() {
       overlay.classList.remove('opacity-100');
       popup.classList.add('translate-y-full');
@@ -217,6 +223,7 @@
         popup.classList.add('hidden');
       }, 300);
     }
+
     btn.addEventListener('click', openPopup);
     close.addEventListener('click', closePopup);
     overlay.addEventListener('click', closePopup);
