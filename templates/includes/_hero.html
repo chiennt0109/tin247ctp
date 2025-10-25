@@ -1,27 +1,32 @@
 <section class="relative overflow-hidden py-20 text-center bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50"
-         style="position: relative; z-index: 1;">
+         style="position: relative; z-index: 1; isolation: isolate;">
   <div class="max-w-5xl mx-auto px-6 relative z-10">
     <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 text-gray-900 flex items-center justify-center gap-2">
-      💻 <span>Chuyên Trần Phú IT-Contest OJ</span>
+      💻 <span>Học tập – Rèn luyện vì ngày mai lập nghiệp</span>
     </h1>
     <p class="text-lg sm:text-xl mb-8 text-gray-700 font-medium">
-      Học tập – Rèn luyện vì ngày mai lập nghiệp 🚀
+                    Tin 247 Chuyên Trần Phú - Elearning CodePath
     </p>
 
     <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
-      <a href="/problems/" class="px-6 py-3 bg-gradient-to-r from-sky-200 to-indigo-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition">
+      <a href="/problems/"
+         class="px-6 py-3 bg-gradient-to-r from-sky-200 to-indigo-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition transform">
          🧩 Làm bài tập
       </a>
-      <a href="/contests/" class="px-6 py-3 bg-gradient-to-r from-amber-200 to-orange-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition">
+      <a href="/contests/"
+         class="px-6 py-3 bg-gradient-to-r from-amber-200 to-orange-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition transform">
          🏆 Tham gia kỳ thi
       </a>
-      <a href="#roadmap" class="px-6 py-3 bg-gradient-to-r from-emerald-200 to-teal-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition">
+      <a href="#roadmap"
+         class="px-6 py-3 bg-gradient-to-r from-emerald-200 to-teal-200 text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition transform">
          📘 Lộ trình học
       </a>
     </div>
   </div>
 
-  <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50 z-0"></div>
+  <!-- lớp nền -->
+  <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50 z-0"
+       style="pointer-events:none;"></div>
 
   <style>
     @keyframes gradientMove {
