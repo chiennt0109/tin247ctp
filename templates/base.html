@@ -20,7 +20,7 @@
       overflow-x: hidden;
     }
 
-    /* ✅ Navbar — luôn nổi trên hero */
+    /* ✅ Navbar luôn nổi trên hero */
     .oj-navbar {
       background-color: #ffffff !important;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -32,6 +32,8 @@
       color: #111827 !important;
       font-weight: 500;
       transition: color 0.2s ease;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .oj-navbar .nav-link:hover {
       color: #2563eb !important;
@@ -42,6 +44,19 @@
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    /* ✅ Fix Tailwind override */
+    .navbar-light .navbar-nav .nav-link,
+    .navbar .nav-link {
+      color: #111827 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative !important;
+      z-index: 10001 !important;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2817,24,39,0.9%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
     }
 
     /* ✅ Footer */
@@ -79,7 +94,8 @@
       <a class="oj-navbar-brand navbar-brand" href="/">
         <span>🏫</span><span>CTP OJ</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -147,21 +163,17 @@
         
       </div>
 
-      <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">
-        <img src="https://i.imgur.com/3b3Gv4x.png" width="40" height="40" class="rounded me-3">
+      <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">        
         <div>
+          <div>
+          <p class="fw-semibold mb-0 text-gray-800">Bạn bè ủng hộ</p>
+          <small class="text-gray-500">🍜 Một bát phở ấm lòng</small>
+        </div>
           <p class="fw-semibold mb-0 text-gray-800">Học trò tri ân</p>
           <small class="text-gray-500">☕ Một ly cà phê sẻ chia</small>
         </div>
       </div>
-
-      <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">
-        <img src="https://i.imgur.com/lLHzf6T.png" width="40" height="40" class="rounded me-3">
-        <div>
-          <p class="fw-semibold mb-0 text-gray-800">Bạn bè ủng hộ</p>
-          <small class="text-gray-500">🍜 Một bát phở ấm lòng</small>
-        </div>
-      </div>
+      
 
       <div class="text-center my-3">
         <img src="{% static 'images/qr_bank.jpg' %}" alt="QR Ngân hàng"
