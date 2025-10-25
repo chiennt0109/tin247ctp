@@ -1,0 +1,83 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Làm việc với số rất lớn bằng phép toán mod.</li>
+  <li>Hiểu nghịch đảo modulo và khi nào tồn tại.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Phép toán modulo</h2>
+<p>Khi số rất lớn (ví dụ 10^1000), ta không thể lưu đầy đủ.  
+Ta chỉ lưu phần dư chia cho MOD, ví dụ 1_000_000_007 (số nguyên tố lớn thường dùng trong bài thi).</p>
+
+<p>Các quy tắc cơ bản:</p>
+<ul>
+  <li>(a + b) % MOD = ((a % MOD) + (b % MOD)) % MOD</li>
+  <li>(a * b) % MOD = ((a % MOD) * (b % MOD)) % MOD</li>
+  <li>a^k % MOD có thể tính nhanh bằng lũy thừa nhanh (binary exponentiation).</li>
+</ul>
+
+<hr>
+
+<h2>⚡ Nghịch đảo modulo</h2>
+<p>
+<b>Nghịch đảo của a theo MOD</b> là số inv sao cho:
+<code>a * inv ≡ 1 (mod MOD)</code><br>
+Chỉ tồn tại nếu gcd(a, MOD) = 1.
+</p>
+
+<h3>TH1: MOD nguyên tố</h3>
+<p>Dùng định lý Fermat nhỏ:  
+<code>inv(a) = a^(MOD-2) mod MOD</code></p>
+
+<h4>Python</h4>
+<pre><code>MOD = 10**9 + 7
+def modpow(a,e):
+    r=1
+    while e:
+        if e&1: r=r*a%MOD
+        a=a*a%MOD
+        e//=2
+    return r
+def modinv(a):
+    return modpow(a, MOD-2)
+print(modinv(5))</code></pre>
+
+<h4>C++</h4>
+<pre><code>const long long MOD = 1000000007;
+long long modpow(long long a,long long e){
+    long long r=1;
+    while(e){
+        if(e&1) r=r*a%MOD;
+        a=a*a%MOD;
+        e>>=1;
+    }
+    return r;
+}
+long long modinv(long long a){
+    return modpow(a, MOD-2);
+}</code></pre>
+
+<hr>
+
+<h2>TH2: MOD không nguyên tố</h2>
+<p>Lúc này phải dùng Euclid mở rộng để giải a·x + MOD·y = 1 ⇒ x chính là nghịch đảo.</p>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính (a × b) mod 1e9+7.</li>
+  <li>Tính a^k mod 1e9+7 với k rất lớn (ví dụ k = 10^12).</li>
+  <li>Tìm nghịch đảo của a theo MOD bất kỳ, nếu tồn tại.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 3</b></summary>
+  <pre><code># Dùng extgcd:
+def inv_general(a,MOD):
+    g,x,y = extgcd(a,MOD)
+    if g != 1:
+        return None  # không tồn tại nghịch đảo
+    return x % MOD</code></pre>
+</details>
