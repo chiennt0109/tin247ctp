@@ -1,0 +1,55 @@
+<h2>🎯 Mục tiêu</h2>
+<ul>
+  <li>Hiểu vì sao cần cây cân bằng (độ cao log n).</li>
+  <li>Biết các phép quay trong AVL: quay trái, quay phải.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Giới thiệu</h2>
+<p>Trong BST thường, nếu thêm theo thứ tự tăng dần → cây lệch hẳn sang phải.  
+<b>AVL Tree</b> tự động quay lại để cân bằng chiều cao 2 nhánh (chênh lệch ≤ 1).</p>
+
+<hr>
+
+<h2>💻 Minh họa Python</h2>
+<pre><code># AVL cơ bản
+class Node:
+  def __init__(self,v): self.val=v;self.h=1;self.left=self.right=None
+def h(n):return n.h if n else 0
+def bal(n):return h(n.left)-h(n.right) if n else 0
+def rotR(y):
+  x=y.left;T=x.right;x.right=y;y.left=T
+  y.h=max(h(y.left),h(y.right))+1
+  x.h=max(h(x.left),h(x.right))+1
+  return x
+def rotL(x):
+  y=x.right;T=y.left;y.left=x;x.right=T
+  x.h=max(h(x.left),h(x.right))+1
+  y.h=max(h(y.left),h(y.right))+1
+  return y
+def insert(node,v):
+  if not node:return Node(v)
+  if v&lt;node.val: node.left=insert(node.left,v)
+  elif v&gt;node.val: node.right=insert(node.right,v)
+  else:return node
+  node.h=max(h(node.left),h(node.right))+1
+  b=bal(node)
+  if b&gt;1 and v&lt;node.left.val:return rotR(node)
+  if b&lt;-1 and v&gt;node.right.val:return rotL(node)
+  if b&gt;1 and v&gt;node.left.val:node.left=rotL(node.left);return rotR(node)
+  if b&lt;-1 and v&lt;node.right.val:node.right=rotR(node.right);return rotL(node)
+  return node
+</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập</h2>
+<ol>
+  <li>Chèn lần lượt [10,20,30,40,50,25], in kết quả.</li>
+  <li>Hiển thị độ cao của cây sau mỗi lần chèn.</li>
+</ol>
+
+<details><summary><b>💡 Lời giải 1</b></summary>
+<pre><code># sau khi chèn 25, cây sẽ quay trái-phải tại 20 để cân bằng</code></pre>
+</details>
