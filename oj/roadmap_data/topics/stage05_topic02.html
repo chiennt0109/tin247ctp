@@ -1,0 +1,64 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu nguyên lý chia để trị.</li>
+  <li>Biết cách tách bài toán lớn thành các phần nhỏ, giải từng phần rồi kết hợp.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Ý tưởng</h2>
+<p>“Chia để trị” gồm 3 bước:</p>
+<ol>
+  <li>Chia bài toán thành 2 hoặc nhiều phần nhỏ.</li>
+  <li>Giải quyết từng phần bằng đệ quy.</li>
+  <li>Kết hợp các kết quả để ra kết quả cuối.</li>
+</ol>
+
+<hr>
+
+<h2>💻 Ví dụ: Tính tổng dãy số bằng chia để trị</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int sumRange(vector&lt;int&gt;& a, int l, int r){
+    if(l==r) return a[l];
+    int m=(l+r)/2;
+    return sumRange(a,l,m)+sumRange(a,m+1,r);
+}
+int main(){
+    int n;cin>>n;
+    vector&lt;int&gt; a(n);
+    for(int i=0;i&lt;n;i++)cin>>a[i];
+    cout&lt;&lt;sumRange(a,0,n-1);
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>def sum_range(a, l, r):
+    if l == r:
+        return a[l]
+    m = (l + r) // 2
+    return sum_range(a, l, m) + sum_range(a, m + 1, r)
+n = int(input())
+a = list(map(int, input().split()))
+print(sum_range(a, 0, n-1))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính tổng các phần tử trong mảng bằng chia để trị.</li>
+  <li>Tìm phần tử lớn nhất trong mảng bằng chia để trị.</li>
+  <li>Đếm số phần tử chẵn trong mảng bằng chia để trị.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+def max_range(a, l, r):
+    if l == r: return a[l]
+    m = (l + r)//2
+    return max(max_range(a,l,m), max_range(a,m+1,r))
+a = [1,7,3,9,2,8]
+print(max_range(a,0,len(a)-1))</code></pre>
+</details>
