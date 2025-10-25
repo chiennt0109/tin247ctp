@@ -1,5 +1,2 @@
 # path: oj/roadmap_data/__init__.py
-
-from .stage_01 import STAGE_1
-
-STAGES = [STAGE_1]
+# Đánh dấu thư mục roadmap_data là Python package
