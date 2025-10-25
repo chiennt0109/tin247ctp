@@ -1,0 +1,74 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết cách cài đặt các thuật toán sắp xếp cơ bản.</li>
+  <li>Hiểu vì sao có nhiều cách sắp xếp khác nhau.</li>
+  <li>So sánh hiệu quả giữa Selection Sort, Insertion Sort và Bubble Sort.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>Mỗi thuật toán sắp xếp có đặc điểm riêng:</p>
+<table class="table table-bordered">
+  <thead class="table-light">
+    <tr><th>Tên</th><th>Ý tưởng</th><th>Độ phức tạp</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Selection Sort</td><td>Chọn phần tử nhỏ nhất đưa lên đầu</td><td>O(n²)</td></tr>
+    <tr><td>Insertion Sort</td><td>Chèn từng phần tử vào vị trí đúng</td><td>O(n²)</td></tr>
+    <tr><td>Bubble Sort</td><td>So sánh cặp kề, đẩy phần tử lớn ra cuối</td><td>O(n²)</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>💻 Ví dụ thực hành</h2>
+
+<h4>C++ – Bubble Sort</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (a[j] > a[j + 1])
+                swap(a[j], a[j + 1]);
+    for (int x : a) cout << x << " ";
+}</code></pre>
+
+<h4>Python – Insertion Sort</h4>
+<pre><code>def insertion_sort(a):
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key
+a = list(map(int, input().split()))
+insertion_sort(a)
+print(*a)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Nhập n và mảng n phần tử, in ra mảng sau khi sắp xếp tăng dần bằng Selection Sort.</li>
+  <li>Viết chương trình sắp xếp mảng giảm dần bằng Bubble Sort.</li>
+  <li>So sánh tốc độ sắp xếp giữa Bubble Sort và Insertion Sort với n = 10000 phần tử ngẫu nhiên.</li>
+</ol>
+
+<details class="mt-3">
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python - Selection Sort
+a = [5, 3, 8, 1, 2]
+for i in range(len(a)):
+    min_idx = i
+    for j in range(i+1, len(a)):
+        if a[j] < a[min_idx]:
+            min_idx = j
+    a[i], a[min_idx] = a[min_idx], a[i]
+print(a)</code></pre>
+</details>
