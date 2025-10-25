@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="py-12 px-6 sm:px-12 lg:px-24 bg-gradient-to-br from-white via-sky-50 to-indigo-50 min-h-screen">
+  <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 leading-relaxed">
+    
+    <!-- Tiêu đề chính -->
+    <h1 class="text-3xl font-bold text-indigo-700 mb-4">{{ topic.title }}</h1>
+    <p class="text-gray-700 mb-8 text-lg">{{ topic.summary }}</p>
+
+    <!-- Phần lý thuyết -->
+    <h2 class="text-2xl font-semibold text-gray-800 mb-3">📘 Lý thuyết chi tiết</h2>
+    <div class="prose max-w-none text-gray-700 text-justify mb-8">
+      {{ topic.detail|safe }}
+    </div>
+
+    <!-- Phần ví dụ minh họa -->
+    {% if topic.examples %}
+    <h2 class="text-2xl font-semibold text-gray-800 mb-3">💡 Ví dụ minh họa</h2>
+    <div class="space-y-4 mb-8">
+      {% for ex in topic.examples %}
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+          <p class="text-gray-700 font-medium mb-2">{{ ex.title }}</p>
+          <pre class="text-sm bg-white border border-gray-100 rounded-lg p-3 overflow-x-auto"><code>{{ ex.code }}</code></pre>
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Phần bài tập -->
+    {% if topic.exercises %}
+    <h2 class="text-2xl font-semibold text-gray-800 mb-3">🧩 Bài tập vận dụng</h2>
+    <ul class="list-decimal pl-6 space-y-2 text-gray-700">
+      {% for ex in topic.exercises %}
+        <li>{{ ex }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- Nút quay lại -->
+    <div class="text-center mt-10">
+      <a href="/roadmap/stage/{{ stage.id }}/"
+         class="inline-block px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 hover:shadow-lg transition">
+         ⬅️ Quay lại giai đoạn {{ stage.id }}
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
