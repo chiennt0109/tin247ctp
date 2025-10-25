@@ -20,13 +20,13 @@
       overflow-x: hidden;
     }
 
-    /* ✅ Navbar */
+    /* ✅ Navbar — luôn nổi trên hero */
     .oj-navbar {
       background-color: #ffffff !important;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
-      z-index: 2000 !important;
+      z-index: 10000 !important;
     }
     .oj-navbar .nav-link {
       color: #111827 !important;
@@ -52,12 +52,15 @@
       color: #6b7280;
       background: #f3f4f6;
     }
-    footer a {
-      color: #2563eb;
-      text-decoration: none;
-    }
 
-    /* ✅ Nút hotline */
+    /* ✅ Popup liên hệ */
+    #hotline-popup .bg-white {
+      background: rgba(255, 255, 255, 0.96) !important;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.2) !important;
+    }
+    #hotline-popup .popup-item:hover {
+      background-color: #f9fafb;
+    }
     #hotline-btn {
       background: linear-gradient(135deg, #2563eb, #1e3a8a);
       padding: 12px 18px;
@@ -65,14 +68,7 @@
       font-weight: 600;
       border: 0;
     }
-
-    /* ✅ Bottom sheet popup */
-    #hotline-popup .popup-item:hover {
-      background-color: #f9fafb;
-    }
   </style>
-
-  {% block extra_head %}{% endblock %}
 </head>
 
 <body class="min-h-screen flex flex-col">
@@ -132,19 +128,17 @@
 
   <!-- ☎️ Nút liên hệ -->
   <button id="hotline-btn"
-          class="fixed bottom-6 right-6 text-white rounded-full shadow-lg flex items-center justify-center gap-2 hover:scale-110 transition-all duration-300"
+          class="fixed bottom-6 right-6 text-white rounded-full shadow-xl flex items-center justify-center gap-2 hover:scale-110 transition-all duration-300"
           style="z-index:9999;">
     📖 Hướng dẫn học tập
   </button>
 
-  <!-- Overlay -->
   <div id="hotline-overlay"
        class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 z-[9998]"></div>
 
-  <!-- Popup bottom sheet -->
   <div id="hotline-popup"
        class="hidden fixed bottom-0 left-0 w-full transition-all duration-300 transform translate-y-full z-[9999]">
-    <div class="bg-white/95 backdrop-blur-md rounded-t-3xl shadow-2xl border-t border-gray-200 p-5 max-w-md mx-auto">
+    <div class="bg-white backdrop-blur-md rounded-t-3xl border-t border-gray-200 p-5 max-w-md mx-auto">
 
       <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
 
@@ -154,7 +148,7 @@
       </div>
 
       <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">
-        <img src="https://i.imgur.com/3b3Gv4x.png" alt="Phở" width="40" height="40" class="rounded me-3">
+        <img src="https://i.imgur.com/3b3Gv4x.png" width="40" height="40" class="rounded me-3">
         <div>
           <p class="fw-semibold mb-0 text-gray-800">Học trò tri ân</p>
           <small class="text-gray-500">🍜 Một bát phở ấm lòng</small>
@@ -162,7 +156,7 @@
       </div>
 
       <div class="popup-item d-flex align-items-center mb-3 p-2 rounded">
-        <img src="https://i.imgur.com/lLHzf6T.png" alt="Cafe" width="40" height="40" class="rounded me-3">
+        <img src="https://i.imgur.com/lLHzf6T.png" width="40" height="40" class="rounded me-3">
         <div>
           <p class="fw-semibold mb-0 text-gray-800">Bạn bè ủng hộ</p>
           <small class="text-gray-500">☕ Một ly cà phê sẻ chia</small>
@@ -170,10 +164,8 @@
       </div>
 
       <div class="text-center my-3">
-        <img src="{% static 'images/z7154674795489_c190e2526b36a51897494f322bd15bc1.jpg' %}"
-             alt="QR Ngân hàng"
-             class="mx-auto rounded-2xl shadow-lg border border-gray-200"
-             style="max-width:200px;">
+        <img src="{% static 'images/qr_bank.jpg' %}" alt="QR Ngân hàng"
+             class="mx-auto rounded-2xl shadow-lg border border-gray-200" style="max-width:200px;">
         <small class="text-gray-600 d-block mt-2">💳 Quét mã để ủng hộ thầy qua ngân hàng</small>
       </div>
 
@@ -197,7 +189,6 @@
     const popup = document.getElementById('hotline-popup');
     const overlay = document.getElementById('hotline-overlay');
     const close = document.getElementById('close-popup');
-
     function openPopup() {
       overlay.classList.remove('hidden');
       popup.classList.remove('hidden');
@@ -206,7 +197,6 @@
         popup.classList.remove('translate-y-full');
       }, 10);
     }
-
     function closePopup() {
       overlay.classList.remove('opacity-100');
       popup.classList.add('translate-y-full');
@@ -215,12 +205,10 @@
         popup.classList.add('hidden');
       }, 300);
     }
-
     btn.addEventListener('click', openPopup);
     close.addEventListener('click', closePopup);
     overlay.addEventListener('click', closePopup);
   });
   </script>
-
 </body>
 </html>
