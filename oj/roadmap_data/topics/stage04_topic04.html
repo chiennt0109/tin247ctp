@@ -1,0 +1,56 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết cách mô phỏng các quy trình đơn giản bằng chương trình.</li>
+  <li>Luyện kỹ năng tổng hợp: nhập, xử lý, xuất dữ liệu.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Ví dụ: Quản lý bán hàng đơn giản</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n; cin >> n;
+    map&lt;string,int&gt; sales;
+    for (int i = 0; i &lt; n; i++) {
+        string name; int value;
+        cin >> name >> value;
+        sales[name] += value;
+    }
+    for (auto [k,v] : sales)
+        cout &lt;&lt; k &lt;&lt; ": " &lt;&lt; v &lt;&lt; endl;
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>n = int(input())
+sales = {}
+for _ in range(n):
+    name, val = input().split()
+    val = int(val)
+    sales[name] = sales.get(name, 0) + val
+for k, v in sales.items():
+    print(k + ":", v)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Mô phỏng hệ thống điểm danh học sinh (đếm số người có mặt).</li>
+  <li>Tính tổng tiền bán hàng theo từng sản phẩm.</li>
+  <li>Thống kê số lượng sản phẩm bán được nhiều nhất.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+sales = {}
+n = int(input())
+for _ in range(n):
+    name, value = input().split()
+    value = int(value)
+    sales[name] = sales.get(name, 0) + value
+top = max(sales, key=sales.get)
+print("San pham ban nhieu nhat:", top, "voi", sales[top], "don vi")</code></pre>
+</details>
