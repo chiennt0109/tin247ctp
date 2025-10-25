@@ -1,0 +1,69 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu khái niệm Node và con trỏ (hoặc tham chiếu) trong danh sách liên kết.</li>
+  <li>Biết tạo, duyệt, chèn và xóa phần tử trong danh sách liên kết.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p><b>Linked List</b> là chuỗi các Node, mỗi Node chứa:</p>
+<ul>
+  <li>Giá trị dữ liệu (data)</li>
+  <li>Con trỏ trỏ đến Node kế tiếp (next)</li>
+</ul>
+<p>Khác với mảng, Linked List cho phép chèn/xóa linh hoạt mà không cần dời các phần tử.</p>
+
+<hr>
+
+<h2>💻 Ví dụ tạo danh sách 1 → 2 → 3</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+struct Node{
+    int val;
+    Node* next;
+    Node(int v):val(v),next(NULL){}
+};
+void print(Node* head){
+    for(Node* p=head;p;p=p->next)
+        cout&lt;&lt;p->val&lt;&lt;" ";
+}
+int main(){
+    Node* head=new Node(1);
+    head->next=new Node(2);
+    head->next->next=new Node(3);
+    print(head);
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>class Node:
+    def __init__(self,val):
+        self.val=val
+        self.next=None
+
+head=Node(1)
+head.next=Node(2)
+head.next.next=Node(3)
+
+cur=head
+while cur:
+    print(cur.val,end=" ")
+    cur=cur.next</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Thêm phần tử mới vào đầu danh sách.</li>
+  <li>Thêm phần tử vào cuối danh sách.</li>
+  <li>Đếm số Node trong danh sách.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Lời giải mẫu 2: Thêm đầu danh sách</b></summary>
+  <pre><code>new_node = Node(0)
+new_node.next = head
+head = new_node</code></pre>
+</details>
