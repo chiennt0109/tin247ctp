@@ -1,0 +1,69 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Phân biệt rõ ba cấu trúc: Stack (ngăn xếp), Queue (hàng đợi), Deque (hai đầu).</li>
+  <li>Hiểu ứng dụng thực tế của từng loại trong xử lý dữ liệu luồng.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết cơ bản</h2>
+<p>
+🔹 <b>Stack (Ngăn xếp)</b>: Lấy ra phần tử cuối cùng được thêm vào (“Last In, First Out”).<br>
+🔹 <b>Queue (Hàng đợi)</b>: Lấy ra phần tử đầu tiên được thêm vào (“First In, First Out”).<br>
+🔹 <b>Deque (Double-ended Queue)</b>: Có thể thêm/xóa ở cả hai đầu.
+</p>
+
+<hr>
+
+<h2>💻 Ví dụ minh họa</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    stack&lt;int&gt; st;
+    queue&lt;int&gt; q;
+    deque&lt;int&gt; dq;
+    for(int i=1;i&lt;=3;i++){
+        st.push(i);
+        q.push(i);
+        dq.push_back(i);
+    }
+    cout&lt;&lt;"Stack top: "&lt;&lt;st.top()&lt;&lt;"\\n";
+    cout&lt;&lt;"Queue front: "&lt;&lt;q.front()&lt;&lt;"\\n";
+    cout&lt;&lt;"Deque back: "&lt;&lt;dq.back()&lt;&lt;"\\n";
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>from collections import deque
+st = []
+q = deque()
+dq = deque()
+
+for i in range(1,4):
+    st.append(i)
+    q.append(i)
+    dq.append(i)
+
+print("Stack top:", st[-1])
+print("Queue front:", q[0])
+print("Deque back:", dq[-1])</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Viết chương trình đảo ngược chuỗi bằng Stack.</li>
+  <li>Mô phỏng người xếp hàng (Queue) vào rạp chiếu phim.</li>
+  <li>Sử dụng Deque để cài đặt hàng đợi 2 đầu.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Lời giải mẫu 1: Đảo chuỗi</b></summary>
+  <pre><code>s = input()
+st = []
+for ch in s:
+    st.append(ch)
+while st:
+    print(st.pop(), end="")</code></pre>
+</details>
