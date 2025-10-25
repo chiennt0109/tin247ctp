@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load socialaccount %}
 {% load static %}
 {% block title %}Đăng nhập | Elearning CodePath{% endblock %}
 {% block content %}
@@ -6,66 +7,61 @@
 <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-sky-100 to-purple-50 py-10 px-4">
   <div class="bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-8 w-full max-w-md border border-gray-200">
 
-    <!-- Header -->
     <div class="text-center mb-6">
-      <img src="{% static 'images/logo_ctp.png' %}" alt="Logo" class="mx-auto mb-3 w-16 h-16 rounded-full shadow-lg">
+      <img src="{% static 'images/logo_ctp.png' %}" alt="Logo" class="mx-auto mb-3 w-16 h-16 rounded-full shadow-md">
       <h1 class="text-2xl font-bold text-gray-800">Đăng nhập hệ thống</h1>
       <p class="text-gray-500 text-sm">Elearning CodePath – CTP Online Judge</p>
     </div>
 
-    <!-- Form -->
-    <form id="loginForm" method="post" class="space-y-4">
+    <form method="post" class="space-y-4">
       {% csrf_token %}
       {% if form.non_field_errors %}
-      <div class="alert alert-danger py-2 px-3 rounded-md text-sm">
-        {{ form.non_field_errors }}
-      </div>
+        <div class="alert alert-danger py-2 px-3 rounded-md text-sm">
+          {{ form.non_field_errors }}
+        </div>
       {% endif %}
 
-      <!-- username -->
       <div>
         <label for="{{ form.username.id_for_label }}" class="form-label text-gray-700 fw-semibold">Tài khoản</label>
         {{ form.username|add_class:"form-control rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" }}
       </div>
 
-      <!-- password -->
       <div>
         <label for="{{ form.password.id_for_label }}" class="form-label text-gray-700 fw-semibold">Mật khẩu</label>
         {{ form.password|add_class:"form-control rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" }}
       </div>
 
-      <!-- reCAPTCHA -->
-      <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
-
       <div class="flex items-center justify-between text-sm mt-2">
-        <a href="/accounts/password_reset/" class="text-indigo-600 hover:text-indigo-800 font-medium">
-          Quên mật khẩu?
-        </a>
-        <a href="/accounts/signup/" class="text-gray-600 hover:text-gray-900 font-medium">
-          Đăng ký tài khoản
-        </a>
+        <a href="/accounts/password_reset/" class="text-indigo-600 hover:text-indigo-800 font-medium">Quên mật khẩu?</a>
+        <a href="/accounts/signup/" class="text-gray-600 hover:text-gray-900 font-medium">Đăng ký tài khoản</a>
       </div>
 
       <button type="submit"
-        class="w-full bg-gradient-to-r from-sky-400 to-indigo-500 text-white py-2 rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
+              class="w-full bg-gradient-to-r from-sky-400 to-indigo-500 text-white py-2 rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
         🔐 Đăng nhập
       </button>
     </form>
+
+    <!-- Social Login -->
+    <div class="mt-6 text-center">
+      <p class="text-gray-600 mb-3">Hoặc đăng nhập bằng</p>
+      <div class="flex justify-center gap-3 flex-wrap">
+        <a href="{% provider_login_url 'google' %}" class="btn btn-light border shadow-sm flex items-center gap-2">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="20"> Google
+        </a>
+        <a href="{% provider_login_url 'facebook' %}" class="btn btn-light border shadow-sm flex items-center gap-2">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" width="20"> Facebook
+        </a>
+        <a href="{% provider_login_url 'github' %}" class="btn btn-light border shadow-sm flex items-center gap-2">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="20"> GitHub
+        </a>
+      </div>
+    </div>
 
     <p class="text-center text-gray-500 text-xs mt-5">
       © 2025 Elearning CodePath | THPT chuyên Trần Phú
     </p>
   </div>
 </section>
-
-<!-- ✅ Google reCAPTCHA v3 -->
-<script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY"></script>
-<script>
-grecaptcha.ready(function() {
-  grecaptcha.execute('YOUR_SITE_KEY', {action: 'login'}).then(function(token) {
-    document.getElementById('g-recaptcha-response').value = token;
-  });
-});
-</script>
 
 {% endblock %}
