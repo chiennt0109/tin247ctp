@@ -1,0 +1,75 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu GCD (ước chung lớn nhất) và LCM (bội chung nhỏ nhất).</li>
+  <li>Biết thuật toán Euclid và Euclid mở rộng.</li>
+  <li>Biết cách tìm x, y sao cho ax + by = gcd(a, b).</li>
+</ul>
+
+<hr>
+
+<h2>📘 GCD và LCM là gì?</h2>
+<ul>
+  <li><b>gcd(a,b)</b>: số lớn nhất chia hết cả a và b.</li>
+  <li><b>lcm(a,b)</b>: số nhỏ nhất chia hết cho cả a và b.</li>
+</ul>
+<p>Liên hệ quan trọng: <code>a * b = gcd(a,b) * lcm(a,b)</code></p>
+
+<hr>
+
+<h2>💡 Thuật toán Euclid (tính gcd)</h2>
+<p>Dựa trên tính chất: gcd(a,b) = gcd(b, a mod b). Lặp cho đến khi b = 0.</p>
+
+<h4>C++</h4>
+<pre><code>long long gcd_ll(long long a,long long b){
+    return b==0? a : gcd_ll(b, a%b);
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>def gcd(a,b):
+    while b:
+        a,b = b,a%b
+    return a</code></pre>
+
+<hr>
+
+<h2>📐 Euclid mở rộng (Extended Euclid)</h2>
+<p>
+Ta tìm <code>x, y</code> sao cho:
+<code>a*x + b*y = gcd(a,b)</code>  
+Công cụ này cực kỳ quan trọng trong lập trình số học (ví dụ: tìm nghịch đảo modulo).
+</p>
+
+<h4>C++</h4>
+<pre><code>long long extgcd(long long a,long long b,long long &x,long long &y){
+    if(b==0){ x=1; y=0; return a; }
+    long long x1,y1;
+    long long g = extgcd(b,a%b,x1,y1);
+    x=y1;
+    y=x1-(a/b)*y1;
+    return g;
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>def extgcd(a,b):
+    if b==0:
+        return a,1,0
+    g,x1,y1 = extgcd(b,a%b)
+    x=y1
+    y=x1-(a//b)*y1
+    return g,x,y</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Nhập a, b. In gcd(a,b) và lcm(a,b).</li>
+  <li>In ra x,y sao cho ax + by = gcd(a,b).</li>
+  <li>Kiểm tra xem hai số có nguyên tố cùng nhau không (gcd = 1).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 2</b></summary>
+  <pre><code>a,b = map(int,input().split())
+g,x,y = extgcd(a,b)
+print("x =",x,"y =",y)</code></pre>
+</details>
