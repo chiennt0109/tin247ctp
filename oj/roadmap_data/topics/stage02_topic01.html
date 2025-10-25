@@ -1,0 +1,218 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu mảng là gì và tại sao phải dùng mảng thay vì dùng từng biến lẻ tẻ.</li>
+  <li>Biết cách khai báo mảng 1 chiều (1D) và truy cập phần tử theo chỉ số.</li>
+  <li>Biết cách tính tổng, tìm min/max trong mảng.</li>
+  <li>Làm quen với mảng 2 chiều (ma trận) để lưu bảng điểm, ma trận pixel, v.v.</li>
+  <li>So sánh cách làm trong C++ và Python.</li>
+</ul>
+
+<hr>
+
+<h2>1. Mảng là gì?</h2>
+<p>Hãy tưởng tượng em cần lưu điểm 5 môn của bạn Nam. Cách <b>tệ</b> nhất:</p>
+<pre><code>// C++
+int d1, d2, d3, d4, d5;
+cin >> d1 >> d2 >> d3 >> d4 >> d5;
+</code></pre>
+
+<p>Nhưng nếu lớp có 45 bạn? 200 bạn? Cách trên sẽ không thể mở rộng.</p>
+
+<p><b>Mảng</b> là một dãy các ô nhớ đứng cạnh nhau, đều cùng kiểu dữ liệu, và có thể truy cập bằng chỉ số.</p>
+
+<p>Ví dụ lưu điểm 5 môn:</p>
+
+<table class="table table-bordered text-sm">
+<thead>
+<tr><th>C++</th><th>Python</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<pre><code>int a[5];           // khai báo mảng 5 phần tử
+for (int i = 0; i < 5; i++) {
+    cin >> a[i];    // nhập từng điểm
+}</code></pre>
+</td>
+<td>
+<pre><code>a = []                       # danh sách rỗng
+for i in range(5):
+    x = int(input())
+    a.append(x)               # thêm vào cuối danh sách
+</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<div class="alert alert-info">
+<b>Ghi nhớ quan trọng:</b><br>
+- C++: chỉ số mảng bắt đầu từ 0.<br>
+- Python: cũng bắt đầu từ 0.<br>
+</div>
+
+<hr>
+
+<h2>2. Duyệt mảng và tính toán cơ bản</h2>
+
+<h3>📌 Ví dụ: Tính tổng các phần tử trong mảng</h3>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;           // số lượng phần tử
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+
+    long long sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += a[i];
+    }
+
+    cout << sum;
+    return 0;
+}</code></pre>
+</td>
+<td>
+<pre><code>n = int(input())
+a = list(map(int, input().split()))  # nhập n số trên 1 dòng
+
+total = 0
+for x in a:
+    total += x
+
+print(total)</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>3. Tìm giá trị lớn nhất / nhỏ nhất trong mảng</h2>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>int mx = a[0];
+for (int i = 1; i &lt; n; i++) {
+    if (a[i] &gt; mx) mx = a[i];
+}
+cout &lt;&lt; mx;</code></pre>
+</td>
+<td>
+<pre><code>mx = a[0]
+for x in a[1:]:
+    if x &gt; mx:
+        mx = x
+print(mx)</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p class="text-muted">(Trong Python thật ra có sẵn <code>max(a)</code> và <code>min(a)</code>, nhưng ở đây chúng ta vẫn tự viết để hiểu thuật toán.)</p>
+
+<hr>
+
+<h2>4. Mảng 2 chiều (ma trận)</h2>
+
+<p>Dùng khi dữ liệu có dạng hàng-cột như bảng điểm nhiều bạn vs nhiều môn, ma trận ảnh, bàn cờ,…</p>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>int a[3][4]; // ma trận 3 hàng, 4 cột
+
+for (int i = 0; i &lt; 3; i++) {
+    for (int j = 0; j &lt; 4; j++) {
+        cin &gt;&gt; a[i][j];
+    }
+}</code></pre>
+</td>
+<td>
+<pre><code>rows = 3
+cols = 4
+a = []
+
+for i in range(rows):
+    row = list(map(int, input().split()))
+    a.append(row)
+</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Truy cập phần tử hàng i, cột j:</p>
+<ul>
+  <li>C++: <code>a[i][j]</code></li>
+  <li>Python: <code>a[i][j]</code></li>
+</ul>
+
+<hr>
+
+<h2>🧪 Bài tập tự luyện</h2>
+<ol>
+  <li>Nhập n và một mảng n số nguyên. In ra tổng và giá trị lớn nhất.</li>
+  <li>Nhập ma trận kích thước R x C. In tổng từng hàng.</li>
+  <li>Đếm có bao nhiêu số chẵn trong mảng.</li>
+</ol>
+
+<details class="mt-3">
+  <summary class="text-primary" style="cursor:pointer;"><b>🔍 Gợi ý / Lời giải mẫu (C++)</b></summary>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i &lt; n; i++) cin >> a[i];
+
+    long long sum = 0;
+    int mx = a[0];
+    int even_count = 0;
+
+    for (int x : a) {
+        sum += x;
+        if (x &gt; mx) mx = x;
+        if (x % 2 == 0) even_count++;
+    }
+
+    cout &lt;&lt; "Tong = " &lt;&lt; sum &lt;&lt; "\\n";
+    cout &lt;&lt; "Max = " &lt;&lt; mx &lt;&lt; "\\n";
+    cout &lt;&lt; "So chan = " &lt;&lt; even_count &lt;&lt; "\\n";
+    return 0;
+}</code></pre>
+</details>
+
+<details class="mt-3">
+  <summary class="text-success" style="cursor:pointer;"><b>🐍 Gợi ý / Lời giải mẫu (Python)</b></summary>
+  <pre><code>n = int(input())
+a = list(map(int, input().split()))
+
+total = sum(a)
+mx = max(a)
+even_count = sum(1 for x in a if x % 2 == 0)
+
+print("Tong =", total)
+print("Max =", mx)
+print("So chan =", even_count)</code></pre>
+</details>
+
+<p class="mt-4 text-center text-info fw-bold">
+➡ Tiếp theo: Chuỗi ký tự (xử lý text, tên học sinh, câu tiếng Việt có dấu).
+</p>
