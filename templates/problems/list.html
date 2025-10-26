@@ -1,16 +1,65 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<h2>Problems</h2>
-<table border="1" cellpadding="6">
-  <tr><th>Code</th><th>Title</th><th>Action</th></tr>
-  {% for p in problems %}
-  <tr>
-    <td>{{ p.code }}</td>
-    <td>{{ p.title }}</td>
-    <td><a href="/problems/{{ p.id }}/">View</a></td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="3">No problems yet.</td></tr>
-  {% endfor %}
-</table>
+<div class="container py-4">
+  <h2>🧩 Danh sách bài toán</h2>
+
+  <!-- Bộ lọc -->
+  <form method="get" class="mb-3">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <select name="tag">
+        <option value="">-- Chọn tag --</option>
+        {% for tag in tags %}
+          <option value="{{ tag.slug }}" {% if tag.slug == selected_tag %}selected{% endif %}>{{ tag.name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="difficulty">
+        <option value="">-- Độ khó --</option>
+        {% for level in "Easy,Medium,Hard".split(",") %}
+          <option value="{{ level }}" {% if selected_difficulty == level %}selected{% endif %}>{{ level }}</option>
+        {% endfor %}
+      </select>
+
+      <button type="submit">Lọc</button>
+      <a href="{% url 'problem_list' %}">🧹 Reset</a>
+    </div>
+  </form>
+
+  <!-- Bảng bài toán -->
+  <table border="1" cellspacing="0" cellpadding="8" width="100%">
+    <thead>
+      <tr>
+        <th>Mã</th>
+        <th>Tiêu đề</th>
+        <th>Độ khó</th>
+        <th>Tag</th>
+        <th>Tỉ lệ AC (%)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in problems %}
+      <tr>
+        <td>{{ p.code }}</td>
+        <td>{{ p.title }}</td>
+        <td>
+          {% if p.difficulty == "Easy" %}<span style="color:green">●</span>{% endif %}
+          {% if p.difficulty == "Medium" %}<span style="color:orange">●</span>{% endif %}
+          {% if p.difficulty == "Hard" %}<span style="color:red">●</span>{% endif %}
+          {{ p.difficulty }}
+        </td>
+        <td>
+          {% for t in p.tags.all %}
+            <span style="background:#eee;padding:3px 8px;border-radius:6px;">{{ t.name }}</span>
+          {% empty %}—{% endfor %}
+        </td>
+        <td>{{ p.success_rate }}</td>
+        <td><a href="{% url 'problem_detail' p.id %}">📖 Xem chi tiết</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Không có bài toán nào</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
