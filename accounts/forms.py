@@ -1,8 +1,8 @@
 # accounts/forms.py
 from django import forms
 from allauth.account.forms import SignupForm
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox  # dùng loại checkbox v2
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
 class SecureSignupForm(SignupForm):
     # Honeypot: bot sẽ điền, người thật không thấy
