@@ -19,13 +19,11 @@ class ProblemAdmin(admin.ModelAdmin):
     change_form_template = "admin/problems/change_form_with_upload.html"
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
-        """Hiển thị nút upload trong trang chỉnh Problem"""
         extra_context = extra_context or {}
         extra_context["show_upload_button"] = True
         return super().change_view(request, object_id, form_url, extra_context)
 
     def view_tests_link(self, obj):
-        """Liên kết xem test trực tiếp"""
         return format_html(
             '<a href="{}" target="_blank">👁 Xem test</a>',
             reverse("admin:view_tests", args=[obj.id])
@@ -45,12 +43,12 @@ class ProblemAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def upload_tests(self, request, problem_id):
-        """Xử lý upload file ZIP chứa test cases"""
         problem = Problem.objects.get(pk=problem_id)
         if request.method == "POST":
             form = UploadTestZipForm(request.POST, request.FILES)
             if form.is_valid():
                 zip_file = request.FILES["zip_file"]
+                imported, skipped = 0, 0
                 with tempfile.TemporaryDirectory() as tmpdir:
                     zip_path = os.path.join(tmpdir, "tests.zip")
                     with open(zip_path, "wb") as f:
@@ -60,37 +58,52 @@ class ProblemAdmin(admin.ModelAdmin):
                     with zipfile.ZipFile(zip_path, "r") as zip_ref:
                         zip_ref.extractall(tmpdir)
 
-                    imported, skipped = 0, 0
+                    # ✅ Tìm tất cả file hợp lệ (.in / .inp)
                     for root, _, files in os.walk(tmpdir):
                         for filename in files:
                             name, ext = os.path.splitext(filename)
-                            if ext.lower() not in [".inp", ".in", ".txt"]:
+                            if ext.lower() not in [".in", ".inp", ".txt"]:
                                 continue
 
-                            inp = os.path.join(root, filename)
-                            out = next(
-                                (os.path.join(root, n)
-                                 for n in [name + ".out", name + ".ans", name + ".txt"]
-                                 if os.path.exists(os.path.join(root, n))),
-                                None
-                            )
-                            if not out:
+                            inp_path = os.path.join(root, filename)
+                            # Kiểu 1: flat → tìm .out/.ans cùng tên
+                            out_candidates = [
+                                name + ".out",
+                                name + ".ans",
+                                name + ".txt",
+                                filename.replace(".inp", ".out"),
+                                filename.replace(".in", ".out")
+                            ]
+
+                            out_path = None
+                            # Nếu có thư mục cha (theo dạng testXY/tenbai.inp)
+                            parent_dir = os.path.basename(root)
+                            maybe_out = os.path.join(root, parent_dir + ".out")
+                            if os.path.exists(maybe_out):
+                                out_path = maybe_out
+                            else:
+                                for cand in out_candidates:
+                                    if os.path.exists(os.path.join(root, cand)):
+                                        out_path = os.path.join(root, cand)
+                                        break
+
+                            if not out_path:
                                 skipped += 1
                                 continue
 
                             try:
-                                with open(inp, encoding="utf-8") as fi:
+                                with open(inp_path, encoding="utf-8", errors="ignore") as fi:
                                     inp_data = fi.read().strip()
-                                with open(out, encoding="utf-8") as fo:
+                                with open(out_path, encoding="utf-8", errors="ignore") as fo:
                                     out_data = fo.read().strip()
-
                                 TestCase.objects.create(
                                     problem=problem,
                                     input_data=inp_data,
                                     expected_output=out_data
                                 )
                                 imported += 1
-                            except Exception:
+                            except Exception as e:
+                                print(f"❌ Lỗi đọc {inp_path}: {e}")
                                 skipped += 1
 
                 messages.success(
@@ -103,7 +116,6 @@ class ProblemAdmin(admin.ModelAdmin):
         return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
     def view_tests(self, request, problem_id):
-        """Xem danh sách test case"""
         problem = Problem.objects.get(pk=problem_id)
         testcases = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {
