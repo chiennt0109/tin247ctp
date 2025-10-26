@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     #captcha
-    "captcha",
+    "django_recaptcha",
     # Ứng dụng dự án
     "accounts",
     "problems",
