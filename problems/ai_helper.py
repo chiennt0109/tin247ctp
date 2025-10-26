@@ -48,3 +48,30 @@ def recommend_next(difficulty: str) -> str:
         "Hard": "Hãy thử 'GRAPHMST' hoặc 'DPBOX' để chinh phục mức cao hơn!"
     }
     return recs.get(difficulty, "Không rõ độ khó — hãy chọn bài phù hợp với khả năng của bạn.")
+# ======================
+# 🎯 AI Learning Path
+# ======================
+def build_learning_path(user, solved_count: int, avg_difficulty: str):
+    """
+    Sinh gợi ý lộ trình học miễn phí (offline logic).
+    """
+    plan = []
+
+    if solved_count < 3:
+        plan.append("🔰 Làm quen: tập trung vào các bài Easy để nắm cú pháp và vòng lặp.")
+        plan.append("👉 Học các chủ đề: nhập xuất, điều kiện, vòng lặp.")
+    elif avg_difficulty == "Easy":
+        plan.append("⚡ Bạn đã làm quen tốt! Hãy chuyển sang mức Medium.")
+        plan.append("👉 Học thêm: mảng, chuỗi, hàm, tìm kiếm tuần tự.")
+    elif avg_difficulty == "Medium":
+        plan.append("🚀 Bạn đang ở mức trung cấp. Hãy luyện thêm các bài về sắp xếp và quy hoạch động.")
+        plan.append("👉 Gợi ý: 'SORTARR', 'DPFIB', 'MAXSUMSUB'")
+    else:
+        plan.append("🌟 Rất tốt! Bạn có thể thử các bài Hard về đồ thị, cây, hoặc tối ưu hóa.")
+        plan.append("👉 Ví dụ: 'MSTPATH', 'FLOWMAX', 'BITSEG'")
+    
+    return {
+        "summary": f"Lộ trình dành cho {user.username if user else 'bạn'}",
+        "recommendations": plan
+    }
+
