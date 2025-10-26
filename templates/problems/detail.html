@@ -1,56 +1,82 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="max-width:900px;margin:0 auto;padding:20px;">
+<div class="container" style="max-width:950px;margin:0 auto;padding:25px;">
   <h2>📘 {{ problem.code }} – {{ problem.title }}</h2>
 
-  <div>
+  <div style="margin-bottom:10px;">
     <span class="badge bg-info">⏱ {{ problem.time_limit }}s</span>
     <span class="badge bg-secondary">💾 {{ problem.memory_limit }}MB</span>
     <span class="badge bg-warning text-dark">🏷 {{ problem.difficulty }}</span>
   </div>
 
   <hr>
-  <div class="problem-statement" style="line-height:1.6;">
+
+  <!-- 🧾 Phần đề bài -->
+  <div id="problem-statement" class="markdown-body" style="line-height:1.7;font-size:1.05rem;">
     {{ problem.statement|safe }}
   </div>
 
   <hr>
-  <h4>🧠 Trợ lý học tập</h4>
-  <button id="hint-btn" class="btn btn-outline-primary btn-sm">💡 Nhận gợi ý AI</button>
-  <div id="ai-response" style="margin-top:10px;padding:10px;background:#f8f9fa;border-radius:6px;min-height:40px;"></div>
 
-  <hr>
-  <h4>🧪 Test cases</h4>
-  {% if problem.testcase_set.all %}
-    <table class="table table-sm table-striped">
-      <thead><tr><th>#</th><th>Input</th><th>Output</th></tr></thead>
-      <tbody>
-        {% for t in problem.testcase_set.all %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td><pre>{{ t.input_data|truncatechars:100 }}</pre></td>
-          <td><pre>{{ t.expected_output|truncatechars:100 }}</pre></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- 🧠 Trợ lý học tập -->
+  <div class="card mb-4" style="border:1px solid #e0e0e0;">
+    <div class="card-body">
+      <h5 class="card-title">🧠 Trợ lý học tập (AI Hint)</h5>
+      <button id="hint-btn" class="btn btn-outline-primary btn-sm">💡 Nhận gợi ý AI</button>
+      <div id="ai-response" style="margin-top:10px;padding:10px;background:#f9f9f9;border-radius:6px;min-height:40px;font-style:italic;"></div>
+    </div>
+  </div>
+
+  <!-- 🚀 Nút nộp bài -->
+  <div style="margin:20px 0;text-align:center;">
+    <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">🚀 Nộp bài</a>
+  </div>
+
+  <!-- 🧪 Ví dụ mẫu -->
+  <h4>🧪 Ví dụ mẫu</h4>
+  {% if problem.sample_input or problem.sample_output %}
+  <div class="row">
+    <div class="col-md-6">
+      <h6>📥 Input:</h6>
+      <pre style="background:#f8f9fa;padding:10px;border-radius:5px;">{{ problem.sample_input }}</pre>
+    </div>
+    <div class="col-md-6">
+      <h6>📤 Output:</h6>
+      <pre style="background:#f8f9fa;padding:10px;border-radius:5px;">{{ problem.sample_output }}</pre>
+    </div>
+  </div>
   {% else %}
-    <p>⚠️ Chưa có test nào được thêm cho bài này.</p>
+  <p class="text-muted">⚠️ Bài này chưa có ví dụ mẫu được nhập.</p>
   {% endif %}
+
 </div>
 
+<!-- 📚 KaTeX + Markdown Rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("problem-statement");
+  const raw = el.innerHTML;
+  el.innerHTML = marked.parse(raw);
+  renderMathInElement(el, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+
 document.getElementById("hint-btn").addEventListener("click", function() {
   const resBox = document.getElementById("ai-response");
   resBox.innerHTML = "⏳ Đang lấy gợi ý...";
   fetch("{% url 'ai_hint' problem.id %}")
     .then(r => r.json())
-    .then(data => {
-      resBox.innerHTML = data.hint || "🤖 Không có gợi ý.";
-    })
-    .catch(() => {
-      resBox.innerHTML = "⚠️ Không thể kết nối máy chủ gợi ý.";
-    });
+    .then(data => resBox.innerHTML = data.hint || "🤖 Không có gợi ý.")
+    .catch(() => resBox.innerHTML = "⚠️ Không thể kết nối máy chủ gợi ý.");
 });
 </script>
 {% endblock %}
