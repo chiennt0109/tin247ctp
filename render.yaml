@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: tin247ctp
+    env: python
+    buildCommand: |
+      pip install --upgrade pip
+      pip install --no-cache-dir -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn oj.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: True
