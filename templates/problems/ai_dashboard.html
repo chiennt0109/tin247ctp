@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width:900px;margin:0 auto;">
+  <h2>📊 AI Learning Dashboard</h2>
+  <p>Chào {{ user.username }}! Đây là lộ trình học mà hệ thống đề xuất miễn phí.</p>
+
+  <button id="loadPathBtn"
+          style="background:#1976d2;color:#fff;padding:10px 14px;
+                 border:none;border-radius:6px;cursor:pointer;">
+    🚀 Xem lộ trình học
+  </button>
+
+  <div id="pathResult"
+       style="margin-top:20px;background:#fafafa;border:1px solid #ddd;
+              padding:15px;border-radius:8px;white-space:pre-wrap;"></div>
+</div>
+
+<script>
+document.getElementById('loadPathBtn').addEventListener('click', async () => {
+  const res = await fetch('/problems/ai_learning_path/');
+  const data = await res.json();
+  const out = document.getElementById('pathResult');
+  if (data.error) {
+    out.innerHTML = '⚠️ ' + data.error;
+  } else {
+    out.innerHTML = `<b>${data.summary}</b><br><br>` +
+      data.recommendations.map(x => '• ' + x).join('<br>');
+  }
+});
+</script>
+{% endblock %}
