@@ -1,88 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container" style="max-width:900px;margin:0 auto;padding:20px;">
-  <h2 style="font-weight:bold;">📘 {{ problem.code }} – {{ problem.title }}</h2>
+  <h2>📘 {{ problem.code }} – {{ problem.title }}</h2>
 
-  <div style="margin-top:15px;">
-    <span class="badge bg-info text-dark">⏱ {{ problem.time_limit }}s</span>
-    <span class="badge bg-secondary text-light">💾 {{ problem.memory_limit }} MB</span>
+  <div>
+    <span class="badge bg-info">⏱ {{ problem.time_limit }}s</span>
+    <span class="badge bg-secondary">💾 {{ problem.memory_limit }}MB</span>
     <span class="badge bg-warning text-dark">🏷 {{ problem.difficulty }}</span>
-    {% if problem.tags.all %}
-      {% for tag in problem.tags.all %}
-        <span class="badge bg-success text-light">{{ tag.name }}</span>
-      {% endfor %}
-    {% endif %}
   </div>
 
   <hr>
-
-  <!-- ✅ Phần đề bài: hỗ trợ Markdown + KaTeX/LaTeX -->
-  <div class="problem-statement" style="margin-top:20px;line-height:1.6;">
+  <div class="problem-statement" style="line-height:1.6;">
     {{ problem.statement|safe }}
   </div>
 
   <hr>
-
-  <!-- 🧠 Gợi ý AI / công cụ hỗ trợ -->
   <h4>🧠 Trợ lý học tập</h4>
-  <div style="display:flex;flex-wrap:wrap;gap:10px;">
-    <a href="{% url 'ai_hint' problem.id %}" class="btn btn-outline-primary btn-sm">💡 Gợi ý</a>
-    <a href="{% url 'ai_debug' problem.id %}" class="btn btn-outline-warning btn-sm">🧩 Gợi ý debug</a>
-    <a href="{% url 'ai_recommend' problem.id %}" class="btn btn-outline-success btn-sm">🚀 Gợi ý bài tương tự</a>
-  </div>
+  <button id="hint-btn" class="btn btn-outline-primary btn-sm">💡 Nhận gợi ý AI</button>
+  <div id="ai-response" style="margin-top:10px;padding:10px;background:#f8f9fa;border-radius:6px;min-height:40px;"></div>
 
   <hr>
-
-  <h4>🧪 Ví dụ test (nếu có)</h4>
+  <h4>🧪 Test cases</h4>
   {% if problem.testcase_set.all %}
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>#</th><th>Input</th><th>Output</th>
-        </tr>
-      </thead>
+    <table class="table table-sm table-striped">
+      <thead><tr><th>#</th><th>Input</th><th>Output</th></tr></thead>
       <tbody>
         {% for t in problem.testcase_set.all %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td><pre style="white-space:pre-wrap">{{ t.input_data|truncatechars:300 }}</pre></td>
-          <td><pre style="white-space:pre-wrap">{{ t.expected_output|truncatechars:300 }}</pre></td>
+          <td><pre>{{ t.input_data|truncatechars:100 }}</pre></td>
+          <td><pre>{{ t.expected_output|truncatechars:100 }}</pre></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   {% else %}
-    <p>⚠️ Chưa có test nào được import cho bài này.</p>
+    <p>⚠️ Chưa có test nào được thêm cho bài này.</p>
   {% endif %}
-
-  <hr>
-  <p style="font-size:0.9rem;color:#777;">
-    ✍️ Đăng bởi: Admin | 🕒 {{ problem.created_at|date:"d/m/Y H:i" }}
-  </p>
 </div>
 
-<!-- ✅ MathJax để hiển thị công thức toán học -->
 <script>
-window.MathJax = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['$$', '$$'], ['\\[', '\\]']]
-  },
-  options: {
-    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-  },
-  svg: { fontCache: 'global' }
-};
-</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<!-- ✅ Tự động highlight code (nếu có trong đề) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
-<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+document.getElementById("hint-btn").addEventListener("click", function() {
+  const resBox = document.getElementById("ai-response");
+  resBox.innerHTML = "⏳ Đang lấy gợi ý...";
+  fetch("{% url 'ai_hint' problem.id %}")
+    .then(r => r.json())
+    .then(data => {
+      resBox.innerHTML = data.hint || "🤖 Không có gợi ý.";
+    })
+    .catch(() => {
+      resBox.innerHTML = "⚠️ Không thể kết nối máy chủ gợi ý.";
+    });
 });
 </script>
-
 {% endblock %}
