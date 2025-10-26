@@ -14,13 +14,12 @@ def problem_list(request):
         problems = problems.filter(difficulty=difficulty)
 
     tags = Tag.objects.all().order_by("name")
+    difficulty_levels = ["Easy", "Medium", "Hard"]  # ✅ thêm dòng này
+
     return render(request, "problems/list.html", {
         "problems": problems,
         "tags": tags,
+        "difficulty_levels": difficulty_levels,  # ✅ gửi sang template
         "selected_tag": tag_slug,
         "selected_difficulty": difficulty,
     })
-
-def problem_detail(request, pk):
-    p = get_object_or_404(Problem, pk=pk)
-    return render(request, "problems/detail.html", {"p": p})
