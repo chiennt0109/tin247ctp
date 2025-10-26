@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     path('', views.problem_list, name='problem_list'),
     path('<int:pk>/', views.problem_detail, name='problem_detail'),
-
+    path("<int:pk>/ai_hint/", views.ai_hint, name="ai_hint"),
     # 🌐 AI hỗ trợ
     path('<int:pk>/ai_hint/', views.ai_hint_real, name='ai_hint'),
     path('<int:pk>/ai_debug/', views.ai_debug, name='ai_debug'),
