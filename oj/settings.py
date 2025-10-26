@@ -150,7 +150,11 @@ RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY", "")
 RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY", "")
 RECAPTCHA_REQUIRED_SCORE = 0.85  # dùng cho v3, không hại nếu để đó
 
+ACCOUNT_FORMS = {
+    "signup": "accounts.forms.SecureSignupForm",
+}
 
+#------------------------
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
