@@ -1,135 +1,88 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container py-4" style="max-width:900px;margin:0 auto;">
+<div class="container" style="max-width:900px;margin:0 auto;padding:20px;">
+  <h2 style="font-weight:bold;">📘 {{ problem.code }} – {{ problem.title }}</h2>
 
-  <a href="{% url 'problem_list' %}" style="text-decoration:none;font-size:0.9rem;">← Quay lại danh sách</a>
-
-  <h2 style="margin-top:8px;">
-    {{ p.code }} – {{ p.title }}
-  </h2>
-
-  <div style="font-size:0.9rem;color:#555;margin-bottom:12px;">
-    <b>Độ khó:</b> {{ p.difficulty }}
-    &nbsp;|&nbsp;
-    <b>Giới hạn:</b> {{ p.time_limit }}s / {{ p.memory_limit }}MB
-    <br>
-    <b>Tag:</b>
-    {% for t in p.tags.all %}
-      <span style="
-        background:#eef;
-        border:1px solid #99c;
-        border-radius:4px;
-        padding:2px 6px;
-        font-size:0.75rem;
-        display:inline-block;
-        margin:1px 2px;
-      ">{{ t.name }}</span>
-    {% empty %}
-      <span style="color:#888;">—</span>
-    {% endfor %}
-    <br>
-    <b>AC:</b> {{ p.ac_count }} / {{ p.submission_count }}
-    ({{ p.success_rate }}%)
-    {% if p.ai_supported %}
-      &nbsp;|&nbsp;
-      <span title="AI Hint / Debug hỗ trợ bài này"
-            style="display:inline-block;background:#222;color:#fff;
-                   font-size:0.7rem;line-height:1;border-radius:4px;
-                   padding:3px 5px;font-family:monospace;">
-        AI
-      </span>
-    {% endif %}
-    {% if p.has_editorial %}
-      &nbsp;|&nbsp; 📘 Có lời giải mẫu
+  <div style="margin-top:15px;">
+    <span class="badge bg-info text-dark">⏱ {{ problem.time_limit }}s</span>
+    <span class="badge bg-secondary text-light">💾 {{ problem.memory_limit }} MB</span>
+    <span class="badge bg-warning text-dark">🏷 {{ problem.difficulty }}</span>
+    {% if problem.tags.all %}
+      {% for tag in problem.tags.all %}
+        <span class="badge bg-success text-light">{{ tag.name }}</span>
+      {% endfor %}
     {% endif %}
   </div>
 
   <hr>
 
-  <h3>Mô tả bài toán</h3>
-  <div style="
-      background:#fafafa;
-      border:1px solid #ddd;
-      border-radius:6px;
-      padding:16px;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size:0.9rem;
-      line-height:1.45;
-      white-space:pre-wrap;
-      overflow-x:auto;
-    ">
-    {{ p.statement }}
+  <!-- ✅ Phần đề bài: hỗ trợ Markdown + KaTeX/LaTeX -->
+  <div class="problem-statement" style="margin-top:20px;line-height:1.6;">
+    {{ problem.statement|safe }}
   </div>
 
-  {% if p.ai_supported %}
   <hr>
-  <div style="margin-top:30px;">
-    <h3>🧠 AI Tools</h3>
-    <div id="ai-tools">
-      <button class="ai-btn" onclick="callAI('ai_hint')">🤖 Gợi ý hướng giải</button>
-      <button class="ai-btn" onclick="callAI('ai_debug')">🧪 Giải thích lỗi test</button>
-      <button class="ai-btn" onclick="callAI('ai_recommend')">🧭 Gợi ý bài tiếp theo</button>
-    </div>
-  
-    <div id="ai-output" style="margin-top:15px;padding:10px;
-         background:#f9f9f9;border:1px solid #ccc;border-radius:6px;
-         font-style:italic;white-space:pre-wrap;"></div>
+
+  <!-- 🧠 Gợi ý AI / công cụ hỗ trợ -->
+  <h4>🧠 Trợ lý học tập</h4>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+    <a href="{% url 'ai_hint' problem.id %}" class="btn btn-outline-primary btn-sm">💡 Gợi ý</a>
+    <a href="{% url 'ai_debug' problem.id %}" class="btn btn-outline-warning btn-sm">🧩 Gợi ý debug</a>
+    <a href="{% url 'ai_recommend' problem.id %}" class="btn btn-outline-success btn-sm">🚀 Gợi ý bài tương tự</a>
   </div>
-  
-  <script>
-  async function callAI(endpoint) {
-    const out = document.getElementById('ai-output');
-    out.textContent = '⏳ Đang xử lý...';
-    try {
-      const res = await fetch(window.location.pathname + endpoint + '/');
-      const data = await res.json();
-      out.textContent = data.result;
-    } catch (err) {
-      out.textContent = '❌ Lỗi kết nối máy chủ AI.';
-    }
-  }
-  </script>
+
+  <hr>
+
+  <h4>🧪 Ví dụ test (nếu có)</h4>
+  {% if problem.testcase_set.all %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th><th>Input</th><th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in problem.testcase_set.all %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><pre style="white-space:pre-wrap">{{ t.input_data|truncatechars:300 }}</pre></td>
+          <td><pre style="white-space:pre-wrap">{{ t.expected_output|truncatechars:300 }}</pre></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>⚠️ Chưa có test nào được import cho bài này.</p>
   {% endif %}
 
-  
-  <div style="margin-top:24px;">
-    <a href="/submissions/{{ p.id }}/submit/"
-       style="text-decoration:none;background:#2e7d32;color:#fff;
-              padding:10px 14px;border-radius:4px;font-size:0.9rem;
-              display:inline-block;">
-      🚀 Gửi bài
-    </a>
-  </div>
-
-  {% if p.ai_supported %}
   <hr>
-  <div id="ai-section" style="margin-top:20px;">
-    <button id="aiHintBtn"
-            style="background:#1976d2;color:#fff;padding:8px 12px;
-                   border:none;border-radius:4px;cursor:pointer;">
-      🤖 Nhận gợi ý
-    </button>
-    <div id="aiHintResult" style="margin-top:10px;color:#333;font-style:italic;"></div>
-  </div>
-
-  <script>
-  document.getElementById('aiHintBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('aiHintBtn');
-    const out = document.getElementById('aiHintResult');
-    btn.disabled = true;
-    btn.innerText = "Đang phân tích...";
-    try {
-      const res = await fetch(window.location.pathname + 'ai_hint/');
-      const data = await res.json();
-      out.textContent = data.hint;
-    } catch (e) {
-      out.textContent = "❌ Lỗi khi lấy gợi ý. Thử lại sau nhé.";
-    }
-    btn.innerText = "🤖 Nhận gợi ý khác";
-    btn.disabled = false;
-  });
-  </script>
-  {% endif %}
-
+  <p style="font-size:0.9rem;color:#777;">
+    ✍️ Đăng bởi: Admin | 🕒 {{ problem.created_at|date:"d/m/Y H:i" }}
+  </p>
 </div>
+
+<!-- ✅ MathJax để hiển thị công thức toán học -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- ✅ Tự động highlight code (nếu có trong đề) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+});
+</script>
+
 {% endblock %}
