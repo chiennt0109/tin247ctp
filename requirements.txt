@@ -18,6 +18,5 @@ django-allauth>=0.63.3
 PyJWT>=2.8.0
 cryptography>=42.0.0
 
-#Capchar
+# Captcha
 django-recaptcha>=3.0.0
-
