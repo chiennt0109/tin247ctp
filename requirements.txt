@@ -20,3 +20,5 @@ cryptography>=42.0.0
 
 #Capchar
 django-recaptcha
+django-recaptcha>=3.0.0
+
