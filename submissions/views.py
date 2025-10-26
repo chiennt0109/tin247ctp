@@ -6,7 +6,7 @@ from .models import Submission
 from judge.grader import grade_submission
 
 @login_required
-def submit(request, problem_id):
+def submission_create(request, problem_id):
     problem = get_object_or_404(Problem, id=problem_id)
     ctx = {'problem': problem, 'result': None}
 
