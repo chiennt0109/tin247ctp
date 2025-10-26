@@ -30,7 +30,8 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-
+    #captcha
+    "captcha",
     # Ứng dụng dự án
     "accounts",
     "problems",
