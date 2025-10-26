@@ -8,11 +8,16 @@ from django.http import HttpResponse
 from django.core.management import call_command
 
 def run_migrate(request):
-    # 🧱 Chạy không hỏi gì thêm
-    call_command("makemigrations", "problems", interactive=False)
-    call_command("makemigrations", "submissions", interactive=False)
-    call_command("migrate", interactive=False)
-    return HttpResponse("✅ Migration executed successfully (non-interactive mode)!")
+    try:
+        # 🧱 Tạo migration và migrate ở chế độ không hỏi gì (non-interactive)
+        call_command("makemigrations", "problems", interactive=False, verbosity=0)
+        call_command("makemigrations", "submissions", interactive=False, verbosity=0)
+        call_command("migrate", interactive=False, verbosity=0)
+        return HttpResponse("✅ Migration executed successfully (safe non-interactive mode)!")
+    except Exception as e:
+        # Ghi rõ lỗi để dễ theo dõi
+        return HttpResponse(f"❌ Migration failed: {e}")
+
 
 urlpatterns = [
     path("", views.home, name="home"),
