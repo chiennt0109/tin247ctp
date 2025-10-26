@@ -1,20 +1,74 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container py-4">
-  <h2>{{ p.code }} – {{ p.title }}</h2>
-  <p><b>Độ khó:</b> {{ p.difficulty }}</p>
-  <p><b>Thời gian:</b> {{ p.time_limit }}s | <b>Bộ nhớ:</b> {{ p.memory_limit }}MB</p>
-  <p>
+<div class="container py-4" style="max-width:900px;margin:0 auto;">
+
+  <a href="{% url 'problem_list' %}" style="text-decoration:none;font-size:0.9rem;">← Quay lại danh sách</a>
+
+  <h2 style="margin-top:8px;">
+    {{ p.code }} – {{ p.title }}
+  </h2>
+
+  <div style="font-size:0.9rem;color:#555;margin-bottom:12px;">
+    <b>Độ khó:</b> {{ p.difficulty }}
+    &nbsp;|&nbsp;
+    <b>Giới hạn:</b> {{ p.time_limit }}s / {{ p.memory_limit }}MB
+    <br>
     <b>Tag:</b>
     {% for t in p.tags.all %}
-      <span style="background:#eee;padding:3px 8px;border-radius:6px;">{{ t.name }}</span>
-    {% empty %}—{% endfor %}
-  </p>
+      <span style="
+        background:#eef;
+        border:1px solid #99c;
+        border-radius:4px;
+        padding:2px 6px;
+        font-size:0.75rem;
+        display:inline-block;
+        margin:1px 2px;
+      ">{{ t.name }}</span>
+    {% empty %}
+      <span style="color:#888;">—</span>
+    {% endfor %}
+    <br>
+    <b>AC:</b> {{ p.ac_count }} / {{ p.submission_count }}
+    ({{ p.success_rate }}%)
+    {% if p.ai_supported %}
+      &nbsp;|&nbsp;
+      <span title="AI Hint / Debug hỗ trợ bài này"
+            style="display:inline-block;background:#222;color:#fff;
+                   font-size:0.7rem;line-height:1;border-radius:4px;
+                   padding:3px 5px;font-family:monospace;">
+        AI
+      </span>
+    {% endif %}
+    {% if p.has_editorial %}
+      &nbsp;|&nbsp; 📘 Có lời giải mẫu
+    {% endif %}
+  </div>
 
   <hr>
-  <pre>{{ p.statement }}</pre>
 
-  <hr>
-  <a href="/submissions/{{ p.id }}/submit/" class="btn btn-success">🚀 Gửi bài</a>
+  <h3>Mô tả bài toán</h3>
+  <div style="
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:6px;
+      padding:16px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size:0.9rem;
+      line-height:1.45;
+      white-space:pre-wrap;
+      overflow-x:auto;
+    ">
+    {{ p.statement }}
+  </div>
+
+  <div style="margin-top:24px;">
+    <a href="/submissions/{{ p.id }}/submit/"
+       style="text-decoration:none;background:#2e7d32;color:#fff;
+              padding:10px 14px;border-radius:4px;font-size:0.9rem;
+              display:inline-block;">
+      🚀 Gửi bài
+    </a>
+  </div>
+
 </div>
 {% endblock %}
