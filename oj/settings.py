@@ -31,7 +31,9 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     #captcha
-    "django_recaptcha",
+    "django_recaptcha",    
+    "crispy_forms",
+    "crispy_bootstrap5",
     # Ứng dụng dự án
     "accounts",
     "problems",
@@ -149,6 +151,9 @@ AUTHENTICATION_BACKENDS = [
 RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY", "")
 RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY", "")
 RECAPTCHA_REQUIRED_SCORE = 0.85  # dùng cho v3, không hại nếu để đó
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 
 ACCOUNT_FORMS = {
     "signup": "accounts.forms.SecureSignupForm",
