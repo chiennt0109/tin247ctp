@@ -15,7 +15,7 @@
 
       <select name="difficulty">
         <option value="">-- Độ khó --</option>
-        {% for level in "Easy,Medium,Hard".split(",") %}
+        {% for level in difficulty_levels %}
           <option value="{{ level }}" {% if selected_difficulty == level %}selected{% endif %}>{{ level }}</option>
         {% endfor %}
       </select>
