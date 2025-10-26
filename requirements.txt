@@ -1,5 +1,3 @@
---no-cache-dir
-
 # Django core
 Django==5.1
 gunicorn>=22.0.0
