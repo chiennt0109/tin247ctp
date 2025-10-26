@@ -3,26 +3,24 @@ from django.shortcuts import render, get_object_or_404
 from .models import Problem, Tag
 
 def problem_list(request):
-    problems = Problem.objects.all()
+    tag_slug = request.GET.get("tag")
+    difficulty = request.GET.get("difficulty")
 
-    # Bộ lọc đơn giản
-    difficulty = request.GET.get('difficulty')
-    tag = request.GET.get('tag')
+    problems = Problem.objects.all().prefetch_related("tags")
 
+    if tag_slug:
+        problems = problems.filter(tags__slug=tag_slug)
     if difficulty:
         problems = problems.filter(difficulty=difficulty)
-    if tag:
-        problems = problems.filter(tags__slug=tag)
 
-    context = {
-        'problems': problems.order_by('code'),
-        'tags': Tag.objects.all(),
-        'selected_difficulty': difficulty,
-        'selected_tag': tag,
-    }
-    return render(request, 'problems/list.html', context)
-
+    tags = Tag.objects.all().order_by("name")
+    return render(request, "problems/list.html", {
+        "problems": problems,
+        "tags": tags,
+        "selected_tag": tag_slug,
+        "selected_difficulty": difficulty,
+    })
 
 def problem_detail(request, pk):
-    problem = get_object_or_404(Problem, pk=pk)
-    return render(request, 'problems/detail.html', {'p': problem})
+    p = get_object_or_404(Problem, pk=pk)
+    return render(request, "problems/detail.html", {"p": p})
