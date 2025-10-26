@@ -1,82 +1,66 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<div class="container" style="max-width:950px;margin:0 auto;padding:25px;">
-  <h2>📘 {{ problem.code }} – {{ problem.title }}</h2>
+<div class="container mt-4">
+  <div class="card shadow-sm p-4 mb-4">
+    <h2 class="mb-3">{{ problem.title }}</h2>
+    <p><strong>Mã bài:</strong> {{ problem.code }}</p>
+    <p><strong>Độ khó:</strong> {{ problem.difficulty }}</p>
+    <p><strong>Giới hạn:</strong> {{ problem.time_limit }}s · {{ problem.memory_limit }}MB</p>
 
-  <div style="margin-bottom:10px;">
-    <span class="badge bg-info">⏱ {{ problem.time_limit }}s</span>
-    <span class="badge bg-secondary">💾 {{ problem.memory_limit }}MB</span>
-    <span class="badge bg-warning text-dark">🏷 {{ problem.difficulty }}</span>
-  </div>
+    <!-- ✅ Phần đề bài -->
+    <hr>
+    <div class="problem-statement" style="margin-top:10px; line-height:1.7;">
+      {{ problem.statement|safe }}
+    </div>
 
-  <hr>
-
-  <!-- 🧾 Phần đề bài -->
-  <div id="problem-statement" class="markdown-body" style="line-height:1.7;font-size:1.05rem;">
-    {{ problem.statement|safe }}
-  </div>
-
-  <hr>
-
-  <!-- 🧠 Trợ lý học tập -->
-  <div class="card mb-4" style="border:1px solid #e0e0e0;">
-    <div class="card-body">
-      <h5 class="card-title">🧠 Trợ lý học tập (AI Hint)</h5>
-      <button id="hint-btn" class="btn btn-outline-primary btn-sm">💡 Nhận gợi ý AI</button>
-      <div id="ai-response" style="margin-top:10px;padding:10px;background:#f9f9f9;border-radius:6px;min-height:40px;font-style:italic;"></div>
+    <!-- ✅ Nút nộp bài -->
+    <div class="text-center mt-4 mb-2">
+      <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">
+        🚀 Nộp bài
+      </a>
     </div>
   </div>
 
-  <!-- 🚀 Nút nộp bài -->
-  <div style="margin:20px 0;text-align:center;">
-    <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">🚀 Nộp bài</a>
-  </div>
-
-  <!-- 🧪 Ví dụ mẫu -->
-  <h4>🧪 Ví dụ mẫu</h4>
+  <!-- ✅ Ví dụ mẫu -->
   {% if problem.sample_input or problem.sample_output %}
-  <div class="row">
-    <div class="col-md-6">
-      <h6>📥 Input:</h6>
-      <pre style="background:#f8f9fa;padding:10px;border-radius:5px;">{{ problem.sample_input }}</pre>
-    </div>
-    <div class="col-md-6">
-      <h6>📤 Output:</h6>
-      <pre style="background:#f8f9fa;padding:10px;border-radius:5px;">{{ problem.sample_output }}</pre>
+  <div class="card shadow-sm p-3 mb-4">
+    <h4>🧪 Ví dụ mẫu</h4>
+    <div class="row">
+      <div class="col-md-6">
+        <h6>📥 Input:</h6>
+        <pre class="bg-light p-2 rounded">{{ problem.sample_input }}</pre>
+      </div>
+      <div class="col-md-6">
+        <h6>📤 Output:</h6>
+        <pre class="bg-light p-2 rounded">{{ problem.sample_output }}</pre>
+      </div>
     </div>
   </div>
-  {% else %}
-  <p class="text-muted">⚠️ Bài này chưa có ví dụ mẫu được nhập.</p>
   {% endif %}
 
+  <!-- ✅ Gợi ý AI (tùy chọn, không gây lỗi nếu chưa bật) -->
+  <div class="card shadow-sm p-3">
+    <h5>🧠 Trợ lý học tập</h5>
+    <p class="text-muted small mb-2">
+      Công cụ AI giúp bạn hiểu và tiếp cận bài toán dễ hơn.
+    </p>
+    <a href="#" class="btn btn-outline-primary btn-sm disabled">💡 Gợi ý (đang phát triển)</a>
+  </div>
 </div>
 
-<!-- 📚 KaTeX + Markdown Rendering -->
+<!-- ✅ KaTeX render cho công thức toán -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("problem-statement");
-  const raw = el.innerHTML;
-  el.innerHTML = marked.parse(raw);
-  renderMathInElement(el, {
-    delimiters: [
-      {left: "$$", right: "$$", display: true},
-      {left: "$", right: "$", display: false}
-    ]
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false }
+      ]
+    });
   });
-});
-
-document.getElementById("hint-btn").addEventListener("click", function() {
-  const resBox = document.getElementById("ai-response");
-  resBox.innerHTML = "⏳ Đang lấy gợi ý...";
-  fetch("{% url 'ai_hint' problem.id %}")
-    .then(r => r.json())
-    .then(data => resBox.innerHTML = data.hint || "🤖 Không có gợi ý.")
-    .catch(() => resBox.innerHTML = "⚠️ Không thể kết nối máy chủ gợi ý.");
-});
 </script>
 {% endblock %}
