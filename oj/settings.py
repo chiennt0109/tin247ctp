@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "contests",
 ]
 
-SITE_ID = 1
+SITE_ID = 2
 
 # =====================
 # ⚙️ Middleware
