@@ -21,6 +21,7 @@ class Problem(models.Model):
     statement = models.TextField()
     time_limit = models.IntegerField(default=2)       # seconds
     memory_limit = models.IntegerField(default=256)   # MB
+    created_at = models.DateTimeField(default=timezone.now)
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='Easy')
     tags = models.ManyToManyField(Tag, blank=True)
     has_editorial = models.BooleanField(default=False)
