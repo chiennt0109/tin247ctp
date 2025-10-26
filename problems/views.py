@@ -3,7 +3,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import Problem, Tag
 import random
-
+from django.http import JsonResponse
+from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next
 # ===========================
 # 🌈 DANH SÁCH BÀI TOÁN
 # ===========================
@@ -55,3 +56,26 @@ def ai_hint(request, pk):
     """Trả về 1 gợi ý đơn giản — sẽ được thay thế bằng gợi ý AI thật ở Phase 3."""
     hint = random.choice(AI_HINTS)
     return JsonResponse({"hint": hint})
+# 🤖 Gợi ý thông minh
+def ai_hint_real(request, pk):
+    from .models import Problem
+    p = get_object_or_404(Problem, pk=pk)
+    hint = gen_ai_hint(p.statement, p.difficulty)
+    return JsonResponse({"type": "hint", "result": hint})
+
+
+# 🧪 Giải thích lỗi test
+def ai_debug(request, pk):
+    input_data = request.GET.get("input", "")
+    expected = request.GET.get("expected", "")
+    got = request.GET.get("got", "")
+    result = analyze_failed_test(input_data, expected, got)
+    return JsonResponse({"type": "debug", "result": result})
+
+
+# 🧭 Gợi ý bài tiếp theo
+def ai_recommend(request, pk):
+    from .models import Problem
+    p = get_object_or_404(Problem, pk=pk)
+    result = recommend_next(p.difficulty)
+    return JsonResponse({"type": "recommend", "result": result})
