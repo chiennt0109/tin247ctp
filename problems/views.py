@@ -6,6 +6,8 @@ import random
 from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next
 from .ai_helper import build_learning_path
 from submissions.models import Submission
+from .models import Problem
+from .ai.ai_hint import get_hint
 
 # ===========================
 # 🌈 DANH SÁCH BÀI TOÁN
@@ -109,4 +111,19 @@ def ai_learning_path(request):
 
     plan = build_learning_path(user, solved, avg_difficulty)
     return JsonResponse(plan)
+def problem_list(request):
+    problems = Problem.objects.all().order_by("id")
+    return render(request, "problems/list.html", {"problems": problems})
+
+
+def problem_detail(request, pk):
+    problem = get_object_or_404(Problem, pk=pk)
+    return render(request, "problems/detail.html", {"problem": problem})
+
+
+# ✅ API AI Hint
+def ai_hint(request, pk):
+    problem = get_object_or_404(Problem, pk=pk)
+    hint = get_hint(problem.title, problem.difficulty)
+    return JsonResponse({"hint": hint})
 
