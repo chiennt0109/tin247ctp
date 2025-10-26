@@ -8,10 +8,11 @@ from django.http import HttpResponse
 from django.core.management import call_command
 
 def run_migrate(request):
-    call_command("makemigrations", "problems")
-    call_command("makemigrations", "submissions")
-    call_command("migrate")
-    return HttpResponse("✅ Migration executed successfully!")
+    # 🧱 Chạy không hỏi gì thêm
+    call_command("makemigrations", "problems", interactive=False)
+    call_command("makemigrations", "submissions", interactive=False)
+    call_command("migrate", interactive=False)
+    return HttpResponse("✅ Migration executed successfully (non-interactive mode)!")
 
 urlpatterns = [
     path("", views.home, name="home"),
