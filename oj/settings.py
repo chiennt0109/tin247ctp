@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from urllib.parse import urlparse
+import logging
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,7 +16,7 @@ ALLOWED_HOSTS = ["*"]
 # 📦 Ứng dụng
 # =====================
 INSTALLED_APPS = [
-    # Hệ thống Django
+    # Django mặc định
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,12 +45,12 @@ SITE_ID = 2
 # =====================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # phục vụ static
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "allauth.account.middleware.AccountMiddleware",  # ✅ BẮT BUỘC với Allauth mới
+    "allauth.account.middleware.AccountMiddleware",  # ✅ BẮT BUỘC
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -78,7 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "oj.wsgi.application"
 
 # =====================
-# 🗄️ Cơ sở dữ liệu
+# 🗄️ Database
 # =====================
 if "DATABASE_URL" in os.environ:
     result = urlparse(os.environ["DATABASE_URL"])
@@ -134,11 +135,15 @@ LOGOUT_REDIRECT_URL = "/"
 # =====================
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "none"  # Có thể đổi thành 'mandatory' nếu muốn xác thực email
+ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
-# Google OAuth
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",  # ✅ THIẾU DÒNG NÀY LÀ KHÔNG ĐĂNG NHẬP GOOGLE ĐƯỢC
+]
+
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
@@ -150,3 +155,10 @@ SOCIALACCOUNT_PROVIDERS = {
         "AUTH_PARAMS": {"access_type": "online"},
     }
 }
+
+# ✅ Gỡ lỗi trang trắng / redirect sai
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_DEBUG = True
+
+# Bật logging chi tiết (Render sẽ ghi vào log)
+logging.basicConfig(level=logging.DEBUG)
