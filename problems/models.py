@@ -1,5 +1,6 @@
 # path: problems/models.py
 from django.db import models
+from django.utils import timezone  # ✅ Thêm dòng này để dùng timezone.now
 
 class Tag(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -21,14 +22,13 @@ class Problem(models.Model):
     statement = models.TextField()
     time_limit = models.IntegerField(default=2)       # seconds
     memory_limit = models.IntegerField(default=256)   # MB
-    created_at = models.DateTimeField(default=timezone.now)
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='Easy')
     tags = models.ManyToManyField(Tag, blank=True)
     has_editorial = models.BooleanField(default=False)
     ai_supported = models.BooleanField(default=False)
     ac_count = models.IntegerField(default=0)
     submission_count = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)  # ✅ Giữ duy nhất dòng này
 
     def __str__(self):
         return f"{self.code} - {self.title}"
