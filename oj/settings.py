@@ -144,6 +144,12 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",  # ✅ THIẾU DÒNG NÀY LÀ KHÔNG ĐĂNG NHẬP GOOGLE ĐƯỢC
 ]
+#Captcha
+
+RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY", "")
+RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY", "")
+RECAPTCHA_REQUIRED_SCORE = 0.85  # dùng cho v3, không hại nếu để đó
+
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
