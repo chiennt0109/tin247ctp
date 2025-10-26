@@ -1,16 +1,10 @@
+--no-cache-dir
+
 # Django core
 Django==5.1
-
-# Production server
 gunicorn>=22.0.0
-
-# Database
 psycopg2-binary>=2.9.9
-
-# Static files
 whitenoise>=6.6.0
-
-# HTTP utilities
 requests>=2.31.0
 
 # Authentication (Allauth + Google OAuth)
@@ -18,5 +12,5 @@ django-allauth>=0.63.3
 PyJWT>=2.8.0
 cryptography>=42.0.0
 
-# Captcha
-django-recaptcha>=3.0.0
+# reCAPTCHA
+django-recaptcha>=4.0.0
