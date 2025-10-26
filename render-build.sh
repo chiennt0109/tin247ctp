@@ -1,12 +1,15 @@
-# path: render-build.sh
 #!/usr/bin/env bash
-set -o errexit
+set -o errexit  # Dừng nếu có lỗi
 
-# Thu thập static
+# Cài thư viện cần thiết
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Thu thập static files
 python manage.py collectstatic --noinput
 
 # Chạy migrate database
 python manage.py migrate --noinput
 
-# Khởi động gunicorn
+# Chạy server gunicorn
 gunicorn oj.wsgi:application
