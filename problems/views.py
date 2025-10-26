@@ -3,8 +3,10 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import Problem, Tag
 import random
-from django.http import JsonResponse
 from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next
+from .ai_helper import build_learning_path
+from submissions.models import Submission
+
 # ===========================
 # 🌈 DANH SÁCH BÀI TOÁN
 # ===========================
@@ -79,3 +81,32 @@ def ai_recommend(request, pk):
     p = get_object_or_404(Problem, pk=pk)
     result = recommend_next(p.difficulty)
     return JsonResponse({"type": "recommend", "result": result})
+
+
+
+def ai_learning_path(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({"error": "Bạn cần đăng nhập để xem lộ trình."}, status=403)
+    
+    subs = Submission.objects.filter(user=user)
+    solved = subs.filter(verdict="AC").count()
+
+    if solved == 0:
+        return JsonResponse({"summary": "Bạn chưa có bài nào đúng 😅", "recommendations": [
+            "🔰 Bắt đầu từ mục 'Giai đoạn 1' trong Roadmap.",
+            "📘 Làm 3 bài Easy đầu tiên để hệ thống phân tích trình độ."
+        ]})
+
+    # Tính độ khó trung bình
+    probs = [s.problem for s in subs.filter(verdict="AC")]
+    levels = {"Easy": 1, "Medium": 2, "Hard": 3}
+    if not probs:
+        avg_difficulty = "Easy"
+    else:
+        avg_score = sum(levels.get(p.difficulty, 1) for p in probs) / len(probs)
+        avg_difficulty = "Easy" if avg_score < 1.5 else ("Medium" if avg_score < 2.5 else "Hard")
+
+    plan = build_learning_path(user, solved, avg_difficulty)
+    return JsonResponse(plan)
+
