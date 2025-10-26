@@ -61,6 +61,37 @@
     {{ p.statement }}
   </div>
 
+  {% if p.ai_supported %}
+  <hr>
+  <div style="margin-top:30px;">
+    <h3>🧠 AI Tools</h3>
+    <div id="ai-tools">
+      <button class="ai-btn" onclick="callAI('ai_hint')">🤖 Gợi ý hướng giải</button>
+      <button class="ai-btn" onclick="callAI('ai_debug')">🧪 Giải thích lỗi test</button>
+      <button class="ai-btn" onclick="callAI('ai_recommend')">🧭 Gợi ý bài tiếp theo</button>
+    </div>
+  
+    <div id="ai-output" style="margin-top:15px;padding:10px;
+         background:#f9f9f9;border:1px solid #ccc;border-radius:6px;
+         font-style:italic;white-space:pre-wrap;"></div>
+  </div>
+  
+  <script>
+  async function callAI(endpoint) {
+    const out = document.getElementById('ai-output');
+    out.textContent = '⏳ Đang xử lý...';
+    try {
+      const res = await fetch(window.location.pathname + endpoint + '/');
+      const data = await res.json();
+      out.textContent = data.result;
+    } catch (err) {
+      out.textContent = '❌ Lỗi kết nối máy chủ AI.';
+    }
+  }
+  </script>
+  {% endif %}
+
+  
   <div style="margin-top:24px;">
     <a href="/submissions/{{ p.id }}/submit/"
        style="text-decoration:none;background:#2e7d32;color:#fff;
