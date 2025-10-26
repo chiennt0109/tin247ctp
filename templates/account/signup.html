@@ -1,25 +1,76 @@
-{% extends 'base.html' %}
-{% block title %}Đăng ký | Elearning CodePath OJ{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %} {# nếu bạn xài crispy, nếu không thì bỏ #}
 
 {% block content %}
-<section class="flex justify-center items-center py-16 bg-gradient-to-br from-emerald-50 via-sky-100 to-indigo-50">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Tạo tài khoản mới</h2>
-    <p class="text-center text-gray-500 mb-6 text-sm">Tham gia cộng đồng học lập trình cùng <b>CodePath</b></p>
+<section class="py-10 flex justify-center">
+  <div class="w-full max-w-md bg-white shadow-xl rounded-xl p-6 border border-gray-100">
+    <h1 class="text-xl font-semibold text-gray-800 text-center mb-4">
+      Đăng ký tài khoản
+    </h1>
 
-    <form method="post" class="space-y-4">
+    <form method="post" action="{% url 'account_signup' %}" class="space-y-4">
       {% csrf_token %}
-      {{ form.as_p }}
+
+      {# username #}
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <p class="text-red-500 text-sm">{{ form.username.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {# email #}
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <p class="text-red-500 text-sm">{{ form.email.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {# password1 #}
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+          <p class="text-red-500 text-sm">{{ form.password1.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {# password2 #}
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nhập lại mật khẩu</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+          <p class="text-red-500 text-sm">{{ form.password2.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      {# honeypot (ẩn) #}
+      <div class="hidden">
+        {{ form.honeypot }}
+      </div>
+
+      {# captcha (hiện ra ô I'm not a robot) #}
+      <div>
+        {{ form.captcha }}
+        {% if form.captcha.errors %}
+          <p class="text-red-500 text-sm">{{ form.captcha.errors.0 }}</p>
+        {% endif %}
+      </div>
+
       <button type="submit"
-              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition">
-        ✨ Đăng ký
+        class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold rounded-lg shadow hover:opacity-90 transition">
+        Tạo tài khoản
       </button>
     </form>
 
-    <div class="text-center mt-5 text-sm text-gray-600">
+    <p class="text-center text-sm text-gray-600 mt-4">
       Đã có tài khoản?
-      <a href="{% url 'account_login' %}" class="text-emerald-600 hover:underline">Đăng nhập</a>
-    </div>
+      <a href="{% url 'account_login' %}" class="text-sky-600 hover:underline">Đăng nhập</a>
+    </p>
   </div>
 </section>
 {% endblock %}
