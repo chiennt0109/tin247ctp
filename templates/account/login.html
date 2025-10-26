@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block title %}Đăng nhập | Elearning CodePath OJ{% endblock %}
+
+{% block content %}
+<section class="flex justify-center items-center py-16 bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Đăng nhập tài khoản</h2>
+    <p class="text-center text-gray-500 mb-6 text-sm">Học tập và rèn luyện cùng <b>CodePath</b></p>
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit"
+              class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition">
+        🔐 Đăng nhập
+      </button>
+    </form>
+
+    <div class="my-4 flex items-center">
+      <div class="flex-grow border-t border-gray-200"></div>
+      <span class="px-2 text-gray-400 text-sm">hoặc</span>
+      <div class="flex-grow border-t border-gray-200"></div>
+    </div>
+
+    <a href="{% provider_login_url 'google' %}"
+       class="w-full inline-flex items-center justify-center gap-2 bg-white border border-gray-300 py-2.5 rounded-lg shadow-sm hover:bg-gray-50 transition">
+      <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png" class="w-5 h-5" alt="Google">
+      <span class="font-medium text-gray-700">Đăng nhập với Google</span>
+    </a>
+
+    <div class="text-center mt-5 text-sm text-gray-600">
+      <a href="{% url 'account_reset_password' %}" class="text-sky-600 hover:underline">Quên mật khẩu?</a> |
+      <a href="{% url 'account_signup' %}" class="text-sky-600 hover:underline">Đăng ký</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
