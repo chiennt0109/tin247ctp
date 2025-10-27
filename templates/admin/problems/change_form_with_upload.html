@@ -1,63 +1,114 @@
 {% extends "admin/base_site.html" %}
-{% load static %}
+{% load i18n static %}
 
 {% block content %}
-<div class="container">
-  <h2>{{ original.code }} – {{ original.title }}</h2>
+<h1>📦 Upload Test Cases cho {{ problem.title }}</h1>
+<p>Chọn tệp .zip chứa các file <code>.inp</code> và <code>.out</code>.</p>
 
-  <form method="post" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-    {{ adminform.form.as_p }}
-    <div class="submit-row">
-      <input type="submit" value="💾 Lưu thay đổi" class="default">
+<form id="uploadForm" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <!-- 🧠 Gợi ý Tag AI -->
+  <div style="margin: 15px 0;">
+    <label for="id_tags"><b>Tags:</b></label>
+    <input type="text" id="id_tags" name="tags" value="{{ problem.tags }}" class="vTextField" style="width: 100%; max-width: 400px;">
+    <button type="button" class="button btn" id="aiTagBtn" style="margin-left: 8px;">🧠 Gợi ý Tag AI</button>
+  </div>
+
+  <button type="submit" class="button btn btn-success">🚀 Upload</button>
+</form>
+
+<!-- Progress bar -->
+<div id="progressContainer" style="margin-top: 20px; display: none;">
+  <label>Đang tải lên...</label>
+  <div style="width: 100%; background-color: #eee; border-radius: 4px;">
+    <div id="progressBar" style="width: 0%; height: 20px; background-color: #4caf50; text-align: center; color: white;">
+      0%
     </div>
-  </form>
-
-  <hr>
-  <h3>👁 Kiểm tra test case</h3>
-  {% if original and original.id %}
-    <p>
-      <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">
-        Mở danh sách test trong tab mới
-      </a>
-    </p>
-  {% else %}
-    <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
-  {% endif %}
-
-  {% if show_upload_button %}
-  <hr>
-  <h3>📦 Upload ZIP Test Cases</h3>
-  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
-    <button type="submit" class="default btn btn-success">⬆️ Upload và Import</button>
-  </form>
-  {% endif %}
+  </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
+// ========== 🚀 Upload progress ==========
+document.getElementById("uploadForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  const bar = document.getElementById("progressBar");
+  const container = document.getElementById("progressContainer");
+
+  xhr.open("POST", "", true);
+  xhr.upload.addEventListener("loadstart", function () {
+    container.style.display = "block";
+    bar.style.width = "0%";
+    bar.textContent = "0%";
+  });
+  xhr.upload.addEventListener("progress", function (e) {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      bar.style.width = percent + "%";
+      bar.textContent = percent + "%";
+    }
+  });
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      bar.style.backgroundColor = "#2196F3";
+      bar.textContent = "✅ Hoàn tất!";
+      setTimeout(() => {
+        window.location.href = "{{ request.path|slice:':-13' }}change/";
+      }, 1200);
+    } else {
+      alert("❌ Lỗi khi upload test. Vui lòng thử lại.");
+      bar.style.backgroundColor = "red";
+    }
+  };
+  xhr.send(data);
+});
+
+
+// ========== 🧠 AI Tag Suggestion ==========
 document.addEventListener("DOMContentLoaded", function() {
-  const textarea = document.querySelector("#id_statement");
-  if (textarea) {
-    new SimpleMDE({
-      element: textarea,
-      spellChecker: false,
-      autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
-      renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
-      toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
-                "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
-      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
+  const aiBtn = document.getElementById("aiTagBtn");
+  const tagsField = document.getElementById("id_tags");
+
+  if (aiBtn && tagsField) {
+    aiBtn.addEventListener("click", async function() {
+      const statementField = document.querySelector("#id_statement");
+      const statement = statementField ? statementField.value : "";
+      aiBtn.disabled = true;
+      aiBtn.textContent = "⏳ Đang gợi ý...";
+
+      try {
+        const res = await fetch("/admin/ai_suggest_tags/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify({ statement })
+        });
+
+        const data = await res.json();
+        aiBtn.disabled = false;
+        aiBtn.textContent = "🧠 Gợi ý Tag AI";
+
+        if (data.tags) {
+          tagsField.value = data.tags.join(", ");
+          alert("✅ AI đề xuất: " + data.tags.join(", "));
+        } else {
+          alert("⚠️ Không nhận dạng được chủ đề.");
+        }
+      } catch (err) {
+        aiBtn.disabled = false;
+        aiBtn.textContent = "🧠 Gợi ý Tag AI";
+        alert("❌ Lỗi khi gọi AI gợi ý tag.");
+      }
     });
   }
 });
 </script>
 
-<style>
-.container{max-width:900px;margin:auto;font-family:sans-serif;}
-a.button{display:inline-block;background:#3c8dbc;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;}
-a.button:hover{background:#337ab7;}
-</style>
+<a href="/admin/problems/problem/{{ problem.id }}/change/" style="display:block; margin-top:15px;">← Quay lại Problem</a>
 {% endblock %}
