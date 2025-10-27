@@ -145,15 +145,15 @@ document.addEventListener("DOMContentLoaded", function() {
           option.selected = data.tags.includes(option.text);
         }
       }
-      alert(`✅ Gợi ý hoàn tất:\n• Code: ${data.code}\n• Độ khó: ${data.difficulty}\n• Tag: ${data.tags.join(", ")}`);
-    } catch(e) {
-      console.error(e);
-      alert("❌ Lỗi khi gọi AI Analyze.");
-    } finally {
-      analyzeBtn.disabled = false;
-      analyzeBtn.textContent = "✨ Phân tích AI toàn diện";
-    }
-  });
+      // 🟢 Lưu tự động sau khi AI gợi ý xong
+      await fetch(window.location.href, {
+        method: "POST",
+        headers: { "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value },
+        body: new FormData(document.getElementById("problemForm"))
+      });
+      
+      alert(`✅ Đã cập nhật:\n• Code: ${data.code}\n• Độ khó: ${data.difficulty}\n• Tag: ${data.tags.join(", ")}`);
+      
 
   // ================== UPLOAD BAR ==================
   const uploadForm = document.getElementById("uploadForm");
