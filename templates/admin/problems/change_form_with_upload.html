@@ -12,8 +12,18 @@
   <!-- 🧠 Gợi ý Tag AI -->
   <div style="margin: 15px 0;">
     <label for="id_tags"><b>Tags:</b></label>
-    <input type="text" id="id_tags" name="tags" value="{{ problem.tags }}" class="vTextField" style="width: 100%; max-width: 400px;">
-    <button type="button" class="button btn" id="aiTagBtn" style="margin-left: 8px;">🧠 Gợi ý Tag AI</button>
+    <input type="text"
+           id="id_tags"
+           name="tags"
+           value="{{ problem.tags }}"
+           class="vTextField"
+           style="width: 100%; max-width: 400px;">
+    <button type="button"
+            class="button btn"
+            id="aiTagBtn"
+            style="margin-left: 8px;">
+      🧠 Gợi ý Tag AI
+    </button>
   </div>
 
   <button type="submit" class="button btn btn-success">🚀 Upload</button>
@@ -23,7 +33,9 @@
 <div id="progressContainer" style="margin-top: 20px; display: none;">
   <label>Đang tải lên...</label>
   <div style="width: 100%; background-color: #eee; border-radius: 4px;">
-    <div id="progressBar" style="width: 0%; height: 20px; background-color: #4caf50; text-align: center; color: white;">
+    <div id="progressBar"
+         style="width: 0%; height: 20px; background-color: #4caf50;
+                text-align: center; color: white;">
       0%
     </div>
   </div>
@@ -40,11 +52,13 @@ document.getElementById("uploadForm").addEventListener("submit", function (e) {
   const container = document.getElementById("progressContainer");
 
   xhr.open("POST", "", true);
+
   xhr.upload.addEventListener("loadstart", function () {
     container.style.display = "block";
     bar.style.width = "0%";
     bar.textContent = "0%";
   });
+
   xhr.upload.addEventListener("progress", function (e) {
     if (e.lengthComputable) {
       const percent = Math.round((e.loaded / e.total) * 100);
@@ -52,6 +66,7 @@ document.getElementById("uploadForm").addEventListener("submit", function (e) {
       bar.textContent = percent + "%";
     }
   });
+
   xhr.onload = function () {
     if (xhr.status === 200) {
       bar.style.backgroundColor = "#2196F3";
@@ -64,6 +79,7 @@ document.getElementById("uploadForm").addEventListener("submit", function (e) {
       bar.style.backgroundColor = "red";
     }
   };
+
   xhr.send(data);
 });
 
@@ -75,8 +91,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
   if (aiBtn && tagsField) {
     aiBtn.addEventListener("click", async function() {
-      const statementField = document.querySelector("#id_statement");
+      const statementField = document.querySelector("#id_statement"); // textarea đề bài trong admin
       const statement = statementField ? statementField.value : "";
+
       aiBtn.disabled = true;
       aiBtn.textContent = "⏳ Đang gợi ý...";
 
@@ -91,6 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         const data = await res.json();
+
         aiBtn.disabled = false;
         aiBtn.textContent = "🧠 Gợi ý Tag AI";
 
