@@ -5,18 +5,30 @@
 <hr>
 <table class="table">
   <thead>
-    <tr><th>#</th><th>Input</th><th>Output</th></tr>
+    <tr><th>#</th><th>Input</th><th>Output</th><th>Xóa</th></tr>
   </thead>
   <tbody>
     {% for t in testcases %}
-    <tr>
+    <tr id="test-{{t.id}}">
       <td>{{ forloop.counter }}</td>
-      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.input_data|truncatechars:500 }}</pre></td>
-      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.expected_output|truncatechars:500 }}</pre></td>
+      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.input_data|truncatechars:400 }}</pre></td>
+      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.expected_output|truncatechars:400 }}</pre></td>
+      <td><button onclick="deleteTest({{t.id}})" class="btn btn-danger btn-sm">🗑</button></td>
     </tr>
     {% empty %}
-    <tr><td colspan="3">⚠️ Chưa có test case nào</td></tr>
+    <tr><td colspan="4" class="text-center text-muted">⚠️ Chưa có test case nào</td></tr>
     {% endfor %}
   </tbody>
 </table>
+<script>
+async function deleteTest(id){
+  if(!confirm("Bạn có chắc muốn xóa test #" + id + " ?")) return;
+  const res = await fetch(`/admin/problems/problem/${id}/delete_test/`, {method:'POST'});
+  if(res.ok){
+    document.getElementById("test-" + id)?.remove();
+  }else{
+    alert("❌ Không xóa được test!");
+  }
+}
+</script>
 {% endblock %}
