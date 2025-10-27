@@ -2,33 +2,63 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-  <!-- 🧭 Thông tin tổng quan bài toán -->
-  <h2>{{ original.code }} – {{ original.title }}</h2>
+<div class="container" style="max-width:900px;margin:auto;font-family:sans-serif;">
 
-  <!-- ✅ Form chỉnh sửa chính -->
+  <h2 style="display:flex;align-items:center;gap:8px;">
+    {{ original.code }} – {{ original.title }}
+  </h2>
+
+  <!-- ================== FORM CHỈNH SỬA BÀI TOÁN ================== -->
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
+
     {{ adminform.form.as_p }}
-    <div class="submit-row">
+
+    <!-- Khu vực tag + nút gợi ý AI -->
+    <div style="margin-bottom:15px;">
+      <label for="id_tags_input" style="font-weight:600;">Tags:</label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <!-- ô nhập tag thủ công -->
+        <input id="id_tags_input"
+               type="text"
+               name="tags_text_helper"
+               placeholder="Ví dụ: Graph, Shortest Path"
+               style="flex:1;min-width:250px;padding:6px 8px;border:1px solid #bbb;border-radius:4px;"
+        />
+
+        <!-- nút gọi AI -->
+        <button type="button"
+                id="ai-tag-btn"
+                style="background:#6f42c1;border:none;color:#fff;border-radius:4px;
+                       padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:14px;">
+          <span>🧠</span>
+          <span>Gợi ý Tag AI</span>
+        </button>
+      </div>
+
+      <!-- ghi chú nhỏ -->
+      <small style="color:#666;">
+        Gợi ý dựa trên nội dung đề bài (heuristic). Bạn có thể sửa lại trước khi lưu.
+      </small>
+    </div>
+
+    <div class="submit-row" style="margin-top:20px;">
       <input type="submit" value="💾 Lưu thay đổi" class="default">
     </div>
   </form>
 
-  <!-- ✅ Gợi ý tag bằng AI -->
-  <div id="ai-suggest" style="margin-top: 15px;">
-    <label for="id_tags"><b>🧠 Gợi ý Tag AI:</b></label><br>
-    <input type="text" id="id_tags" name="tags" value="{{ original.tags }}" style="width: 60%; max-width: 500px;">
-    <button id="aiTagBtn" type="button" class="button btn btn-info">✨ Đề xuất tự động</button>
-  </div>
+  <hr style="margin:30px 0;">
 
-  <hr>
-  <!-- ✅ Phần xem test case -->
+  <!-- ================== XEM TEST CASE ================== -->
   <h3>👁 Kiểm tra test case</h3>
   {% if original and original.id %}
     <p>
-      <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">
-        Mở danh sách test trong tab mới
+      <a href="{% url 'admin:view_tests' original.id %}"
+         target="_blank"
+         class="button"
+         style="display:inline-block;background:#3c8dbc;color:white;
+                padding:6px 12px;border-radius:6px;text-decoration:none;">
+        👁 Mở danh sách test trong tab mới
       </a>
     </p>
   {% else %}
@@ -36,35 +66,96 @@
   {% endif %}
 
   {% if show_upload_button %}
-  <hr>
-  <!-- ✅ Upload test case -->
-  <h3>📦 Upload ZIP Test Cases</h3>
-  <form id="uploadForm" action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
-    <button type="submit" class="default btn btn-success">⬆️ Upload và Import</button>
-  </form>
+    <hr style="margin:30px 0;">
 
-  <!-- progress bar -->
-  <div id="progressContainer" style="margin-top: 15px; display: none;">
-    <label>Đang tải lên...</label>
-    <div style="width: 100%; background-color: #eee; border-radius: 4px;">
-      <div id="progressBar" style="width: 0%; height: 20px; background-color: #4caf50; text-align: center; color: white;">
-        0%
+    <!-- ================== UPLOAD TEST ZIP ================== -->
+    <h3 style="display:flex;align-items:center;gap:6px;">
+      📦 Upload Test Cases cho <span>{{ original.code }}</span>
+    </h3>
+    <p>Chọn tệp .zip chứa các file <code>.inp</code>/<code>.in</code> và <code>.out</code>/<code>.ans</code>.</p>
+
+    <form action="{% url 'admin:upload_tests' original.id %}"
+          method="post"
+          enctype="multipart/form-data"
+          id="uploadForm"
+          style="margin-top: 10px;">
+      {% csrf_token %}
+      <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
+      <button type="submit"
+              class="default btn btn-success"
+              style="background:#28a745;border:none;color:#fff;border-radius:4px;
+                     padding:6px 12px;cursor:pointer;">
+        🚀 Upload
+      </button>
+    </form>
+
+    <!-- progress bar -->
+    <div id="progressContainer" style="margin-top: 15px; display: none;">
+      <label>Đang tải lên...</label>
+      <div style="width: 100%; background-color: #eee; border-radius: 4px;">
+        <div id="progressBar"
+             style="width: 0%; height: 20px; background-color: #4caf50;
+                    text-align: center; color: white; font-size:12px;">
+          0%
+        </div>
       </div>
     </div>
-  </div>
+
+    <script>
+    // AJAX upload để có thanh progress
+    (function(){
+      const formEl = document.getElementById("uploadForm");
+      if(!formEl) return;
+      formEl.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const data = new FormData(formEl);
+        const xhr = new XMLHttpRequest();
+        const bar = document.getElementById("progressBar");
+        const container = document.getElementById("progressContainer");
+
+        xhr.open("POST", "", true);
+
+        xhr.upload.addEventListener("loadstart", function () {
+          container.style.display = "block";
+          bar.style.width = "0%";
+          bar.textContent = "0%";
+          bar.style.backgroundColor = "#4caf50";
+        });
+
+        xhr.upload.addEventListener("progress", function (ev) {
+          if (ev.lengthComputable) {
+            const percent = Math.round((ev.loaded / ev.total) * 100);
+            bar.style.width = percent + "%";
+            bar.textContent = percent + "%";
+          }
+        });
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            bar.style.backgroundColor = "#2196F3";
+            bar.textContent = "✅ Hoàn tất!";
+            // quay lại trang change sau 1.2s
+            setTimeout(() => {
+              window.location.href = "/admin/problems/problem/{{ original.id }}/change/";
+            }, 1200);
+          } else {
+            alert("❌ Lỗi khi upload test. Vui lòng thử lại.");
+            bar.style.backgroundColor = "red";
+          }
+        };
+        xhr.send(data);
+      });
+    })();
+    </script>
   {% endif %}
+
 </div>
 
-<!-- ✅ SimpleMDE Markdown -->
+<!-- ================== MARKDOWN EDITOR ================== -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
-<!-- ✅ Upload và AI tag script -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // SimpleMDE cho phần statement
   const textarea = document.querySelector("#id_statement");
   if (textarea) {
     new SimpleMDE({
@@ -72,81 +163,72 @@ document.addEventListener("DOMContentLoaded", function() {
       spellChecker: false,
       autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
       renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
-      toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
-                "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
-      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
-    });
-  }
-
-  // Thanh tiến trình upload
-  const uploadForm = document.getElementById("uploadForm");
-  if (uploadForm) {
-    uploadForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const data = new FormData(uploadForm);
-      const xhr = new XMLHttpRequest();
-      const bar = document.getElementById("progressBar");
-      const container = document.getElementById("progressContainer");
-      xhr.open("POST", uploadForm.action, true);
-      xhr.upload.addEventListener("loadstart", function() {
-        container.style.display = "block";
-        bar.style.width = "0%";
-        bar.textContent = "0%";
-      });
-      xhr.upload.addEventListener("progress", function(e) {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-          bar.style.width = percent + "%";
-          bar.textContent = percent + "%";
-        }
-      });
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          bar.style.backgroundColor = "#2196F3";
-          bar.textContent = "✅ Hoàn tất!";
-          setTimeout(() => window.location.reload(), 1000);
-        } else {
-          alert("❌ Lỗi khi upload test. Vui lòng thử lại.");
-          bar.style.backgroundColor = "red";
-        }
-      };
-      xhr.send(data);
-    });
-  }
-
-  // Gợi ý tag AI
-  const aiBtn = document.getElementById("aiTagBtn");
-  const tagField = document.getElementById("id_tags");
-  if (aiBtn && tagField) {
-    aiBtn.addEventListener("click", async () => {
-      aiBtn.disabled = true;
-      aiBtn.textContent = "⏳ Đang phân tích...";
-      const statement = textarea ? textarea.value : "";
-      try {
-        const res = await fetch(`/admin/problems/ai_suggest_tags/`, {
-          method: "POST",
-          headers: {"Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}"},
-          body: JSON.stringify({ statement })
-        });
-        const data = await res.json();
-        if (data.tags) tagField.value = data.tags.join(", ");
-        aiBtn.textContent = "✨ Đề xuất lại";
-      } catch {
-        alert("Lỗi khi lấy gợi ý từ AI.");
-        aiBtn.textContent = "🧠 Gợi ý Tag AI";
-      }
-      aiBtn.disabled = false;
+      toolbar: [
+        "bold","italic","heading","|",
+        "quote","unordered-list","ordered-list","|",
+        "link","image","table","code","|",
+        "preview","side-by-side","fullscreen","|","guide"
+      ],
+      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown (có thể dùng $...$ cho LaTeX)..."
     });
   }
 });
 </script>
 
+<!-- ================== GỢI Ý TAG AI ================== -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const btn = document.getElementById("ai-tag-btn");
+  const tagInput = document.getElementById("id_tags_input");
+  const statementField = document.getElementById("id_statement");
+
+  if (!btn || !tagInput || !statementField) return;
+
+  btn.addEventListener("click", async function() {
+    btn.disabled = true;
+    btn.style.opacity = 0.6;
+    btn.textContent = "⏳ Đang gợi ý...";
+
+    try {
+      // gửi nội dung đề bài tới endpoint AI nội bộ
+      const res = await fetch("/problems/ai_suggest_tags/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": (function(){
+            // lấy csrf token từ input[name=csrfmiddlewaretoken] trong form chính
+            const csr = document.querySelector('input[name="csrfmiddlewaretoken"]');
+            return csr ? csr.value : "";
+          })()
+        },
+        body: JSON.stringify({
+          statement: statementField.value || ""
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.tags && data.tags.length) {
+          tagInput.value = data.tags.join(", ");
+        } else {
+          alert("Không gợi ý được tag nào.");
+        }
+      } else {
+        alert("Lỗi AI Tag: " + res.status);
+      }
+    } catch(err) {
+      console.error(err);
+      alert("Không gọi được AI tag.");
+    } finally {
+      btn.disabled = false;
+      btn.style.opacity = 1;
+      btn.textContent = "🧠 Gợi ý Tag AI";
+    }
+  });
+});
+</script>
+
 <style>
-.container{max-width:900px;margin:auto;font-family:sans-serif;}
-a.button{display:inline-block;background:#3c8dbc;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;}
 a.button:hover{background:#337ab7;}
-.btn{cursor:pointer;border:none;padding:6px 12px;border-radius:6px;}
-.btn-info{background:#17a2b8;color:white;}
-.btn-success{background:#28a745;color:white;}
 </style>
 {% endblock %}
