@@ -2,7 +2,6 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
-from problems.views_admin import ai_suggest_tags
 
 urlpatterns = [
     path("", views.home, name="home"),
