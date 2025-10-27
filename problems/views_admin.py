@@ -2,62 +2,49 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.views.decorators import staff_member_required
-import json
+import json, re
 
 @csrf_exempt
 @staff_member_required
-def ai_suggest_tags(request):
-    """
-    API rất nhỏ cho admin:
-    - input: { "statement": "...đề bài thô..." }
-    - output: { "tags": ["Graph", "Dijkstra", ...] }
-
-    Hiện tại dùng rule-based (tầng 0, miễn phí).
-    Sau này bạn có thể thay bằng model AI thật.
-    """
+def ai_analyze_problem(request):
+    """Phân tích đề bài: tự sinh mã, độ khó, tag."""
     if request.method != "POST":
         return JsonResponse({"error": "POST only"}, status=405)
 
     try:
         body = json.loads(request.body.decode("utf-8"))
+        text = (body.get("statement") or "").lower()
+        title = body.get("title") or "Untitled"
     except Exception:
-        body = {}
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-    text = (body.get("statement") or "").lower()
+    # === 1️⃣ Gợi ý tag (rule-based) ===
+    tags = []
+    if any(k in text for k in ["graph", "đồ thị", "cạnh", "đỉnh"]): tags.append("Graph")
+    if any(k in text for k in ["dijkstra", "bfs", "dfs", "đường đi"]): tags.append("Shortest Path")
+    if any(k in text for k in ["dp", "quy hoạch động", "dynamic programming"]): tags.append("DP")
+    if any(k in text for k in ["string", "xâu", "chuỗi"]): tags.append("String")
+    if any(k in text for k in ["greedy", "tham lam"]): tags.append("Greedy")
+    if any(k in text for k in ["sort", "sắp xếp"]): tags.append("Sorting")
+    if any(k in text for k in ["mod", "gcd", "lcm", "prime", "số nguyên tố"]): tags.append("Math")
+    if not tags: tags = ["General"]
 
-    suggested = []
+    # === 2️⃣ Sinh mã bài ===
+    prefix = f"{len(title)}{len(tags)}"
+    keyword = re.sub(r'[^A-Za-z0-9]+', '', title.split()[0].upper())[:3]
+    code = f"{prefix}-{keyword}"
 
-    # --- Heuristic gợi ý tag ---
-    if any(k in text for k in ["đồ thị", "graph", "cạnh", "đỉnh"]):
-        suggested.append("Graph")
-    if any(k in text for k in ["bfs", "dfs", "dijkstra", "shortest path", "đường đi ngắn nhất", "chi phí thấp nhất"]):
-        suggested.append("Shortest Path")
-    if any(k in text for k in ["quy hoạch động", "quy hoach dong", "dynamic programming", "dp", "f[i]"]):
-        suggested.append("DP")
-    if any(k in text for k in ["chuỗi", "xâu", "string", "substring", "prefix", "kmp", "z-algorithm"]):
-        suggested.append("String")
-    if any(k in text for k in ["tham lam", "tham-lam", "greedy"]):
-        suggested.append("Greedy")
-    if any(k in text for k in ["hai con trỏ", "two pointers", "two-pointer", "two pointer"]):
-        suggested.append("Two Pointers")
-    if any(k in text for k in ["sắp xếp", "sort", "sorting"]):
-        suggested.append("Sorting")
-    if any(k in text for k in ["cây phân đoạn", "segment tree", "fenwick", "binary indexed tree", "bit tree"]):
-        suggested.append("Data Structure")
+    # === 3️⃣ Đánh giá độ khó ===
+    difficulty = "Easy"
+    if any(k in text for k in ["qhd", "dp", "dijkstra", "segment", "tổ hợp", "backtrack"]):
+        difficulty = "Hard"
+    elif any(k in text for k in ["greedy", "sắp xếp", "sort", "trung bình"]):
+        difficulty = "Medium"
+    if len(text) > 1500 or "ràng buộc" in text:
+        difficulty = "Hard"
 
-    if any(k in text for k in ["mod", "modulo", "ước", "bội", "gcd", "lcm", "số nguyên tố", "prime"]):
-        suggested.append("Math")
-
-    # fallback nếu rỗng
-    if not suggested:
-        suggested.append("General")
-
-    # loại trùng, giữ thứ tự
-    seen = set()
-    unique_tags = []
-    for t in suggested:
-        if t not in seen:
-            seen.add(t)
-            unique_tags.append(t)
-
-    return JsonResponse({"tags": unique_tags})
+    return JsonResponse({
+        "code": code,
+        "difficulty": difficulty,
+        "tags": tags
+    })
