@@ -1,34 +1,61 @@
 {% extends "admin/base_site.html" %}
 {% block content %}
-<h2>📄 {{ problem.code }} – {{ problem.title }}</h2>
-<p><b>Tổng số test:</b> {{ testcases|length }}</p>
-<hr>
-<table class="table">
-  <thead>
-    <tr><th>#</th><th>Input</th><th>Output</th><th>Xóa</th></tr>
-  </thead>
-  <tbody>
-    {% for t in testcases %}
-    <tr id="test-{{t.id}}">
-      <td>{{ forloop.counter }}</td>
-      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.input_data|truncatechars:400 }}</pre></td>
-      <td><pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">{{ t.expected_output|truncatechars:400 }}</pre></td>
-      <td><button onclick="deleteTest({{t.id}})" class="btn btn-danger btn-sm">🗑</button></td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="4" class="text-center text-muted">⚠️ Chưa có test case nào</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div style="max-width:900px;margin:auto;font-family:'Segoe UI',sans-serif;">
+  <h2>📄 {{ problem.code }} – {{ problem.title }}</h2>
+  <p><b>Tổng số test:</b> <span id="test-count">{{ testcases|length }}</span></p>
+  <hr>
+
+  <table class="table" style="width:100%;border-collapse:collapse;">
+    <thead style="background:#f1f1f1;">
+      <tr>
+        <th style="width:40px;">#</th>
+        <th>Input</th>
+        <th>Output</th>
+        <th style="width:80px;text-align:center;">Xoá</th>
+      </tr>
+    </thead>
+    <tbody id="test-table">
+      {% for t in testcases %}
+      <tr id="test-{{ t.id }}" style="border-bottom:1px solid #ddd;">
+        <td>{{ forloop.counter }}</td>
+        <td><pre style="white-space:pre-wrap;max-height:150px;overflow:auto;">{{ t.input_data|truncatechars:400 }}</pre></td>
+        <td><pre style="white-space:pre-wrap;max-height:150px;overflow:auto;">{{ t.expected_output|truncatechars:400 }}</pre></td>
+        <td style="text-align:center;">
+          <button class="delete-btn" data-id="{{ t.id }}"
+            style="background:#f44336;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">🗑</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" style="text-align:center;color:gray;">⚠️ Chưa có test case nào</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 <script>
-async function deleteTest(id){
-  if(!confirm("Bạn có chắc muốn xóa test #" + id + " ?")) return;
-  const res = await fetch(`/admin/problems/problem/${id}/delete_test/`, {method:'POST'});
-  if(res.ok){
-    document.getElementById("test-" + id)?.remove();
-  }else{
-    alert("❌ Không xóa được test!");
-  }
-}
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async e => {
+      const id = btn.dataset.id;
+      if (!confirm("Bạn có chắc muốn xoá test #" + id + " không?")) return;
+      try {
+        const res = await fetch(`/admin/problems/delete_test/${id}/`, {
+          method: "DELETE",
+          headers: { "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]')?.value || "" }
+        });
+        if (res.ok) {
+          document.getElementById("test-" + id)?.remove();
+          const c = document.getElementById("test-count");
+          c.textContent = parseInt(c.textContent) - 1;
+        } else {
+          alert("❌ Lỗi khi xoá test.");
+        }
+      } catch(err) {
+        console.error(err);
+        alert("❌ Không thể kết nối tới server.");
+      }
+    });
+  });
+});
 </script>
 {% endblock %}
