@@ -4,124 +4,107 @@ from django import forms
 from django.contrib import admin, messages
 from django.urls import path, reverse
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.utils.html import format_html
 from .models import Problem, TestCase, Tag
 
-# -------------------------------------------
-# 🧩 FORM UPLOAD TEST ZIP
-# -------------------------------------------
+
+# ===========================
+# 📦 FORM UPLOAD ZIP
+# ===========================
 class UploadTestZipForm(forms.Form):
     zip_file = forms.FileField(label="Chọn file .zip chứa testcases")
 
-# -------------------------------------------
-# 🧠 AI AUTO TAG HELPER
-# -------------------------------------------
-def auto_tag_problem(problem):
-    """
-    Hàm hỗ trợ: dựa trên nội dung statement,
-    gợi ý và gán tag tự động cho Problem (rule-based miễn phí)
-    """
-    text = (problem.statement or "").lower()
-    suggested = []
 
-    if any(k in text for k in ["đồ thị", "graph", "cạnh", "đỉnh"]):
-        suggested.append("Graph")
-    if any(k in text for k in ["bfs", "dfs", "dijkstra", "đường đi ngắn nhất", "shortest path"]):
-        suggested.append("Shortest Path")
-    if any(k in text for k in ["quy hoạch động", "dynamic programming", "dp", "f[i]"]):
-        suggested.append("DP")
-    if any(k in text for k in ["chuỗi", "string", "substring", "prefix", "kmp", "z-algorithm"]):
-        suggested.append("String")
-    if any(k in text for k in ["tham lam", "greedy"]):
-        suggested.append("Greedy")
-    if any(k in text for k in ["hai con trỏ", "two pointers", "two pointer"]):
-        suggested.append("Two Pointers")
-    if any(k in text for k in ["sort", "sắp xếp"]):
-        suggested.append("Sorting")
-    if any(k in text for k in ["mod", "modulo", "ước", "bội", "gcd", "lcm", "prime"]):
-        suggested.append("Math")
-    if not suggested:
-        suggested.append("General")
+# ===========================
+# 🧠 RULE-BASED AI TAGGER
+# ===========================
+def ai_tag_suggest(text: str):
+    """Trích xuất tag theo heuristic rule — miễn phí và cực nhanh."""
+    t = (text or "").lower()
+    tags = []
+    if any(k in t for k in ["đồ thị", "graph", "đỉnh", "cạnh"]):
+        tags.append("Graph")
+    if any(k in t for k in ["bfs", "dfs", "dijkstra", "shortest path", "đường đi ngắn nhất"]):
+        tags.append("Shortest Path")
+    if any(k in t for k in ["quy hoạch động", "dynamic programming", "dp", "f[i]"]):
+        tags.append("DP")
+    if any(k in t for k in ["chuỗi", "string", "prefix", "suffix", "substring", "kmp", "z-algorithm"]):
+        tags.append("String")
+    if any(k in t for k in ["tham lam", "greedy"]):
+        tags.append("Greedy")
+    if any(k in t for k in ["hai con trỏ", "two pointers"]):
+        tags.append("Two Pointers")
+    if any(k in t for k in ["cây phân đoạn", "segment tree", "fenwick", "binary indexed tree"]):
+        tags.append("Data Structure")
+    if any(k in t for k in ["mod", "modulo", "ước", "bội", "gcd", "lcm", "prime"]):
+        tags.append("Math")
+    if not tags:
+        tags.append("General")
+    # loại trùng, giữ thứ tự
+    return list(dict.fromkeys(tags))
 
-    # loại trùng và sắp xếp
-    suggested = list(dict.fromkeys(suggested))
 
-    # tạo tag nếu chưa tồn tại
+def apply_tags_to_problem(problem):
+    """Tạo và gán tag vào Problem"""
+    tags = ai_tag_suggest(problem.statement)
     tag_objs = []
-    for name in suggested:
+    for name in tags:
         tag, _ = Tag.objects.get_or_create(
             name=name,
             defaults={"slug": name.lower().replace(" ", "-")}
         )
         tag_objs.append(tag)
-
-    # gán vào problem
     problem.tags.set(tag_objs)
-    return suggested
+    return tags
 
-# -------------------------------------------
-# 🧱 CLASS ADMIN CHÍNH
-# -------------------------------------------
+
+# ===========================
+# ⚙️ ADMIN CHÍNH
+# ===========================
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = (
-        "code", "title", "difficulty",
-        "time_limit", "memory_limit", "view_tests_link"
-    )
+    list_display = ("code", "title", "difficulty", "ac_count", "submission_count", "view_tests_link")
     search_fields = ("code", "title")
     change_form_template = "admin/problems/change_form_with_upload.html"
-    filter_horizontal = ("tags",)  # ✅ đảm bảo hiển thị danh sách tag
+    filter_horizontal = ("tags",)
+    readonly_fields = ("created_at",)
 
-    # -------------------------------------
-    # Mở form change có thêm context
-    # -------------------------------------
+    # -------------------------
+    # Giao diện “Change Form”
+    # -------------------------
     def change_view(self, request, object_id, form_url="", extra_context=None):
+        problem = Problem.objects.get(pk=object_id)
         extra_context = extra_context or {}
         extra_context["show_upload_button"] = True
+        extra_context["auto_tag_url"] = reverse("admin:auto_tag_problem", args=[problem.id])
         return super().change_view(request, object_id, form_url, extra_context)
 
-    # -------------------------------------
-    # Link xem test
-    # -------------------------------------
-    def view_tests_link(self, obj):
-        return format_html(
-            '<a href="{}" target="_blank">👁 Xem test</a>',
-            reverse("admin:view_tests", args=[obj.id])
-        )
-    view_tests_link.short_description = "Test cases"
-
-    # -------------------------------------
-    # URL bổ sung
-    # -------------------------------------
+    # -------------------------
+    # Gợi ý tag bằng API (ajax)
+    # -------------------------
     def get_urls(self):
         urls = super().get_urls()
-        my_urls = [
-            path("<int:problem_id>/upload_tests/",
-                 self.admin_site.admin_view(self.upload_tests),
-                 name="upload_tests"),
-            path("<int:problem_id>/view_tests/",
-                 self.admin_site.admin_view(self.view_tests),
-                 name="view_tests"),
-            path("<int:problem_id>/auto_tag/",
-                 self.admin_site.admin_view(self.auto_tag_view),
-                 name="auto_tag"),  # ✅ endpoint AI tag ngay trong admin
+        custom = [
+            path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
+            path("<int:problem_id>/view_tests/", self.admin_site.admin_view(self.view_tests), name="view_tests"),
+            path("<int:problem_id>/auto_tag/", self.admin_site.admin_view(self.auto_tag), name="auto_tag_problem"),
+            path("<int:test_id>/delete_test/", self.admin_site.admin_view(self.delete_test), name="delete_test"),
         ]
-        return my_urls + urls
+        return custom + urls
 
-    # -------------------------------------
-    # Tính năng AI Tag thủ công (qua nút)
-    # -------------------------------------
-    def auto_tag_view(self, request, problem_id):
+    # -------------------------
+    # Xử lý gợi ý tag AI
+    # -------------------------
+    def auto_tag(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
-        tags = auto_tag_problem(problem)
-        messages.success(
-            request, f"🤖 Đã tự động gợi ý và gán {len(tags)} tag: {', '.join(tags)}"
-        )
+        tags = apply_tags_to_problem(problem)
+        messages.success(request, f"🤖 Đã tự động gán {len(tags)} tag: {', '.join(tags)}")
         return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
 
-    # -------------------------------------
-    # Upload ZIP
-    # -------------------------------------
+    # -------------------------
+    # Upload Test
+    # -------------------------
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         if request.method == "POST":
@@ -134,63 +117,55 @@ class ProblemAdmin(admin.ModelAdmin):
                     with open(zip_path, "wb") as f:
                         for chunk in zip_file.chunks():
                             f.write(chunk)
-                    with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                        zip_ref.extractall(tmpdir)
+                    with zipfile.ZipFile(zip_path, "r") as z:
+                        z.extractall(tmpdir)
                     for root, _, files in os.walk(tmpdir):
-                        for filename in files:
-                            name, ext = os.path.splitext(filename)
-                            if ext.lower() not in [".in", ".inp", ".txt"]:
+                        for fn in files:
+                            if not fn.endswith((".in", ".inp", ".txt")):
                                 continue
-                            inp_path = os.path.join(root, filename)
+                            name, _ = os.path.splitext(fn)
+                            inp_path = os.path.join(root, fn)
+                            out_candidates = [name + ".out", name + ".ans", name + ".txt"]
                             out_path = None
-                            out_candidates = [
-                                name + ".out", name + ".ans", name + ".txt",
-                                filename.replace(".inp", ".out"),
-                                filename.replace(".in", ".out")
-                            ]
-                            parent_dir = os.path.basename(root)
-                            maybe_out = os.path.join(root, parent_dir + ".out")
-                            if os.path.exists(maybe_out):
-                                out_path = maybe_out
-                            else:
-                                for cand in out_candidates:
-                                    if os.path.exists(os.path.join(root, cand)):
-                                        out_path = os.path.join(root, cand)
-                                        break
+                            for c in out_candidates:
+                                if os.path.exists(os.path.join(root, c)):
+                                    out_path = os.path.join(root, c)
+                                    break
                             if not out_path:
                                 skipped += 1
                                 continue
-                            try:
-                                with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                                    inp_data = fi.read().strip()
-                                with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                                    out_data = fo.read().strip()
-                                TestCase.objects.create(
-                                    problem=problem,
-                                    input_data=inp_data,
-                                    expected_output=out_data
-                                )
-                                imported += 1
-                            except Exception as e:
-                                print(f"❌ Lỗi đọc {inp_path}: {e}")
-                                skipped += 1
-
-                messages.success(
-                    request,
-                    f"✅ Đã import {imported} test case cho {problem.code} (bỏ qua {skipped})."
-                )
+                            with open(inp_path, encoding="utf-8", errors="ignore") as fi:
+                                inp_data = fi.read().strip()
+                            with open(out_path, encoding="utf-8", errors="ignore") as fo:
+                                out_data = fo.read().strip()
+                            TestCase.objects.create(problem=problem, input_data=inp_data, expected_output=out_data)
+                            imported += 1
+                messages.success(request, f"✅ Đã import {imported} test case (bỏ qua {skipped}).")
                 return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
         else:
             form = UploadTestZipForm()
         return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
-    # -------------------------------------
-    # View test
-    # -------------------------------------
+    # -------------------------
+    # View test + xóa test
+    # -------------------------
     def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
-        testcases = TestCase.objects.filter(problem=problem)
-        return render(request, "admin/problems/view_tests.html", {
-            "problem": problem,
-            "testcases": testcases,
-        })
+        tests = TestCase.objects.filter(problem=problem)
+        return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": tests})
+
+    def delete_test(self, request, test_id):
+        try:
+            t = TestCase.objects.get(pk=test_id)
+            t.delete()
+            return JsonResponse({"status": "ok"})
+        except TestCase.DoesNotExist:
+            return JsonResponse({"status": "error", "msg": "Not found"}, status=404)
+
+    # -------------------------
+    # Liên kết xem test
+    # -------------------------
+    def view_tests_link(self, obj):
+        url = reverse("admin:view_tests", args=[obj.id])
+        return format_html('<a href="{}" class="button" target="_blank">👁 Xem test</a>', url)
+    view_tests_link.short_description = "Test cases"
