@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from problems.views_admin import ai_suggest_tags
 
 urlpatterns = [
     path("", views.home, name="home"),
@@ -19,4 +20,7 @@ urlpatterns = [
     path("roadmap/stage/<int:stage_id>/", views.roadmap_stage, name="roadmap_stage"),
     path("roadmap/run/", views.run_code_online, name="run_code_online"),
     path("stages/<int:stage_id>/topic/<int:topic_index>/", views.topic_detail, name="topic_detail"),
+    path("admin/ai_suggest_tags/", ai_suggest_tags, name="ai_suggest_tags"),
 ]
+
+
