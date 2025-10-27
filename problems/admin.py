@@ -28,8 +28,9 @@ class ProblemAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
+           path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
             path("<int:problem_id>/view_tests/", self.admin_site.admin_view(self.view_tests), name="view_tests"),
+            path("delete_test/<int:test_id>/", self.admin_site.admin_view(self.delete_test), name="delete_test"),
         ]
         return my_urls + urls
 
@@ -72,3 +73,15 @@ class ProblemAdmin(admin.ModelAdmin):
         problem = Problem.objects.get(pk=problem_id)
         testcases = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": testcases})
+
+    def delete_test(self, request, test_id):
+        from django.http import HttpResponse
+        if request.method == "DELETE":
+            try:
+                from .models import TestCase
+                TestCase.objects.filter(pk=test_id).delete()
+                return HttpResponse(status=204)
+            except Exception:
+                return HttpResponse(status=500)
+        return HttpResponse(status=405)
+
