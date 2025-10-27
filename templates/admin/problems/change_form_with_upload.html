@@ -1,3 +1,8 @@
+{# =============================== #}
+{# path: templates/admin/problems/change_form_with_upload.html #}
+{# ✅ Giao diện quản trị Problem hiện đại: Upload test, AI tag, AutoTag, Markdown #}
+{# =============================== #}
+
 {% extends "admin/base_site.html" %}
 {% load static %}
 
@@ -7,93 +12,93 @@
     ⚙️ {{ original.code }} – {{ original.title }}
   </h2>
 
-  <div style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:20px;">
-    <!-- ======================================= -->
-    <!-- CỘT TRÁI: FORM CHỈNH SỬA BÀI TOÁN -->
-    <!-- ======================================= -->
-    <div>
-      <form method="post" enctype="multipart/form-data" novalidate id="problemForm">
-        {% csrf_token %}
-        {{ adminform.form.as_p }}
+  <form method="post" enctype="multipart/form-data" novalidate id="problemForm">
+    {% csrf_token %}
+    {{ adminform.form.as_p }}
 
-        <div class="submit-row" style="margin-top:20px;">
-          <input type="submit" value="💾 Lưu thay đổi" class="default">
-        </div>
-      </form>
-
-      <hr style="margin:30px 0;">
-
-      <!-- ================== TEST CASE ================== -->
-      <h3>👁 Kiểm tra Test Cases</h3>
-      {% if original and original.id %}
-        <p>
-          <a href="{% url 'admin:view_tests' original.id %}"
-             target="_blank"
-             class="button"
-             style="display:inline-block;background:#3c8dbc;color:white;
-                    padding:6px 12px;border-radius:6px;text-decoration:none;">
-            👁 Mở danh sách test
-          </a>
-        </p>
-      {% else %}
-        <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
-      {% endif %}
-
-      {% if show_upload_button %}
-      <hr style="margin:30px 0;">
-      <h3>📦 Upload ZIP Test Cases</h3>
-      <p>Chọn file .zip chứa các file <code>.inp</code> / <code>.out</code>.</p>
-
-      <form id="uploadForm" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
-        <button type="submit" class="default" style="background:#28a745;color:white;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;">
-          🚀 Upload
-        </button>
-      </form>
-
-      <div id="progressContainer" style="margin-top: 10px; display: none;">
-        <label>Đang tải lên...</label>
-        <div style="width: 100%; background-color: #eee; border-radius: 4px;">
-          <div id="progressBar"
-               style="width: 0%; height: 20px; background-color: #4caf50;
-                      text-align: center; color: white; font-size:12px;">
-            0%
-          </div>
-        </div>
-      </div>
+    <div class="submit-row" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+      <input type="submit" value="💾 Lưu thay đổi" class="default">
+      {% if auto_tag_url %}
+      <a href="{{ auto_tag_url }}" class="button"
+         style="background:#6f42c1;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;">
+        🤖 Tự động gán tag
+      </a>
       {% endif %}
     </div>
+  </form>
 
-    <!-- ======================================= -->
-    <!-- CỘT PHẢI: HỖ TRỢ AI -->
-    <!-- ======================================= -->
-    <div style="background:#f9f9f9;padding:20px;border-radius:10px;border:1px solid #ddd;">
-      <h3 style="margin-top:0;">🧠 Công cụ AI hỗ trợ</h3>
+  <hr style="margin:30px 0;">
 
-      <div>
-        <button id="ai-tag-btn"
-                style="width:100%;background:#6f42c1;color:#fff;border:none;
-                       padding:8px;border-radius:6px;cursor:pointer;font-size:15px;">
-          ✨ Gợi ý Tag từ nội dung đề bài
-        </button>
-        <small style="display:block;color:#666;margin-top:6px;">
-          AI sẽ đọc nội dung đề bài, phân tích và gợi ý tag phù hợp (VD: Graph, DP, Greedy...).
-        </small>
+  <!-- ================== TEST CASE ================== -->
+  <h3>👁 Kiểm tra Test Cases</h3>
+  {% if original and original.id %}
+  <p>
+    <a href="{% url 'admin:view_tests' original.id %}"
+       target="_blank"
+       class="button"
+       style="display:inline-block;background:#3c8dbc;color:white;
+              padding:6px 12px;border-radius:6px;text-decoration:none;">
+      👁 Mở danh sách test
+    </a>
+  </p>
+  {% else %}
+  <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
+  {% endif %}
+
+  {% if show_upload_button %}
+  <hr style="margin:30px 0;">
+  <h3>📦 Upload ZIP Test Cases</h3>
+  <p>Chọn file .zip chứa các file <code>.inp</code> / <code>.out</code>.</p>
+
+  <form id="uploadForm" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
+    <button type="submit" class="default"
+            style="background:#28a745;color:white;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;">
+      🚀 Upload
+    </button>
+  </form>
+
+  <div id="progressContainer" style="margin-top: 10px; display: none;">
+    <label>Đang tải lên...</label>
+    <div style="width: 100%; background-color: #eee; border-radius: 4px;">
+      <div id="progressBar"
+           style="width: 0%; height: 20px; background-color: #4caf50;
+                  text-align: center; color: white; font-size:12px;">
+        0%
       </div>
+    </div>
+  </div>
+  {% endif %}
 
-      <hr>
+  <hr style="margin:30px 0;">
 
-      <div>
-        <button id="ai-summary-btn"
-                style="width:100%;background:#17a2b8;color:#fff;border:none;
-                       padding:8px;border-radius:6px;cursor:pointer;font-size:15px;">
-          🪄 Tóm tắt đề bài (demo)
-        </button>
-        <small style="display:block;color:#666;margin-top:6px;">
-          Hiện chỉ mô phỏng, có thể thay bằng API AI thật sau này.
-        </small>
-      </div>
+  <!-- ================== AI TOOLS ================== -->
+  <div style="background:#f9f9f9;padding:20px;border-radius:10px;border:1px solid #ddd;">
+    <h3 style="margin-top:0;">🧠 Công cụ AI hỗ trợ</h3>
+
+    <div>
+      <button id="ai-tag-btn"
+              style="width:100%;background:#6f42c1;color:#fff;border:none;
+                     padding:8px;border-radius:6px;cursor:pointer;font-size:15px;">
+        ✨ Gợi ý Tag từ nội dung đề bài
+      </button>
+      <small style="display:block;color:#666;margin-top:6px;">
+        AI sẽ đọc nội dung đề bài, phân tích và gợi ý tag phù hợp (VD: Graph, DP, Greedy...).
+      </small>
+    </div>
+
+    <hr>
+
+    <div>
+      <button id="ai-summary-btn"
+              style="width:100%;background:#17a2b8;color:#fff;border:none;
+                     padding:8px;border-radius:6px;cursor:pointer;font-size:15px;">
+        🪄 Tóm tắt đề bài (demo)
+      </button>
+      <small style="display:block;color:#666;margin-top:6px;">
+        Hiện chỉ mô phỏng, có thể thay bằng API AI thật sau này.
+      </small>
     </div>
   </div>
 </div>
@@ -125,19 +130,17 @@ document.addEventListener("DOMContentLoaded", function() {
   const summaryBtn = document.getElementById("ai-summary-btn");
   const statement = document.getElementById("id_statement");
 
-  // hàm tìm field tags thật trong form
   function getTagSelect() {
     return document.querySelector('select[name="tags"]');
   }
 
-  // ===================== GỢI Ý TAG =====================
+  // --- Gợi ý tag ---
   tagBtn?.addEventListener("click", async function() {
     const tagSelect = getTagSelect();
     if (!statement || !tagSelect) {
       alert("Không tìm thấy nội dung đề bài hoặc trường tags!");
       return;
     }
-
     tagBtn.disabled = true;
     tagBtn.textContent = "⏳ Đang gợi ý...";
     try {
@@ -149,14 +152,12 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         body: JSON.stringify({ statement: statement.value })
       });
-
       if (res.ok) {
         const data = await res.json();
         const tags = data.tags || [];
         if (tags.length === 0) {
           alert("⚠️ Không gợi ý được tag nào.");
         } else {
-          // gán trực tiếp vào field select multiple
           for (const option of tagSelect.options) {
             option.selected = tags.includes(option.text);
           }
@@ -175,12 +176,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  // ===================== TÓM TẮT (demo) =====================
+  // --- Tóm tắt (demo) ---
   summaryBtn?.addEventListener("click", function() {
     if (!statement) return;
     const text = statement.value.trim();
     if (!text) { alert("Đề bài trống."); return; }
-
     const sentences = text.split(/[.!?]/).filter(s => s.trim().length > 0);
     const summary = sentences.slice(0, 3).join(". ") + "...";
     alert("📘 Tóm tắt (demo):\n\n" + summary);
@@ -216,9 +216,7 @@ if (uploadForm) {
       if (xhr.status === 200) {
         bar.style.backgroundColor = "#2196F3";
         bar.textContent = "✅ Hoàn tất!";
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
+        setTimeout(() => location.reload(), 800);
       } else {
         alert("❌ Lỗi khi upload test.");
         bar.style.backgroundColor = "red";
@@ -229,4 +227,8 @@ if (uploadForm) {
 }
 </script>
 
+<style>
+.container pre {background:#f7f7f7;padding:6px;border-radius:4px;}
+a.button:hover {opacity:0.85;}
+</style>
 {% endblock %}
