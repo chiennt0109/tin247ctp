@@ -1,59 +1,61 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
-
 {% block content %}
-<div class="container" style="max-width:1100px;margin:auto;font-family:'Segoe UI',sans-serif;">
-  <h2 style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
-    ⚙️ {{ original.code }} – {{ original.title }}
-  </h2>
+<div class="container">
+  <h2>{{ original.code }} – {{ original.title }}</h2>
 
-  <form method="post" enctype="multipart/form-data" id="problemForm">
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {{ adminform.form.as_p }}
-
-    <div class="submit-row" style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="submit-row">
       <input type="submit" value="💾 Lưu thay đổi" class="default">
-      <button type="button" id="ai-analyze-btn"
-         style="background:#ff9800;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
-        ✨ Phân tích AI toàn diện
-      </button>
-      <button type="button" id="ai-suggest-btn"
-         style="background:#17a2b8;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
-        💡 Gợi ý tag
-      </button>
-    </div>
-
-    <div id="suggestions" style="margin-top:10px;display:none;">
-      <p><b>✨ Tag gợi ý:</b></p>
-      <div id="suggested-tags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
   </form>
 
-  <hr style="margin:30px 0;">
+  <hr>
+  <h3>🤖 AI Hỗ trợ nhập liệu</h3>
+  <button type="button" id="aiAnalyze" class="button">✨ Phân tích & Gợi ý toàn diện</button>
+  <p id="aiResult" style="margin-top:10px;color:#333;"></p>
+
+  <hr>
+  <h3>👁 Test Cases</h3>
+  {% if original and original.id %}
+    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">Mở danh sách test</a>
+  {% else %}
+    <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
+  {% endif %}
+
+  {% if show_upload_button %}
+  <hr>
   <h3>📦 Upload ZIP Test Cases</h3>
-  <form id="uploadForm" method="post" enctype="multipart/form-data">
+  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
-    <button type="submit" class="default"
-            style="background:#28a745;color:white;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;">
-      🚀 Upload
-    </button>
+    <button type="submit" class="default btn btn-success">⬆️ Upload và Import</button>
   </form>
-
-  <div id="progressContainer" style="margin-top: 10px; display: none;">
-    <label>Đang tải lên...</label>
-    <div style="width: 100%; background-color: #eee; border-radius: 4px;">
-      <div id="progressBar"
-           style="width: 0%; height: 20px; background-color: #4caf50;
-                  text-align: center; color: white; font-size:12px;">0%</div>
-    </div>
-  </div>
+  {% endif %}
 </div>
 
-<!-- ========== SCRIPT ========== -->
+<script>
+document.getElementById("aiAnalyze").addEventListener("click", async () => {
+  const title = document.querySelector("#id_title").value;
+  const statement = document.querySelector("#id_statement").value;
+  const res = await fetch("/problems/ai_analyze_problem/", {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}"},
+    body: JSON.stringify({title, statement})
+  });
+  const data = await res.json();
+  if (data.error) return alert("❌ " + data.error);
+  document.querySelector("#id_code").value = data.code;
+  document.querySelector("#id_difficulty").value = data.difficulty;
+  document.getElementById("aiResult").innerHTML =
+    `✅ <b>Mã:</b> ${data.code} — <b>Độ khó:</b> ${data.difficulty} — <b>Tags:</b> ${data.tags.join(", ")}`;
+});
+</script>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const textarea = document.querySelector("#id_statement");
@@ -62,134 +64,17 @@ document.addEventListener("DOMContentLoaded", function() {
       element: textarea,
       spellChecker: false,
       autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
-      renderingConfig: { singleLineBreaks: false, codeSyntaxHighlighting: true },
       toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
                 "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
       placeholder: "✏️ Nhập nội dung bài toán bằng Markdown..."
     });
   }
-
-  const suggestBtn = document.getElementById("ai-suggest-btn");
-  const analyzeBtn = document.getElementById("ai-analyze-btn");
-  const statement = document.getElementById("id_statement");
-  const suggestionsBox = document.getElementById("suggestions");
-  const tagArea = document.getElementById("suggested-tags");
-  const tagSelect = document.querySelector('select[name="tags"]');
-
-  // ================== GỢI Ý TAG ==================
-  suggestBtn.addEventListener("click", async function() {
-    suggestBtn.disabled = true;
-    suggestBtn.textContent = "⏳ Đang gợi ý...";
-    try {
-      const res = await fetch("/problems/ai_suggest_tags/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({ statement: statement.value })
-      });
-      const data = await res.json();
-      const tags = data.tags || [];
-      tagArea.innerHTML = "";
-      if (tags.length > 0) {
-        suggestionsBox.style.display = "block";
-        tags.forEach(tag => {
-          const el = document.createElement("span");
-          el.textContent = tag;
-          el.style = "background:#e0f7fa;color:#00796b;padding:4px 8px;border-radius:6px;cursor:pointer;";
-          el.onclick = () => {
-            for (const option of tagSelect.options) {
-              if (option.text === tag) option.selected = true;
-            }
-            el.style.background="#b2dfdb";
-          };
-          tagArea.appendChild(el);
-        });
-      } else {
-        alert("Không gợi ý được tag nào.");
-      }
-    } catch(e) {
-      console.error(e);
-      alert("❌ Lỗi khi gợi ý tag.");
-    } finally {
-      suggestBtn.disabled = false;
-      suggestBtn.textContent = "💡 Gợi ý tag";
-    }
-  });
-
-  // ================== PHÂN TÍCH TOÀN DIỆN ==================
-  analyzeBtn.addEventListener("click", async function() {
-    const title = document.getElementById("id_title").value;
-    const codeField = document.getElementById("id_code");
-    const diffSelect = document.getElementById("id_difficulty");
-
-    analyzeBtn.disabled = true;
-    analyzeBtn.textContent = "⏳ Đang phân tích...";
-
-    try {
-      const res = await fetch("/problems/ai_analyze_problem/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({ title, statement: statement.value })
-      });
-      const data = await res.json();
-
-      if (data.code) codeField.value = data.code;
-      if (data.difficulty && diffSelect) diffSelect.value = data.difficulty;
-      if (data.tags && tagSelect) {
-        for (const option of tagSelect.options) {
-          option.selected = data.tags.includes(option.text);
-        }
-      }
-      // 🟢 Lưu tự động sau khi AI gợi ý xong
-      await fetch(window.location.href, {
-        method: "POST",
-        headers: { "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value },
-        body: new FormData(document.getElementById("problemForm"))
-      });
-      
-      alert(`✅ Đã cập nhật:\n• Code: ${data.code}\n• Độ khó: ${data.difficulty}\n• Tag: ${data.tags.join(", ")}`);
-      
-
-  // ================== UPLOAD BAR ==================
-  const uploadForm = document.getElementById("uploadForm");
-  if (uploadForm) {
-    uploadForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const data = new FormData(this);
-      const xhr = new XMLHttpRequest();
-      const bar = document.getElementById("progressBar");
-      const container = document.getElementById("progressContainer");
-      xhr.open("POST", "", true);
-      xhr.upload.addEventListener("loadstart", () => {
-        container.style.display = "block";
-        bar.style.width = "0%";
-        bar.textContent = "0%";
-      });
-      xhr.upload.addEventListener("progress", e => {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-          bar.style.width = percent + "%";
-          bar.textContent = percent + "%";
-        }
-      });
-      xhr.onload = function() {
-        if (xhr.status === 200) {
-          bar.style.backgroundColor = "#2196F3";
-          bar.textContent = "✅ Hoàn tất!";
-          setTimeout(() => location.reload(), 800);
-        } else {
-          alert("❌ Lỗi khi upload test.");
-          bar.style.backgroundColor = "red";
-        }
-      };
-      xhr.send(data);
-    });
-  }
 });
 </script>
+
+<style>
+.container{max-width:900px;margin:auto;font-family:sans-serif;}
+a.button{display:inline-block;background:#3c8dbc;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;}
+a.button:hover{background:#337ab7;}
+</style>
 {% endblock %}
