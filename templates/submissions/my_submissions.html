@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📄 My Submissions</h2>
+<table class="table table-bordered">
+  <thead>
+     <tr>
+       <th>#</th>
+       <th>Problem</th>
+       <th>Verdict</th>
+       <th>Time</th>
+       <th>When</th>
+     </tr>
+  </thead>
+  <tbody>
+  {% for s in subs %}
+     <tr>
+       <td>{{ forloop.counter }}</td>
+       <td><a href="/problems/{{ s.problem.id }}/">{{ s.problem.code }}</a></td>
+       <td>{{ s.verdict }}</td>
+       <td>{{ s.exec_time }}s</td>
+       <td>{{ s.created_at }}</td>
+     </tr>
+  {% empty %}
+     <tr><td colspan="5">No submissions yet</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
