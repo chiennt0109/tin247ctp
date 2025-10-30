@@ -1,83 +1,58 @@
-import requests, tempfile, os, subprocess, json
+# path: judge/run_code.py
+import os, requests, time, tempfile, subprocess
 
 JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions"
 JUDGE0_HEADERS = {
-    "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-    "x-rapidapi-key": "5ffcbfd655mshaec0bea4d41e0d6p1325b6jsnbadf24e9e8f2",   # ❗ Thay key của bạn vào đây
-    "content-type": "application/json"
+    "X-RapidAPI-Key": os.getenv("JUDGE0_API_KEY", ""),
+    "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+    "Content-Type": "application/json"
 }
 
 LANG_MAP = {
-    "cpp": 54,      # g++ 17
-    "python": 71,   # Python 3.11
-    "pypy": 99,     # PyPy 3
-    "java": 62      # Java 17
+    "cpp": 54,     # GCC 17
+    "python": 71,  # Python 3.11
+    "pypy": 70,    # PyPy 7.3
+    "java": 62     # Java 17
 }
 
-# ✅ Cache compile C++ để tăng tốc
-COMPILE_CACHE = {}
+def run_program(lang, code, stdin, time_limit=3):
+    if lang not in LANG_MAP:
+        return ("Unsupported language", "")
 
-def run_judge0(language, code, input_data):
-    # ✅ check cache (chỉ áp dụng với C++)
-    cache_key = code.strip()
-    if language == "cpp" and cache_key in COMPILE_CACHE:
-        token = COMPILE_CACHE[cache_key]
-    else:
-        payload = {
-            "source_code": code,
-            "language_id": LANG_MAP.get(language),
-            "stdin": input_data,
-            "compiler_options": "-O2 -std=gnu++17",
-        }
+    payload = {
+        "language_id": LANG_MAP[lang],
+        "source_code": code,
+        "stdin": stdin,
+        "cpu_time_limit": time_limit,
+        "wall_time_limit": time_limit + 1,
+        "memory_limit": 256000,
+        "enable_per_process_and_thread_time_limit": True,
+        "compiler_options": "",
+        "command_line_arguments": ""
+    }
 
-        r = requests.post(JUDGE0_URL, data=json.dumps(payload), headers=JUDGE0_HEADERS)
-        if r.status_code != 201:
-            return f"API Error {r.status_code}", ""
+    r = requests.post(JUDGE0_URL + "?base64_encoded=false&wait=false",
+                      json=payload, headers=JUDGE0_HEADERS)
+    token = r.json().get("token")
 
-        token = r.json()["token"]
+    # ✅ Poll kết quả
+    for _ in range(50):
+        time.sleep(0.15)
+        res = requests.get(f"{JUDGE0_URL}/{token}?base64_encoded=false",
+                           headers=JUDGE0_HEADERS).json()
 
-        # ✅ Lưu token compile vào cache
-        if language == "cpp":
-            COMPILE_CACHE[cache_key] = token
+        status = res.get("status", {}).get("description", "")
+        stdout = res.get("stdout", "")
+        stderr = res.get("stderr", "")
+        compile_err = res.get("compile_output", "")
 
-    # ✅ GET kết quả
-    while True:
-        r = requests.get(f"{JUDGE0_URL}/{token}", headers=JUDGE0_HEADERS)
-        data = r.json()
-        status = data["status"]["description"]
-
-        if status in ["In Queue", "Processing"]:
+        if status in ["Queue", "Processing"]:
             continue
 
-        stdout = data.get("stdout", "") or ""
-        stderr = data.get("stderr", "") or ""
-        compile_output = data.get("compile_output", "")
-
-        if compile_output:
-            return f"Compilation Error:\n{compile_output}", ""
-
+        if compile_err:
+            return ("Compilation Error:\n" + compile_err, "")
         if stderr:
-            return f"Runtime Error:\n{stderr}", ""
+            return ("Runtime Error:\n" + stderr, "")
+        return (stdout or "", "")
 
-        return stdout, ""
-
-def run_program(language: str, code: str, input_data: str, time_limit=5):
-    # ✅ Python local cho roadmap
-    if language in ["python", "pypy"]:
-        with tempfile.TemporaryDirectory() as tmp:
-            src = os.path.join(tmp, "main.py")
-            open(src, "w").write(code)
-            try:
-                p = subprocess.run(["python3", src], input=input_data,
-                                   capture_output=True, text=True, timeout=time_limit)
-                if p.returncode != 0:
-                    return f"Runtime Error:\n{p.stderr}", ""
-                return p.stdout, ""
-            except subprocess.TimeoutExpired:
-                return "Time Limit Exceeded", ""
-
-    # ✅ C++, Java → Judge0
-    if language in ["cpp", "java"]:
-        return run_judge0(language, code, input_data)
-
-    return f"Unsupported language: {language}", ""
+    return ("Time Limit Exceeded", "")
