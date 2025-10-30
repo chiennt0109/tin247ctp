@@ -1,8 +1,8 @@
 # path: oj/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from . import views  # dùng cho trang chính của hệ thống (home, roadmap, topic, run_code)
-from problems import views_admin  # cho các API AI dành riêng cho admin
+from . import views
+from problems import views_admin
 
 urlpatterns = [
     # 🧭 Trang chủ & Roadmap học tập
@@ -16,8 +16,11 @@ urlpatterns = [
     # ⚙️ Khu vực quản trị
     path("admin/", admin.site.urls),
 
-    # 📘 Hệ thống bài tập Problems (người dùng + AI)
+    # 📘 Hệ thống bài tập Problems
     path("problems/", include("problems.urls")),
+
+    # 📤 Hệ thống nộp bài Submissions ✅ thêm dòng này
+    path("submissions/", include("submissions.urls")),
 
     # 🧠 API AI dành riêng cho Admin
     path("admin/problems/ai_analyze_problem/", views_admin.ai_analyze_problem, name="ai_analyze_problem"),
