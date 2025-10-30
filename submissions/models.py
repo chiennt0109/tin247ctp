@@ -29,6 +29,7 @@ class Submission(models.Model):
     passed_tests = models.IntegerField(default=0)
     total_tests = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    #-----------------------Debug
+    debug_info = models.TextField(blank=True, null=True)
     def __str__(self):
         return f"{self.user.username} → {self.problem.code} [{self.verdict}]"
