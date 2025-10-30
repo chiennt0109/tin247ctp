@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>📝 Submission #{{ sub.id }}</h3>
+
+<p><b>Problem:</b> {{ sub.problem.code }}</p>
+<p><b>Status:</b> {{ sub.verdict }}</p>
+<p><b>Exec time:</b> {{ sub.exec_time }}s</p>
+<p><b>Passed:</b> {{ sub.passed_tests }}/{{ sub.total_tests }}</p>
+
+<h4>💻 Code</h4>
+<pre>{{ sub.source_code }}</pre>
+
+<a href="/submissions/my/" class="btn btn-secondary">⬅ Back</a>
+{% endblock %}
