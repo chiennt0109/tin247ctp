@@ -110,6 +110,7 @@ def run_code_for_roadmap(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request"}, status=400)
 
+    # ---- Lấy dữ liệu gửi lên (hỗ trợ form & JSON)
     try:
         data = json.loads(request.body)
     except:
@@ -120,17 +121,18 @@ def run_code_for_roadmap(request):
     input_data = data.get("input", "")
 
     if not lang or not code:
-        return JsonResponse({"error": "Missing lang or code"}, status=400)
+        return JsonResponse({"error": "Missing language or code"}, status=400)
 
-    # ✅ Nếu Python → chạy local cho nhanh (không mất point RapidAPI)
+    # ---- Python chạy local cho nhanh, tránh tốn quota
     if lang in ["python", "pypy"]:
         out, err = run_program(lang, code, input_data)
         return JsonResponse({
             "output": (out or "").strip(),
-            "error": (err or "").strip()
+            "error": (err or "").strip(),
+            "status": "OK (Local Python)"
         })
 
-    # ✅ Còn lại — dùng Judge0
+    # ---- Map language → Judge0 IDs
     language_map = {
         "cpp": 54, "c++": 54,
         "java": 62,
@@ -147,32 +149,38 @@ def run_code_for_roadmap(request):
     headers = {
         "X-RapidAPI-Key": "5ffcbfd655mshaec0bea4d41e0d6p1325b6jsnbadf24e9e8f2",
         "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-        "Content-Type": "application/json"
+        "content-type": "application/json",
+        "use-case": "education"  # ✅ bắt buộc mới
     }
 
-    # Submit
-    r = requests.post("https://judge0-ce.p.rapidapi.com/submissions",
-                      headers=headers, data=json.dumps(payload))
-    token = r.json().get("token")
-    if not token:
-        return JsonResponse({"error": "Judge0 submit failed"}, status=500)
+    try:
+        # ✅ Dùng wait=true để lấy kết quả luôn
+        r = requests.post(
+            "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true",
+            data=json.dumps(payload),
+            headers=headers,
+            timeout=10
+        )
 
-    # Poll result
-    for _ in range(30):
-        time.sleep(0.1)
-        res = requests.get(
-            f"https://judge0-ce.p.rapidapi.com/submissions/{token}?base64_encoded=false",
-            headers=headers
-        ).json()
+        if r.status_code != 200:
+            return JsonResponse({"error": f"Judge0 HTTP {r.status_code}"}, status=500)
 
-        if res["status"]["id"] in [3,4,5,6,7,8,13]:
-            break
+        res = r.json()
 
-    return JsonResponse({
-        "output": (res.get("stdout") or "").strip(),
-        "error": (res.get("stderr") or res.get("compile_output") or "").strip(),
-        "status": res["status"]["description"]
-    })
+        return JsonResponse({
+            "output": (res.get("stdout") or "").strip(),
+            "error": (res.get("stderr") or res.get("compile_output") or "").strip(),
+            "status": res["status"]["description"]
+        })
+
+    except Exception as e:
+        # ✅ fallback khi RapidAPI die → vẫn chạy Python local
+        out, err = run_program(lang, code, input_data)
+        return JsonResponse({
+            "output": (out or "").strip(),
+            "error": f"Judge0 Error: {e} | Local: {(err or '').strip()}",
+            "status": "Fallback to Local"
+        })
 
 
 # ==============================
