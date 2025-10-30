@@ -20,12 +20,12 @@
   <hr>
   <h3>👁 Test Cases</h3>
   {% if original and original.id %}
-    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">Mở danh sách test</a>
+    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">👁 Mở danh sách test</a>
   {% else %}
     <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
   {% endif %}
 
-  {% if show_upload_button %}
+  {% if original and original.id %}
   <hr>
   <h3>📦 Upload ZIP Test Cases</h3>
   <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
