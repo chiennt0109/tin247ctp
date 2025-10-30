@@ -1,0 +1,8 @@
+<h3>My submissions</h3>
+<ul>
+{% for s in subs %}
+  <li><a href="/submissions/{{ s.id }}/">{{ s.problem.code }} — {{ s.verdict }}</a></li>
+{% empty %}
+  <li>No submissions yet.</li>
+{% endfor %}
+</ul>
