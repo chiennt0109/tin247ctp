@@ -5,16 +5,17 @@ from . import views
 from problems import views_admin
 
 urlpatterns = [
-    # Trang chủ & Roadmap
     path("", views.home, name="home"),
-    path("roadmap/stage/<int:stage_id>/", views.roadmap_stage, name="roadmap_stage"),
-    path("roadmap/stage/<int:stage_id>/topic/<int:topic_index>/", views.topic_detail, name="topic_detail"),
 
-    # Form chạy code (UI)
-    path("run_code/", views.run_code_page, name="run_code_online"),
+    # Roadmap
+    path("stage/<int:stage_id>/", views.roadmap_stage, name="roadmap_stage"),
+    path("stage/<int:stage_id>/topic/<int:topic_index>/", views.topic_detail, name="topic_detail"),
 
-    # API JSON chạy code (quan trọng)
-    path("api/run_code/", views.api_run_code, name="api_run_code"),
+    # ✅ Run code UI (page)
+    path("run_code/", views.run_code_page, name="run_code_page"),
+
+    # ✅ Run code API (JSON)
+    path("api/run_code/", views.run_code_online, name="run_code_online"),
 
     # Admin
     path("admin/", admin.site.urls),
@@ -22,9 +23,9 @@ urlpatterns = [
     # Problems
     path("problems/", include("problems.urls")),
 
-    # Submissions
+    # ✅ Submissions system
     path("submissions/", include("submissions.urls")),
 
-    # AI admin
+    # Admin AI
     path("admin/problems/ai_analyze_problem/", views_admin.ai_analyze_problem, name="ai_analyze_problem"),
 ]
