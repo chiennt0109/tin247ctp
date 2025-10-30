@@ -1,4 +1,5 @@
 # path: problems/admin.py
+
 import os, zipfile, tempfile, io
 from django import forms
 from django.contrib import admin, messages
@@ -10,8 +11,9 @@ from django.utils.html import format_html
 from .models import Problem, TestCase
 
 
+# Form upload ZIP
 class UploadTestZipForm(forms.Form):
-    zip_file = forms.FileField(label="Chọn file .zip chứa testcases")
+    zip_file = forms.FileField(label="Chọn file .zip chứa test cases")
 
 
 @admin.register(Problem)
@@ -21,21 +23,22 @@ class ProblemAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = super().get_urls()
-        my = [
+        my_urls = [
             path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
             path("<int:problem_id>/view_tests/", self.admin_site.admin_view(self.view_tests), name="view_tests"),
             path("<int:problem_id>/delete_test/<int:test_id>/", self.admin_site.admin_view(self.delete_test), name="delete_test"),
             path("<int:problem_id>/download_tests/", self.admin_site.admin_view(self.download_tests), name="download_tests"),
         ]
-        return my + urls
+        return my_urls + urls
 
+    # Link mở trang xem test
     def view_tests_link(self, obj):
         return format_html(
             '<a href="{}" target="_blank">👁 Xem test</a>',
             reverse("admin:view_tests", args=[obj.id])
         )
 
-    # ✅ IMPORT TEST — hỗ trợ 2 cấu trúc thư mục bạn dùng
+    # ✅ UPLOAD TESTCASE — hỗ trợ 2 cấu trúc thư mục
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         form = UploadTestZipForm(request.POST or None, request.FILES or None)
@@ -54,70 +57,64 @@ class ProblemAdmin(admin.ModelAdmin):
                 with zipfile.ZipFile(zip_path, "r") as z:
                     z.extractall(tmpdir)
 
-                for root, _, files in os.walk(tmpdir):
-                    for file in files:
-                        name, ext = os.path.splitext(file)
-                        ext = ext.lower()
+                VALID_IN = (".in", ".inp", ".txt", ".IN", ".INP", ".TXT")
+                VALID_OUT = (".out", ".ans", ".txt", ".OUT", ".ANS", ".TXT")
 
-                        # Acceptable input extensions
-                        if ext not in [".inp", ".in", ".txt"]:
+                def ignore_file(name):
+                    return name.startswith('.') or "__MACOSX" in name or name.lower().endswith(".ds_store")
+
+                for root, _, files in os.walk(tmpdir):
+                    for filename in files:
+                        if ignore_file(filename):
                             continue
 
-                        inp_path = os.path.join(root, file)
-                        out_path = None
+                        name, ext = os.path.splitext(filename)
+                        if ext not in VALID_IN:
+                            continue
 
-                        # Candidate output names
-                        candidates = [
-                            name + ".out", name + ".ans", name + ".txt",
-                            file.replace(".inp", ".out"),
-                            file.replace(".in", ".out"),
-                        ]
+                        inp = os.path.join(root, filename)
+                        out = None
 
-                        # Search in same folder
-                        for cand in candidates:
-                            cp = os.path.join(root, cand)
-                            if os.path.exists(cp):
-                                out_path = cp
+                        # Try same folder matching
+                        for oe in VALID_OUT:
+                            candidate = os.path.join(root, name + oe)
+                            if os.path.exists(candidate):
+                                out = candidate
                                 break
 
-                        # Try parent folder (test01 / PS_EqualPoint.INP / PS_EqualPoint.OUT)
-                        if not out_path:
-                            parent = os.path.dirname(root)
-                            for cand in candidates:
-                                cp = os.path.join(parent, cand)
-                                if os.path.exists(cp):
-                                    out_path = cp
+                        # Try folder-name pattern folder/test01/test01.out
+                        if not out:
+                            folder = os.path.basename(root)
+                            for oe in VALID_OUT:
+                                candidate = os.path.join(root, folder + oe)
+                                if os.path.exists(candidate):
+                                    out = candidate
                                     break
 
-                        if not out_path:
+                        if not out:
                             skipped += 1
                             continue
 
-                        with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                            input_data = fi.read().strip()
-                        with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                            output_data = fo.read().strip()
+                        with open(inp, encoding="utf-8", errors="ignore") as f:
+                            inp_data = f.read().strip()
+                        with open(out, encoding="utf-8", errors="ignore") as f:
+                            out_data = f.read().strip()
 
-                        # Avoid input == output error
-                        if input_data == output_data:
-                            skipped += 1
-                            continue
-
-                        TestCase.objects.create(problem=problem, input_data=input_data, expected_output=output_data)
+                        TestCase.objects.create(problem=problem, input_data=inp_data, expected_output=out_data)
                         imported += 1
 
-            messages.success(request, f"✅ Đã import {imported} test • ❌ Bỏ qua {skipped}")
+            messages.success(request, f"✅ Imported {imported} tests — 🚫 Skipped {skipped}")
             return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
 
         return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
-    # ✅ Xem test
+    # Xem test
     def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": tests})
 
-    # ✅ Xóa test
+    # Xoá test
     def delete_test(self, request, problem_id, test_id):
         try:
             TestCase.objects.get(id=test_id, problem_id=problem_id).delete()
@@ -125,7 +122,7 @@ class ProblemAdmin(admin.ModelAdmin):
         except TestCase.DoesNotExist:
             return JsonResponse({"status": "error"})
 
-    # ✅ Tải test xuống
+    # Tải toàn bộ test về ZIP
     def download_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
@@ -139,6 +136,7 @@ class ProblemAdmin(admin.ModelAdmin):
 
         z.close()
         buf.seek(0)
+
         resp = HttpResponse(buf, content_type="application/zip")
         resp["Content-Disposition"] = f"attachment; filename={problem.code}_tests.zip"
         return resp
