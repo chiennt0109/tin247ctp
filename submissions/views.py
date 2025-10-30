@@ -22,7 +22,27 @@ def submission_create(request, problem_id):
         )
 
         # Chấm + nhận logs
-        result = grade_submission(sub)
+        # ✅ Parse result (with debug list)
+        if isinstance(result, tuple):
+            if len(result) == 5:
+                verdict, exec_time, passed, total, debug_info = result
+            else:
+                verdict = str(result[0])
+                exec_time, passed, total, debug_info = 0.0, 0, 0, []
+        else:
+            verdict = str(result)
+            exec_time, passed, total, debug_info = 0.0, 0, 0, []
+        
+        # ✅ Save
+        sub.verdict = verdict
+        sub.exec_time = exec_time
+        sub.passed_tests = passed
+        sub.total_tests = total
+        sub.debug_info = str(debug_info)[:5000]  # tránh quá dài
+        sub.save()
+        
+        return redirect("submission_detail", submission_id=sub.id)
+
 
         # Chuẩn hóa kết quả (v, time, passed, total, logs)
         verdict, exec_time, passed, total, logs = None, 0.0, 0, 0, []
