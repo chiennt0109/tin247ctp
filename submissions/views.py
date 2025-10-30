@@ -6,6 +6,7 @@ from .models import Submission
 from problems.models import Problem
 from judge.grader import grade_submission   # ✅ dùng grader chính
 
+
 @login_required
 def submission_create(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
@@ -59,3 +60,7 @@ def submission_create(request, problem_id):
 def submission_detail(request, submission_id):
     sub = get_object_or_404(Submission, pk=submission_id)
     return render(request, "submissions/detail.html", {"sub": sub})
+
+def my_submissions(request):
+    subs = Submission.objects.filter(user=request.user).order_by("-created_at")
+    return render(request, "submissions/my_submissions.html", {"subs": subs})
