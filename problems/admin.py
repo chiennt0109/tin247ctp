@@ -19,12 +19,6 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "difficulty", "time_limit", "memory_limit", "view_tests_link")
     change_form_template = "admin/problems/change_form_with_upload.html"
 
-    # ✅ Để hiển thị nút Upload Test
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form.show_upload_button = True
-        return form
-
     def get_urls(self):
         urls = super().get_urls()
         my = [
@@ -41,90 +35,89 @@ class ProblemAdmin(admin.ModelAdmin):
             reverse("admin:view_tests", args=[obj.id])
         )
 
-    # ✅ Import test ZIP
+    # ✅ IMPORT TEST — hỗ trợ 2 cấu trúc thư mục bạn dùng
     def upload_tests(self, request, problem_id):
-    problem = Problem.objects.get(pk=problem_id)
-    form = UploadTestZipForm(request.POST or None, request.FILES or None)
+        problem = Problem.objects.get(pk=problem_id)
+        form = UploadTestZipForm(request.POST or None, request.FILES or None)
 
-    if request.method == "POST" and form.is_valid():
-        zip_file = request.FILES["zip_file"]
-        imported = skipped = 0
+        if request.method == "POST" and form.is_valid():
+            zip_file = request.FILES["zip_file"]
+            imported = skipped = 0
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            zip_path = os.path.join(tmpdir, "tests.zip")
+            with tempfile.TemporaryDirectory() as tmpdir:
+                zip_path = os.path.join(tmpdir, "tests.zip")
 
-            with open(zip_path, "wb") as f:
-                for chunk in zip_file.chunks():
-                    f.write(chunk)
+                with open(zip_path, "wb") as f:
+                    for chunk in zip_file.chunks():
+                        f.write(chunk)
 
-            with zipfile.ZipFile(zip_path, "r") as z:
-                z.extractall(tmpdir)
+                with zipfile.ZipFile(zip_path, "r") as z:
+                    z.extractall(tmpdir)
 
-            for root, _, files in os.walk(tmpdir):
-                for file in files:
-                    name, ext = os.path.splitext(file)
-                    ext = ext.lower()
+                for root, _, files in os.walk(tmpdir):
+                    for file in files:
+                        name, ext = os.path.splitext(file)
+                        ext = ext.lower()
 
-                    # Accept common input formats
-                    if ext not in [".inp", ".in", ".txt"]:
-                        continue
+                        # Acceptable input extensions
+                        if ext not in [".inp", ".in", ".txt"]:
+                            continue
 
-                    inp_path = os.path.join(root, file)
-                    out_path = None
+                        inp_path = os.path.join(root, file)
+                        out_path = None
 
-                    # Candidate output file names
-                    base = name  # e.g. PS_EqualPoint
-                    candidates = [
-                        base + ".out", base + ".ans", base + ".txt",
-                        file.replace(".inp", ".out"),
-                        file.replace(".in", ".out"),
-                    ]
+                        # Candidate output names
+                        candidates = [
+                            name + ".out", name + ".ans", name + ".txt",
+                            file.replace(".inp", ".out"),
+                            file.replace(".in", ".out"),
+                        ]
 
-                    # Same folder search
-                    for cand in candidates:
-                        cp = os.path.join(root, cand)
-                        if os.path.exists(cp):
-                            out_path = cp
-                            break
-
-                    # Search one level above if not found
-                    if not out_path:
-                        parent = os.path.dirname(root)
+                        # Search in same folder
                         for cand in candidates:
-                            cp = os.path.join(parent, cand)
+                            cp = os.path.join(root, cand)
                             if os.path.exists(cp):
                                 out_path = cp
                                 break
 
-                    if not out_path:
-                        skipped += 1
-                        continue
+                        # Try parent folder (test01 / PS_EqualPoint.INP / PS_EqualPoint.OUT)
+                        if not out_path:
+                            parent = os.path.dirname(root)
+                            for cand in candidates:
+                                cp = os.path.join(parent, cand)
+                                if os.path.exists(cp):
+                                    out_path = cp
+                                    break
 
-                    # Read data
-                    with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                        input_data = fi.read().strip()
-                    with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                        output_data = fo.read().strip()
+                        if not out_path:
+                            skipped += 1
+                            continue
 
-                    TestCase.objects.create(
-                        problem=problem,
-                        input_data=input_data,
-                        expected_output=output_data
-                    )
-                    imported += 1
+                        with open(inp_path, encoding="utf-8", errors="ignore") as fi:
+                            input_data = fi.read().strip()
+                        with open(out_path, encoding="utf-8", errors="ignore") as fo:
+                            output_data = fo.read().strip()
 
-        messages.success(request, f"✅ Đã import {imported} test • ❌ Bỏ qua {skipped}")
-        return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
+                        # Avoid input == output error
+                        if input_data == output_data:
+                            skipped += 1
+                            continue
 
-    return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
+                        TestCase.objects.create(problem=problem, input_data=input_data, expected_output=output_data)
+                        imported += 1
 
-    # ✅ View tests
+            messages.success(request, f"✅ Đã import {imported} test • ❌ Bỏ qua {skipped}")
+            return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
+
+        return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
+
+    # ✅ Xem test
     def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": tests})
 
-    # ✅ Delete test via Ajax
+    # ✅ Xóa test
     def delete_test(self, request, problem_id, test_id):
         try:
             TestCase.objects.get(id=test_id, problem_id=problem_id).delete()
@@ -132,7 +125,7 @@ class ProblemAdmin(admin.ModelAdmin):
         except TestCase.DoesNotExist:
             return JsonResponse({"status": "error"})
 
-    # ✅ Export test zip
+    # ✅ Tải test xuống
     def download_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
@@ -140,9 +133,9 @@ class ProblemAdmin(admin.ModelAdmin):
         buf = io.BytesIO()
         z = zipfile.ZipFile(buf, "w")
 
-        for i, t in enumerate(tests, start=1):
-            z.writestr(f"{problem.code}/test{i:02d}.inp", t.input_data)
-            z.writestr(f"{problem.code}/test{i:02d}.out", t.expected_output)
+        for idx, t in enumerate(tests, start=1):
+            z.writestr(f"{problem.code}/test{idx:02d}.inp", t.input_data)
+            z.writestr(f"{problem.code}/test{idx:02d}.out", t.expected_output)
 
         z.close()
         buf.seek(0)
