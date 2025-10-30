@@ -1,12 +1,20 @@
 # path: oj/views.py
+import json
+import os
+import time
+import requests
+
 from django.shortcuts import render
 from django.http import JsonResponse
-from judge.run_code import run_program
-import os
 from django.utils.safestring import mark_safe
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
-# Import toàn bộ stage
+from judge.run_code import run_program  # dùng cho demo run & backup
+
+# ==============================
+# ✅ Import Roadmap Stages
+# ==============================
 from .roadmap_data.stage_01 import STAGE_1
 from .roadmap_data.stage_02 import STAGE_2
 from .roadmap_data.stage_03 import STAGE_3
@@ -27,15 +35,21 @@ STAGES = [
     STAGE_8, STAGE_9, STAGE_10, STAGE_11, STAGE_12, STAGE_13, STAGE_14
 ]
 
+# ==============================
+# 🏠 HOME
+# ==============================
 def home(request):
     return render(request, "home.html", {"stages": STAGES})
 
+
+# ==============================
+# 📚 ROADMAP STAGE + TOPIC
+# ==============================
 def roadmap_stage(request, stage_id):
     stage = next((s for s in STAGES if s["id"] == stage_id), None)
     if not stage:
         return render(request, "oj/not_found.html", {"message": "Không tìm thấy giai đoạn này."})
 
-    # ✅ NẾU topic có html_file → tự động đọc và gán vào topic["detail"]
     for topic in stage.get("topics", []):
         html_file = topic.get("html_file")
         if html_file:
@@ -54,35 +68,140 @@ def roadmap_stage(request, stage_id):
         "next_stage": next_stage
     })
 
+
 def topic_detail(request, stage_id, topic_index):
-    # Tìm stage theo ID
     stage = next((s for s in STAGES if s["id"] == stage_id), None)
     if not stage:
-        return render(request, "oj/not_found.html", {"message": "Không tìm thấy giai đoạn này."})
+        return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung."})
 
-    # Kiểm tra index topic hợp lệ
     topics = stage.get("topics", [])
     if topic_index < 1 or topic_index > len(topics):
         return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung chi tiết."})
 
-    # Lấy topic tương ứng
     topic = topics[topic_index - 1]
+    return render(request, "topic_detail.html", {"stage": stage, "topic": topic})
 
-    # Trả về trang chi tiết
-    return render(request, "topic_detail.html", {
-        "stage": stage,
-        "topic": topic
-    })
+
+# ==============================
+# 💻 RUN CODE — TRANG DEMO
+# ==============================
+def run_code_page(request):
+    return render(request, "run_code.html")
 
 
 def run_code_online(request):
     if request.method == "POST":
-        language = request.POST.get("language", "")
-        code = request.POST.get("code", "")
+        lang = request.POST.get("language")
+        code = request.POST.get("code")
         input_data = request.POST.get("input", "")
         try:
-            result, _ = run_program(language, code, input_data)
+            result, _ = run_program(lang, code, input_data)
         except Exception as e:
             result = f"Lỗi khi chạy code: {str(e)}"
         return JsonResponse({"output": result})
     return JsonResponse({"error": "Invalid request"})
+
+
+# ==============================
+# 🚀 RUN CODE FOR ROADMAP (Judge0)
+# ==============================
+@csrf_exempt
+def run_code_for_roadmap(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    # ---- Lấy dữ liệu gửi lên (hỗ trợ form & JSON)
+    try:
+        data = json.loads(request.body)
+    except:
+        data = request.POST
+
+    lang = data.get("language", "").strip()
+    code = data.get("code", "").strip()
+    input_data = data.get("input", "")
+
+    if not lang or not code:
+        return JsonResponse({"error": "Missing language or code"}, status=400)
+
+    # ---- Python chạy local cho nhanh, tránh tốn quota
+    if lang in ["python", "pypy"]:
+        out, err = run_program(lang, code, input_data)
+        return JsonResponse({
+            "output": (out or "").strip(),
+            "error": (err or "").strip(),
+            "status": "OK (Local Python)"
+        })
+
+    # ---- Map language → Judge0 IDs
+    language_map = {
+        "cpp": 54, "c++": 54,
+        "java": 62,
+        "python": 71,
+        "pypy": 70
+    }
+
+    payload = {
+        "source_code": code,
+        "language_id": language_map.get(lang, 54),
+        "stdin": input_data
+    }
+
+    headers = {
+        "X-RapidAPI-Key": "5ffcbfd655mshaec0bea4d41e0d6p1325b6jsnbadf24e9e8f2",
+        "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+        "content-type": "application/json",
+        "use-case": "education"  # ✅ bắt buộc mới
+    }
+
+    try:
+        # ✅ Dùng wait=true để lấy kết quả luôn
+        r = requests.post(
+            "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true",
+            data=json.dumps(payload),
+            headers=headers,
+            timeout=10
+        )
+
+        if r.status_code != 200:
+            return JsonResponse({"error": f"Judge0 HTTP {r.status_code}"}, status=500)
+
+        res = r.json()
+
+        return JsonResponse({
+            "output": (res.get("stdout") or "").strip(),
+            "error": (res.get("stderr") or res.get("compile_output") or "").strip(),
+            "status": res["status"]["description"]
+        })
+
+    except Exception as e:
+        # ✅ fallback khi RapidAPI die → vẫn chạy Python local
+        out, err = run_program(lang, code, input_data)
+        return JsonResponse({
+            "output": (out or "").strip(),
+            "error": f"Judge0 Error: {e} | Local: {(err or '').strip()}",
+            "status": "Fallback to Local"
+        })
+
+
+# ==============================
+# 🧾 API run for AJAX (giữ nguyên bản cũ)
+# ==============================
+@csrf_exempt
+def api_run_code(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    lang = data.get("language", "").strip()
+    code = data.get("code", "").strip()
+    input_data = data.get("input", "")
+
+    if not lang or not code:
+        return JsonResponse({"error": "Missing language or code"}, status=400)
+
+    out, err = run_program(lang, code, input_data)
+    return JsonResponse({"output": out, "error": err or ""})
