@@ -107,80 +107,66 @@ def run_code_online(request):
 # ==============================
 @csrf_exempt
 def run_code_for_roadmap(request):
+    """
+    This runner = for learning only (small input)
+    Python runs locally, C++ uses fallback API ONLY here.
+    """
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request"}, status=400)
 
-    # ---- Lấy dữ liệu gửi lên (hỗ trợ form & JSON)
-    try:
-        data = json.loads(request.body)
-    except:
-        data = request.POST
-
-    lang = data.get("language", "").strip()
-    code = data.get("code", "").strip()
-    input_data = data.get("input", "")
+    lang = request.POST.get("language", "").strip()
+    code = request.POST.get("code", "").strip()
+    input_data = request.POST.get("input", "")
 
     if not lang or not code:
         return JsonResponse({"error": "Missing language or code"}, status=400)
 
-    # ---- Python chạy local cho nhanh, tránh tốn quota
-    if lang in ["python", "pypy"]:
-        out, err = run_program(lang, code, input_data)
-        return JsonResponse({
-            "output": (out or "").strip(),
-            "error": (err or "").strip(),
-            "status": "OK (Local Python)"
-        })
+    # ✅ Run Python locally
+    if lang == "python":
+        import subprocess, tempfile, os
+        with tempfile.NamedTemporaryFile(suffix=".py", delete=False) as f:
+            f.write(code.encode())
+            filename = f.name
+        try:
+            r = subprocess.run(
+                ["python3", filename],
+                input=input_data,
+                capture_output=True,
+                text=True,
+                timeout=3
+            )
+            return JsonResponse({"output": r.stdout, "error": r.stderr})
+        except Exception as e:
+            return JsonResponse({"output": "", "error": str(e)})
+        finally:
+            os.remove(filename)
 
-    # ---- Map language → Judge0 IDs
-    language_map = {
-        "cpp": 54, "c++": 54,
-        "java": 62,
-        "python": 71,
-        "pypy": 70
-    }
+    # ✅ C++ fallback ONLY for roadmap (not judge)
+    if lang == "cpp":
+        try:
+            payload = {
+                "source": code,
+                "input": input_data
+            }
+            r = requests.post(
+                "https://wandbox.org/api/compile.json",
+                json={
+                    "code": code,
+                    "stdin": input_data,
+                    "compiler": "gcc-13.2.0",
+                    "options": "warning,gnu++17,timeout=2",
+                },
+                timeout=5
+            ).json()
 
-    payload = {
-        "source_code": code,
-        "language_id": language_map.get(lang, 54),
-        "stdin": input_data
-    }
+            return JsonResponse({
+                "output": r.get("program_output", "") or "",
+                "error": r.get("compiler_error", "") + r.get("program_error", "")
+            })
+        except Exception as e:
+            return JsonResponse({"output": "", "error": str(e)})
 
-    headers = {
-        "X-RapidAPI-Key": "5ffcbfd655mshaec0bea4d41e0d6p1325b6jsnbadf24e9e8f2",
-        "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-        "content-type": "application/json",
-        "use-case": "education"  # ✅ bắt buộc mới
-    }
-
-    try:
-        # ✅ Dùng wait=true để lấy kết quả luôn
-        r = requests.post(
-            "https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true",
-            data=json.dumps(payload),
-            headers=headers,
-            timeout=10
-        )
-
-        if r.status_code != 200:
-            return JsonResponse({"error": f"Judge0 HTTP {r.status_code}"}, status=500)
-
-        res = r.json()
-
-        return JsonResponse({
-            "output": (res.get("stdout") or "").strip(),
-            "error": (res.get("stderr") or res.get("compile_output") or "").strip(),
-            "status": res["status"]["description"]
-        })
-
-    except Exception as e:
-        # ✅ fallback khi RapidAPI die → vẫn chạy Python local
-        out, err = run_program(lang, code, input_data)
-        return JsonResponse({
-            "output": (out or "").strip(),
-            "error": f"Judge0 Error: {e} | Local: {(err or '').strip()}",
-            "status": "Fallback to Local"
-        })
+    return JsonResponse({"error": "Language not supported"}, status=400)
 
 
 # ==============================
