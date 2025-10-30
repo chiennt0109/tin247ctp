@@ -3,33 +3,68 @@ import time
 from problems.models import TestCase
 from .run_code import run_program
 
-def normalize(s):
-    return "" if s is None else s.replace("\r\n","\n").rstrip()
 
-def compare(a,b):
-    ua = [x.rstrip() for x in normalize(a).split("\n") if x != ""]
-    ub = [x.rstrip() for x in normalize(b).split("\n") if x != ""]
-    return ua == ub
+def normalize(text):
+    if text is None:
+        return ""
+    return text.replace("\r\n", "\n").strip()
 
-def grade_submission(sub):
-    tests = TestCase.objects.filter(problem=sub.problem).order_by("id")
-    passed = 0
+
+def compare_output(user_out, expected_out):
+    """So sánh từng dòng, bỏ dòng trống và \r"""
+    u_lines = [line.rstrip() for line in normalize(user_out).split("\n") if line.strip() != ""]
+    e_lines = [line.rstrip() for line in normalize(expected_out).split("\n") if line.strip() != ""]
+    return u_lines == e_lines
+
+
+def grade_submission(submission):
+    """
+    Chấm từng test case trong DB.
+    Trả về (verdict, total_time, passed, total, debug_info)
+    """
+    problem = submission.problem
+    tests = TestCase.objects.filter(problem=problem).order_by("id")
+
     total = tests.count()
-    total_time = 0
-    debug = ""
+    passed = 0
+    total_time = 0.0
+    debug_info = ""
+
+    if total == 0:
+        return ("No Testcases", 0, 0, 0, "⚠️ Problem has no testcases")
 
     for tc in tests:
-        start = time.time()
-        out, err = run_program(sub.language, sub.source_code, tc.input_data, time_limit=3)
-        total_time += time.time() - start
+        start_time = time.time()
+        out, err = run_program(submission.language, submission.source_code, tc.input_data)
+        elapsed = time.time() - start_time
+        total_time += elapsed
 
-        if "Error" in out or "not supported" in out:
-            return ("Runtime Error", total_time, passed, total, out)
+        # Phát hiện lỗi biên dịch hoặc runtime
+        if out.startswith("Compilation Error"):
+            debug_info = f"[Test {tc.id}] Compilation Error:\n{err}"
+            return ("Compilation Error", total_time, passed, total, debug_info)
+        if out.startswith("Runtime Error"):
+            debug_info = f"[Test {tc.id}] Runtime Error:\n{err}"
+            return ("Runtime Error", total_time, passed, total, debug_info)
+        if out.startswith("Time Limit Exceeded"):
+            debug_info = f"[Test {tc.id}] Time Limit Exceeded"
+            return ("Time Limit Exceeded", total_time, passed, total, debug_info)
+        if out.startswith("API Error"):
+            debug_info = f"[Test {tc.id}] API Error → {out}"
+            return ("Runtime Error", total_time, passed, total, debug_info)
 
-        if not compare(out, tc.expected_output):
-            debug = f"\n--- TEST {tc.id} FAILED ---\nInput:\n{tc.input_data}\nExpected:\n{tc.expected_output}\nGot:\n{out}\nSTDERR:\n{err}"
-            return ("Wrong Answer", total_time, passed, total, debug)
+        # So sánh kết quả
+        if not compare_output(out, tc.expected_output):
+            debug_info = (
+                f"\n❌ [Test {tc.id}] WRONG ANSWER\n"
+                f"Input:\n{tc.input_data}\n"
+                f"Expected:\n{tc.expected_output}\n"
+                f"Got:\n{out}\n"
+                f"Stderr:\n{err}\n"
+            )
+            return ("Wrong Answer", total_time, passed, total, debug_info)
 
         passed += 1
 
-    return ("Accepted", total_time, passed, total, "OK")
+    debug_info = f"✅ Passed all {passed}/{total} tests"
+    return ("Accepted", total_time, passed, total, debug_info)
