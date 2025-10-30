@@ -1,71 +1,83 @@
-import subprocess, tempfile, os, requests, json
+import requests, tempfile, os, subprocess, json
 
-# API chạy code miễn phí
-PISTON_API = "https://emkc.org/api/v2/piston/execute"
-
-LOCAL_COMPILERS = {
-    'python': {
-        'src': 'main.py',
-        'run': lambda tmp: ["python3", os.path.join(tmp, "main.py")],
-    },
-    'pypy': {
-        'src': 'main.py',
-        'run': lambda tmp: ["pypy3", os.path.join(tmp, "main.py")],
-    },
+JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions"
+JUDGE0_HEADERS = {
+    "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
+    "x-rapidapi-key": "YOUR_RAPIDAPI_KEY",   # ❗ Thay key của bạn vào đây
+    "content-type": "application/json"
 }
 
-def run_program(language: str, source_code: str, input_data: str, time_limit: int = 5):
-    # ✅ Python / PyPy chạy local
-    if language in LOCAL_COMPILERS:
-        cfg = LOCAL_COMPILERS[language]
+LANG_MAP = {
+    "cpp": 54,      # g++ 17
+    "python": 71,   # Python 3.11
+    "pypy": 99,     # PyPy 3
+    "java": 62      # Java 17
+}
+
+# ✅ Cache compile C++ để tăng tốc
+COMPILE_CACHE = {}
+
+def run_judge0(language, code, input_data):
+    # ✅ check cache (chỉ áp dụng với C++)
+    cache_key = code.strip()
+    if language == "cpp" and cache_key in COMPILE_CACHE:
+        token = COMPILE_CACHE[cache_key]
+    else:
+        payload = {
+            "source_code": code,
+            "language_id": LANG_MAP.get(language),
+            "stdin": input_data,
+            "compiler_options": "-O2 -std=gnu++17",
+        }
+
+        r = requests.post(JUDGE0_URL, data=json.dumps(payload), headers=JUDGE0_HEADERS)
+        if r.status_code != 201:
+            return f"API Error {r.status_code}", ""
+
+        token = r.json()["token"]
+
+        # ✅ Lưu token compile vào cache
+        if language == "cpp":
+            COMPILE_CACHE[cache_key] = token
+
+    # ✅ GET kết quả
+    while True:
+        r = requests.get(f"{JUDGE0_URL}/{token}", headers=JUDGE0_HEADERS)
+        data = r.json()
+        status = data["status"]["description"]
+
+        if status in ["In Queue", "Processing"]:
+            continue
+
+        stdout = data.get("stdout", "") or ""
+        stderr = data.get("stderr", "") or ""
+        compile_output = data.get("compile_output", "")
+
+        if compile_output:
+            return f"Compilation Error:\n{compile_output}", ""
+
+        if stderr:
+            return f"Runtime Error:\n{stderr}", ""
+
+        return stdout, ""
+
+def run_program(language: str, code: str, input_data: str, time_limit=5):
+    # ✅ Python local cho roadmap
+    if language in ["python", "pypy"]:
         with tempfile.TemporaryDirectory() as tmp:
-            src_path = os.path.join(tmp, cfg['src'])
-            with open(src_path, 'w') as f:
-                f.write(source_code)
-
+            src = os.path.join(tmp, "main.py")
+            open(src, "w").write(code)
             try:
-                r = subprocess.run(
-                    cfg['run'](tmp),
-                    input=input_data,
-                    capture_output=True,
-                    text=True,
-                    timeout=time_limit
-                )
-                if r.returncode != 0:
-                    return ("Runtime Error:\n" + r.stderr, "")
-                return (r.stdout, "")
+                p = subprocess.run(["python3", src], input=input_data,
+                                   capture_output=True, text=True, timeout=time_limit)
+                if p.returncode != 0:
+                    return f"Runtime Error:\n{p.stderr}", ""
+                return p.stdout, ""
             except subprocess.TimeoutExpired:
-                return ("Time Limit Exceeded", "")
-            except Exception as e:
-                return (f"Internal Error: {e}", "")
+                return "Time Limit Exceeded", ""
 
-    # ✅ C++ / Java: gửi API chấm
-    elif language in ["cpp", "java"]:
-        try:
-            payload = {
-                "language": "cpp" if language == "cpp" else "java",
-                "version": "10.2.0" if language == "cpp" else "15.0.2",
-                "files": [
-                    {"name": "main.cpp" if language == "cpp" else "Main.java",
-                     "content": source_code}
-                ],
-                "stdin": input_data
-            }
+    # ✅ C++, Java → Judge0
+    if language in ["cpp", "java"]:
+        return run_judge0(language, code, input_data)
 
-            resp = requests.post(PISTON_API, json=payload, timeout=time_limit+2)
-            data = resp.json()
-
-            run = data.get("run", {})
-            stdout = run.get("stdout", "").strip()
-            stderr = run.get("stderr", "").strip()
-
-            if stderr:
-                return (f"Runtime Error:\n{stderr}", "")
-
-            return (stdout, "")
-        except requests.Timeout:
-            return ("Time Limit Exceeded", "")
-        except Exception as e:
-            return (f"API Error: {e}", "")
-
-    return (f"Unsupported language: {language}", "")
+    return f"Unsupported language: {language}", ""
