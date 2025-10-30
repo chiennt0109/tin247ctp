@@ -1,13 +1,12 @@
 # path: oj/views.py
+import json
+import os
 from django.shortcuts import render
 from django.http import JsonResponse
 from judge.run_code import run_program
-import os
 from django.utils.safestring import mark_safe
 from django.conf import settings
-import json
 from django.views.decorators.csrf import csrf_exempt
-
 # Import toàn bộ stage
 from .roadmap_data.stage_01 import STAGE_1
 from .roadmap_data.stage_02 import STAGE_2
