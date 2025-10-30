@@ -1,74 +1,57 @@
-# =============================================================
-# 📁 File: problems/admin.py
-# ✅ Chức năng trong file:
-#   - Hiển thị Problem trong Django Admin
-#   - Upload ZIP test theo 2 kiểu folder
-#     ✅ test01.inp + test01.out
-#     ✅ test01/test01.inp + test01.out
-#   - Xem test trong giao diện admin
-#   - Xoá từng test
-#   - ✅ Download toàn bộ test thành ZIP
-# =============================================================
+# path: problems/admin.py
 
-import os, zipfile, tempfile, io
+import os
+import zipfile
+import tempfile
+import io
+
 from django import forms
 from django.contrib import admin, messages
 from django.shortcuts import render, redirect
 from django.urls import path, reverse
 from django.http import JsonResponse, HttpResponse
 from django.utils.html import format_html
+
 from .models import Problem, TestCase
 
 
-# ======================
-# 📦 Form Upload ZIP Test
-# ======================
+# Form upload ZIP
 class UploadTestZipForm(forms.Form):
     zip_file = forms.FileField(label="Chọn file .zip chứa testcases")
 
 
-# ======================
-# 🧠 Problem Admin
-# ======================
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "difficulty", "time_limit", "memory_limit", "view_tests_link")
 
-    # ✅ Dùng custom template có nút Upload Test ZIP
+    # Template custom thay cho trang change_form default
     change_form_template = "admin/problems/change_form_with_upload.html"
 
-    # ======================
-    # 🔗 Custom route trong admin
-    # ======================
-    def get_urls(self):
-        urls = super().get_urls()
-        my = [
-            # 📥 Upload ZIP test
-            path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
+    # ✅ Thêm show_upload_button vào context để template hiển thị nút Upload
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["show_upload_button"] = True
+        return super().change_view(request, object_id, form_url, extra_context)
 
-            # 👁 Xem test
-            path("<int:problem_id>/view_tests/", self.admin_site.admin_view(self.view_tests), name="view_tests"),
-
-            # 🗑 Xoá 1 test
-            path("<int:problem_id>/delete_test/<int:test_id>/", self.admin_site.admin_view(self.delete_test), name="delete_test"),
-
-            # 📤 Download toàn bộ test về ZIP
-            path("<int:problem_id>/download_tests/", self.admin_site.admin_view(self.download_tests), name="download_tests"),
-        ]
-        return my + urls
-
-    # ======================
-    # 🔗 Link xem test (hiển thị trong list_display)
-    # ======================
+    # Link Hiển thị danh sách test
     def view_tests_link(self, obj):
         return format_html(
             '<a href="{}" target="_blank">👁 Xem test</a>',
             reverse("admin:view_tests", args=[obj.id])
         )
 
-    # ======================
-    # 📥 Upload & Parse ZIP test
-    # ======================
+    # Tạo URL riêng cho upload + xem + xóa + download test
+    def get_urls(self):
+        urls = super().get_urls()
+        custom = [
+            path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
+            path("<int:problem_id>/view_tests/", self.admin_site.admin_view(self.view_tests), name="view_tests"),
+            path("<int:problem_id>/delete_test/<int:test_id>/", self.admin_site.admin_view(self.delete_test), name="delete_test"),
+            path("<int:problem_id>/download_tests/", self.admin_site.admin_view(self.download_tests), name="download_tests"),
+        ]
+        return custom + urls
+
+    # ✅ Upload và import testcases từ ZIP
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         form = UploadTestZipForm(request.POST or None, request.FILES or None)
@@ -80,16 +63,16 @@ class ProblemAdmin(admin.ModelAdmin):
             with tempfile.TemporaryDirectory() as tmpdir:
                 zip_path = os.path.join(tmpdir, "tests.zip")
 
-                # ✅ Lưu file tạm
+                # Save file
                 with open(zip_path, "wb") as f:
                     for chunk in zip_file.chunks():
                         f.write(chunk)
 
-                # ✅ Giải nén
+                # Extract all files
                 with zipfile.ZipFile(zip_path, "r") as z:
                     z.extractall(tmpdir)
 
-                # ✅ Duyệt file theo 2 kiểu
+                # Scan tất cả file .in / .inp / .txt
                 for root, _, files in os.walk(tmpdir):
                     for filename in files:
                         name, ext = os.path.splitext(filename)
@@ -99,19 +82,22 @@ class ProblemAdmin(admin.ModelAdmin):
                         inp_path = os.path.join(root, filename)
                         out_path = None
 
-                        # 🎯 Ưu tiên tìm .out cùng folder
-                        for cand in [name + ".out", name + ".ans", name + ".txt",
-                                     filename.replace(".in", ".out"), filename.replace(".inp", ".out")]:
-                            cp = os.path.join(root, cand)
+                        # Kiểm tra cùng folder
+                        candidates = [
+                            name + ".out", name + ".ans", name + ".txt",
+                            filename.replace(".in", ".out"), filename.replace(".inp", ".out")
+                        ]
+                        for c in candidates:
+                            cp = os.path.join(root, c)
                             if os.path.exists(cp):
                                 out_path = cp
                                 break
 
-                        # 🎯 Nếu không có thì dò folder cha
+                        # Nếu chưa thấy thì check parent dir
                         if not out_path:
                             parent = os.path.dirname(root)
-                            for cand in [name + ".out", name + ".ans", name + ".txt"]:
-                                cp = os.path.join(parent, cand)
+                            for c in [name + ".out", name + ".ans", name + ".txt"]:
+                                cp = os.path.join(parent, c)
                                 if os.path.exists(cp):
                                     out_path = cp
                                     break
@@ -120,14 +106,13 @@ class ProblemAdmin(admin.ModelAdmin):
                             skipped += 1
                             continue
 
-                        # ✅ Đọc nội dung test
+                        # Đọc input/output
                         with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                            input_data = fi.read().strip()
+                            inp = fi.read().strip()
                         with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                            output_data = fo.read().strip()
+                            out = fo.read().strip()
 
-                        # ✅ Lưu DB
-                        TestCase.objects.create(problem=problem, input_data=input_data, expected_output=output_data)
+                        TestCase.objects.create(problem=problem, input_data=inp, expected_output=out)
                         imported += 1
 
             messages.success(request, f"✅ Import {imported} test • 🚫 Bỏ qua {skipped}")
@@ -135,17 +120,13 @@ class ProblemAdmin(admin.ModelAdmin):
 
         return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
-    # ======================
-    # 👁 Trang xem test
-    # ======================
+    # ✅ View testcases
     def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": tests})
 
-    # ======================
-    # 🗑 Xoá test
-    # ======================
+    # ✅ Xóa test
     def delete_test(self, request, problem_id, test_id):
         try:
             TestCase.objects.get(id=test_id, problem_id=problem_id).delete()
@@ -153,9 +134,7 @@ class ProblemAdmin(admin.ModelAdmin):
         except TestCase.DoesNotExist:
             return JsonResponse({"status": "error"})
 
-    # ======================
-    # 📤 Download toàn bộ test thành ZIP
-    # ======================
+    # ✅ Download toàn bộ testcases dưới dạng ZIP
     def download_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
