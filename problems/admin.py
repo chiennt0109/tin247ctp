@@ -6,7 +6,6 @@ from django.urls import path, reverse
 from django.shortcuts import render, redirect
 from django.utils.html import format_html
 from django.http import JsonResponse
-from django.db import transaction
 from .models import Problem, TestCase
 
 
@@ -20,9 +19,6 @@ class ProblemAdmin(admin.ModelAdmin):
     search_fields = ("code", "title")
     change_form_template = "admin/problems/change_form_with_upload.html"
 
-    # ==============================
-    # ⚙️ Trang sửa Problem
-    # ==============================
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
         extra_context["show_upload_button"] = True
@@ -35,9 +31,6 @@ class ProblemAdmin(admin.ModelAdmin):
         )
     view_tests_link.short_description = "Test cases"
 
-    # ==============================
-    # 🛣️ Custom URLs
-    # ==============================
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
@@ -47,9 +40,6 @@ class ProblemAdmin(admin.ModelAdmin):
         ]
         return my_urls + urls
 
-    # ==============================
-    # 📦 Upload .zip test
-    # ==============================
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         if request.method == "POST":
@@ -63,77 +53,67 @@ class ProblemAdmin(admin.ModelAdmin):
                     with open(zip_path, "wb") as f:
                         for chunk in zip_file.chunks():
                             f.write(chunk)
+                    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                        zip_ref.extractall(tmpdir)
 
-                    with zipfile.ZipFile(zip_path, "r") as zf:
-                        zf.extractall(tmpdir)
+                    for root, _, files in os.walk(tmpdir):
+                        for filename in files:
+                            name, ext = os.path.splitext(filename)
+                            if ext.lower() not in [".in", ".inp"]:
+                                continue
 
-                    with transaction.atomic():
-                        TestCase.objects.filter(problem=problem).delete()
+                            inp_path = os.path.join(root, filename)
+                            base = os.path.splitext(os.path.basename(filename))[0]
 
-                        for root, _, files in os.walk(tmpdir):
-                            for filename in files:
-                                name, ext = os.path.splitext(filename)
-                                if ext.lower() not in [".in", ".inp", ".txt"]:
-                                    continue
+                            # Candidate outputs
+                            out_candidates = [
+                                base + ".out",
+                                base + ".ans",
+                            ]
 
-                                inp_path = os.path.join(root, filename)
-                                out_path = None
+                            parent = os.path.basename(root)
+                            if parent.lower() == base.lower():
+                                out_candidates.append(os.path.join(root, base + ".out"))
+                                out_candidates.append(os.path.join(root, base + ".ans"))
 
-                                for cand in [
-                                    name + ".out",
-                                    name + ".ans",
-                                    filename.replace(".inp", ".out"),
-                                    filename.replace(".in", ".out"),
-                                ]:
-                                    if os.path.exists(os.path.join(root, cand)):
-                                        out_path = os.path.join(root, cand)
-                                        break
+                            out_path = None
+                            for cand in out_candidates:
+                                cand_path = os.path.join(root, cand) if not cand.startswith(root) else cand
+                                if os.path.exists(cand_path):
+                                    out_path = cand_path
+                                    break
 
-                                if not out_path:
-                                    skipped += 1
-                                    continue
+                            if not out_path:
+                                skipped += 1
+                                continue
 
-                                try:
-                                    with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                                        inp_data = fi.read().strip()
-                                    with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                                        out_data = fo.read().strip()
+                            with open(inp_path, encoding="utf-8", errors="ignore") as fi:
+                                inp_data = fi.read().rstrip()
+                            with open(out_path, encoding="utf-8", errors="ignore") as fo:
+                                out_data = fo.read().rstrip()
 
-                                    TestCase.objects.create(
-                                        problem=problem,
-                                        input_data=inp_data,
-                                        expected_output=out_data,
-                                    )
-                                    imported += 1
-                                except Exception as e:
-                                    print(f"❌ Lỗi đọc {filename}: {e}")
-                                    skipped += 1
+                            TestCase.objects.create(
+                                problem=problem,
+                                input_data=inp_data,
+                                expected_output=out_data
+                            )
+                            imported += 1
 
-                messages.success(request, f"✅ Đã import {imported} test (bỏ qua {skipped}) cho {problem.code}")
-                if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    return JsonResponse({"status": "ok", "imported": imported, "skipped": skipped})
-                return redirect(reverse("admin:view_tests", args=[problem.id]))
-
+                messages.success(request, f"✅ Đã import {imported} test (bỏ {skipped})")
+                return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
         else:
             form = UploadTestZipForm()
-
         return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
-    # ==============================
-    # 👁 Xem danh sách test
-    # ==============================
     def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         testcases = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": testcases})
 
-    # ==============================
-    # 🗑 Xoá test đơn lẻ
-    # ==============================
     def delete_test(self, request, problem_id, test_id):
         try:
             test = TestCase.objects.get(id=test_id, problem_id=problem_id)
             test.delete()
             return JsonResponse({"status": "ok"})
         except TestCase.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "Không tìm thấy test"}, status=404)
+            return JsonResponse({"status": "error"}, status=404)
