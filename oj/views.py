@@ -5,6 +5,8 @@ from judge.run_code import run_program
 import os
 from django.utils.safestring import mark_safe
 from django.conf import settings
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 # Import toàn bộ stage
 from .roadmap_data.stage_01 import STAGE_1
@@ -86,3 +88,32 @@ def run_code_online(request):
             result = f"Lỗi khi chạy code: {str(e)}"
         return JsonResponse({"output": result})
     return JsonResponse({"error": "Invalid request"})
+
+def run_code_page(request):
+    """Trang chạy code (giao diện HTML)"""
+    return render(request, "run_code.html")
+
+@csrf_exempt
+def api_run_code(request):
+    """API chạy code trả về JSON cho trình duyệt"""
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    lang = data.get("language", "").strip()
+    code = data.get("code", "").strip()
+    input_data = data.get("input", "")
+
+    if not lang or not code:
+        return JsonResponse({"error": "Missing language or code"}, status=400)
+
+    output, err = run_program(lang, code, input_data)
+
+    return JsonResponse({
+        "output": output,
+        "error": err or ""
+    })
