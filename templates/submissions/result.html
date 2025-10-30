@@ -1,7 +1,3 @@
-{% comment %}
-📁 path: templates/submissions/result.html
-Hiển thị kết quả chấm bài và lịch sử nộp bài.
-{% endcomment %}
 {% extends "base.html" %}
 {% load static %}
 
@@ -16,7 +12,7 @@ Hiển thị kết quả chấm bài và lịch sử nộp bài.
     <hr>
   </div>
 
-  <!-- 🧾 Kết quả mới nhất -->
+  <!-- 🧾 Kết quả chấm bài -->
   <div class="card p-4 shadow-sm mb-4">
     <h4 class="mb-3">📊 Kết quả chấm bài</h4>
 
@@ -38,7 +34,9 @@ Hiển thị kết quả chấm bài và lịch sử nộp bài.
         🧮 <b>Test qua:</b> {{ result.passed_tests }}/{{ result.total_tests }}
       </p>
     {% else %}
-      <div class="alert alert-info">⚙️ Hệ thống chưa có kết quả chấm nào để hiển thị.</div>
+      <div class="alert alert-info">
+        ⚙️ Hệ thống chưa có kết quả chấm nào để hiển thị.
+      </div>
     {% endif %}
 
     <div class="mt-3">
@@ -58,12 +56,12 @@ Hiển thị kết quả chấm bài và lịch sử nộp bài.
       <table class="table table-striped align-middle">
         <thead class="table-light">
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Thời gian</th>
-            <th scope="col">Ngôn ngữ</th>
-            <th scope="col">Kết quả</th>
-            <th scope="col">Thời gian chạy</th>
-            <th scope="col">Test qua</th>
+            <th>#</th>
+            <th>Thời gian</th>
+            <th>Ngôn ngữ</th>
+            <th>Kết quả</th>
+            <th>Thời gian chạy</th>
+            <th>Test qua</th>
           </tr>
         </thead>
         <tbody>
@@ -89,11 +87,12 @@ Hiển thị kết quả chấm bài và lịch sử nộp bài.
             <td>{{ s.passed_tests }}/{{ s.total_tests }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="6" class="text-center">⚠️ Bạn chưa nộp bài nào cho bài toán này.</td></tr>
+          <tr><td colspan="6" class="text-center text-muted">⚠️ Bạn chưa nộp bài nào cho bài toán này.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   {% endif %}
+
 </div>
 {% endblock %}
