@@ -1,78 +1,86 @@
 # path: judge/run_code.py
-import os, subprocess, tempfile, requests
+import subprocess, tempfile, os, shutil, requests
 
-_LOCAL = {
-    "python": {
-        "file": "main.py",
-        "run": lambda tmp: ["python3", os.path.join(tmp, "main.py")],
-    },
-    "pypy": {
-        "file": "main.py",
-        "run": lambda tmp: ["pypy3", os.path.join(tmp, "main.py")],
-    },
-}
+PISTON = "https://emkc.org/api/v2/piston/execute"
 
-PISTON_API = "https://emkc.org/api/v2/piston/execute"
-PISTON_VERSION = {
-    "cpp": "10.2.0",
-    "java": "15.0.2",
-}
+def _truncate(s, n=2000):
+    return (s or "")[:n]
 
-def _cut(s, limit=1_000_000):
-    if not s: return ""
-    return s if len(s) <= limit else s[:limit] + "\n[output truncated]"
+def run_program(language, code, input_data, time_limit=5):
+    language = language.lower().strip()
 
-def run_program(language, source_code, input_data, time_limit=5):
-    language = (language or "").lower().strip()
-    source_code = source_code or ""
-    input_data = input_data or ""
-
-    # ✅ Python / PyPy chạy local
-    if language in _LOCAL:
-        cfg = _LOCAL[language]
-        try:
-            with tempfile.TemporaryDirectory() as tmp:
-                src = os.path.join(tmp, cfg["file"])
-                with open(src, "w") as f: f.write(source_code)
-
-                proc = subprocess.run(
-                    cfg["run"](tmp),
+    # ---------------- Python / PyPy local ----------------
+    if language in ("python", "pypy"):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = os.path.join(tmp, "main.py")
+            with open(src, "w") as f:
+                f.write(code)
+            try:
+                p = subprocess.run(
+                    ["python3", src] if language=="python" else ["pypy3", src],
                     input=input_data,
-                    capture_output=True,
                     text=True,
+                    capture_output=True,
                     timeout=time_limit
                 )
-                if proc.returncode != 0:
-                    return (f"Runtime Error\n{_cut(proc.stderr)}", "")
-                return (_cut(proc.stdout), "")
-        except subprocess.TimeoutExpired:
-            return ("Time Limit Exceeded", "")
-        except Exception as e:
-            return (f"Internal Error: {e}", "")
+                if p.returncode != 0:
+                    return ("Runtime Error:\n" + _truncate(p.stderr), _truncate(p.stderr))
+                return (p.stdout, p.stderr)
+            except subprocess.TimeoutExpired:
+                return ("Time Limit Exceeded", "")
+            except Exception as e:
+                return (f"Internal Error: {e}", "")
 
-    # ✅ C++ / Java dùng API miễn phí
-    if language in ("cpp", "java"):
+    # ---------------- C++ local compile ----------------
+    if language == "cpp":
+        gpp = shutil.which("g++")
+        if gpp:
+            with tempfile.TemporaryDirectory() as tmp:
+                src = os.path.join(tmp, "main.cpp")
+                bin = os.path.join(tmp, "a.out")
+                with open(src, "w") as f:
+                    f.write(code)
+
+                cp = subprocess.run([gpp, src, "-O2", "-std=gnu++17", "-o", bin],
+                                    capture_output=True, text=True)
+
+                if cp.returncode != 0:
+                    return ("Compilation Error:\n" + _truncate(cp.stderr), cp.stderr)
+
+                try:
+                    p = subprocess.run([bin], input=input_data, text=True,
+                                       capture_output=True, timeout=time_limit)
+                    if p.returncode != 0:
+                        return ("Runtime Error:\n" + _truncate(p.stderr), p.stderr)
+                    return (p.stdout, p.stderr)
+                except subprocess.TimeoutExpired:
+                    return ("Time Limit Exceeded", "")
+                except Exception as e:
+                    return (f"Internal Error: {e}", "")
+
+        # ----------- Fallback Piston if no g++ installed -----------
         try:
             payload = {
-                "language": language,
-                "version": PISTON_VERSION[language],
-                "files": [{"name": f"main.{language}", "content": source_code}],
-                "stdin": input_data,
+                "language": "cpp",
+                "version": "10.2.0",
+                "files": [{"name": "main.cpp", "content": code}],
+                "stdin": input_data
             }
-            r = requests.post(PISTON_API, json=payload, timeout=time_limit + 4)
+            r = requests.post(PISTON, json=payload, timeout=time_limit + 3)
+
+            # API trả HTML → lỗi
+            if r.text.strip().startswith("<!DOCTYPE"):
+                return ("API Error: HTML response", "")
+
             data = r.json()
 
-            if r.status_code != 200:
-                return (f"API Error ({r.status_code})", "")
+            out = data.get("run", {}).get("stdout", "")
+            err = data.get("run", {}).get("stderr", "")
 
-            if data.get("compile", {}).get("code"):
-                return ("Compilation Error\n" + _cut(data["compile"]["stderr"]), "")
+            if err.strip():
+                return ("Runtime Error:\n" + _truncate(err), err)
+            return (out, err)
 
-            run = data.get("run", {})
-            if run.get("code") != 0:
-                return ("Runtime Error\n" + _cut(run.get("stderr", "")), "")
-
-            return (_cut(run.get("stdout", "")), "")
         except requests.Timeout:
             return ("Time Limit Exceeded", "")
         except Exception as e:
