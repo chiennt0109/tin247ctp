@@ -7,29 +7,65 @@ from django.shortcuts import render, redirect
 from django.urls import path, reverse
 from django.http import JsonResponse, HttpResponse
 from django.utils.html import format_html
-
-from .models import Problem, TestCase
-
-
+from .models import Problem, TestCase, Tag
 # Form upload ZIP
 class UploadTestZipForm(forms.Form):
     zip_file = forms.FileField(label="Chọn file .zip chứa test cases")
 
 
 @admin.register(Problem)
-class ProblemAdmin(admin.ModelAdmin):
-    list_display = ("code", "title", "difficulty", "time_limit", "memory_limit", "view_tests_link")
-    change_form_template = "admin/problems/change_form_with_upload.html"
+class ProblemAdminForm(forms.ModelForm):
+    class Meta:
+        model = Problem
+        fields = "__all__"
 
-    def get_urls(self):
-        urls = super().get_urls()
-        my_urls = [
-            path("<int:problem_id>/upload_tests/", self.admin_site.admin_view(self.upload_tests), name="upload_tests"),
-            path("<int:problem_id>/view_tests/", self.admin_site.admin_view(self.view_tests), name="view_tests"),
-            path("<int:problem_id>/delete_test/<int:test_id>/", self.admin_site.admin_view(self.delete_test), name="delete_test"),
-            path("<int:problem_id>/download_tests/", self.admin_site.admin_view(self.download_tests), name="download_tests"),
-        ]
-        return my_urls + urls
+    # ✅ Force load đúng dữ liệu instance, không bị giữ cache
+    statement = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 25,
+                "style": "font-family:monospace;",
+                "autocomplete": "off",       # 🔥 chống browser nhớ form
+                "data-no-store": "true",     # 🔥 chống editor cache
+            }
+        )
+    )
+
+    input_spec = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 5, "style": "font-family:monospace;"})
+    )
+
+    output_spec = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 5, "style": "font-family:monospace;"})
+    )
+
+    sample_input = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4, "style": "font-family:monospace;"})
+    )
+
+    sample_output = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4, "style": "font-family:monospace;"})
+    )
+
+
+# ✅ Keep TestCase inline (KHÔNG thay đổi)
+class TestCaseInline(admin.TabularInline):
+    model = TestCase
+    extra = 0
+
+
+@admin.register(Problem)
+class ProblemAdmin(admin.ModelAdmin):
+    form = ProblemAdminForm
+
+    list_display = ("code", "title", "difficulty", "submission_count", "ac_count")
+    search_fields = ("code", "title")
+    inlines = [TestCaseInline]
 
     # Link mở trang xem test
     def view_tests_link(self, obj):
