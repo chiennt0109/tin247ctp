@@ -3,7 +3,7 @@ import requests, tempfile, os, subprocess, json
 JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions"
 JUDGE0_HEADERS = {
     "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-    "x-rapidapi-key": "YOUR_RAPIDAPI_KEY",   # ❗ Thay key của bạn vào đây
+    "x-rapidapi-key": "5ffcbfd655mshaec0bea4d41e0d6p1325b6jsnbadf24e9e8f2",   # ❗ Thay key của bạn vào đây
     "content-type": "application/json"
 }
 
