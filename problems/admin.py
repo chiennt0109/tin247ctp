@@ -19,6 +19,12 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "difficulty", "time_limit", "memory_limit", "view_tests_link")
     change_form_template = "admin/problems/change_form_with_upload.html"
 
+    # ✅ Để hiển thị nút Upload Test
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.show_upload_button = True
+        return form
+
     def get_urls(self):
         urls = super().get_urls()
         my = [
@@ -35,6 +41,7 @@ class ProblemAdmin(admin.ModelAdmin):
             reverse("admin:view_tests", args=[obj.id])
         )
 
+    # ✅ Import test ZIP
     def upload_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         form = UploadTestZipForm(request.POST or None, request.FILES or None)
@@ -45,7 +52,6 @@ class ProblemAdmin(admin.ModelAdmin):
 
             with tempfile.TemporaryDirectory() as tmpdir:
                 zip_path = os.path.join(tmpdir, "tests.zip")
-
                 with open(zip_path, "wb") as f:
                     for chunk in zip_file.chunks():
                         f.write(chunk)
@@ -53,72 +59,55 @@ class ProblemAdmin(admin.ModelAdmin):
                 with zipfile.ZipFile(zip_path, "r") as z:
                     z.extractall(tmpdir)
 
-                input_exts = [".in", ".inp", ".txt", ".INP", ".IN"]
-                output_exts = [".out", ".ans", ".txt", ".OUT", ".ANS"]
-
                 for root, _, files in os.walk(tmpdir):
                     for filename in files:
                         name, ext = os.path.splitext(filename)
-
-                        # Là input?
-                        if ext.lower() not in [e.lower() for e in input_exts]:
+                        if ext.lower() not in [".in", ".inp", ".txt"]:
                             continue
 
                         inp_path = os.path.join(root, filename)
                         out_path = None
 
-                        # Match trực tiếp
-                        for out_ext in output_exts:
-                            cand = os.path.join(root, name + out_ext)
-                            if os.path.exists(cand):
-                                out_path = cand
+                        # ✅ tìm output cùng folder
+                        for cand in [name + ".out", name + ".ans", name + ".txt"]:
+                            cp = os.path.join(root, cand)
+                            if os.path.exists(cp):
+                                out_path = cp
                                 break
 
-                            # Replace INP → OUT
-                            for in_ext in input_exts:
-                                cand2 = os.path.join(root, filename.replace(in_ext, out_ext))
-                                if os.path.exists(cand2):
-                                    out_path = cand2
-                                    break
-                            if out_path:
-                                break
-
-                        # Tìm ở thư mục cha
+                        # ✅ nếu không có, thử thư mục cha (hỗ trợ folder/test01/)
                         if not out_path:
                             parent = os.path.dirname(root)
-                            for out_ext in output_exts:
-                                cand = os.path.join(parent, name + out_ext)
-                                if os.path.exists(cand):
-                                    out_path = cand
+                            for cand in [name + ".out", name + ".ans", name + ".txt"]:
+                                cp = os.path.join(parent, cand)
+                                if os.path.exists(cp):
+                                    out_path = cp
                                     break
 
                         if not out_path:
                             skipped += 1
                             continue
 
-                        # Đọc file
                         with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                            input_data = fi.read().strip()
+                            inp = fi.read().strip()
                         with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                            output_data = fo.read().strip()
+                            out = fo.read().strip()
 
-                        TestCase.objects.create(
-                            problem=problem,
-                            input_data=input_data,
-                            expected_output=output_data
-                        )
+                        TestCase.objects.create(problem=problem, input_data=inp, expected_output=out)
                         imported += 1
 
-            messages.success(request, f"✅ Import {imported} test • 🚫 Bỏ qua {skipped}")
+            messages.success(request, f"✅ Đã import {imported} test • 🚫 Bỏ qua {skipped}")
             return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
 
         return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
+    # ✅ View tests
     def view_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
         return render(request, "admin/problems/view_tests.html", {"problem": problem, "testcases": tests})
 
+    # ✅ Delete test via Ajax
     def delete_test(self, request, problem_id, test_id):
         try:
             TestCase.objects.get(id=test_id, problem_id=problem_id).delete()
@@ -126,6 +115,7 @@ class ProblemAdmin(admin.ModelAdmin):
         except TestCase.DoesNotExist:
             return JsonResponse({"status": "error"})
 
+    # ✅ Export test zip
     def download_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
         tests = TestCase.objects.filter(problem=problem)
@@ -133,9 +123,9 @@ class ProblemAdmin(admin.ModelAdmin):
         buf = io.BytesIO()
         z = zipfile.ZipFile(buf, "w")
 
-        for idx, t in enumerate(tests, start=1):
-            z.writestr(f"{problem.code}/test{idx:02d}.inp", t.input_data)
-            z.writestr(f"{problem.code}/test{idx:02d}.out", t.expected_output)
+        for i, t in enumerate(tests, start=1):
+            z.writestr(f"{problem.code}/test{i:02d}.inp", t.input_data)
+            z.writestr(f"{problem.code}/test{i:02d}.out", t.expected_output)
 
         z.close()
         buf.seek(0)
