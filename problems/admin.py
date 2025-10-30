@@ -43,63 +43,80 @@ class ProblemAdmin(admin.ModelAdmin):
 
     # ✅ Import test ZIP
     def upload_tests(self, request, problem_id):
-        problem = Problem.objects.get(pk=problem_id)
-        form = UploadTestZipForm(request.POST or None, request.FILES or None)
+    problem = Problem.objects.get(pk=problem_id)
+    form = UploadTestZipForm(request.POST or None, request.FILES or None)
 
-        if request.method == "POST" and form.is_valid():
-            zip_file = request.FILES["zip_file"]
-            imported = skipped = 0
+    if request.method == "POST" and form.is_valid():
+        zip_file = request.FILES["zip_file"]
+        imported = skipped = 0
 
-            with tempfile.TemporaryDirectory() as tmpdir:
-                zip_path = os.path.join(tmpdir, "tests.zip")
-                with open(zip_path, "wb") as f:
-                    for chunk in zip_file.chunks():
-                        f.write(chunk)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            zip_path = os.path.join(tmpdir, "tests.zip")
 
-                with zipfile.ZipFile(zip_path, "r") as z:
-                    z.extractall(tmpdir)
+            with open(zip_path, "wb") as f:
+                for chunk in zip_file.chunks():
+                    f.write(chunk)
 
-                for root, _, files in os.walk(tmpdir):
-                    for filename in files:
-                        name, ext = os.path.splitext(filename)
-                        if ext.lower() not in [".in", ".inp", ".txt"]:
-                            continue
+            with zipfile.ZipFile(zip_path, "r") as z:
+                z.extractall(tmpdir)
 
-                        inp_path = os.path.join(root, filename)
-                        out_path = None
+            for root, _, files in os.walk(tmpdir):
+                for file in files:
+                    name, ext = os.path.splitext(file)
+                    ext = ext.lower()
 
-                        # ✅ tìm output cùng folder
-                        for cand in [name + ".out", name + ".ans", name + ".txt"]:
-                            cp = os.path.join(root, cand)
+                    # Accept common input formats
+                    if ext not in [".inp", ".in", ".txt"]:
+                        continue
+
+                    inp_path = os.path.join(root, file)
+                    out_path = None
+
+                    # Candidate output file names
+                    base = name  # e.g. PS_EqualPoint
+                    candidates = [
+                        base + ".out", base + ".ans", base + ".txt",
+                        file.replace(".inp", ".out"),
+                        file.replace(".in", ".out"),
+                    ]
+
+                    # Same folder search
+                    for cand in candidates:
+                        cp = os.path.join(root, cand)
+                        if os.path.exists(cp):
+                            out_path = cp
+                            break
+
+                    # Search one level above if not found
+                    if not out_path:
+                        parent = os.path.dirname(root)
+                        for cand in candidates:
+                            cp = os.path.join(parent, cand)
                             if os.path.exists(cp):
                                 out_path = cp
                                 break
 
-                        # ✅ nếu không có, thử thư mục cha (hỗ trợ folder/test01/)
-                        if not out_path:
-                            parent = os.path.dirname(root)
-                            for cand in [name + ".out", name + ".ans", name + ".txt"]:
-                                cp = os.path.join(parent, cand)
-                                if os.path.exists(cp):
-                                    out_path = cp
-                                    break
+                    if not out_path:
+                        skipped += 1
+                        continue
 
-                        if not out_path:
-                            skipped += 1
-                            continue
+                    # Read data
+                    with open(inp_path, encoding="utf-8", errors="ignore") as fi:
+                        input_data = fi.read().strip()
+                    with open(out_path, encoding="utf-8", errors="ignore") as fo:
+                        output_data = fo.read().strip()
 
-                        with open(inp_path, encoding="utf-8", errors="ignore") as fi:
-                            inp = fi.read().strip()
-                        with open(out_path, encoding="utf-8", errors="ignore") as fo:
-                            out = fo.read().strip()
+                    TestCase.objects.create(
+                        problem=problem,
+                        input_data=input_data,
+                        expected_output=output_data
+                    )
+                    imported += 1
 
-                        TestCase.objects.create(problem=problem, input_data=inp, expected_output=out)
-                        imported += 1
+        messages.success(request, f"✅ Đã import {imported} test • ❌ Bỏ qua {skipped}")
+        return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
 
-            messages.success(request, f"✅ Đã import {imported} test • 🚫 Bỏ qua {skipped}")
-            return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
-
-        return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
+    return render(request, "admin/problems/upload_tests.html", {"form": form, "problem": problem})
 
     # ✅ View tests
     def view_tests(self, request, problem_id):
