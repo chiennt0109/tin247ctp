@@ -1,67 +1,30 @@
-# path: judge/run_code.py
-import os, requests, time
+import subprocess, tempfile, os, time
 
-JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions"
-JUDGE0_HEADERS = {
-    "X-RapidAPI-Key": os.getenv("JUDGE0_API_KEY", ""),
-    "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-    "Content-Type": "application/json"
-}
+# Chỉ cho phép Python trong chế độ an toàn
+def run_program(lang, code, stdin, time_limit=3):
+    if lang not in ["python", "pypy"]:
+        return ("Language disabled", "")
 
-LANG_MAP = {
-    "cpp": 54,     # GCC 17
-    "python": 71,  # Python 3.11
-    "pypy": 70,    # PyPy
-    "java": 62     # Java 17
-}
+    with tempfile.TemporaryDirectory() as tmp:
+        src = os.path.join(tmp, "main.py")
+        with open(src, "w") as f:
+            f.write(code)
 
-def run_program(lang, code, stdin, time_limit=2):
-    if lang not in LANG_MAP:
-        return ("", "Unsupported language")
+        try:
+            result = subprocess.run(
+                ["python3", src] if lang == "python" else ["pypy3", src],
+                input=stdin,
+                text=True,
+                capture_output=True,
+                timeout=time_limit
+            )
 
-    payload = {
-        "language_id": LANG_MAP[lang],
-        "source_code": code,
-        "stdin": stdin,
-        "cpu_time_limit": time_limit,
-        "wall_time_limit": time_limit + 1,
-        "memory_limit": 256000,
-        "enable_per_process_and_thread_time_limit": True
-    }
+            if result.returncode != 0:
+                return ("Runtime Error:\n" + result.stderr, "")
 
-    try:
-        r = requests.post(JUDGE0_URL + "?base64_encoded=false&wait=false",
-                          json=payload, headers=JUDGE0_HEADERS, timeout=10)
-        token = r.json().get("token", None)
-        if not token:
-            return ("", "Judge0 did not return token")
+            return (result.stdout, "")
 
-        # Polling
-        for _ in range(60):
-            time.sleep(0.15)
-            res = requests.get(f"{JUDGE0_URL}/{token}?base64_encoded=false",
-                               headers=JUDGE0_HEADERS).json()
-
-            status = res.get("status", {}).get("description", "")
-
-            if status in ["In Queue", "Processing"]:
-                continue
-
-            stdout = res.get("stdout", "") or ""
-            stderr = res.get("stderr", "") or ""
-            compile_err = res.get("compile_output", "") or ""
-
-            # unify error output
-            if compile_err:
-                return ("", "Compilation Error:\n" + compile_err)
-            if stderr:
-                return ("", "Runtime Error:\n" + stderr)
-            if status == "Time Limit Exceeded":
-                return ("", "Time Limit Exceeded")
-
-            return (stdout, "")
-
-        return ("", "Time Limit Exceeded")
-
-    except Exception as e:
-        return ("", f"System Error: {e}")
+        except subprocess.TimeoutExpired:
+            return ("Time Limit Exceeded", "")
+        except Exception as e:
+            return ("Internal Error: " + str(e), "")
