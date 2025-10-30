@@ -1,30 +1,56 @@
-import subprocess, tempfile, os, time
+# path: judge/run_code.py
+import subprocess, tempfile, os, sys
 
-# Chỉ cho phép Python trong chế độ an toàn
 def run_program(lang, code, stdin, time_limit=3):
-    if lang not in ["python", "pypy"]:
-        return ("Language disabled", "")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        if lang == "python" or lang == "pypy":
+            src = os.path.join(tmpdir, "main.py")
+            with open(src, "w") as f:
+                f.write(code)
+            try:
+                r = subprocess.run(
+                    ["python3", src],
+                    input=stdin,
+                    text=True,
+                    capture_output=True,
+                    timeout=time_limit
+                )
+            except subprocess.TimeoutExpired:
+                return ("Time Limit Exceeded", "")
+            
+            if r.returncode != 0:
+                return ("Runtime Error:\n" + r.stderr, "")
+            return (r.stdout, "")
 
-    with tempfile.TemporaryDirectory() as tmp:
-        src = os.path.join(tmp, "main.py")
-        with open(src, "w") as f:
-            f.write(code)
+        elif lang == "cpp":
+            # Render không có g++ → chỉ chấm local được
+            gpp = "/usr/bin/g++"
+            if not os.path.exists(gpp):
+                return ("C++ not supported on this server", "")
+            
+            src = os.path.join(tmpdir, "main.cpp")
+            binfile = os.path.join(tmpdir, "a.out")
+            with open(src, "w") as f:
+                f.write(code)
 
-        try:
-            result = subprocess.run(
-                ["python3", src] if lang == "python" else ["pypy3", src],
-                input=stdin,
-                text=True,
-                capture_output=True,
-                timeout=time_limit
-            )
+            c = subprocess.run([gpp, src, "-O2", "-std=gnu++17", "-o", binfile], capture_output=True, text=True)
+            if c.returncode != 0:
+                return ("Compilation Error:\n" + c.stderr, "")
 
-            if result.returncode != 0:
-                return ("Runtime Error:\n" + result.stderr, "")
+            try:
+                r = subprocess.run(
+                    [binfile],
+                    input=stdin,
+                    text=True,
+                    capture_output=True,
+                    timeout=time_limit
+                )
+            except subprocess.TimeoutExpired:
+                return ("Time Limit Exceeded", "")
 
-            return (result.stdout, "")
+            if r.returncode != 0:
+                return ("Runtime Error:\n" + r.stderr, "")
+            return (r.stdout, "")
 
-        except subprocess.TimeoutExpired:
-            return ("Time Limit Exceeded", "")
-        except Exception as e:
-            return ("Internal Error: " + str(e), "")
+        else:
+            return ("Unsupported language", "")
