@@ -3,6 +3,7 @@
 <h2>📄 {{ problem.code }} – {{ problem.title }}</h2>
 <p><b>Tổng số test:</b> {{ testcases|length }}</p>
 <hr>
+
 <table class="table table-striped">
   <thead>
     <tr><th>#</th><th>Input</th><th>Output</th><th>Xoá</th></tr>
@@ -24,7 +25,7 @@
 <script>
 function deleteTest(testId) {
   if (!confirm("Bạn có chắc muốn xoá test này?")) return;
-  fetch(`/admin/problems/problem/${{{ problem.id }}}/delete_test/${testId}/`, {
+  fetch(`/admin/problems/problem/{{ problem.id }}/delete_test/${testId}/`, {
     method: "POST",
     headers: {"X-CSRFToken": "{{ csrf_token }}"}
   })
