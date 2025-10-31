@@ -1,60 +1,49 @@
-import subprocess, tempfile, os, shutil
+import subprocess, tempfile, os, json, sys, signal
 
-def _clean(s, n=2000):
-    return (s or "")[:n]
+def run_program(lang, code, input_data, time_limit=2):
+    tmp = tempfile.mkdtemp()
+    source = os.path.join(tmp, "code")
 
-def run_program(lang, code, input_data, time_limit=3):
-    lang = lang.lower()
-
-    # -------- Python ----------
-    if lang in ("python", "pypy"):
-        with tempfile.TemporaryDirectory() as tmp:
-            src = os.path.join(tmp, "main.py")
-            with open(src, "w") as f: f.write(code)
-
-            cmd = ["python3", src] if lang == "python" else ["pypy3", src]
-
-            try:
-                p = subprocess.run(cmd, input=input_data, text=True,
-                                   capture_output=True, timeout=time_limit)
-            except subprocess.TimeoutExpired:
-                return ("Time Limit Exceeded", "")
-
-            if p.returncode != 0:
-                return ("Runtime Error:\n" + _clean(p.stderr), p.stderr)
-            return (p.stdout, p.stderr)
-
-    # -------- C++ ----------
     if lang == "cpp":
-        tmp = tempfile.mkdtemp()
-        src = os.path.join(tmp, "main.cpp")
-        bin = os.path.join(tmp, "a.out")
+        source += ".cpp"
+        exe = os.path.join(tmp, "run")
 
-        with open(src, "w") as f: f.write(code)
+        with open(source, "w") as f:
+            f.write(code)
 
-        # compile
-        cp = subprocess.run(
-            ["g++", src, "-O2", "-std=gnu++17", "-o", bin],
-            capture_output=True, text=True
+        # Compile C++
+        compile_cmd = ["g++", "-std=c++17", source, "-O2", "-o", exe]
+        comp = subprocess.run(
+            compile_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
-        if cp.returncode != 0:
-            shutil.rmtree(tmp)
-            return ("Compilation Error:\n" + _clean(cp.stderr), cp.stderr)
 
-        # run
-        try:
-            p = subprocess.run([bin], input=input_data, text=True,
-                               capture_output=True, timeout=time_limit)
-        except subprocess.TimeoutExpired:
-            shutil.rmtree(tmp)
-            return ("Time Limit Exceeded", "")
+        if comp.returncode != 0:
+            return "Compilation Error", comp.stderr
 
-        out, err = p.stdout, p.stderr
-        shutil.rmtree(tmp)
+        run_cmd = [exe]
 
-        if p.returncode != 0:
-            return ("Runtime Error:\n" + _clean(err), err)
+    elif lang == "python":
+        source += ".py"
+        with open(source, "w") as f:
+            f.write(code)
+        run_cmd = ["python3", source]
 
-        return (out, err)
+    else:
+        return "Internal Error", "Unsupported language"
 
-    return (f"Unsupported language: {lang}", "")
+    try:
+        p = subprocess.run(
+            run_cmd,
+            input=input_data,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=time_limit
+        )
+        return p.stdout, p.stderr
+
+    except subprocess.TimeoutExpired:
+        return "Time Limit Exceeded", ""
+
+    except Exception as e:
+        return "Runtime Error", str(e)
