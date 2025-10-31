@@ -1,5 +1,3 @@
-# path: submissions/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Submission
@@ -22,17 +20,14 @@ def submission_create(request, problem_id):
             verdict="Pending"
         )
 
-        result = grade_submission(sub)
+        # ✅ Gọi grader (định dạng mới)
+        verdict, exec_time, passed, total, debug = grade_submission(sub)
 
-        if isinstance(result, tuple):
-            verdict, t, p, tot, debug = result
-        else:
-            verdict, t, p, tot, debug = result, 0, 0, 0, {}
-
+        # ✅ Lưu kết quả
         sub.verdict = verdict
-        sub.exec_time = float(t)
-        sub.passed_tests = p
-        sub.total_tests = tot
+        sub.exec_time = float(exec_time)
+        sub.passed_tests = passed
+        sub.total_tests = total
         sub.debug_info = str(debug)
         sub.save()
 
@@ -51,8 +46,6 @@ def submission_detail(request, submission_id):
         ).order_by("-created_at")
     })
 
-
 def my_submissions(request):
     subs = Submission.objects.filter(user=request.user).order_by("-id")
     return render(request, "submissions/my_submissions.html", {"submissions": subs})
-
