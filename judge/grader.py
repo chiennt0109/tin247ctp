@@ -1,61 +1,58 @@
 # path: judge/grader.py
-import time
-from problems.models import TestCase
+import time, json
 from .run_code import run_program
+from problems.models import TestCase
 
-def normalize(t):
-    if t is None: return ""
-    return t.replace("\r", "").rstrip()
+def grade_submission(submission):
+    problem = submission.problem
+    tests = TestCase.objects.filter(problem=problem).order_by("id")
 
-def same(a, b):
-    ua = normalize(a).split("\n")
-    ub = normalize(b).split("\n")
-    ua = [x.rstrip() for x in ua if x.strip() != "" or True]
-    ub = [x.rstrip() for x in ub if x.strip() != "" or True]
-    return ua == ub
-
-def grade_submission(sub):
-    problem = sub.problem
-    tests = TestCase.objects.filter(problem=problem)
-    total = tests.count()
     passed = 0
-    total_time = 0
-    debug = {}
+    total = 0
+    debug = []
+    start_time = time.time()
 
-    for tc in tests:
-        start = time.time()
+    for t in tests:
+        total += 1
 
-        result = run_program(sub.language, sub.source_code, tc.input_data, time_limit=problem.time_limit)
+        # Run user code on this testcase
+        out, err = run_program(
+            submission.language,
+            submission.source_code,
+            t.input_data,
+            time_limit=problem.time_limit
+        )
 
-        if isinstance(result, tuple):
-            out = result[0]
-            err = result[1] if len(result) > 1 else ""
-        else:
-            out = str(result)
-            err = ""
+        # Normalize output to compare
+        out_clean = out.replace("\r", "").strip() if out else ""
+        expected = t.expected_output.replace("\r", "").strip()
 
-        total_time += time.time() - start
+        # Collect debug result
+        debug.append({
+            "test_id": t.id,
+            "input": t.input_data,
+            "expected": expected,
+            "got": out_clean,
+            "stderr": err,
+            "status": "✅" if out_clean == expected else "❌"
+        })
 
-        # classification
-        if out.startswith("Compilation Error"):
-            return ("Compilation Error", total_time, passed, total, {"test": tc.id, "err": err})
+        # Count passed
+        if out_clean == expected:
+            passed += 1
 
-        if out.startswith("Runtime Error"):
-            return ("Runtime Error", total_time, passed, total, {"test": tc.id, "err": err})
+    exec_time = round(time.time() - start_time, 4)
 
-        if out.strip() == "Time Limit Exceeded":
-            return ("Time Limit Exceeded", total_time, passed, total, {"test": tc.id})
+    # Final verdict
+    if passed == total:
+        verdict = "Accepted"
+    else:
+        verdict = "Wrong Answer"
 
-        if not same(out, tc.expected_output):
-            debug = {
-                "test": tc.id,
-                "input": tc.input_data,
-                "expected": tc.expected_output,
-                "got": out,
-                "stderr": err
-            }
-            return ("Wrong Answer", total_time, passed, total, debug)
-
-        passed += 1
-
-    return ("Accepted", total_time, passed, total, debug)
+    return (
+        verdict,
+        exec_time,
+        passed,
+        total,
+        json.dumps(debug, ensure_ascii=False)
+    )
