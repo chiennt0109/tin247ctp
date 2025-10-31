@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
 
                 # ✅ Không tạo lại các trường đã tồn tại trong DB
-                # ('passed_tests', models.IntegerField(default=0)),
-                # ('total_tests', models.IntegerField(default=0)),
-                # ('debug_info', models.TextField(blank=True, null=True)),
+                ('passed_tests', models.IntegerField(default=0)),
+                ('total_tests', models.IntegerField(default=0)),
+                ('debug_info', models.TextField(blank=True, null=True)),
 
                 ('problem', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='problems.problem')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='auth.user')),
