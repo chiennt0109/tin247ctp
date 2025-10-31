@@ -23,10 +23,9 @@ class Migration(migrations.Migration):
                 ('exec_time', models.FloatField(default=0.0)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
 
-                # ✅ Không tạo lại các trường đã tồn tại trong DB
-                ('passed_tests', models.IntegerField(default=0)),
-                ('total_tests', models.IntegerField(default=0)),
-                ('debug_info', models.TextField(blank=True, null=True)),
+                # ✅ KHÔNG tạo lại các trường đã có trong DB
+                # CÁC CỘT passed_tests, total_tests, debug_info đã tồn tại trong DB
+                # nên migration này không được tạo chúng nữa
 
                 ('problem', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='problems.problem')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='auth.user')),
