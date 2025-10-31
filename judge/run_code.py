@@ -1,43 +1,60 @@
 import subprocess, tempfile, os, shutil
 
-def run_program(language, code_or_bin, input_data, time_limit=2):
-    language = language.lower()
+def _clean(s, n=2000):
+    return (s or "")[:n]
 
-    # Python
-    if language == "python":
+def run_program(lang, code, input_data, time_limit=3):
+    lang = lang.lower()
+
+    # -------- Python ----------
+    if lang in ("python", "pypy"):
         with tempfile.TemporaryDirectory() as tmp:
-            src = tmp + "/main.py"
-            open(src, "w").write(code_or_bin)
+            src = os.path.join(tmp, "main.py")
+            with open(src, "w") as f: f.write(code)
+
+            cmd = ["python3", src] if lang == "python" else ["pypy3", src]
+
             try:
-                p = subprocess.run(["python3", src], input=input_data, text=True,
+                p = subprocess.run(cmd, input=input_data, text=True,
                                    capture_output=True, timeout=time_limit)
-                if p.returncode != 0:
-                    return ("Runtime Error", p.stderr)
-                return (p.stdout, "")
             except subprocess.TimeoutExpired:
                 return ("Time Limit Exceeded", "")
 
-    # C++ compile
-    if language == "compile_cpp":
-        with tempfile.TemporaryDirectory() as tmp:
-            cpp = tmp + "/main.cpp"
-            out = tmp + "/a.out"
-            open(cpp, "w").write(code_or_bin)
-            p = subprocess.run(["g++", cpp, "-O2", "-std=c++17", "-o", out],
-                               capture_output=True, text=True)
             if p.returncode != 0:
-                return ("Compilation Error", p.stderr)
-            return ("OK", out)
+                return ("Runtime Error:\n" + _clean(p.stderr), p.stderr)
+            return (p.stdout, p.stderr)
 
-    # C++ run compiled binary
-    if language == "run_cpp_bin":
+    # -------- C++ ----------
+    if lang == "cpp":
+        tmp = tempfile.mkdtemp()
+        src = os.path.join(tmp, "main.cpp")
+        bin = os.path.join(tmp, "a.out")
+
+        with open(src, "w") as f: f.write(code)
+
+        # compile
+        cp = subprocess.run(
+            ["g++", src, "-O2", "-std=gnu++17", "-o", bin],
+            capture_output=True, text=True
+        )
+        if cp.returncode != 0:
+            shutil.rmtree(tmp)
+            return ("Compilation Error:\n" + _clean(cp.stderr), cp.stderr)
+
+        # run
         try:
-            p = subprocess.run([code_or_bin], input=input_data, text=True,
+            p = subprocess.run([bin], input=input_data, text=True,
                                capture_output=True, timeout=time_limit)
-            if p.returncode != 0:
-                return ("Runtime Error", p.stderr)
-            return (p.stdout, "")
         except subprocess.TimeoutExpired:
+            shutil.rmtree(tmp)
             return ("Time Limit Exceeded", "")
 
-    return ("Unknown Language", "")
+        out, err = p.stdout, p.stderr
+        shutil.rmtree(tmp)
+
+        if p.returncode != 0:
+            return ("Runtime Error:\n" + _clean(err), err)
+
+        return (out, err)
+
+    return (f"Unsupported language: {lang}", "")
