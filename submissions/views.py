@@ -10,32 +10,31 @@ def submission_create(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
 
     if request.method == "POST":
+        lang = request.POST.get("language")
+        code = request.POST.get("source")
+
         sub = Submission.objects.create(
             user=request.user,
             problem=problem,
-            language=request.POST.get("language"),
-            source_code=request.POST.get("source"),
+            language=lang,
+            source_code=code,
             verdict="Pending"
         )
 
-        verdict, time_used, passed, total, debug = grade_submission(sub)
+        result = grade_submission(sub)
+
+        if isinstance(result, tuple):
+            verdict, t, p, tot, debug = result
+        else:
+            verdict, t, p, tot, debug = result, 0, 0, 0, {}
 
         sub.verdict = verdict
-        sub.exec_time = time_used
-        sub.passed_tests = passed
-        sub.total_tests = total
-        sub.debug_info = debug
+        sub.exec_time = float(t)
+        sub.passed_tests = p
+        sub.total_tests = tot
+        sub.debug_info = str(debug)
         sub.save()
 
         return redirect("submission_detail", submission_id=sub.id)
 
     return render(request, "submissions/submit.html", {"problem": problem})
-
-@login_required
-def submission_detail(request, submission_id):
-    sub = get_object_or_404(Submission, pk=submission_id)
-    return render(request, "submissions/detail.html", {"sub": sub})
-
-def my_submissions(request):
-    subs = Submission.objects.filter(user=request.user).order_by("-created_at")
-    return render(request, "submissions/my_submissions.html", {"subs": subs})
