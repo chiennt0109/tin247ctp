@@ -93,6 +93,41 @@
       </table>
     </div>
   {% endif %}
+{% if result.debug_info %}
+<hr>
+<h4>🔍 Test Debug</h4>
+<table class="table table-bordered">
+<thead>
+<tr>
+  <th>#</th>
+  <th>Input</th>
+  <th>Expected</th>
+  <th>Output</th>
+  <th>Result</th>
+</tr>
+</thead>
+<tbody>
+{% for row in result.debug_info|json_script:"dbg" %}
+{% endfor %}
+{% endfor %}
+</tbody>
+</table>
+
+<script>
+const dbg = JSON.parse(document.getElementById("dbg").textContent);
+const tbody = document.querySelector("tbody");
+
+dbg.forEach((t, i) => {
+  tbody.innerHTML += `
+  <tr>
+    <td>${i+1}</td>
+    <td><pre>${t.input}</pre></td>
+    <td><pre>${t.expected}</pre></td>
+    <td><pre>${t.got}</pre></td>
+    <td>${t.status}</td>
+  </tr>`;
+});
+</script>
 
 </div>
 {% endblock %}
