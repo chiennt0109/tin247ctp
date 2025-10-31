@@ -2,86 +2,85 @@ import subprocess, tempfile, os, shutil, requests
 
 PISTON = "https://emkc.org/api/v2/piston/execute"
 
-def _safe(s):
-    if s is None:
-        return ""
-    return str(s)[:5000]  # avoid huge logs
+def safe(v): return "" if v is None else str(v)
 
-def run_program(language, code, input_data, time_limit=4):
-    language = language.lower().strip()
+def run_program(lang, code, stdin, time_limit=4):
+    lang = lang.lower().strip()
 
-    # ✅ PYTHON / PYPY local execution
-    if language in ("python", "pypy"):
+    # ---------------- PYTHON LOCAL ----------------
+    if lang in ("python", "pypy"):
         with tempfile.TemporaryDirectory() as tmp:
-            src = os.path.join(tmp, "main.py")
-            with open(src, "w") as f:
-                f.write(code)
+            src = f"{tmp}/main.py"
+            open(src, "w").write(code)
 
             try:
                 p = subprocess.run(
-                    ["python3", src] if language == "python" else ["pypy3", src],
-                    input=input_data,
-                    text=True,
-                    capture_output=True,
-                    timeout=time_limit
+                    ["python3", src],
+                    input=stdin, text=True,
+                    capture_output=True, timeout=time_limit
                 )
                 if p.returncode != 0:
-                    return ("Runtime Error:\n" + _safe(p.stderr), _safe(p.stderr))
-                return (_safe(p.stdout), _safe(p.stderr))
+                    return (f"Runtime Error:\n{safe(p.stderr)}", safe(p.stderr))
+                return (safe(p.stdout), safe(p.stderr))
             except subprocess.TimeoutExpired:
                 return ("Time Limit Exceeded", "")
             except Exception as e:
                 return (f"Internal Error: {e}", "")
 
-    # ✅ C++ compile & run (LOCAL if available)
-    if language == "cpp":
-        gxx = shutil.which("g++")
-
-        if gxx:
+    # ---------------- C++ LOCAL IF AVAILABLE ----------------
+    if lang == "cpp":
+        gpp = shutil.which("g++")
+        if gpp:
             with tempfile.TemporaryDirectory() as tmp:
-                src = os.path.join(tmp, "main.cpp")
-                out = os.path.join(tmp, "a.out")
-                with open(src, "w") as f:
-                    f.write(code)
+                src = f"{tmp}/main.cpp"
+                exe = f"{tmp}/a.out"
+                open(src, "w").write(code)
 
-                compile_p = subprocess.run([gxx, src, "-O2", "-std=gnu++17", "-o", out],
-                                           capture_output=True, text=True)
+                compile = subprocess.run(
+                    [gpp, src, "-O2", "-std=gnu++17", "-o", exe],
+                    capture_output=True, text=True
+                )
 
-                if compile_p.returncode != 0:
-                    return ("Compilation Error:\n" + _safe(compile_p.stderr), _safe(compile_p.stderr))
+                if compile.returncode != 0:
+                    return (f"Compilation Error:\n{safe(compile.stderr)}", safe(compile.stderr))
 
                 try:
-                    run_p = subprocess.run([out], input=input_data, text=True,
-                                           capture_output=True, timeout=time_limit)
-                    if run_p.returncode != 0:
-                        return ("Runtime Error:\n" + _safe(run_p.stderr), _safe(run_p.stderr))
-                    return (_safe(run_p.stdout), _safe(run_p.stderr))
+                    run = subprocess.run(
+                        [exe], input=stdin, text=True,
+                        capture_output=True, timeout=time_limit
+                    )
+                    if run.returncode != 0:
+                        return (f"Runtime Error:\n{safe(run.stderr)}", safe(run.stderr))
+                    return (safe(run.stdout), safe(run.stderr))
+
                 except subprocess.TimeoutExpired:
                     return ("Time Limit Exceeded", "")
                 except Exception as e:
                     return (f"Internal Error: {e}", "")
 
-        # ✅ If no g++ → fallback to PISTON
+        # ---------------- Fallback to Piston ----------------
         try:
-            payload = {
-                "language": "cpp",
-                "version": "10.2.0",
-                "files": [{"name": "main.cpp", "content": code}],
-                "stdin": input_data
-            }
-            r = requests.post(PISTON, json=payload, timeout=time_limit + 2)
-
-            if r.text.startswith("<!DOCTYPE"):
-                return ("API Error", "")
-
+            r = requests.post(
+                PISTON,
+                json={
+                    "language": "cpp",
+                    "version": "10.2.0",
+                    "files": [{"name": "main.cpp", "content": code}],
+                    "stdin": stdin
+                },
+                timeout=time_limit + 2
+            )
             data = r.json()
-            out = data.get("run", {}).get("stdout", "")
-            err = data.get("run", {}).get("stderr", "")
+            out = safe(data.get("run", {}).get("stdout", ""))
+            err = safe(data.get("run", {}).get("stderr", ""))
+
+            if "compile" in data and data["compile"].get("stderr"):
+                return (f"Compilation Error:\n{safe(data['compile']['stderr'])}", "")
 
             if err.strip():
-                return ("Runtime Error:\n" + _safe(err), _safe(err))
+                return (f"Runtime Error:\n{err}", err)
 
-            return (_safe(out), _safe(err))
+            return (out, err)
 
         except requests.Timeout:
             return ("Time Limit Exceeded", "")
