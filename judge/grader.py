@@ -1,58 +1,53 @@
-# path: judge/grader.py
-import time, json
-from .run_code import run_program
 from problems.models import TestCase
+from .run_code import run_program
+import time
+
+def normalize(s):
+    return (s or "").strip().replace('\r\n', '\n').rstrip()
 
 def grade_submission(submission):
     problem = submission.problem
-    tests = TestCase.objects.filter(problem=problem).order_by("id")
+    tests = TestCase.objects.filter(problem=problem)
+    lang = submission.language
+    code = submission.source_code
+
+    total_tests = tests.count()
+    if total_tests == 0:
+        return ("No Test Cases", 0, 0, 0, "")
 
     passed = 0
-    total = 0
-    debug = []
-    start_time = time.time()
+    total_time = 0.0
+    debug_log = []
 
-    for t in tests:
-        total += 1
+    # 🔥 Compile once for C++
+    compiled_bin = None
+    if lang == "cpp":
+        out, err = run_program("compile_cpp", code, "")
+        if "Compilation Error" in out:
+            return ("Compilation Error", 0, 0, total_tests, out)
 
-        # Run user code on this testcase
-        out, err = run_program(
-            submission.language,
-            submission.source_code,
-            t.input_data,
-            time_limit=problem.time_limit
-        )
+        # Saved binary path
+        compiled_bin = err.strip()  # err used to return binary path
 
-        # Normalize output to compare
-        out_clean = out.replace("\r", "").strip() if out else ""
-        expected = t.expected_output.replace("\r", "").strip()
+    for tc in tests:
+        start = time.time()
 
-        # Collect debug result
-        debug.append({
-            "test_id": t.id,
-            "input": t.input_data,
-            "expected": expected,
-            "got": out_clean,
-            "stderr": err,
-            "status": "✅" if out_clean == expected else "❌"
-        })
+        if lang == "cpp":
+            out, err = run_program("run_cpp_bin", compiled_bin, tc.input_data, time_limit=problem.time_limit)
+        else:
+            out, err = run_program(lang, code, tc.input_data, time_limit=problem.time_limit)
 
-        # Count passed
-        if out_clean == expected:
+        elapsed = time.time() - start
+        total_time += elapsed
+
+        debug_log.append(f"IN:\n{tc.input_data}\nOUT:\n{out}\nEXP:\n{tc.expected_output}\n---\n")
+
+        # timeout / runtime / API errors
+        if any(key in out for key in ["Time Limit", "Runtime Error", "API Error", "Internal Error"]):
+            return (out, total_time, passed, total_tests, "\n".join(debug_log[:5]))
+
+        if normalize(out) == normalize(tc.expected_output):
             passed += 1
 
-    exec_time = round(time.time() - start_time, 4)
-
-    # Final verdict
-    if passed == total:
-        verdict = "Accepted"
-    else:
-        verdict = "Wrong Answer"
-
-    return (
-        verdict,
-        exec_time,
-        passed,
-        total,
-        json.dumps(debug, ensure_ascii=False)
-    )
+    verdict = "Accepted" if passed == total_tests else "Wrong Answer"
+    return (verdict, total_time, passed, total_tests, "\n".join(debug_log[:5]))
