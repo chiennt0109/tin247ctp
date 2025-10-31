@@ -51,3 +51,8 @@ def submission_detail(request, submission_id):
         ).order_by("-created_at")
     })
 
+
+def my_submissions(request):
+    subs = Submission.objects.filter(user=request.user).order_by("-id")
+    return render(request, "submissions/my_submissions.html", {"submissions": subs})
+
