@@ -1,8 +1,30 @@
-<h3>My submissions</h3>
-<ul>
-{% for s in subs %}
-  <li><a href="/submissions/{{ s.id }}/">{{ s.problem.code }} — {{ s.verdict }}</a></li>
-{% empty %}
-  <li>No submissions yet.</li>
-{% endfor %}
-</ul>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>📝 Bài đã nộp của bạn</h3>
+  <hr>
+
+  <table class="table table-bordered">
+    <tr>
+      <th>ID</th>
+      <th>Bài</th>
+      <th>Ngôn ngữ</th>
+      <th>Kết quả</th>
+      <th>Thời gian</th>
+      <th>Ngày nộp</th>
+    </tr>
+    {% for s in submissions %}
+    <tr>
+      <td>{{ s.id }}</td>
+      <td>{{ s.problem.code }}</td>
+      <td>{{ s.language }}</td>
+      <td>{{ s.verdict }}</td>
+      <td>{{ s.exec_time }}s</td>
+      <td>{{ s.created_at }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="text-center">⚠️ Bạn chưa nộp bài nào</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
