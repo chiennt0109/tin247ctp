@@ -1,13 +1,15 @@
+# path: judge/run_code.py
 import subprocess, tempfile, os, shutil, requests
 
 PISTON = "https://emkc.org/api/v2/piston/execute"
 
-def safe(v): return "" if v is None else str(v)
+def safe(x):
+    return "" if x is None else str(x)
 
 def run_program(lang, code, stdin, time_limit=4):
     lang = lang.lower().strip()
 
-    # ---------------- PYTHON LOCAL ----------------
+    # -------------------------------- PYTHON LOCAL --------------------------------
     if lang in ("python", "pypy"):
         with tempfile.TemporaryDirectory() as tmp:
             src = f"{tmp}/main.py"
@@ -27,7 +29,7 @@ def run_program(lang, code, stdin, time_limit=4):
             except Exception as e:
                 return (f"Internal Error: {e}", "")
 
-    # ---------------- C++ LOCAL IF AVAILABLE ----------------
+    # -------------------------------- C++ LOCAL / FALLBACK --------------------------------
     if lang == "cpp":
         gpp = shutil.which("g++")
         if gpp:
@@ -36,29 +38,28 @@ def run_program(lang, code, stdin, time_limit=4):
                 exe = f"{tmp}/a.out"
                 open(src, "w").write(code)
 
-                compile = subprocess.run(
-                    [gpp, src, "-O2", "-std=gnu++17", "-o", exe],
-                    capture_output=True, text=True
-                )
+                cp = subprocess.run([gpp, src, "-O2", "-std=gnu++17", "-o", exe],
+                                    capture_output=True, text=True)
 
-                if compile.returncode != 0:
-                    return (f"Compilation Error:\n{safe(compile.stderr)}", safe(compile.stderr))
+                if cp.returncode != 0:
+                    return (f"Compilation Error:\n{safe(cp.stderr)}", safe(cp.stderr))
 
                 try:
                     run = subprocess.run(
                         [exe], input=stdin, text=True,
                         capture_output=True, timeout=time_limit
                     )
+
                     if run.returncode != 0:
                         return (f"Runtime Error:\n{safe(run.stderr)}", safe(run.stderr))
-                    return (safe(run.stdout), safe(run.stderr))
 
+                    return (safe(run.stdout), safe(run.stderr))
                 except subprocess.TimeoutExpired:
                     return ("Time Limit Exceeded", "")
                 except Exception as e:
                     return (f"Internal Error: {e}", "")
 
-        # ---------------- Fallback to Piston ----------------
+        # ---- Fallback via PISTON ----
         try:
             r = requests.post(
                 PISTON,
@@ -71,11 +72,13 @@ def run_program(lang, code, stdin, time_limit=4):
                 timeout=time_limit + 2
             )
             data = r.json()
+
             out = safe(data.get("run", {}).get("stdout", ""))
             err = safe(data.get("run", {}).get("stderr", ""))
 
-            if "compile" in data and data["compile"].get("stderr"):
-                return (f"Compilation Error:\n{safe(data['compile']['stderr'])}", "")
+            comp = data.get("compile", {})
+            if comp and comp.get("stderr"):
+                return (f"Compilation Error:\n{safe(comp.get('stderr'))}", "")
 
             if err.strip():
                 return (f"Runtime Error:\n{err}", err)
