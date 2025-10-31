@@ -1,4 +1,5 @@
 # path: submissions/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Submission
@@ -38,3 +39,15 @@ def submission_create(request, problem_id):
         return redirect("submission_detail", submission_id=sub.id)
 
     return render(request, "submissions/submit.html", {"problem": problem})
+
+@login_required
+def submission_detail(request, submission_id):
+    sub = get_object_or_404(Submission, id=submission_id)
+    return render(request, "submissions/result.html", {
+        "result": sub,
+        "problem": sub.problem,
+        "submissions": Submission.objects.filter(
+            user=request.user, problem=sub.problem
+        ).order_by("-created_at")
+    })
+
