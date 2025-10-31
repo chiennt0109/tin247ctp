@@ -25,11 +25,10 @@ class Submission(models.Model):
     language = models.CharField(max_length=10, choices=LANG_CHOICES)
     source_code = models.TextField()
     verdict = models.CharField(max_length=50, choices=VERDICT_CHOICES, default='Pending')
-    exec_time = models.FloatField(default=0.0)
+    exec_time = models.FloatField(default=0.0)    
+    created_at = models.DateTimeField(auto_now_add=True)
     passed_tests = models.IntegerField(default=0)
     total_tests = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    #-----------------------Debug
     debug_info = models.TextField(blank=True, null=True)
     def __str__(self):
         return f"{self.user.username} → {self.problem.code} [{self.verdict}]"
