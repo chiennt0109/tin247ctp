@@ -1,133 +1,80 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Kết quả nộp bài - {{ problem.title }}{% endblock %}
-
 {% block content %}
 <div class="container mt-4">
+    <h2>📝 Submission #{{ result.id }}</h2>
+    <p><b>Problem:</b> {{ problem.title }} ({{ problem.code }})</p>
+    <p><b>Status:</b> 
+        {% if result.verdict == "Accepted" %}
+            <span class="text-success fw-bold">✅ {{ result.verdict }}</span>
+        {% elif "Time Limit" in result.verdict %}
+            <span class="text-warning fw-bold">⏳ {{ result.verdict }}</span>
+        {% elif "Runtime" in result.verdict %}
+            <span class="text-danger fw-bold">💥 {{ result.verdict }}</span>
+        {% else %}
+            <span class="text-danger fw-bold">❌ {{ result.verdict }}</span>
+        {% endif %}
+    </p>
+    <p><b>Execution Time:</b> {{ result.exec_time }}s</p>
+    <p><b>Passed Tests:</b> {{ result.passed_tests }}/{{ result.total_tests }}</p>
 
-  <!-- 🧩 Thông tin bài toán -->
-  <div class="mb-4">
-    <h2>🧠 {{ problem.code }} – {{ problem.title }}</h2>
     <hr>
-  </div>
 
-  <!-- 🧾 Kết quả chấm bài -->
-  <div class="card p-4 shadow-sm mb-4">
-    <h4 class="mb-3">📊 Kết quả chấm bài</h4>
+    <h4>💻 Submitted Code</h4>
+    <pre class="bg-dark text-light p-3 rounded">{{ result.source_code }}</pre>
 
-    {% if result %}
-      {% if result.verdict == "Accepted" %}
-        <h4><span class="badge bg-success">✅ Accepted</span></h4>
-      {% elif "Wrong" in result.verdict %}
-        <h4><span class="badge bg-danger">❌ {{ result.verdict }}</span></h4>
-      {% elif "Time" in result.verdict %}
-        <h4><span class="badge bg-warning text-dark">⏰ {{ result.verdict }}</span></h4>
-      {% elif "Memory" in result.verdict %}
-        <h4><span class="badge bg-warning text-dark">💾 {{ result.verdict }}</span></h4>
-      {% else %}
-        <h4><span class="badge bg-secondary">{{ result.verdict }}</span></h4>
-      {% endif %}
+    <hr>
 
-      <p class="mt-3">
-        ⏱ <b>Thời gian:</b> {{ result.exec_time }} giây<br>
-        🧮 <b>Test qua:</b> {{ result.passed_tests }}/{{ result.total_tests }}
-      </p>
-    {% else %}
-      <div class="alert alert-info">
-        ⚙️ Hệ thống chưa có kết quả chấm nào để hiển thị.
-      </div>
-    {% endif %}
+    <h4>🧪 Debug Test Results</h4>
 
-    <div class="mt-3">
-      <a href="{% url 'submission_create' problem.id %}" class="btn btn-primary">
-        🔁 Nộp lại
-      </a>
-      <a href="/problems/" class="btn btn-secondary ms-2">
-        ⬅️ Quay lại danh sách bài
-      </a>
-    </div>
-  </div>
-
-  <!-- 📜 Lịch sử nộp bài -->
-  {% if submissions %}
-    <div class="card p-4 shadow-sm">
-      <h5 class="mb-3">🧾 Lịch sử nộp bài của bạn</h5>
-      <table class="table table-striped align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Thời gian</th>
-            <th>Ngôn ngữ</th>
-            <th>Kết quả</th>
-            <th>Thời gian chạy</th>
-            <th>Test qua</th>
-          </tr>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Input</th>
+                <th>Expected Output</th>
+                <th>Your Output</th>
+                <th>Result</th>
+            </tr>
         </thead>
-        <tbody>
-          {% for s in submissions %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ s.created_at|date:"H:i:s d/m/Y" }}</td>
-            <td><span class="badge bg-info text-dark">{{ s.language|upper }}</span></td>
-            <td>
-              {% if s.verdict == "Accepted" %}
-                <span class="badge bg-success">✅ {{ s.verdict }}</span>
-              {% elif "Wrong" in s.verdict %}
-                <span class="badge bg-danger">❌ {{ s.verdict }}</span>
-              {% elif "Time" in s.verdict %}
-                <span class="badge bg-warning text-dark">⏰ {{ s.verdict }}</span>
-              {% elif "Memory" in s.verdict %}
-                <span class="badge bg-warning text-dark">💾 {{ s.verdict }}</span>
-              {% else %}
-                <span class="badge bg-secondary">{{ s.verdict }}</span>
-              {% endif %}
-            </td>
-            <td>{{ s.exec_time }}s</td>
-            <td>{{ s.passed_tests }}/{{ s.total_tests }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="6" class="text-center text-muted">⚠️ Bạn chưa nộp bài nào cho bài toán này.</td></tr>
-          {% endfor %}
+        <tbody id="debug-body">
+            <!-- JS will fill -->
         </tbody>
-      </table>
-    </div>
-  {% endif %}
-{% if result.debug_info %}
-<hr>
-<h4>🔍 Test Debug</h4>
-<table class="table table-bordered">
-<thead>
-<tr>
-  <th>#</th>
-  <th>Input</th>
-  <th>Expected</th>
-  <th>Output</th>
-  <th>Result</th>
-</tr>
-</thead>
-<tbody>
-{% for row in result.debug_info|json_script:"dbg" %}
-{% endfor %}
-{% endfor %}
-</tbody>
-</table>
+    </table>
 
-<script>
-const dbg = JSON.parse(document.getElementById("dbg").textContent);
-const tbody = document.querySelector("tbody");
+    {{ result.debug_info|safe|json_script:"dbg" }}
 
-dbg.forEach((t, i) => {
-  tbody.innerHTML += `
-  <tr>
-    <td>${i+1}</td>
-    <td><pre>${t.input}</pre></td>
-    <td><pre>${t.expected}</pre></td>
-    <td><pre>${t.got}</pre></td>
-    <td>${t.status}</td>
-  </tr>`;
-});
-</script>
+    <script>
+    try {
+        const dbg = JSON.parse(document.getElementById("dbg").textContent);
+        const tbody = document.getElementById("debug-body");
+
+        dbg.forEach((t, i) => {
+            tbody.innerHTML += `
+            <tr>
+                <td>${i+1}</td>
+                <td><pre>${t.input}</pre></td>
+                <td><pre>${t.expected}</pre></td>
+                <td><pre>${t.got}</pre></td>
+
+                <td class="fw-bold">
+                    ${t.expected.trim() === t.got.trim()
+                        ? "<span class='text-success'>✅</span>"
+                        : "<span class='text-danger'>❌</span>"}
+                </td>
+            </tr>`;
+        });
+    } catch(e) {
+        document.getElementById("debug-body").innerHTML = 
+            "<tr><td colspan='5'><i>No detailed debug info</i></td></tr>";
+    }
+    </script>
+
+    <br>
+
+    <a href="/problems/{{ problem.id }}/" class="btn btn-secondary">⬅ Back to Problem</a>
+    <a href="/submissions/my/" class="btn btn-primary">📂 My Submissions</a>
 
 </div>
 {% endblock %}
