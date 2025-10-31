@@ -1,4 +1,3 @@
-# path: judge/run_code.py
 import subprocess, tempfile, os, shutil, requests
 
 PISTON = "https://emkc.org/api/v2/piston/execute"
@@ -9,7 +8,7 @@ def _truncate(s, n=2000):
 def run_program(language, code, input_data, time_limit=5):
     language = language.lower().strip()
 
-    # ---------------- Python / PyPy local ----------------
+    # ---------------- Python local ----------------
     if language in ("python", "pypy"):
         with tempfile.TemporaryDirectory() as tmp:
             src = os.path.join(tmp, "main.py")
@@ -24,12 +23,12 @@ def run_program(language, code, input_data, time_limit=5):
                     timeout=time_limit
                 )
                 if p.returncode != 0:
-                    return ("Runtime Error:\n" + _truncate(p.stderr), _truncate(p.stderr))
-                return (p.stdout, p.stderr)
+                    return ("Runtime Error", _truncate(p.stderr), "")
+                return (p.stdout, "", "")
             except subprocess.TimeoutExpired:
-                return ("Time Limit Exceeded", "")
+                return ("Time Limit Exceeded", "", "")
             except Exception as e:
-                return (f"Internal Error: {e}", "")
+                return ("Internal Error", str(e), "")
 
     # ---------------- C++ local compile ----------------
     if language == "cpp":
@@ -45,20 +44,23 @@ def run_program(language, code, input_data, time_limit=5):
                                     capture_output=True, text=True)
 
                 if cp.returncode != 0:
-                    return ("Compilation Error:\n" + _truncate(cp.stderr), cp.stderr)
+                    return ("Compilation Error", _truncate(cp.stderr), "")
 
                 try:
-                    p = subprocess.run([bin], input=input_data, text=True,
-                                       capture_output=True, timeout=time_limit)
+                    p = subprocess.run([bin],
+                                       input=input_data,
+                                       text=True,
+                                       capture_output=True,
+                                       timeout=time_limit)
                     if p.returncode != 0:
-                        return ("Runtime Error:\n" + _truncate(p.stderr), p.stderr)
-                    return (p.stdout, p.stderr)
+                        return ("Runtime Error", _truncate(p.stderr), "")
+                    return (p.stdout, "", "")
                 except subprocess.TimeoutExpired:
-                    return ("Time Limit Exceeded", "")
+                    return ("Time Limit Exceeded", "", "")
                 except Exception as e:
-                    return (f"Internal Error: {e}", "")
+                    return ("Internal Error", str(e), "")
 
-        # ----------- Fallback Piston if no g++ installed -----------
+        # -------- fallback piston API ------------
         try:
             payload = {
                 "language": "cpp",
@@ -66,24 +68,20 @@ def run_program(language, code, input_data, time_limit=5):
                 "files": [{"name": "main.cpp", "content": code}],
                 "stdin": input_data
             }
-            r = requests.post(PISTON, json=payload, timeout=time_limit + 3)
+            r = requests.post(PISTON, json=payload, timeout=time_limit + 2)
 
-            # API trả HTML → lỗi
-            if r.text.strip().startswith("<!DOCTYPE"):
-                return ("API Error: HTML response", "")
+            if r.text.startswith("<!DOCTYPE"):
+                return ("API Error", "", "")
 
             data = r.json()
-
             out = data.get("run", {}).get("stdout", "")
             err = data.get("run", {}).get("stderr", "")
 
             if err.strip():
-                return ("Runtime Error:\n" + _truncate(err), err)
-            return (out, err)
+                return ("Runtime Error", err, "")
 
-        except requests.Timeout:
-            return ("Time Limit Exceeded", "")
+            return (out, "", "")
         except Exception as e:
-            return (f"API Error: {e}", "")
+            return ("API Error", str(e), "")
 
-    return (f"Unsupported language: {language}", "")
+    return ("Unsupported language", f"{language}", "")
