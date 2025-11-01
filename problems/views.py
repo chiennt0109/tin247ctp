@@ -2,12 +2,13 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Count, Q
+from django.core.paginator import Paginator
 import random
 
 from .models import Problem, Tag
 from submissions.models import Submission
 
-# AI helpers (bản bạn đang dùng)
+# AI helpers
 from .ai_helper import (
     gen_ai_hint,
     analyze_failed_test,
@@ -15,12 +16,12 @@ from .ai_helper import (
     build_learning_path,
 )
 
-# AI hint “chuẩn” (LLM) bạn đã thêm riêng
+# AI hint LLM
 from .ai.ai_hint import get_hint
 
 
 # ===========================
-# 🌈 DANH SÁCH BÀI TOÁN
+# 🌈 DANH SÁCH BÀI TOÁN + PAGINATION
 # ===========================
 def problem_list(request):
     tag_slug = request.GET.get("tag", "").strip()
@@ -33,60 +34,30 @@ def problem_list(request):
     if difficulty:
         qs = qs.filter(difficulty=difficulty)
 
-    # ---- Thống kê Submit/AC, tránh xung đột tên field có sẵn trên model ----
-    # Nếu model Problem đã có field 'ac_count'/'submit_count' → annotate bằng tên khác,
-    # rồi ánh xạ lại thuộc tính trên từng object để template cũ vẫn dùng p.ac_count / p.submit_count.
-    has_ac_field = False
-    has_submit_field = False
-    try:
-        Problem._meta.get_field("ac_count")
-        has_ac_field = True
-    except Exception:
-        pass
-    try:
-        Problem._meta.get_field("submit_count")
-        has_submit_field = True
-    except Exception:
-        pass
+    qs = qs.annotate(
+        submit_count_live=Count("submission", distinct=True),
+        ac_count_live=Count(
+            "submission",
+            filter=Q(submission__verdict="Accepted"),
+            distinct=True,
+        ),
+    )
 
-    if has_ac_field or has_submit_field:
-        qs = qs.annotate(
-            submit_count_agg=Count("submission", distinct=True),
-            ac_count_agg=Count(
-                "submission",
-                filter=Q(submission__verdict="Accepted"),
-                distinct=True,
-            ),
-        )
-        problems = list(qs)
-        for p in problems:
-            # Nếu model không có sẵn thuộc tính, hoặc muốn “ghi đè” bằng số liệu thống kê
-            if not hasattr(p, "submit_count") or p.submit_count is None:
-                setattr(p, "submit_count", getattr(p, "submit_count_agg", 0))
-            if not hasattr(p, "ac_count") or p.ac_count is None:
-                setattr(p, "ac_count", getattr(p, "ac_count_agg", 0))
-    else:
-        qs = qs.annotate(
-            submit_count=Count("submission", distinct=True),
-            ac_count=Count(
-                "submission",
-                filter=Q(submission__verdict="Accepted"),
-                distinct=True,
-            ),
-        )
-        problems = list(qs)
+    paginator = Paginator(qs, 12)  # ✅ mỗi trang 12 bài
+    page = request.GET.get("page")
+    problems = paginator.get_page(page)
 
-    tags = Tag.objects.all()
-    difficulties = ["Easy", "Medium", "Hard"]
-
-    context = {
-        "problems": problems,
-        "tags": tags,
-        "difficulty_levels": difficulties,
-        "selected_tag": tag_slug,
-        "selected_difficulty": difficulty,
-    }
-    return render(request, "problems/list.html", context)
+    return render(
+        request,
+        "problems/list.html",
+        {
+            "problems": problems,
+            "tags": Tag.objects.all(),
+            "difficulty_levels": ["Easy", "Medium", "Hard"],
+            "selected_tag": tag_slug,
+            "selected_difficulty": difficulty,
+        },
+    )
 
 
 # ===========================
@@ -94,8 +65,6 @@ def problem_list(request):
 # ===========================
 def problem_detail(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
-
-    # Thống kê submit/AC cho trang chi tiết
     submit_count = Submission.objects.filter(problem=problem).count()
     ac_count = Submission.objects.filter(problem=problem, verdict="Accepted").count()
 
@@ -111,89 +80,73 @@ def problem_detail(request, pk):
 
 
 # ===========================
-# 🤖 AI gợi ý (random đơn giản)
+# 🤖 AI HINT: bản random cũ
 # ===========================
 AI_HINTS = [
     "Thử kiểm tra lại điều kiện dừng của vòng lặp.",
-    "Hãy xem xét các trường hợp biên như n = 1 hoặc m = 0.",
-    "Độ phức tạp O(n²) có thể gây TLE, thử tối ưu hơn bằng cấu trúc dữ liệu.",
-    "Cẩn thận tràn số — dùng kiểu long long hoặc int64.",
-    "Có thể bạn đang đọc input sai định dạng, hãy kiểm tra lại mẫu input.",
-    "Đừng quên reset biến đếm trong mỗi test case.",
-    "Khi kết quả bị lệch 1 đơn vị, hãy kiểm tra lại chỉ số mảng bắt đầu từ 0 hay 1.",
-    "Hãy thử in debug với test nhỏ để kiểm tra từng bước tính toán.",
+    "Hãy xem xét các trường hợp biên.",
+    "Dùng prefix sum hoặc DP xem sao?",
+    "Cẩn thận tràn số — dùng long long.",
+    "Kiểm tra lại input format.",
+    "Reset biến giữa các test case.",
 ]
 
 def ai_hint_random(request, pk):
-    """Gợi ý ngẫu nhiên (giữ lại bản cũ)."""
-    return JsonResponse({"hint": random.choice(AI_HINTS)})
+    return JsonResponse({"result": random.choice(AI_HINTS)})
 
 
 # ===========================
-# 🤖 AI hint thật (LLM của bạn)
+# 🤖 AI hint LLM chính
 # ===========================
-def ai_hint(request, pk):
-    """Gợi ý AI chuẩn (dùng get_hint) — endpoint chính."""
+def ai_hint_real(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
-    return JsonResponse({"hint": get_hint(problem.title, problem.difficulty)})
+    hint = get_hint(problem.title, problem.difficulty)
+    return JsonResponse({"result": hint})
 
 
 # ===========================
-# 🧪 AI giải thích test sai
+# 🧪 AI debug test fail
 # ===========================
 def ai_debug(request, pk):
     input_data = request.GET.get("input", "")
     expected = request.GET.get("expected", "")
     got = request.GET.get("got", "")
-    return JsonResponse(
-        {"type": "debug", "result": analyze_failed_test(input_data, expected, got)}
-    )
+    res = analyze_failed_test(input_data, expected, got)
+    return JsonResponse({"result": res})
 
 
 # ===========================
-# 🧭 AI gợi ý bài kế tiếp
+# 🎯 Gợi ý bài kế
 # ===========================
 def ai_recommend(request, pk):
     p = get_object_or_404(Problem, pk=pk)
-    return JsonResponse({"type": "recommend", "result": recommend_next(p.difficulty)})
+    res = recommend_next(p.difficulty)
+    return JsonResponse({"result": res})
 
 
 # ===========================
-# 📚 Lộ trình học AI
+# 📚 AI lộ trình học
 # ===========================
 def ai_learning_path(request):
     user = request.user
     if not user.is_authenticated:
-        return JsonResponse(
-            {"error": "Bạn cần đăng nhập để xem lộ trình."}, status=403
-        )
+        return JsonResponse({"result": "Bạn cần đăng nhập để xem lộ trình."}, status=403)
 
     subs = Submission.objects.filter(user=user)
     solved = subs.filter(verdict="Accepted").count()
 
     if solved == 0:
-        return JsonResponse(
-            {
-                "summary": "Bạn chưa có bài nào đúng 😅",
-                "recommendations": [
-                    "🔰 Bắt đầu từ mục 'Giai đoạn 1' trong Roadmap.",
-                    "📘 Làm 3 bài Easy đầu tiên để hệ thống phân tích trình độ.",
-                ],
-            }
-        )
+        return JsonResponse({
+            "summary": "Bạn chưa giải bài nào.",
+            "suggest": [
+                "Bắt đầu từ Roadmap Giai đoạn 1",
+                "Làm 3 bài Easy đầu tiên"
+            ]
+        })
 
     probs = [s.problem for s in subs.filter(verdict="Accepted")]
     levels = {"Easy": 1, "Medium": 2, "Hard": 3}
+    avg_score = sum(levels[p.difficulty] for p in probs) / len(probs)
+    diff = "Easy" if avg_score < 1.5 else "Medium" if avg_score < 2.5 else "Hard"
 
-    if not probs:
-        avg_difficulty = "Easy"
-    else:
-        avg_score = sum(levels.get(p.difficulty, 1) for p in probs) / len(probs)
-        if avg_score < 1.5:
-            avg_difficulty = "Easy"
-        elif avg_score < 2.5:
-            avg_difficulty = "Medium"
-        else:
-            avg_difficulty = "Hard"
-
-    return JsonResponse(build_learning_path(user, solved, avg_difficulty))
+    return JsonResponse(build_learning_path(user, solved, diff))
