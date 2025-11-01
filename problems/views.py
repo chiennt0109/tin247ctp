@@ -75,8 +75,12 @@ def problem_list(request):
     tags = Tag.objects.all()
     difficulties = ["Easy", "Medium", "Hard"]
 
+    paginator = Paginator(problems, 15)  # 9 bài / trang
+    page = request.GET.get("page")
+    problems_page = paginator.get_page(page)
+    
     context = {
-        "problems": problems,
+        "problems": problems_page,
         "tags": tags,
         "difficulty_levels": difficulties,
         "selected_tag": tag_slug,
