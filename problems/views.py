@@ -150,3 +150,9 @@ def ai_learning_path(request):
     diff = "Easy" if avg_score < 1.5 else "Medium" if avg_score < 2.5 else "Hard"
 
     return JsonResponse(build_learning_path(user, solved, diff))
+
+# ========== BACKWARD COMPAT fix ==========
+# Giúp URL cũ ai_hint/ vẫn hoạt động
+def ai_hint(request, pk):
+    return ai_hint_real(request, pk)
+
