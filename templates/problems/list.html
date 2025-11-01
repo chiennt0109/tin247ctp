@@ -4,100 +4,95 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h3 class="fw-bold text-primary mb-3">📘 Danh sách bài toán</h3>
+  <h3 class="fw-bold text-primary mb-3">📘 Danh sách bài toán</h3>
 
-    <!-- 🔍 Bộ lọc -->
-    <form method="get" class="row g-2 mb-4">
-        <div class="col-md-4">
-            <select name="tag" class="form-select">
-                <option value="">📎 Tất cả chủ đề</option>
-                {% for tag in tags %}
-                <option value="{{ tag.slug }}" {% if selected_tag == tag.slug %}selected{% endif %}>
-                    {{ tag.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
+  <!-- Bộ lọc -->
+  <form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-md-4">
+      <label class="form-label mb-1">Chủ đề</label>
+      <select name="tag" class="form-select">
+        <option value="">— Tất cả chủ đề —</option>
+        {% for tag in tags %}
+          <option value="{{ tag.slug }}" {% if selected_tag == tag.slug %}selected{% endif %}>{{ tag.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
-        <div class="col-md-3">
-            <select name="difficulty" class="form-select">
-                <option value="">🎯 Tất cả độ khó</option>
-                {% for d in difficulty_levels %}
-                <option value="{{ d }}" {% if selected_difficulty == d %}selected{% endif %}>
-                    {{ d }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Độ khó</label>
+      <select name="difficulty" class="form-select">
+        <option value="">— Tất cả độ khó —</option>
+        {% for d in difficulty_levels %}
+          <option value="{{ d }}" {% if selected_difficulty == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
-        <div class="col-md-2">
-            <button class="btn btn-primary w-100">Lọc</button>
-        </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Lọc</button>
+    </div>
+    <div class="col-md-2">
+      <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
+    </div>
+  </form>
 
-        <div class="col-md-2">
-            <a href="{% url 'problem_list' %}" class="btn btn-secondary w-100">Reset</a>
-        </div>
-    </form>
-
-    <!-- 📝 Bảng bài toán -->
-    <table class="table table-hover table-bordered bg-white shadow-sm rounded">
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
-            <tr class="text-center">
-                <th style="width:8%">Mã</th>
-                <th>Tiêu đề</th>
-                <th style="width:15%">Độ khó</th>
-                <th style="width:22%">Tag</th>
-                <th style="width:15%">AC / Submit</th>
-                <th style="width:15%"></th>
-            </tr>
+          <tr class="text-center">
+            <th style="width:10%">Mã</th>
+            <th>Tiêu đề</th>
+            <th style="width:16%">Độ khó</th>
+            <th style="width:26%">Tag</th>
+            <th style="width:14%">AC / Submit</th>
+            <th style="width:16%"></th>
+          </tr>
         </thead>
-
         <tbody>
         {% for p in problems %}
-            <tr>
-                <td class="text-center fw-bold">{{ p.code }}</td>
-
-                <td>
-                    <a href="{% url 'problem_detail' p.id %}" class="fw-bold text-decoration-none text-primary">
-                        {{ p.title }}
-                    </a>
-                </td>
-
-                <td class="text-center">
-                    {% if p.difficulty == "Easy" %}
-                        🟢 Easy
-                    {% elif p.difficulty == "Medium" %}
-                        🟡 Medium
-                    {% else %}
-                        🔴 Hard
-                    {% endif %}
-                </td>
-
-                <td>
-                    {% for tag in p.tags.all %}
-                        <span class="badge text-bg-info">{{ tag.name }}</span>
-                    {% empty %}
-                        —
-                    {% endfor %}
-                </td>
-
-                <td class="text-center">
-                    {{ p.ac_count }} / {{ p.submit_count }}
-                </td>
-
-                <td class="text-center">
-                    <a class="btn btn-outline-primary btn-sm" href="{% url 'problem_detail' p.id %}">Xem</a>
-                    <a class="btn btn-success btn-sm" href="{% url 'submission_create' p.id %}">Gửi</a>
-                </td>
-            </tr>
+          <tr>
+            <td class="text-center fw-semibold text-secondary">{{ p.code }}</td>
+            <td>
+              <a href="{% url 'problem_detail' p.id %}" class="text-decoration-none fw-semibold">
+                {{ p.title }}
+              </a>
+            </td>
+            <td class="text-center">
+              {% if p.difficulty == "Easy" %}
+                <span class="badge rounded-pill text-bg-success">Easy</span>
+              {% elif p.difficulty == "Medium" %}
+                <span class="badge rounded-pill text-bg-warning">Medium</span>
+              {% else %}
+                <span class="badge rounded-pill text-bg-danger">Hard</span>
+              {% endif %}
+            </td>
+            <td>
+              {% for tag in p.tags.all %}
+                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle me-1">{{ tag.name }}</span>
+              {% empty %} —
+              {% endfor %}
+            </td>
+            <td class="text-center">
+              <span class="fw-semibold text-success">{{ p.ac_count }}</span>
+              <span class="text-muted">/ {{ p.submit_count }}</span>
+            </td>
+            <td class="text-center">
+              <a class="btn btn-outline-primary btn-sm" href="{% url 'problem_detail' p.id %}">Xem</a>
+              <a class="btn btn-success btn-sm" href="{% url 'submission_create' p.id %}">Gửi</a>
+            </td>
+          </tr>
         {% empty %}
-            <tr><td colspan="6" class="text-center py-3">🚫 Không có bài nào</td></tr>
+          <tr><td colspan="6" class="text-center py-3">🚫 Không có bài nào</td></tr>
         {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 
-    <small class="text-muted">
-        🔰 Gợi ý: bắt đầu từ các bài <span class="fw-bold text-success">Easy</span> trước để làm quen.
-    </small>
+  <small class="text-muted d-block mt-2">
+    🔰 Mẹo: bắt đầu từ các bài <span class="fw-semibold text-success">Easy</span> để làm nóng.
+  </small>
+
 </div>
 {% endblock %}
