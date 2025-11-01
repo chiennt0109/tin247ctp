@@ -21,8 +21,9 @@ urlpatterns = [
     # AI cho admin
     path('ai_suggest_tags/', views_admin.ai_suggest_tags, name="ai_suggest_tags"),
     path('ai_analyze_problem/', views_admin.ai_analyze_problem, name="ai_analyze_problem"),
+    path("admin_ai_generate/", views.admin_ai_generate),
+    path("admin_ai_samples/", views.admin_ai_samples),
+    path("admin_ai_check/", views.admin_ai_check),
+    path("<int:pk>/ai_solution/", views.get_solution, name="ai_solution"),
 
-    #path("admin_ai_generate/", views.admin_ai_generate),
-   # path("admin_ai_samples/", views.admin_ai_samples),
-   # path("admin_ai_check/", views.admin_ai_check),
 ]
