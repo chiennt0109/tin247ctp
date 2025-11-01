@@ -1,101 +1,93 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Danh sách bài toán{% endblock %}
-
 {% block content %}
-<div class="container mt-3">
-  <h4>🟢 Danh sách bài toán</h4>
+<div class="container mt-4">
+    <h3>📘 Danh sách bài toán</h3>
 
-  <!-- Filter bar -->
-  <form method="get" class="row g-2 align-items-end mt-3 mb-3">
-    <div class="col-md-4">
-      <label class="form-label">Tag</label>
-      <select name="tag" class="form-select">
-        <option value="">-- Tất cả --</option>
-        {% for t in tags %}
-          <option value="{{ t.slug }}" {% if selected_tag == t.slug %}selected{% endif %}>
-            {{ t.name }}
-          </option>
+    <!-- Filter -->
+    <form class="row g-2 mb-3">
+        <div class="col-md-3">
+            <select name="tag" class="form-select">
+                <option value="">-- Tất cả tag --</option>
+                {% for tag in tags %}
+                    <option value="{{ tag.slug }}" {% if selected_tag == tag.slug %}selected{% endif %}>
+                        {{ tag.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select name="difficulty" class="form-select">
+                <option value="">-- Tất cả độ khó --</option>
+                {% for d in difficulty_levels %}
+                    <option value="{{ d }}" {% if selected_difficulty == d %}selected{% endif %}>
+                        {{ d }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Lọc</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'problem_list' %}" class="btn btn-secondary w-100">Reset</a>
+        </div>
+    </form>
+
+    <!-- Problems Table -->
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>Mã</th>
+            <th>Tiêu đề</th>
+            <th>Độ khó</th>
+            <th>Tag</th>
+            <th>AC / Submit</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for p in problems %}
+            <tr>
+                <td>{{ p.code }}</td>
+                <td>
+                    <a href="{% url 'problem_detail' p.id %}" class="fw-bold">{{ p.title }}</a>
+                </td>
+                <td>
+                    {% if p.difficulty == "Easy" %}
+                        🟢 Easy
+                    {% elif p.difficulty == "Medium" %}
+                        🟡 Medium
+                    {% else %}
+                        🔴 Hard
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% for tag in p.tags.all %}
+                        <span class="badge text-bg-info">{{ tag.name }}</span>
+                    {% empty %}
+                        —
+                    {% endfor %}
+                </td>
+
+                <td>{{ p.ac_count }}/{{ p.submit_count }}</td>
+
+                <td>
+                    <a class="btn btn-primary btn-sm" href="{% url 'problem_detail' p.id %}">Xem</a>
+                    <a class="btn btn-success btn-sm" href="{% url 'submission_create' p.id %}">Gửi bài</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6" class="text-center">Không có bài nào</td></tr>
         {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Độ khó</label>
-      <select name="difficulty" class="form-select">
-        <option value="">-- Tất cả --</option>
-        {% for d in difficulties %}
-          <option value="{{ d }}" {% if selected_difficulty == d %}selected{% endif %}>{{ d }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-5">
-      <button class="btn btn-primary me-2">Lọc</button>
-      <a class="btn btn-outline-secondary" href="{% url 'problems:list' %}">Reset</a>
-    </div>
-  </form>
+        </tbody>
+    </table>
 
-  <table class="table table-hover align-middle">
-    <thead class="table-light">
-      <tr>
-        <th style="width:120px;">Mã</th>
-        <th>Tiêu đề</th>
-        <th style="width:110px;">Độ khó</th>
-        <th style="width:160px;">Tag</th>
-        <th style="width:140px;">AC / Submit</th>
-        <th style="width:180px;" class="text-end">Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for p in problems %}
-      <tr>
-        <td><b>{{ p.code }}</b></td>
-
-        <!-- Click vào tên bài mở detail -->
-        <td>
-          <a href="{% url 'problems:detail' p.id %}" class="link-primary">
-            {{ p.title }}
-          </a>
-        </td>
-
-        <td>
-          {% if p.difficulty == "Easy" %}
-            <span class="badge bg-success">Easy</span>
-          {% elif p.difficulty == "Medium" %}
-            <span class="badge bg-warning text-dark">Medium</span>
-          {% else %}
-            <span class="badge bg-danger">Hard</span>
-          {% endif %}
-        </td>
-
-        <td>
-          {% if p.tags.all %}
-            {% for t in p.tags.all %}
-              <span class="badge bg-light text-dark border">{{ t.name }}</span>
-            {% empty %}
-              —
-            {% endfor %}
-          {% else %}—{% endif %}
-        </td>
-
-        <td>
-          <b>{{ p.ac_count|default:0 }}</b> / {{ p.submit_count|default:0 }}
-          {% if p.submit_count %}
-            <small class="text-muted">
-              ({{ (p.ac_count|default:0) |divisibleby:1 and "" }}{{ p.ac_count|default:0|floatformat:0|add:0|mul:100|divisibleby:p.submit_count }})
-            </small>
-          {% endif %}
-        </td>
-
-        <td class="text-end">
-          <a class="btn btn-sm btn-outline-primary" href="{% url 'problems:detail' p.id %}">👁 Xem</a>
-          <a class="btn btn-sm btn-success ms-2" href="{% url 'submission_create' p.id %}">📝 Gửi bài</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="6" class="text-center text-muted">Không có bài toán phù hợp bộ lọc.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <small>🔰 Gợi ý: Bắt đầu từ các bài Easy trước.</small>
 </div>
 {% endblock %}
