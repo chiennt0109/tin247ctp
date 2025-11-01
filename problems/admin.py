@@ -3,7 +3,8 @@ from django.utils.html import format_html
 from django.urls import path
 from django.http import JsonResponse
 from .models import Problem, TestCase, Tag
-from .ai_helper import ai_generate_statement, ai_generate_samples, ai_check_format, ai_suggest_tags
+from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next, build_learning_path
+
 import zipfile, io, os
 
 ### ========== CUSTOM ADMIN ==========
