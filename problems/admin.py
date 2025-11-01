@@ -28,9 +28,9 @@ class ProblemAdmin(admin.ModelAdmin):
         ("Đề bài", {
             "fields": ("statement",)
         }),
-        ("Upload", {
-            "fields": ("pdf_file", "zip_tests"),
-        }),
+        #("Upload", {
+         #   "fields": ("pdf_file", "zip_tests"),
+        #}),
     )
 
     class Media:
