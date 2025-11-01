@@ -228,3 +228,7 @@ def get_solution(request, pk):
 
 def get_next_recommendation(request, pk):
     return ai_recommend(request, pk)
+
+def get_learning_path(request, pk=None):
+    return ai_learning_path(request)
+
