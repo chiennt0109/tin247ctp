@@ -1,130 +1,66 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
+<div class="container mt-4">
 
-<div class="problem-container">
-  <h2>{{ problem.code }} – {{ problem.title }}</h2>
+    <a href="{% url 'problem_list' %}" class="btn btn-secondary mb-3">⬅ Quay lại</a>
 
-  <!-- 🔹 1️⃣ Nguồn markdown thô -->
-  <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
+    <h3 class="fw-bold">{{ problem.code }} – {{ problem.title }}</h3>
 
-  <!-- 🔹 2️⃣ Khu vực render ra HTML -->
-  <div id="problem-statement" class="markdown-body"></div>
+    <p><b>Độ khó:</b>
+        {% if problem.difficulty == "Easy" %}
+            🟢 Easy
+        {% elif problem.difficulty == "Medium" %}
+            🟡 Medium
+        {% else %}
+            🔴 Hard
+        {% endif %}
+    </p>
 
-  <!-- 🔹 3️⃣ Giới hạn -->
-  <!--p><b>⏱ Giới hạn:</b> {{ problem.time_limit }}s, {{ problem.memory_limit }}MB</p-->
+    <p><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }} lượt</p>
 
-  <!-- 🔹 4️⃣ Nút nộp bài -->
-  <div class="text-center mt-4 mb-2">
-    <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">
-      🚀 Nộp bài
-    </a>
-    <a href="/problems/" class="btn btn-secondary btn-lg ms-2">⬅️ Quay lại danh sách</a>
-  </div>
+    <hr>
+    <div class="card p-3 mb-3">
+        <pre style="white-space: pre-wrap;">{{ problem.statement }}</pre>
+    </div>
+
+    <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">🚀 Gửi bài</a>
+
+    <hr>
+    <h4>🤖 Hỗ trợ AI</h4>
+
+    <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
+    <button onclick="aiRecommend()" class="btn btn-info">📌 Gợi ý bài kế</button>
+    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình học</button>
+
+    <div id="aiBox" class="mt-3 p-3 border rounded" style="display:none;"></div>
+
 </div>
 
-<!-- ==========================================================
-🧩 1) Markdown + KaTeX + HighlightJS (hiển thị đề bài)
-========================================================== -->
-
-<!-- ✅ Thư viện CSS/JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const src = document.getElementById("md-src");
-  const out = document.getElementById("problem-statement");
+function show(text) {
+    const box = document.getElementById("aiBox");
+    box.style.display = "block";
+    box.innerHTML = text;
+}
 
-  if (!src || !out) return;
+function aiHint() {
+    fetch(`/problems/{{ problem.id }}/ai_hint_real/`)
+    .then(r => r.json())
+    .then(d => show("💡 " + d.result));
+}
 
-  // 🧩 1️⃣ Markdown to HTML
-  const html = marked.parse(src.value || "");
+function aiRecommend() {
+    fetch(`/problems/{{ problem.id }}/ai_recommend/`)
+    .then(r => r.json())
+    .then(d => show("➡️ " + d.result));
+}
 
-  // 🧩 2️⃣ Bỏ escape HTML (để KaTeX xử lý ký hiệu)
-  out.innerHTML = html;
-
-  // 🧩 3️⃣ Render KaTeX toán học
-  if (window.renderMathInElement) {
-    renderMathInElement(out, {
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "$", right: "$", display: false }
-      ],
-      throwOnError: false,
-      strict: false
-    });
-  }
-
-  // 🧩 4️⃣ Highlight code
-  document.querySelectorAll('#problem-statement pre code').forEach(el => {
-    try { hljs.highlightElement(el); } catch(e) {}
-  });
-});
+function aiPath() {
+    fetch(`/problems/ai_learning_path/`)
+    .then(r => r.json())
+    .then(d => show("📚 " + JSON.stringify(d)));
+}
 </script>
-
-<!-- ==========================================================
-🎨 2) CSS hiển thị
-========================================================== -->
-<style>
-.problem-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  font-family: system-ui, sans-serif;
-}
-
-.markdown-body {
-  line-height: 1.6;
-  font-size: 16px;
-  color: #222;
-}
-
-.markdown-body pre code {
-  background-color: #f6f8fa;
-  padding: 10px;
-  display: block;
-  border-radius: 6px;
-  overflow-x: auto;
-  font-size: 14px;
-}
-
-.markdown-body table {
-  border-collapse: collapse;
-  margin: 10px 0;
-}
-.markdown-body table th,
-.markdown-body table td {
-  border: 1px solid #ddd;
-  padding: 6px 10px;
-}
-
-.markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  margin-top: 1.2em;
-  font-weight: 600;
-}
-
-/* 🧮 KaTeX hiển thị cân đối */
-.markdown-body .katex-display {
-  margin: 1em 0;
-  text-align: center;
-}
-.markdown-body .katex {
-  font-size: 1.1em;
-}
-
-  .markdown-body .katex-display {
-  margin: 1em 0;
-  text-align: center;
-}
-.markdown-body .katex {
-  font-size: 1.05em;
-  color: #222;
-}
-</style>
-
 {% endblock %}
