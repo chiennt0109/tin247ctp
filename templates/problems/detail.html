@@ -4,83 +4,83 @@
 {% block content %}
 <div class="container mt-4">
 
-  <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary mb-3">⬅ Quay lại danh sách</a>
+  <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary mb-3">⬅ Danh sách</a>
 
   <div class="d-flex justify-content-between align-items-center mb-2">
     <h3 class="fw-bold">{{ problem.code }} — {{ problem.title }}</h3>
     <a href="{% url 'submission_create' problem.id %}" class="btn btn-success">🚀 Gửi bài</a>
   </div>
 
-  <p class="mb-1">
-    <b>Độ khó:</b>
-    {% if problem.difficulty == "Easy" %}
-      <span class="badge rounded-pill text-bg-success">Easy</span>
-    {% elif problem.difficulty == "Medium" %}
-      <span class="badge rounded-pill text-bg-warning">Medium</span>
-    {% else %}
-      <span class="badge rounded-pill text-bg-danger">Hard</span>
+  <p><b>Độ khó:</b>
+    {% if problem.difficulty == "Easy" %}<span class="badge text-bg-success">Easy</span>
+    {% elif problem.difficulty == "Medium" %}<span class="badge text-bg-warning">Medium</span>
+    {% else %}<span class="badge text-bg-danger">Hard</span>
     {% endif %}
   </p>
 
-  <p class="text-muted"><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }} lượt</p>
+  <p class="text-muted"><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }}</p>
 
-  <!-- ✅ Card gọn, giống Roadmap -->
-  <div class="card shadow-sm border-0 p-4 mb-4">
-    <div id="problem-statement" class="problem-statement">
+  <div class="card shadow-sm p-3 mb-3">
+    <div id="problem-statement" style="white-space: pre-wrap; font-size: 1.05rem;">
       {{ problem.statement|safe }}
     </div>
   </div>
 
-  <!-- 🤖 AI Tools -->
-  <h5 class="fw-semibold mb-2">🤖 Hỗ trợ AI</h5>
-  <div class="d-flex gap-2 flex-wrap mb-2">
+  <h5 class="fw-semibold">🤖 Hỗ trợ AI</h5>
+  <div class="d-flex gap-2 mb-2">
     <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
-    <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Bài kế tiếp</button>
+    <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Bài tiếp</button>
     <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình</button>
   </div>
 
   <div id="aiBox" class="alert alert-secondary d-none"></div>
+
 </div>
 
-<style>
-.problem-statement {
-  white-space: pre-wrap;
-  line-height: 1.62;
-  font-size: 1.05rem;
+<script>
+function show(text) {
+  const box = document.getElementById("aiBox");
+  box.classList.remove("d-none");
+  box.innerHTML = text;
 }
-</style>
 
-<!-- ✅ MathJax -->
+function aiHint() {
+  fetch(`/problems/{{ problem.id }}/ai_hint_real/`)
+    .then(r => r.json())
+    .then(d => show("💡 " + (d.result || d.hint)));
+}
+
+function aiRecommend() {
+  fetch(`/problems/{{ problem.id }}/ai_recommend/`)
+    .then(r => r.json())
+    .then(d => show("➡️ " + d.result));
+}
+
+function aiPath() {
+  fetch(`/problems/ai_learning_path/`)
+    .then(r => {
+      if(r.status === 403) {
+        show("⚠️ Hãy đăng nhập để xem lộ trình 🎓");
+        return null;
+      }
+      return r.json();
+    })
+    .then(d => d && show("📚 " + (d.summary ?? JSON.stringify(d))));
+}
+
+// ✅ Re-render math after load
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.MathJax) MathJax.typesetPromise();
+});
+</script>
+
+<!-- MathJax -->
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
   svg: { fontCache: 'global' }
 };
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
-<script>
-function show(t){const b=document.getElementById("aiBox");b.classList.remove("d-none");b.innerHTML=t;}
-
-function aiHint(){
-  fetch(`/problems/{{ problem.id }}/ai_hint_real/`)
-    .then(r=>r.ok?r.json():Promise.reject())
-    .then(d=>show("💡 "+(d.result||d.hint||"Không có dữ liệu")))
-    .catch(()=>show("⚠️ Lỗi gọi gợi ý."));
-}
-
-function aiRecommend(){
-  fetch(`/problems/{{ problem.id }}/ai_recommend/`)
-    .then(r=>r.ok?r.json():Promise.reject())
-    .then(d=>show("➡️ "+(d.result||"Không có dữ liệu")))
-    .catch(()=>show("⚠️ Lỗi gợi ý bài tiếp theo."));
-}
-
-function aiPath(){
-  fetch(`/problems/ai_learning_path/`)
-    .then(r=>r.ok?r.json():Promise.reject())
-    .then(d=>show("📚 "+(d.summary?d.summary:JSON.stringify(d))))
-    .catch(()=>show("⚠️ Lỗi lộ trình học."));
-}
-</script>
 {% endblock %}
