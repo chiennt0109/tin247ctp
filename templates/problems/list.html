@@ -63,15 +63,18 @@
                     </div>
 
                     <!-- Progress -->
+                    <!-- AC / Submit -->
                     <div class="small mb-2 fw-semibold">
-                        ✅ {{ p.ac_count_live }}/{{ p.submit_count_live }} hoàn thành
+                      ✅ {{ p.ac_count }}/{{ p.submit_count }} hoàn thành
                     </div>
+                    
+                
                     <div class="progress mb-3" style="height: 6px;">
-                        {% if p.submit_count_live > 0 %}
-                        <div class="progress-bar bg-success" style="width: {{ p.ac_count_live|div:p.submit_count_live|mul:100 }}%"></div>
-                        {% else %}
-                        <div class="progress-bar bg-secondary" style="width: 0%"></div>
-                        {% endif %}
+                      {% if p.submit_count > 0 %}
+                      <div class="progress-bar bg-success" style="width: {{ p.ac_pct }}%"></div>
+                      {% else %}
+                      <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                      {% endif %}
                     </div>
 
                     <!-- Buttons -->
