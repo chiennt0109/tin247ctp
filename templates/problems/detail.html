@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load markdownify %}
 
 {% block content %}
 <div class="container mt-4">
 
-    <a href="{% url 'problem_list' %}" class="btn btn-secondary mb-3">⬅ Quay lại</a>
+    <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary mb-3">⬅ Quay lại danh sách</a>
 
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <h3 class="fw-bold">{{ problem.code }} – {{ problem.title }}</h3>
+        <h3 class="fw-bold text-primary">{{ problem.code }} – {{ problem.title }}</h3>
         <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">🚀 Gửi bài</a>
     </div>
 
@@ -26,58 +25,64 @@
 
     <hr>
 
-    <!-- ✅ Render markdown + KaTeX -->
-    <div class="card p-3 mb-3 problem-statement markdown-body">
-        {{ problem.statement|markdownify|safe }}
-    </div>
+    <!-- ✅ markdown container -->
+    <div id="statement" class="card p-4 mb-4 shadow-sm" style="background: #fff;"></div>
 
     <hr>
 
     <h4>🤖 Hỗ trợ AI</h4>
     <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
-    <button onclick="aiRecommend()" class="btn btn-info">📌 Gợi ý bài kế</button>
-    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình học</button>
+    <button onclick="aiRecommend()" class="btn btn-info">📌 Bài kế</button>
+    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình</button>
 
     <div id="aiBox" class="mt-3 p-3 border rounded" style="display:none;"></div>
 
 </div>
 
 <script>
-function show(text) {
+const rawMarkdown = `{{ problem.statement|escapejs }}`;
+
+function showAI(text) {
     const box = document.getElementById("aiBox");
     box.style.display = "block";
     box.innerHTML = text;
 }
 
-// ✅ gọi API đúng route mới
 function aiHint() {
     fetch(`/problems/{{ problem.id }}/ai_hint/`)
-    .then(r => r.json())
-    .then(d => show("💡 " + d.hint))
-    .catch(() => show("❗ Lỗi AI"));
+    .then(r=>r.json()).then(d=>showAI("💡 " + d.hint));
 }
-
 function aiRecommend() {
     fetch(`/problems/{{ problem.id }}/ai_recommend/`)
-    .then(r => r.json())
-    .then(d => show("➡️ " + d.result))
-    .catch(() => show("❗ Lỗi AI"));
+    .then(r=>r.json()).then(d=>showAI("➡️ " + d.result));
 }
-
 function aiPath() {
     fetch(`/problems/ai_learning_path/`)
-    .then(r => r.json())
-    .then(d => show("📚 " + JSON.stringify(d, null, 2)))
-    .catch(() => show("❗ Lỗi AI"));
+    .then(r=>r.json()).then(d=>showAI("📚 " + JSON.stringify(d, null, 2)));
 }
 </script>
 
-<!-- ✅ KaTeX CDN -->
-<link rel="stylesheet"
- href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<!-- ✅ markdown + highlight.js + katex -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+
 <script>
+const md = window.markdownit({
+    html: true,
+    linkify: true,
+    highlight: function (str, lang) {
+        try { return hljs.highlight(str, { language: lang }).value; }
+        catch (__) { return ''; }
+    }
+});
+
+document.getElementById("statement").innerHTML = md.render(rawMarkdown);
+
 document.addEventListener("DOMContentLoaded", function() {
   renderMathInElement(document.body);
 });
