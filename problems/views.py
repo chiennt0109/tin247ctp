@@ -34,31 +34,55 @@ def problem_list(request):
     if difficulty:
         qs = qs.filter(difficulty=difficulty)
 
-    qs = qs.annotate(
-        submit_count_live=Count("submission", distinct=True),
-        ac_count_live=Count(
-            "submission",
-            filter=Q(submission__verdict="Accepted"),
-            distinct=True,
-        ),
-    )
+    # Kiểm tra có field ac_count / submit_count sẵn không để tránh trùng tên annotate
+    has_ac_field = False
+    has_submit_field = False
+    try:
+        Problem._meta.get_field("ac_count")
+        has_ac_field = True
+    except Exception:
+        pass
+    try:
+        Problem._meta.get_field("submit_count")
+        has_submit_field = True
+    except Exception:
+        pass
 
-    paginator = Paginator(qs, 12)  # ✅ mỗi trang 12 bài
-    page = request.GET.get("page")
-    problems = paginator.get_page(page)
+    if has_ac_field or has_submit_field:
+        qs = qs.annotate(
+            submit_count_agg=Count("submission", distinct=True),
+            ac_count_agg=Count("submission", filter=Q(submission__verdict="Accepted"), distinct=True),
+        )
+        problems = list(qs)
+        for p in problems:
+            if not hasattr(p, "submit_count") or p.submit_count is None:
+                setattr(p, "submit_count", getattr(p, "submit_count_agg", 0))
+            if not hasattr(p, "ac_count") or p.ac_count is None:
+                setattr(p, "ac_count", getattr(p, "ac_count_agg", 0))
+    else:
+        qs = qs.annotate(
+            submit_count=Count("submission", distinct=True),
+            ac_count=Count("submission", filter=Q(submission__verdict="Accepted"), distinct=True),
+        )
+        problems = list(qs)
 
-    return render(
-        request,
-        "problems/list.html",
-        {
-            "problems": problems,
-            "tags": Tag.objects.all(),
-            "difficulty_levels": ["Easy", "Medium", "Hard"],
-            "selected_tag": tag_slug,
-            "selected_difficulty": difficulty,
-        },
-    )
+    # ✅ TÍNH SẴN % AC (tránh filter tùy biến trong template)
+    for p in problems:
+        sc = int(getattr(p, "submit_count", 0) or 0)
+        ac = int(getattr(p, "ac_count", 0) or 0)
+        p.ac_pct = int(ac * 100 / sc) if sc > 0 else 0
 
+    tags = Tag.objects.all()
+    difficulties = ["Easy", "Medium", "Hard"]
+
+    context = {
+        "problems": problems,
+        "tags": tags,
+        "difficulty_levels": difficulties,
+        "selected_tag": tag_slug,
+        "selected_difficulty": difficulty,
+    }
+    return render(request, "problems/list.html", context)
 
 # ===========================
 # 📘 CHI TIẾT BÀI TOÁN
