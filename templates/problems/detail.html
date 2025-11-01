@@ -87,7 +87,7 @@ window.MathJax = {
 
       <!-- Problem Statement (Markdown / MathJax) -->
       <div class="markdown-body" id="problem-content">
-        {{ problem.description|safe }}
+        {{ problem.statement|safe }}
       </div>
 
       <hr class="my-4">
@@ -150,5 +150,23 @@ document.getElementById("btn-ai-hint").onclick = () =>
 document.getElementById("btn-ai-solve").onclick = () =>
   window.location.href = "/problems/{{ problem.id }}/ai_solution/";
 </script>
+
+<!-- ✅ MathJax -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<!-- ✅ Markdown render (không cần build) -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+document.getElementById("problem-content").innerHTML =
+    marked.parse(document.getElementById("problem-content").innerText);
+MathJax.typesetPromise();
+</script>
+
 
 {% endblock %}
