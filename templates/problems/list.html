@@ -5,7 +5,6 @@
 <div class="container mt-4">
     <h3>📘 Danh sách bài toán</h3>
 
-    <!-- Filter -->
     <form class="row g-2 mb-3">
         <div class="col-md-3">
             <select name="tag" class="form-select">
@@ -37,8 +36,7 @@
         </div>
     </form>
 
-    <!-- Problems Table -->
-    <table class="table table-bordered table-hover">
+    <table class="table table-hover table-bordered bg-white shadow-sm">
         <thead class="table-light">
         <tr>
             <th>Mã</th>
@@ -53,9 +51,11 @@
         <tbody>
         {% for p in problems %}
             <tr>
-                <td>{{ p.code }}</td>
+                <td class="fw-bold">{{ p.code }}</td>
                 <td>
-                    <a href="{% url 'problem_detail' p.id %}" class="fw-bold">{{ p.title }}</a>
+                    <a href="{% url 'problem_detail' p.id %}" class="text-decoration-none fw-bold">
+                        {{ p.title }}
+                    </a>
                 </td>
                 <td>
                     {% if p.difficulty == "Easy" %}
@@ -66,16 +66,13 @@
                         🔴 Hard
                     {% endif %}
                 </td>
-
                 <td>
                     {% for tag in p.tags.all %}
                         <span class="badge text-bg-info">{{ tag.name }}</span>
-                    {% empty %}
-                        —
-                    {% endfor %}
+                    {% empty %} — {% endfor %}
                 </td>
 
-                <td>{{ p.ac_count_live }}/{{ p.submit_count_live }}</td>
+                <td>{{ p.ac_count }}/{{ p.submit_count }}</td>
 
                 <td>
                     <a class="btn btn-primary btn-sm" href="{% url 'problem_detail' p.id %}">Xem</a>
