@@ -1,41 +1,74 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load markdownify %}
 
 {% block content %}
 <div class="container mt-4">
 
-  <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary mb-3">⬅ Danh sách</a>
+  <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary mb-3">⬅ Quay lại danh sách</a>
 
   <div class="d-flex justify-content-between align-items-center mb-2">
-    <h3 class="fw-bold">{{ problem.code }} — {{ problem.title }}</h3>
+    <h3 class="fw-bold">
+      {{ problem.code }} — {{ problem.title }}
+    </h3>
     <a href="{% url 'submission_create' problem.id %}" class="btn btn-success">🚀 Gửi bài</a>
   </div>
 
-  <p><b>Độ khó:</b>
-    {% if problem.difficulty == "Easy" %}<span class="badge text-bg-success">Easy</span>
-    {% elif problem.difficulty == "Medium" %}<span class="badge text-bg-warning">Medium</span>
-    {% else %}<span class="badge text-bg-danger">Hard</span>
+  <p class="mb-1">
+    <b>Độ khó:</b>
+    {% if problem.difficulty == "Easy" %}
+        <span class="badge rounded-pill text-bg-success">Easy</span>
+    {% elif problem.difficulty == "Medium" %}
+        <span class="badge rounded-pill text-bg-warning">Medium</span>
+    {% else %}
+        <span class="badge rounded-pill text-bg-danger">Hard</span>
     {% endif %}
   </p>
 
-  <p class="text-muted"><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }}</p>
+  <p class="text-muted"><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }} lượt</p>
 
-  <div class="card shadow-sm p-3 mb-3">
-    <div id="problem-statement" style="white-space: pre-wrap; font-size: 1.05rem;">
-      {{ problem.statement|safe }}
-    </div>
+  <div class="card shadow-sm border-0 mb-4 p-3">
+      <div id="problem-statement" class="problem-statement">
+          {{ problem.statement|markdownify|safe }}
+      </div>
   </div>
 
-  <h5 class="fw-semibold">🤖 Hỗ trợ AI</h5>
-  <div class="d-flex gap-2 mb-2">
+  <h5 class="fw-semibold mb-2">🤖 Hỗ trợ AI</h5>
+  <div class="d-flex gap-2 flex-wrap mb-2">
     <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
-    <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Bài tiếp</button>
-    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình</button>
+    <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Gợi ý bài kế</button>
+    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình học</button>
   </div>
-
   <div id="aiBox" class="alert alert-secondary d-none"></div>
 
 </div>
+
+<style>
+.problem-statement {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 1.02rem;
+}
+.code-block {
+  background: #272822;
+  color: #f8f8f2;
+  padding: .75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+</style>
+
+<!-- ✅ MathJax v3 config -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']]
+  },
+  startup: { typeset: true }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 <script>
 function show(text) {
@@ -46,41 +79,23 @@ function show(text) {
 
 function aiHint() {
   fetch(`/problems/{{ problem.id }}/ai_hint_real/`)
-    .then(r => r.json())
-    .then(d => show("💡 " + (d.result || d.hint)));
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => show("💡 " + (d.result || d.hint || "Không có dữ liệu")))
+    .catch(() => show("⚠️ Không gọi được gợi ý."));
 }
 
 function aiRecommend() {
   fetch(`/problems/{{ problem.id }}/ai_recommend/`)
-    .then(r => r.json())
-    .then(d => show("➡️ " + d.result));
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => show("➡️ " + (d.result || "Không có dữ liệu")))
+    .catch(() => show("⚠️ Không gọi được gợi ý tiếp theo."));
 }
 
 function aiPath() {
   fetch(`/problems/ai_learning_path/`)
-    .then(r => {
-      if(r.status === 403) {
-        show("⚠️ Hãy đăng nhập để xem lộ trình 🎓");
-        return null;
-      }
-      return r.json();
-    })
-    .then(d => d && show("📚 " + (d.summary ?? JSON.stringify(d))));
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => show("📚 " + (d.summary ? d.summary : JSON.stringify(d))))
+    .catch(() => show("⚠️ Không gọi được lộ trình học."));
 }
-
-// ✅ Re-render math after load
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.MathJax) MathJax.typesetPromise();
-});
 </script>
-
-<!-- MathJax -->
-<script>
-window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-  svg: { fontCache: 'global' }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-
 {% endblock %}
