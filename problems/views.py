@@ -1,49 +1,66 @@
 # path: problems/views.py
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from django.db.models import Count, Q
 from .models import Problem, Tag
 import random
-from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next
-from .ai_helper import build_learning_path
+
 from submissions.models import Submission
-from .models import Problem
+from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next, build_learning_path
 from .ai.ai_hint import get_hint
 
 # ===========================
 # 🌈 DANH SÁCH BÀI TOÁN
 # ===========================
 def problem_list(request):
-    problems = Problem.objects.all().order_by("code")
+    tag_slug = request.GET.get("tag", "").strip()
+    difficulty = request.GET.get("difficulty", "").strip()
+
+    qs = Problem.objects.all().order_by("code")
+
+    if tag_slug:
+        qs = qs.filter(tags__slug=tag_slug)
+
+    if difficulty:
+        qs = qs.filter(difficulty=difficulty)
+
+    # ✅ Thống kê submit/AC
+    qs = qs.annotate(
+        submit_count = Count("submission", distinct=True),
+        ac_count = Count("submission", filter=Q(submission__verdict="Accepted"), distinct=True),
+    )
+
     tags = Tag.objects.all()
-
-    selected_tag = request.GET.get("tag")
-    selected_difficulty = request.GET.get("difficulty")
-
-    if selected_tag:
-        problems = problems.filter(tags__slug=selected_tag)
-    if selected_difficulty:
-        problems = problems.filter(difficulty=selected_difficulty)
+    difficulties = ["Easy", "Medium", "Hard"]
 
     context = {
-        "problems": problems,
+        "problems": qs,
         "tags": tags,
-        "selected_tag": selected_tag,
-        "selected_difficulty": selected_difficulty,
-        "difficulty_levels": ["Easy", "Medium", "Hard"],
+        "difficulty_levels": difficulties,
+        "selected_tag": tag_slug,
+        "selected_difficulty": difficulty,
     }
     return render(request, "problems/list.html", context)
 
 
 # ===========================
-# 📘 CHI TIẾT MỘT BÀI TOÁN
+# 📘 CHI TIẾT BÀI TOÁN
 # ===========================
 def problem_detail(request, pk):
-    p = get_object_or_404(Problem, pk=pk)
-    return render(request, "problems/detail.html", {"p": p})
+    problem = get_object_or_404(Problem, pk=pk)
+
+    submit_count = Submission.objects.filter(problem=problem).count()
+    ac_count = Submission.objects.filter(problem=problem, verdict="Accepted").count()
+
+    return render(request, "problems/detail.html", {
+        "problem": problem,
+        "submit_count": submit_count,
+        "ac_count": ac_count,
+    })
 
 
 # ===========================
-# 🤖 GỢI Ý TỪ AI (TẠM NGẪU NHIÊN)
+# 🤖 AI gợi ý (random)
 # ===========================
 AI_HINTS = [
     "Thử kiểm tra lại điều kiện dừng của vòng lặp.",
@@ -57,73 +74,60 @@ AI_HINTS = [
 ]
 
 def ai_hint(request, pk):
-    """Trả về 1 gợi ý đơn giản — sẽ được thay thế bằng gợi ý AI thật ở Phase 3."""
-    hint = random.choice(AI_HINTS)
-    return JsonResponse({"hint": hint})
-# 🤖 Gợi ý thông minh
+    return JsonResponse({"hint": random.choice(AI_HINTS)})
+
+
+# ✅ AI hint thật
 def ai_hint_real(request, pk):
-    from .models import Problem
     p = get_object_or_404(Problem, pk=pk)
-    hint = gen_ai_hint(p.statement, p.difficulty)
-    return JsonResponse({"type": "hint", "result": hint})
+    return JsonResponse({"type": "hint", "result": gen_ai_hint(p.statement, p.difficulty)})
 
 
-# 🧪 Giải thích lỗi test
+# ✅ AI giải thích test sai
 def ai_debug(request, pk):
     input_data = request.GET.get("input", "")
     expected = request.GET.get("expected", "")
     got = request.GET.get("got", "")
-    result = analyze_failed_test(input_data, expected, got)
-    return JsonResponse({"type": "debug", "result": result})
+    return JsonResponse({"type": "debug", "result": analyze_failed_test(input_data, expected, got)})
 
 
-# 🧭 Gợi ý bài tiếp theo
+# ✅ AI gợi ý bài kế tiếp
 def ai_recommend(request, pk):
-    from .models import Problem
     p = get_object_or_404(Problem, pk=pk)
-    result = recommend_next(p.difficulty)
-    return JsonResponse({"type": "recommend", "result": result})
+    return JsonResponse({"type": "recommend", "result": recommend_next(p.difficulty)})
 
 
-
+# ✅ Lộ trình học AI
 def ai_learning_path(request):
     user = request.user
     if not user.is_authenticated:
         return JsonResponse({"error": "Bạn cần đăng nhập để xem lộ trình."}, status=403)
-    
+
     subs = Submission.objects.filter(user=user)
-    solved = subs.filter(verdict="AC").count()
+    solved = subs.filter(verdict="Accepted").count()
 
     if solved == 0:
-        return JsonResponse({"summary": "Bạn chưa có bài nào đúng 😅", "recommendations": [
-            "🔰 Bắt đầu từ mục 'Giai đoạn 1' trong Roadmap.",
-            "📘 Làm 3 bài Easy đầu tiên để hệ thống phân tích trình độ."
-        ]})
+        return JsonResponse({
+            "summary": "Bạn chưa có bài nào đúng 😅",
+            "recommendations": [
+                "🔰 Bắt đầu từ mục 'Giai đoạn 1' trong Roadmap.",
+                "📘 Làm 3 bài Easy đầu tiên để hệ thống phân tích trình độ."
+            ]
+        })
 
-    # Tính độ khó trung bình
-    probs = [s.problem for s in subs.filter(verdict="AC")]
+    probs = [s.problem for s in subs.filter(verdict="Accepted")]
     levels = {"Easy": 1, "Medium": 2, "Hard": 3}
+
     if not probs:
         avg_difficulty = "Easy"
     else:
         avg_score = sum(levels.get(p.difficulty, 1) for p in probs) / len(probs)
         avg_difficulty = "Easy" if avg_score < 1.5 else ("Medium" if avg_score < 2.5 else "Hard")
 
-    plan = build_learning_path(user, solved, avg_difficulty)
-    return JsonResponse(plan)
-def problem_list(request):
-    problems = Problem.objects.all().order_by("id")
-    return render(request, "problems/list.html", {"problems": problems})
+    return JsonResponse(build_learning_path(user, solved, avg_difficulty))
 
 
-def problem_detail(request, pk):
-    problem = get_object_or_404(Problem, pk=pk)
-    return render(request, "problems/detail.html", {"problem": problem})
-
-
-# ✅ API AI Hint
+# ✅ AI Hint chính xác
 def ai_hint(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
-    hint = get_hint(problem.title, problem.difficulty)
-    return JsonResponse({"hint": hint})
-
+    return JsonResponse({"hint": get_hint(problem.title, problem.difficulty)})
