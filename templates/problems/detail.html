@@ -1,122 +1,162 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
 
 <style>
-.problem-page {
-    max-width: 860px;
-    margin: auto;
-    padding: 1rem;
+/* khung “giấy” đọc như PDF */
+.problem-page { max-width: 980px; margin: 0 auto; }
+.btn-top-actions { display:flex; gap:.6rem; margin-bottom: .75rem; }
+.problem-paper{
+  background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.06);
+  padding:24px 22px;border:1px solid #eef2f7
 }
-.problem-paper {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-.btn-top-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-.problem-title {
-    font-weight: 700;
-    font-size: 1.45rem;
-}
-.markdown-body {
-    font-size: 1rem;
-    line-height: 1.65;
-}
-.markdown-body pre, code {
-    background: #f6f8fa;
-    padding: 8px;
-    border-radius: 6px;
-}
-.markdown-body table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.markdown-body th, .markdown-body td {
-    padding: 6px;
-    border: 1px solid #ddd;
-}
+.problem-title{font-size:28px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.markdown-body{line-height:1.65;color:#111827;font-size:16px}
+.markdown-body h1,.markdown-body h2,.markdown-body h3{margin-top:1.15em;font-weight:700}
+.markdown-body code{background:#f6f8fa;padding:.15rem .35rem;border-radius:6px}
+.markdown-body pre code{display:block;padding:12px;border-radius:10px;overflow:auto}
+.markdown-body table{border-collapse:collapse;margin:10px 0;width:100%}
+.markdown-body th,.markdown-body td{border:1px solid #e5e7eb;padding:6px 10px}
+.katex-display{margin:1rem 0;text-align:center}
+.ai-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:14px}
+.badge-soft{border-radius:999px;padding:.25rem .6rem;font-weight:600;font-size:.82rem}
+.badge-easy{background:#ecfdf5;color:#064e3b}
+.badge-info{background:#eff6ff;color:#1d4ed8}
+.alert-soft{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;margin-top:10px;display:none}
 </style>
 
 <div class="problem-page">
 
-    <!-- ✅ Top buttons -->
-    <div class="btn-top-actions">
-        <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary rounded-pill">⬅ Quay lại</a>
-        <a href="{% url 'submission_create' problem.id %}" class="btn btn-success rounded-pill">🚀 Nộp bài</a>
+  <!-- ✅ Top buttons (ngoài “giấy”) -->
+  <div class="btn-top-actions">
+    <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary rounded-pill">⬅ Quay lại</a>
+    <a href="{% url 'submission_create' problem.id %}" class="btn btn-success rounded-pill">🚀 Nộp bài</a>
+  </div>
+
+  <!-- ✅ “Giấy” đọc đề -->
+  <div class="problem-paper">
+
+    <div class="problem-title">{{ problem.title }}</div>
+    <div class="text-muted mb-2">{{ problem.code }}</div>
+
+    {% if problem.difficulty %}
+      <span class="badge-soft badge-easy">🟢 {{ problem.difficulty }}</span>
+    {% endif %}
+    {% for t in problem.tags.all %}
+      <span class="badge-soft badge-info">#{{ t.name }}</span>
+    {% empty %}{% endfor %}
+
+    <hr class="my-3">
+
+    <!-- 🔹 Markdown source (ẩn) -->
+    <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
+
+    <!-- 🔹 Rendered HTML -->
+    <div id="problem-statement" class="markdown-body"></div>
+
+    <hr class="my-3">
+
+    <div class="text-success fw-semibold">
+      ✅ Đã AC: {{ ac_count }} / {{ submit_count }} submissions
     </div>
 
-    <!-- ✅ Problem content card (PDF style) -->
-    <div class="problem-paper">
-        
-        <div class="problem-title">{{ problem.title }}</div>
-        <div class="text-muted mb-2">{{ problem.code }}</div>
+    <!-- 🔹 Kết quả AI -->
+    <div id="aiBox" class="alert-soft"></div>
 
-        {% if problem.difficulty %}
-        <span class="badge text-bg-success">{{ problem.difficulty }}</span>
-        {% endif %}
+  </div>
 
-        {% for tag in problem.tags.all %}
-        <span class="badge bg-info text-dark">#{{ tag.name }}</span>
-        {% endfor %}
-
-        <hr>
-
-        <!-- ✅ Render Markdown + LaTeX -->
-        <div id="problem-content" class="markdown-body">
-            {{ problem.statement|safe }}
-        </div>
-
-        <hr>
-        <p><strong>✅ Đã AC:</strong> {{ ac_count }} / {{ submit_count }} submissions</p>
-    </div>
-
-    <!-- ✅ AI buttons below paper -->
-    <div class="mt-3 d-flex flex-wrap gap-2">
-
-        <button id="ai-hint" class="btn btn-primary rounded-pill">💡 Gợi ý AI</button>
-        <button id="ai-solve" class="btn btn-outline-primary rounded-pill">🧠 Hướng dẫn AI</button>
-        <button id="copy-problem" class="btn btn-outline-dark rounded-pill">📋 Copy đề</button>
-
-    </div>
-
+  <!-- ✅ AI buttons dưới “giấy” -->
+  <div class="ai-actions">
+    <button id="btn-ai-hint" class="btn btn-primary rounded-pill">💡 Gợi ý AI</button>
+    <button id="btn-ai-next" class="btn btn-info text-white rounded-pill">📌 Gợi ý bài kế</button>
+    <button id="btn-ai-copy" class="btn btn-outline-dark rounded-pill">📋 Copy đề</button>
+  </div>
 </div>
 
-<!-- ✅ MathJax -->
-<script>
-window.MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<!-- ✅ Markdown Render -->
+<!-- =========================
+     Assets: Marked + DOMPurify + KaTeX + HLJS
+========================= -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
 <script>
-const raw = document.getElementById("problem-content").innerText;
-document.getElementById("problem-content").innerHTML = marked.parse(raw);
-MathJax.typesetPromise();
+(function(){
+  const src = document.getElementById('md-src');
+  const out = document.getElementById('problem-statement');
+
+  // 1) Markdown -> HTML (không hiển thị raw “##”, không coi toàn bộ là code)
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+    smartLists: true,
+    highlight: (code, lang) => { try { return hljs.highlight(code, {language: lang||'plaintext'}).value } catch { return code } }
+  });
+  const html = marked.parse(src.value || '');
+
+  // 2) Sanitize để không bị “hiện mã”/tag lạ
+  const clean = DOMPurify.sanitize(html, {USE_PROFILES: {html: true}});
+
+  // 3) Đổ ra DOM
+  out.innerHTML = clean;
+
+  // 4) Render KaTeX (hỗ trợ $...$, $$...$$, \(..\), \[..\])
+  if (window.renderMathInElement) {
+    renderMathInElement(out, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$",  right: "$",  display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true }
+      ],
+      throwOnError: false
+    });
+  }
+
+  // 5) Re-highlight code blocks sau khi KaTeX xong
+  out.querySelectorAll('pre code').forEach(el => { try { hljs.highlightElement(el) } catch(e){} });
+})();
 </script>
 
-<!-- ✅ Buttons Logic -->
 <script>
-document.getElementById("ai-hint").onclick = () => {
-    window.location.href = "/problems/{{ problem.id }}/ai_hint/";
-};
+// Helpers hiển thị kết quả AI
+function showAI(text, type='info'){
+  const box = document.getElementById('aiBox');
+  box.style.display = 'block';
+  box.className = 'alert-soft';
+  box.innerHTML = (type==='error' ? '⚠️ ' : '🤖 ') + text;
+}
 
-document.getElementById("ai-solve").onclick = () => {
-    window.location.href = "/problems/{{ problem.id }}/ai_solution/";
-};
+// 💡 Gợi ý AI (LLM)
+document.getElementById('btn-ai-hint').addEventListener('click', async () => {
+  try{
+    const res = await fetch("{% url 'ai_hint' problem.id %}");
+    if(!res.ok){ const t = await res.text(); throw new Error(t||res.statusText); }
+    const data = await res.json();
+    showAI(data.hint || data.result || 'Không có gợi ý.');
+  }catch(e){ showAI('Không gọi được gợi ý AI.', 'error'); }
+});
 
-document.getElementById("copy-problem").onclick = () => {
-    navigator.clipboard.writeText(document.getElementById("problem-content").innerText);
-    alert("✅ Đã copy đề!");
-};
+// 📌 Gợi ý bài kế tiếp
+document.getElementById('btn-ai-next').addEventListener('click', async () => {
+  try{
+    const res = await fetch("{% url 'ai_recommend' problem.id %}");
+    if(!res.ok){ const t = await res.text(); throw new Error(t||res.statusText); }
+    const data = await res.json();
+    showAI(data.result || 'Không có đề xuất.');
+  }catch(e){ showAI('Không gọi được gợi ý bài kế tiếp.', 'error'); }
+});
+
+// 📋 Copy đề
+document.getElementById('btn-ai-copy').addEventListener('click', async () => {
+  const txt = document.getElementById('problem-statement').innerText;
+  try{ await navigator.clipboard.writeText(txt); showAI('Đã copy nội dung đề ✅'); }
+  catch{ showAI('Không copy được nội dung.', 'error'); }
+});
 </script>
 
 {% endblock %}
