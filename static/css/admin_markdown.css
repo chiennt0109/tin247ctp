@@ -1,0 +1,11 @@
+#preview-box code {
+    background:#f6f8fa;
+    padding:3px 4px;
+    border-radius:5px;
+}
+#preview-box pre code {
+    display:block;
+    background:#1e1e1e;
+    color:#eee;
+    padding:10px;
+}
