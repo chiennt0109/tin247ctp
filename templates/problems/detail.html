@@ -1,131 +1,154 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
-{% block content %}
-<div class="container mt-4">
-
-    <a href="{% url 'problem_list' %}" class="btn btn-outline-secondary mb-3">⬅ Quay lại danh sách</a>
-
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h3 class="fw-bold">{{ problem.code }} — {{ problem.title }}</h3>
-
-        <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">
-            🚀 Nộp bài
-        </a>
-    </div>
-
-    <p class="mb-1">
-        <b>Độ khó:</b>
-        {% if problem.difficulty == "Easy" %}
-            <span class="badge rounded-pill text-bg-success">Easy</span>
-        {% elif problem.difficulty == "Medium" %}
-            <span class="badge rounded-pill text-bg-warning">Medium</span>
-        {% else %}
-            <span class="badge rounded-pill text-bg-danger">Hard</span>
-        {% endif %}
-    </p>
-
-    <p class="text-muted">
-        ✅ <b>{{ ac_count }}</b> / {{ submit_count }} lượt đã AC
-    </p>
-
-    <!-- 🔥 Vùng hiển thị đề bài -->
-    <div class="card shadow-sm border-0 mb-4 p-3">
-        <!-- Markdown source -->
-        <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
-
-        <!-- Render output -->
-        <div id="problem-statement" class="markdown-body"></div>
-    </div>
-
-    <!-- 🤖 AI Support -->
-    <h5 class="fw-semibold mb-2">🤖 Hỗ trợ AI</h5>
-    <div class="d-flex gap-2 flex-wrap mb-2">
-        <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
-        <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Bài kế tiếp</button>
-        <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình học</button>
-    </div>
-
-    <div id="aiBox" class="alert alert-secondary d-none"></div>
-
-</div>
-
-<!-- ✅ Markdown + KaTeX + HighlightJS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
+{% block extra_head %}
+<!-- MathJax -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const src = document.getElementById("md-src");
-    const out = document.getElementById("problem-statement");
-
-    if (!src || !out) return;
-
-    const html = marked.parse(src.value || "");
-    out.innerHTML = html;
-
-    if (window.renderMathInElement) {
-        renderMathInElement(out, {
-            delimiters: [
-                { left: "$$", right: "$$", display: true },
-                { left: "$", right: "$", display: false }
-            ],
-            throwOnError: false
-        });
-    }
-
-    document.querySelectorAll('#problem-statement pre code').forEach(el => {
-        try { hljs.highlightElement(el); } catch(e) {}
-    });
-});
-
-function show(text) {
-    const box = document.getElementById("aiBox");
-    box.classList.remove("d-none");
-    box.innerHTML = text;
-}
-
-function aiHint() {
-    fetch(`/problems/{{ problem.id }}/ai_hint/`)
-        .then(r => r.json())
-        .then(d => show("💡 " + (d.hint || d.result || "Không có dữ liệu")));
-}
-
-function aiRecommend() {
-    fetch(`/problems/{{ problem.id }}/ai_recommend/`)
-        .then(r => r.json())
-        .then(d => show("➡️ " + (d.result || "Không có dữ liệu")));
-}
-
-function aiPath() {
-    fetch(`/problems/ai_learning_path/`)
-        .then(r => r.json())
-        .then(d => show("📚 " + (d.summary || JSON.stringify(d))));
-}
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
 </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
 <style>
-.markdown-body {
-    line-height: 1.6;
-    font-size: 16px;
-    color: #222;
+/* PDF Reader Style */
+.problem-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  padding-bottom: 4rem;
+  background: #f5f7fa;
 }
-.markdown-body pre code {
-    background: #f6f8fa;
-    padding: 10px;
-    display: block;
-    border-radius: 5px;
-    overflow-x: auto;
+
+.problem-paper {
+  background: white;
+  width: 860px;
+  min-height: 1000px;
+  padding: 40px 45px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: #111;
 }
-.markdown-body .katex-display {
-    text-align: center;
-    margin: 1rem 0;
+
+.problem-paper h1, .problem-paper h2 {
+  font-weight: 700;
+}
+
+.code-block {
+  background: #1e293b;
+  color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+}
+
+.action-zone {
+  display: flex;
+  gap: .75rem;
+  padding: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="problem-wrapper">
+
+  <div class="problem-paper">
+
+      <!-- Title -->
+      <h2 class="fw-bold mb-3">{{ problem.title }}</h2>
+      <p class="text-muted mb-4">{{ problem.code }}</p>
+
+      <!-- Difficulty + Tag -->
+      <p>
+        {% if problem.difficulty == "Easy" %}
+          <span class="badge bg-success-subtle text-success-emphasis">🟢 Easy</span>
+        {% elif problem.difficulty == "Medium" %}
+          <span class="badge bg-warning-subtle text-warning-emphasis">🟡 Medium</span>
+        {% else %}
+          <span class="badge bg-danger-subtle text-danger-emphasis">🔴 Hard</span>
+        {% endif %}
+
+        {% for t in problem.tags.all %}
+        <span class="badge bg-info-subtle text-info-emphasis">{{ t.name }}</span>
+        {% endfor %}
+      </p>
+
+      <hr>
+
+      <!-- Problem Statement (Markdown / MathJax) -->
+      <div class="markdown-body" id="problem-content">
+        {{ problem.description|safe }}
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Input/Output samples -->
+      {% if problem.samples.all %}
+        <h5 class="fw-bold mb-2">📘 Ví dụ mẫu</h5>
+        {% for s in problem.samples.all %}
+          <div class="mb-3">
+            <div><strong>Input:</strong></div>
+            <pre class="code-block">{{ s.input }}</pre>
+            <div><strong>Output:</strong></div>
+            <pre class="code-block">{{ s.output }}</pre>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+  </div>
+</div>
+
+
+
+<!-- ✅ Actions below PDF viewer -->
+<div class="action-zone">
+  <a href="{% url 'submission_create' problem.id %}" class="btn btn-success rounded-pill px-4">
+    🚀 Nộp bài
+  </a>
+
+  <button id="btn-ai-hint" class="btn btn-primary rounded-pill px-4">
+    💡 Gợi ý AI
+  </button>
+
+  <button id="btn-ai-solve" class="btn btn-outline-primary rounded-pill px-4">
+    🧠 Xem hướng giải AI
+  </button>
+
+  <button id="btn-copy" class="btn btn-outline-dark rounded-pill px-4">
+    📋 Copy đề
+  </button>
+
+  <a href="/problems/" class="btn btn-secondary rounded-pill px-4">
+    ⬅️ Quay lại danh sách
+  </a>
+</div>
+
+
+<script>
+// Copy problem statement
+document.getElementById("btn-copy").onclick = () => {
+  const text = document.getElementById("problem-content").innerText;
+  navigator.clipboard.writeText(text);
+  alert("✅ Đã copy nội dung đề");
+};
+
+// AI Hint
+document.getElementById("btn-ai-hint").onclick = () =>
+  window.location.href = "/problems/{{ problem.id }}/ai_hint/";
+
+// AI Solve
+document.getElementById("btn-ai-solve").onclick = () =>
+  window.location.href = "/problems/{{ problem.id }}/ai_solution/";
+</script>
 
 {% endblock %}
