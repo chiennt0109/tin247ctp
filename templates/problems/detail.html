@@ -13,75 +13,74 @@
 
   <p class="mb-1">
     <b>Độ khó:</b>
-    {% if problem.difficulty == "Easy" %} <span class="badge rounded-pill text-bg-success">Easy</span>
-    {% elif problem.difficulty == "Medium" %} <span class="badge rounded-pill text-bg-warning">Medium</span>
-    {% else %} <span class="badge rounded-pill text-bg-danger">Hard</span>
+    {% if problem.difficulty == "Easy" %}
+      <span class="badge rounded-pill text-bg-success">Easy</span>
+    {% elif problem.difficulty == "Medium" %}
+      <span class="badge rounded-pill text-bg-warning">Medium</span>
+    {% else %}
+      <span class="badge rounded-pill text-bg-danger">Hard</span>
     {% endif %}
   </p>
+
   <p class="text-muted"><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }} lượt</p>
 
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card p-3 mb-3">
-      <div id="problem-statement" style="white-space: pre-wrap;">
-          {{ problem.statement|safe }}
-      </div>
+  <!-- ✅ Card gọn, giống Roadmap -->
+  <div class="card shadow-sm border-0 p-4 mb-4">
+    <div id="problem-statement" class="problem-statement">
+      {{ problem.statement|safe }}
     </div>
   </div>
 
+  <!-- 🤖 AI Tools -->
   <h5 class="fw-semibold mb-2">🤖 Hỗ trợ AI</h5>
   <div class="d-flex gap-2 flex-wrap mb-2">
     <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
-    <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Gợi ý bài kế</button>
-    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình học</button>
+    <button onclick="aiRecommend()" class="btn btn-info text-white">📌 Bài kế tiếp</button>
+    <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình</button>
   </div>
-  <div id="aiBox" class="alert alert-secondary d-none"></div>
 
+  <div id="aiBox" class="alert alert-secondary d-none"></div>
 </div>
 
 <style>
-.problem-statement{
-  white-space: pre-wrap; 
-  line-height: 1.6;
-  font-size: 1.02rem;
+.problem-statement {
+  white-space: pre-wrap;
+  line-height: 1.62;
+  font-size: 1.05rem;
 }
 </style>
 
-<!-- ⚙️ MathJax v3 cấu hình để nhận $...$ và \( ... \) -->
+<!-- ✅ MathJax -->
 <script>
 window.MathJax = {
   tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
   svg: { fontCache: 'global' }
 };
 </script>
-<script id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 <script>
-function show(text) {
-  const box = document.getElementById("aiBox");
-  box.classList.remove("d-none");
-  box.innerHTML = text;
-}
+function show(t){const b=document.getElementById("aiBox");b.classList.remove("d-none");b.innerHTML=t;}
 
-function aiHint() {
+function aiHint(){
   fetch(`/problems/{{ problem.id }}/ai_hint_real/`)
-    .then(r => r.ok ? r.json() : Promise.reject())
-    .then(d => show("💡 " + (d.result || d.hint || "Không có dữ liệu")))
-    .catch(() => show("⚠️ Không gọi được gợi ý."));
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>show("💡 "+(d.result||d.hint||"Không có dữ liệu")))
+    .catch(()=>show("⚠️ Lỗi gọi gợi ý."));
 }
 
-function aiRecommend() {
+function aiRecommend(){
   fetch(`/problems/{{ problem.id }}/ai_recommend/`)
-    .then(r => r.ok ? r.json() : Promise.reject())
-    .then(d => show("➡️ " + (d.result || "Không có dữ liệu")))
-    .catch(() => show("⚠️ Không gọi được gợi ý tiếp theo."));
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>show("➡️ "+(d.result||"Không có dữ liệu")))
+    .catch(()=>show("⚠️ Lỗi gợi ý bài tiếp theo."));
 }
 
-function aiPath() {
+function aiPath(){
   fetch(`/problems/ai_learning_path/`)
-    .then(r => r.ok ? r.json() : Promise.reject())
-    .then(d => show("📚 " + (d.summary ? d.summary : JSON.stringify(d))))
-    .catch(() => show("⚠️ Không gọi được lộ trình học."));
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>show("📚 "+(d.summary?d.summary:JSON.stringify(d))))
+    .catch(()=>show("⚠️ Lỗi lộ trình học."));
 }
 </script>
 {% endblock %}
