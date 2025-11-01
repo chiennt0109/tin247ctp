@@ -1,0 +1,85 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+  <h2>{{ original.code }} – {{ original.title }}</h2>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ adminform.form.as_p }}
+    <div class="submit-row">
+      <input type="submit" value="💾 Lưu thay đổi" class="default">
+    </div>
+  </form>
+
+  <hr>
+  <h3>👁 Test Cases</h3>
+  {% if original and original.id %}
+    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">👁 Xem test</a>
+  {% else %}
+    <p style="color:gray;">💡 Lưu bài toán trước khi xem test.</p>
+  {% endif %}
+
+  {% if original and original.id %}
+  <hr>
+  <h3>📦 Upload ZIP Test Cases</h3>
+  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
+    <button type="submit" class="default btn btn-success">⬆️ Upload & Import</button>
+  </form>
+  {% endif %}
+</div>
+
+
+{# --------------------- Markdown Editor + KaTeX ---------------------- #}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.querySelector("#id_statement");
+
+  if (textarea) {
+    const editor = new SimpleMDE({
+      element: textarea,
+      spellChecker: false,
+      autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
+      toolbar: [
+        "bold","italic","heading","|",
+        "quote","unordered-list","ordered-list","|",
+        "link","image","table","code","|",
+        "preview","side-by-side","fullscreen","|",
+        { name:"math", action: () => editor.codemirror.replaceSelection("$$ a^2 + b^2 = c^2 $$"), className:"fa fa-superscript", title:"Insert LaTeX" },
+        "guide"
+      ],
+      previewRender: function(plainText) {
+        let html = SimpleMDE.prototype.markdown(plainText);
+        // render LaTeX
+        setTimeout(() => {
+          renderMathInElement(document.querySelector(".editor-preview"), {
+            delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "$", right: "$", display: false}
+            ]
+          });
+        }, 10);
+        return html;
+      }
+    });
+  }
+});
+</script>
+
+<style>
+.container{max-width:900px;margin:auto;font-family:sans-serif;}
+a.button{display:inline-block;background:#3c8dbc;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;}
+a.button:hover{background:#337ab7;}
+.editor-preview pre, .editor-preview-side pre { background: #222; color: #fff; padding: 8px; border-radius: 6px; }
+</style>
+{% endblock %}
