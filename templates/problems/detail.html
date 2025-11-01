@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load markdownify %}
 
 {% block content %}
 <div class="container mt-4">
 
     <a href="{% url 'problem_list' %}" class="btn btn-secondary mb-3">⬅ Quay lại</a>
 
-    <h3 class="fw-bold">{{ problem.code }} – {{ problem.title }}</h3>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="fw-bold">{{ problem.code }} – {{ problem.title }}</h3>
+        <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">🚀 Gửi bài</a>
+    </div>
 
     <p><b>Độ khó:</b>
         {% if problem.difficulty == "Easy" %}
@@ -21,15 +25,15 @@
     <p><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }} lượt</p>
 
     <hr>
-    <div class="card p-3 mb-3">
-        <pre style="white-space: pre-wrap;">{{ problem.statement }}</pre>
+
+    <!-- ✅ Render markdown + KaTeX -->
+    <div class="card p-3 mb-3 problem-statement markdown-body">
+        {{ problem.statement|markdownify|safe }}
     </div>
 
-    <a href="{% url 'submission_create' problem.id %}" class="btn btn-success btn-lg">🚀 Gửi bài</a>
-
     <hr>
-    <h4>🤖 Hỗ trợ AI</h4>
 
+    <h4>🤖 Hỗ trợ AI</h4>
     <button onclick="aiHint()" class="btn btn-warning">💡 Gợi ý</button>
     <button onclick="aiRecommend()" class="btn btn-info">📌 Gợi ý bài kế</button>
     <button onclick="aiPath()" class="btn btn-primary">📚 Lộ trình học</button>
@@ -45,22 +49,38 @@ function show(text) {
     box.innerHTML = text;
 }
 
+// ✅ gọi API đúng route mới
 function aiHint() {
-    fetch(`/problems/{{ problem.id }}/ai_hint_real/`)
+    fetch(`/problems/{{ problem.id }}/ai_hint/`)
     .then(r => r.json())
-    .then(d => show("💡 " + d.result));
+    .then(d => show("💡 " + d.hint))
+    .catch(() => show("❗ Lỗi AI"));
 }
 
 function aiRecommend() {
     fetch(`/problems/{{ problem.id }}/ai_recommend/`)
     .then(r => r.json())
-    .then(d => show("➡️ " + d.result));
+    .then(d => show("➡️ " + d.result))
+    .catch(() => show("❗ Lỗi AI"));
 }
 
 function aiPath() {
     fetch(`/problems/ai_learning_path/`)
     .then(r => r.json())
-    .then(d => show("📚 " + JSON.stringify(d)));
+    .then(d => show("📚 " + JSON.stringify(d, null, 2)))
+    .catch(() => show("❗ Lỗi AI"));
 }
 </script>
+
+<!-- ✅ KaTeX CDN -->
+<link rel="stylesheet"
+ href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body);
+});
+</script>
+
 {% endblock %}
