@@ -1,0 +1,18 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/ai_admin.css' %}">
+<script src="{% static 'js/ai_admin.js' %}"></script>
+{% endblock %}
+
+{% block after_related_objects %}
+<div class="card mt-3 p-3">
+  <h4>⚙️ AI hỗ trợ soạn đề</h4>
+  <button class="btn btn-primary mb-2" onclick="generateStatement()">📝 Sinh đề bài</button>
+  <button class="btn btn-success mb-2" onclick="generateSamples()">📥 Sinh mẫu test</button>
+  <button class="btn btn-warning mb-2" onclick="checkFormat()">✅ Kiểm tra format</button>
+  <button class="btn btn-info mb-2" onclick="suggestTags()">🏷️ Gợi ý tags</button>
+</div>
+{% endblock %}
