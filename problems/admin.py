@@ -33,6 +33,7 @@ class ProblemAdmin(admin.ModelAdmin):
         #}),
     )
 
+
     class Media:
         css = {
             "all": [
@@ -45,6 +46,9 @@ class ProblemAdmin(admin.ModelAdmin):
             "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
             "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js",
             "/static/js/admin_ai_helper.js",
+            "https://cdn.jsdelivr.net/npm/marked/marked.min.js",
+            "https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js",
+            "/static/js/ai_editor.js",
         ]
 
     ### -------- Show Tags --------
