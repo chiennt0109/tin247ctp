@@ -21,10 +21,9 @@
   <p class="text-muted"><b>Đã AC:</b> {{ ac_count }} / {{ submit_count }} lượt</p>
 
   <div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
-      <!--  🔧 KHÔNG dùng <pre> để MathJax xử lý LaTeX; vẫn giữ xuống dòng bằng CSS -->
-      <div class="problem-statement">
-        {{ problem.statement|linebreaksbr|safe }}
+    <div class="card p-3 mb-3">
+      <div id="problem-statement" style="white-space: pre-wrap;">
+          {{ problem.statement|safe }}
       </div>
     </div>
   </div>
