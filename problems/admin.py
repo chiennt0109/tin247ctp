@@ -57,7 +57,7 @@ class ProblemAdmin(admin.ModelAdmin):
     display_tags.short_description = "Tags"
 
     ### -------- Custom Buttons (AI) --------
-    change_form_template = "admin/problems/problem_change_form.html"
+    change_form_template = "admin/problems/change_form_with_upload.html"
 
     def get_urls(self):
         urls = super().get_urls()
