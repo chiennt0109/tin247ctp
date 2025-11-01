@@ -1,12 +1,16 @@
 {% extends "admin/change_form.html" %}
+{% load static %}
 
 {% block extrahead %}
 {{ block.super }}
+
+<!-- KaTeX + Markdown -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<script src="/static/js/ai_editor.js"></script>
+<!-- AI Editor client script -->
+<script src="{% static 'js/ai_editor.js' %}"></script>
 
 <style>
 .CodeBlock {
@@ -16,16 +20,45 @@
     font-family: monospace;
     white-space: pre-wrap;
 }
-.ai-buttons {
-    margin-top: 6px;
+.ai-buttons { margin-top: 8px; }
+.container { max-width: 900px; margin: auto; font-family: sans-serif; }
+a.button {
+    display: inline-block; background:#3c8dbc; color:white;
+    padding:6px 12px; border-radius:6px; text-decoration:none;
 }
+a.button:hover { background:#337ab7; }
 </style>
 {% endblock %}
 
 {% block after_related_objects %}
+<!-- ✅ AI Buttons -->
 <div class="ai-buttons">
     <button type="button" class="button" onclick="aiGenerateStatement()">✨ AI tạo đề bài</button>
     <button type="button" class="button" onclick="aiFixLatex()">🧠 Sửa LaTeX</button>
     <button type="button" class="button" onclick="aiAutoTag()">🏷️ Tự gán tags</button>
+</div>
+
+<hr>
+
+<!-- ✅ Test Management -->
+<div class="container">
+  <h3>👁 Test Cases</h3>
+
+  {% if original.id %}
+    <a href="{% url 'admin:problems_problem_view_tests' original.id %}" target="_blank" class="button">👁 Xem test</a>
+  {% else %}
+    <p style="color:gray;">💡 Lưu bài toán trước khi xem test.</p>
+  {% endif %}
+
+  {% if original.id %}
+  <hr>
+  <h3>📦 Upload ZIP Test Cases</h3>
+
+  <form action="{% url 'admin:problems_problem_upload_tests' original.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
+    <button type="submit" class="default btn btn-success">⬆️ Upload & Import</button>
+  </form>
+  {% endif %}
 </div>
 {% endblock %}
