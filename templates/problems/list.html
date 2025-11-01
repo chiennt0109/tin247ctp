@@ -1,152 +1,101 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Danh sách bài toán{% endblock %}
+
 {% block content %}
-<div class="container py-4">
+<div class="container mt-3">
+  <h4>🟢 Danh sách bài toán</h4>
 
-  <h2 class="mb-3">🧩 Danh sách bài toán</h2>
-
-  <!-- Bộ lọc -->
-  <form method="get" class="mb-4" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
-    <div>
-      <label style="font-size:0.9rem;color:#555;">Tag</label><br>
-      <select name="tag" style="min-width:150px;padding:6px 8px;">
+  <!-- Filter bar -->
+  <form method="get" class="row g-2 align-items-end mt-3 mb-3">
+    <div class="col-md-4">
+      <label class="form-label">Tag</label>
+      <select name="tag" class="form-select">
         <option value="">-- Tất cả --</option>
-        {% for tag in tags %}
-          <option value="{{ tag.slug }}" {% if tag.slug == selected_tag %}selected{% endif %}>
-            {{ tag.name }}
+        {% for t in tags %}
+          <option value="{{ t.slug }}" {% if selected_tag == t.slug %}selected{% endif %}>
+            {{ t.name }}
           </option>
         {% endfor %}
       </select>
     </div>
-
-    <div>
-      <label style="font-size:0.9rem;color:#555;">Độ khó</label><br>
-      <select name="difficulty" style="min-width:120px;padding:6px 8px;">
+    <div class="col-md-3">
+      <label class="form-label">Độ khó</label>
+      <select name="difficulty" class="form-select">
         <option value="">-- Tất cả --</option>
-        {% for level in difficulty_levels %}
-          <option value="{{ level }}" {% if selected_difficulty == level %}selected{% endif %}>
-            {{ level }}
-          </option>
+        {% for d in difficulties %}
+          <option value="{{ d }}" {% if selected_difficulty == d %}selected{% endif %}>{{ d }}</option>
         {% endfor %}
       </select>
     </div>
-
-    <div style="display:flex;gap:8px;">
-      <button type="submit" style="padding:6px 12px;">Lọc</button>
-      <a href="{% url 'problem_list' %}" style="padding:6px 12px; background:#eee; border-radius:4px; text-decoration:none; color:#333;">
-        🧹 Reset
-      </a>
+    <div class="col-md-5">
+      <button class="btn btn-primary me-2">Lọc</button>
+      <a class="btn btn-outline-secondary" href="{% url 'problems:list' %}">Reset</a>
     </div>
   </form>
 
-  <!-- Bảng bài toán -->
-  <div style="overflow-x:auto;">
-    <table cellspacing="0" cellpadding="8" style="width:100%;border-collapse:collapse;font-size:0.95rem;">
-      <thead>
-        <tr style="background:#f5f5f5;text-align:left;border-bottom:1px solid #ddd;">
-          <th style="white-space:nowrap;">Mã</th>
-          <th>Tiêu đề</th>
-          <th style="white-space:nowrap;">Độ khó</th>
-          <th>Tag</th>
-          <th style="white-space:nowrap;">AC / Submit</th>
-          <th style="text-align:center;white-space:nowrap;">AI</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in problems %}
-        <tr style="border-bottom:1px solid #eee;">
-          <td style="font-family:monospace;white-space:nowrap;">{{ p.code }}</td>
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th style="width:120px;">Mã</th>
+        <th>Tiêu đề</th>
+        <th style="width:110px;">Độ khó</th>
+        <th style="width:160px;">Tag</th>
+        <th style="width:140px;">AC / Submit</th>
+        <th style="width:180px;" class="text-end">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in problems %}
+      <tr>
+        <td><b>{{ p.code }}</b></td>
 
-          <td>
-            <div style="font-weight:600;">{{ p.title }}</div>
-            {% if p.has_editorial %}
-              <div style="font-size:0.8rem;color:#555;">📘 Có lời giải mẫu</div>
-            {% endif %}
-          </td>
+        <!-- Click vào tên bài mở detail -->
+        <td>
+          <a href="{% url 'problems:detail' p.id %}" class="link-primary">
+            {{ p.title }}
+          </a>
+        </td>
 
-          <td style="white-space:nowrap;">
-            {% if p.difficulty == "Easy" %}
-              <span style="color:#2e7d32;font-weight:bold;">●</span>
-            {% elif p.difficulty == "Medium" %}
-              <span style="color:#f57c00;font-weight:bold;">●</span>
-            {% elif p.difficulty == "Hard" %}
-              <span style="color:#d32f2f;font-weight:bold;">●</span>
-            {% endif %}
-            <span>{{ p.difficulty }}</span>
-          </td>
+        <td>
+          {% if p.difficulty == "Easy" %}
+            <span class="badge bg-success">Easy</span>
+          {% elif p.difficulty == "Medium" %}
+            <span class="badge bg-warning text-dark">Medium</span>
+          {% else %}
+            <span class="badge bg-danger">Hard</span>
+          {% endif %}
+        </td>
 
-          <td style="max-width:220px;">
+        <td>
+          {% if p.tags.all %}
             {% for t in p.tags.all %}
-              <span style="
-                background:#eef;
-                border:1px solid #99c;
-                border-radius:4px;
-                padding:2px 6px;
-                font-size:0.8rem;
-                display:inline-block;
-                margin:1px 2px;
-              ">
-                {{ t.name }}
-              </span>
+              <span class="badge bg-light text-dark border">{{ t.name }}</span>
             {% empty %}
-              <span style="color:#888;font-size:0.85rem;">—</span>
+              —
             {% endfor %}
-          </td>
+          {% else %}—{% endif %}
+        </td>
 
-          <td style="white-space:nowrap;font-size:0.85rem;">
-            {% with total=p.submission_count ac=p.ac_count %}
-              {% if total > 0 %}
-                <span style="font-weight:600;">{{ ac }}/{{ total }}</span>
-                <span style="color:#555;">
-                  ({{ p.success_rate }}%)
-                </span>
-              {% else %}
-                <span style="color:#888;">0/0 (0%)</span>
-              {% endif %}
-            {% endwith %}
-          </td>
+        <td>
+          <b>{{ p.ac_count|default:0 }}</b> / {{ p.submit_count|default:0 }}
+          {% if p.submit_count %}
+            <small class="text-muted">
+              ({{ (p.ac_count|default:0) |divisibleby:1 and "" }}{{ p.ac_count|default:0|floatformat:0|add:0|mul:100|divisibleby:p.submit_count }})
+            </small>
+          {% endif %}
+        </td>
 
-          <td style="text-align:center;">
-            {% if p.ai_supported %}
-              <span title="AI Hint / AI Explain hỗ trợ"
-                    style="display:inline-block;background:#222;color:#fff;font-size:0.7rem;
-                           line-height:1;border-radius:4px;padding:3px 5px;font-family:monospace;">
-                AI
-              </span>
-            {% else %}
-              <span style="color:#bbb;font-size:0.7rem;">—</span>
-            {% endif %}
-          </td>
-
-          <td style="text-align:right;white-space:nowrap;">
-            <a href="{% url 'problem_detail' p.id %}"
-               style="text-decoration:none;background:#1976d2;color:#fff;padding:6px 10px;
-                      border-radius:4px;font-size:0.8rem;display:inline-block;">
-              📖 Xem
-            </a>
-            <a href="/submissions/{{ p.id }}/submit/"
-               style="text-decoration:none;background:#2e7d32;color:#fff;padding:6px 10px;
-                      border-radius:4px;font-size:0.8rem;display:inline-block;margin-left:4px;">
-              🚀 Gửi bài
-            </a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="7" style="text-align:center;padding:24px;color:#888;">
-            Không có bài toán nào phù hợp.
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Gợi ý UX học sinh -->
-  <div style="margin-top:16px;font-size:0.8rem;color:#666;">
-    <b>Gợi ý:</b> Chọn bài Easy trước để làm quen. Những bài có nhãn
-    <span style="background:#222;color:#fff;font-size:0.7rem;line-height:1;border-radius:4px;padding:2px 4px;font-family:monospace;">AI</span>
-    có thể nhận gợi ý khi bạn bị WA.
-  </div>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'problems:detail' p.id %}">👁 Xem</a>
+          <a class="btn btn-sm btn-success ms-2" href="{% url 'submission_create' p.id %}">📝 Gửi bài</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-center text-muted">Không có bài toán phù hợp bộ lọc.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}
