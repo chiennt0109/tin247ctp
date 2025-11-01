@@ -15,7 +15,7 @@
   <hr>
   <h3>👁 Test Cases</h3>
   {% if original and original.id %}
-    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">👁 Xem test</a>
+    <a href="{% url 'view_tests' original.id %}" target="_blank" class="button">👁 Xem test</a>
   {% else %}
     <p style="color:gray;">💡 Lưu bài toán trước khi xem test.</p>
   {% endif %}
@@ -23,7 +23,7 @@
   {% if original and original.id %}
   <hr>
   <h3>📦 Upload ZIP Test Cases</h3>
-  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
+  <form action="{% url 'upload_tests' original.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
     <button type="submit" class="default btn btn-success">⬆️ Upload & Import</button>
