@@ -184,3 +184,44 @@ def ai_learning_path(request):
 def ai_hint(request, pk):
     return ai_hint_real(request, pk)
 
+# ===========================
+# ✅ AI TOOLS FOR ADMIN FORM
+# ===========================
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+
+# Sinh đề bằng AI (fake mẫu)
+def admin_ai_generate(request):
+    sample_problem = (
+        "### Bài toán ví dụ\n"
+        "Cho dãy số A có N phần tử. Hãy in tổng các phần tử.\n\n"
+        "**Input:**\nN và dãy số A\n\n"
+        "**Output:**\nTổng các phần tử.\n"
+    )
+    return JsonResponse({"content": sample_problem})
+
+# Sinh sample I/O tự động
+@csrf_exempt
+def admin_ai_samples(request):
+    txt = request.body.decode("utf-8")
+    return JsonResponse({
+        "samples": [
+            {"in": "3\n1 2 3", "out": "6"},
+            {"in": "5\n2 2 2 2 2", "out": "10"}
+        ]
+    })
+
+# Kiểm tra format bài toán
+@csrf_exempt
+def admin_ai_check(request):
+    return JsonResponse({"msg": "✅ Format hợp lệ — Markdown + I/O OK"})
+
+# ===========================
+# ✅ AI SOLUTION (fake)
+# ===========================
+def get_solution(request, pk):
+    p = get_object_or_404(Problem, pk=pk)
+    return JsonResponse({
+        "solution": f"Để giải bài {p.title}, hãy duyệt mảng và xử lý theo yêu cầu đề bài.\n\n"
+                    "Ví dụ Python:\n```python\narr = list(map(int,input().split()))\nprint(sum(arr))\n```"
+    })
