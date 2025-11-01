@@ -225,3 +225,6 @@ def get_solution(request, pk):
         "solution": f"Để giải bài {p.title}, hãy duyệt mảng và xử lý theo yêu cầu đề bài.\n\n"
                     "Ví dụ Python:\n```python\narr = list(map(int,input().split()))\nprint(sum(arr))\n```"
     })
+
+def get_next_recommendation(request, pk):
+    return ai_recommend(request, pk)
