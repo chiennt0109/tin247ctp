@@ -11,6 +11,8 @@ urlpatterns = [
     path('<int:pk>/ai_debug/', views.ai_debug, name="ai_debug"),
     path('<int:pk>/ai_recommend/', views.ai_recommend, name="ai_recommend"),
     path('ai_learning_path/', views.ai_learning_path, name="ai_learning_path"),
+    path("<int:pk>/ai_hint_random/", views.ai_hint_random, name="ai_hint_random"),
+    
 
     # AI cho admin
     path('ai_suggest_tags/', views_admin.ai_suggest_tags, name="ai_suggest_tags"),
