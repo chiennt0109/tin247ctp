@@ -56,9 +56,13 @@
 
         {% for p in problems %}
           <tr>
-            <td class="fw-bold text-primary">{{ p.code }}</td>
+            <td class="fw-bold text-primary"><h5 class="fw-bold text-dark mb-1">
+              <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.code }}</a></h5>
+            </td>
 
-            <td>{{ p.title }}</td>
+            <td><h5 class="fw-bold text-dark mb-1">
+              <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.title }}</a></h5>
+            </td>
 
             <td>
               {% if p.tags.all %}
