@@ -3,42 +3,106 @@
 
 {% block extrahead %}
 {{ block.super }}
+
+<!-- KaTeX -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- SimpleMDE Markdown Editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<!-- AI Editor -->
 <script src="{% static 'js/ai_editor.js' %}"></script>
 
 <style>
-.CodeBlock { border:1px solid #ddd;padding:8px;background:#fafafa;font-family:monospace;white-space:pre-wrap; }
-.ai-buttons { margin-top:10px; }
+.container-box{padding:10px 0;}
+.ai-buttons button,.zip-btn{margin:4px 0;}
+#aiResult{margin-top:6px;font-size:14px;}
+.CodeBlock{border:1px solid #ddd;background:#fafafa;padding:8px;white-space:pre-wrap;}
 </style>
 {% endblock %}
 
 {% block after_related_objects %}
+<div class="container-box">
 
+<!-- ✅ AI Auto Fill -->
+<h3>🤖 AI Hỗ trợ nhập liệu</h3>
+<button class="button" id="aiAnalyze">✨ Phân tích & điền tự động</button>
+<p id="aiResult"></p>
+
+<hr>
+
+<!-- ✅ AI Latex & Auto Tag Buttons -->
 <div class="ai-buttons">
-    <button type="button" class="button" onclick="aiGenerateStatement()">✨ AI tạo đề bài</button>
+    <button type="button" class="button" onclick="aiGenerateStatement()">📝 AI tạo đề</button>
     <button type="button" class="button" onclick="aiFixLatex()">🧠 Sửa LaTeX</button>
-    <button type="button" class="button" onclick="aiAutoTag()">🏷️ Gán tags</button>
+    <button type="button" class="button" onclick="aiAutoTag()">🏷️ Tự gán tag</button>
 </div>
 
 <hr>
 
-<h3>📦 Upload ZIP Test Cases</h3>
+<!-- ✅ Upload ZIP -->
 {% if original and original.id %}
+<h3>📦 Upload ZIP Test Cases</h3>
 <form action="{% url 'admin:problems_problem_upload_tests' original.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" name="zip_file" accept=".zip" required>
-    <button type="submit" class="button">📥 Upload ZIP</button>
+    <button type="submit" class="button zip-btn">⬆️ Upload ZIP</button>
 </form>
 
 <hr>
+
+<!-- ✅ View Tests -->
 <h3>👁 Test Cases</h3>
 <a class="button" target="_blank" href="{% url 'admin:problems_problem_view_tests' original.id %}">👁 Xem test</a>
-<a class="button" href="{% url 'admin:problems_problem_download_tests' original.id %}">⬇️ Tải tất cả</a>
-
+<a class="button" href="{% url 'admin:problems_problem_download_tests' original.id %}">⬇️ Tải toàn bộ</a>
 {% else %}
-<p style="color:gray;">💡 Lưu bài trước để upload test.</p>
+<p>💡 Lưu bài trước để upload test hoặc xem test.</p>
 {% endif %}
 
+</div>
+
+<script>
+/* ✅ SimpleMDE init */
+document.addEventListener("DOMContentLoaded", function () {
+    const textarea = document.querySelector("#id_statement");
+    if (textarea) {
+        new SimpleMDE({
+            element: textarea,
+            spellChecker: false,
+            autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
+            placeholder: "✏️ Nhập nội dung bài toán bằng Markdown...",
+        });
+    }
+});
+
+/* ✅ AI Auto-Fill (code + difficulty + tags) */
+document.getElementById("aiAnalyze").addEventListener("click", async () => {
+  const title = document.querySelector("#id_title").value;
+  const statement = document.querySelector("#id_statement").value;
+
+  const res = await fetch("/problems/ai_analyze_problem/", {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}"},
+    body: JSON.stringify({ title, statement })
+  });
+
+  const data = await res.json();
+  if (data.error) return alert("❌ " + data.error);
+
+  document.querySelector("#id_code").value = data.code;
+  document.querySelector("#id_difficulty").value = data.difficulty;
+
+  let tags = data.tags || [];
+  const tagField = document.querySelector("#id_tags");
+  for (let option of tagField.options) {
+      if (tags.includes(option.text)) option.selected = true;
+  }
+
+  document.getElementById("aiResult").innerHTML =
+    `✅ <b>Mã:</b> ${data.code} — <b>Độ khó:</b> ${data.difficulty} — <b>Tags:</b> ${tags.join(", ")}`;
+});
+</script>
 {% endblock %}
