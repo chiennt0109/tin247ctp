@@ -60,21 +60,31 @@ class ProblemAdmin(admin.ModelAdmin):
     change_form_template = "admin/problems/change_form_with_upload.html"
 
     def get_urls(self):
-    urls = super().get_urls()
-    custom = [
-        # ------ AI Tools ------
-        path("ai_generate/", self.admin_site.admin_view(self.admin_ai_generate), name="problems_problem_ai_generate"),
-        path("ai_samples/", self.admin_site.admin_view(self.admin_ai_samples), name="problems_problem_ai_samples"),
-        path("ai_check/", self.admin_site.admin_view(self.admin_ai_check), name="problems_problem_ai_check"),
-        path("ai_autotag/", self.admin_site.admin_view(self.admin_ai_autotag), name="problems_problem_ai_autotag"),
+        urls = super().get_urls()
+        custom = [
+            path(
+                "<int:problem_id>/upload-tests/",
+                self.admin_site.admin_view(self.upload_tests),
+                name="problems_problem_upload_tests",
+            ),
+            path(
+                "<int:problem_id>/tests/",
+                self.admin_site.admin_view(self.view_tests),
+                name="problems_problem_view_tests",
+            ),
+            path(
+                "<int:problem_id>/tests/<int:test_id>/delete/",
+                self.admin_site.admin_view(self.delete_test),
+                name="problems_problem_delete_test",
+            ),
+            path(
+                "<int:problem_id>/tests/download/",
+                self.admin_site.admin_view(self.download_tests),
+                name="problems_problem_download_tests",
+            ),
+        ]
+        return custom + urls
 
-        # ------ Test Management ------
-        path("<int:problem_id>/tests/", self.admin_site.admin_view(self.view_tests), name="problems_problem_view_tests"),
-        path("<int:problem_id>/upload-tests/", self.admin_site.admin_view(self.upload_tests), name="problems_problem_upload_tests"),
-        path("<int:problem_id>/tests/<int:test_id>/delete/", self.admin_site.admin_view(self.delete_test), name="problems_problem_delete_test"),
-        path("<int:problem_id>/tests/download/", self.admin_site.admin_view(self.download_tests), name="problems_problem_download_tests"),
-    ]
-    return custom + urls
 
 
     def admin_ai_generate(self, request):
