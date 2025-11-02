@@ -72,144 +72,79 @@ class ProblemAdmin(admin.ModelAdmin):
     view_tests_link.short_description = "Test cases"
 
     ### ✅ Upload ZIP xử lý test
-    # problems/admin.py (chỉ thay hàm này trong class ProblemAdmin)
-
     def upload_tests(self, request, problem_id):
-        from django.db import transaction
-        problem = Problem.objects.get(pk=problem_id)
-        form = UploadTestZipForm(request.POST or None, request.FILES or None)
-    
-        if request.method == "POST" and form.is_valid():
-            zip_file = request.FILES["zip_file"]
-    
-            # Các đuôi hợp lệ
-            ALLOW_TXT = False  # Đặt True nếu bạn muốn nhận cả .txt
-            IN_EXTS  = {".in", ".inp"} | ({".txt"} if ALLOW_TXT else set())
-            OUT_EXTS = {".out", ".ans"} | ({".txt"} if ALLOW_TXT else set())
-    
-            imported = 0
-            skipped  = 0
-            paired_missing_output = []
-            found_pairs = []
-    
-            # Sẽ build 2 map:
-            # 1) map_base_input  : basename -> path_input
-            # 2) map_base_output : basename -> path_output
-            # Và kịch bản B: nếu phát hiện thư mục in/out, sẽ ghép theo filename trong 2 folder
-    
-            with tempfile.TemporaryDirectory() as tmpdir:
-                zip_path = os.path.join(tmpdir, "tests.zip")
-                with open(zip_path, "wb") as f:
-                    for chunk in zip_file.chunks():
-                        f.write(chunk)
-    
-                with zipfile.ZipFile(zip_path, "r") as z:
-                    z.extractall(tmpdir)
-    
-                # Quét toàn bộ cây thư mục
-                input_dirs  = []
-                output_dirs = []
-    
-                map_base_input  = {}
-                map_base_output = {}
-    
-                for root, _, files in os.walk(tmpdir):
-                    # Nhận diện thư mục in/out phổ biến
-                    folder = os.path.basename(root).lower()
-                    if folder in {"in", "input"}:
-                        input_dirs.append(root)
-                    if folder in {"out", "output"}:
-                        output_dirs.append(root)
-    
-                    for fname in files:
-                        name, ext = os.path.splitext(fname)
-                        full = os.path.join(root, fname)
-                        ext_l = ext.lower()
-    
-                        # Bỏ các file ẩn hệ thống
-                        if fname.startswith("._") or fname.startswith(".DS_Store"):
-                            continue
-    
-                        if ext_l in IN_EXTS:
-                            # Trường hợp A (cùng thư mục): gom theo basename
-                            map_base_input.setdefault(name, []).append(full)
-    
-                        if ext_l in OUT_EXTS:
-                            map_base_output.setdefault(name, []).append(full)
-    
-                def pick_one(path_list):
-                    # Ưu tiên file “ngắn hơn” (tránh duplicate), hoặc cứ lấy cái đầu.
-                    if not path_list:
-                        return None
-                    return sorted(path_list, key=lambda p: (len(os.path.basename(p)), p))[0]
-    
-                # Ưu tiên ghép theo A (cặp cùng thư mục — cùng basename)
-                for base, inputs in map_base_input.items():
-                    inp_path = pick_one(inputs)
-                    out_path = pick_one(map_base_output.get(base, []))
-                    if inp_path and out_path:
-                        found_pairs.append((inp_path, out_path))
-                    elif inp_path and not out_path:
-                        paired_missing_output.append(os.path.basename(inp_path))
-    
-                # Nếu A ghép được 0 cặp và có cấu trúc B rõ ràng → thử B
-                if not found_pairs and (input_dirs and output_dirs):
-                    # Ghép theo filename trong 2 cây: cùng tên base
-                    def collect(dir_roots, exts):
-                        bag = {}
-                        for d in dir_roots:
-                            for root, _, files in os.walk(d):
-                                for fname in files:
-                                    name, ext = os.path.splitext(fname)
-                                    if ext.lower() in exts:
-                                        bag[name] = os.path.join(root, fname)
-                        return bag
-    
-                    bag_in  = collect(input_dirs, IN_EXTS)
-                    bag_out = collect(output_dirs, OUT_EXTS)
-    
-                    for base, inp_path in bag_in.items():
-                        out_path = bag_out.get(base)
-                        if out_path:
-                            found_pairs.append((inp_path, out_path))
-                        else:
-                            paired_missing_output.append(os.path.basename(inp_path))
-    
-                # Ghi DB (atomic)
-                with transaction.atomic():
-                    for inp_path, out_path in found_pairs:
-                        try:
-                            with open(inp_path, "r", encoding="utf-8", errors="ignore") as fi:
-                                inp = fi.read().strip()
-                            with open(out_path, "r", encoding="utf-8", errors="ignore") as fo:
-                                out = fo.read().strip()
-    
-                            TestCase.objects.create(
-                                problem=problem,
-                                input_data=inp,
-                                expected_output=out
-                            )
-                            imported += 1
-                        except Exception:
-                            skipped += 1
-    
-            # Thông báo rõ xử lý
-            extra = ""
-            if paired_missing_output:
-                extra = f" | Thiếu file output cho: {min(len(paired_missing_output),5)}+" \
-                        f" ví dụ: {', '.join(paired_missing_output[:5])}"
-    
-            messages.success(
-                request,
-                f"✅ Imported: {imported} | ❌ Skipped: {skipped}{extra}"
-            )
-            return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
-    
-        return render(
-            request,
-            "admin/problems/upload_tests.html",
-            {"form": form, "problem": problem}
-        )
+    problem = Problem.objects.get(pk=problem_id)
+    form = UploadTestZipForm(request.POST or None, request.FILES or None)
+
+    if request.method == "POST" and form.is_valid():
+        zip_file = request.FILES["zip_file"]
+        imported = skipped = 0
+
+        VALID_IN = (".in", ".inp", ".txt")
+        VALID_OUT = (".out", ".ans", ".txt")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_zip = os.path.join(tmpdir, "tests.zip")
+
+            # Lưu zip tạm
+            with open(tmp_zip, "wb") as f:
+                for chunk in zip_file.chunks():
+                    f.write(chunk)
+
+            # Giải nén
+            with zipfile.ZipFile(tmp_zip) as z:
+                z.extractall(tmpdir)
+
+            # Duyệt tất cả file
+            for root, _, files in os.walk(tmpdir):
+                for file in files:
+                    # bỏ file rác hệ thống
+                    if file.startswith("._") or file.lower().startswith("thumbs.db"):
+                        continue
+
+                    name, ext = os.path.splitext(file)
+                    if ext.lower() not in VALID_IN:
+                        continue
+
+                    inp_path = os.path.join(root, file)
+                    out_path = None
+
+                    # Ghép output dựa trên basename + extension
+                    for oe in VALID_OUT:
+                        candidate = os.path.join(root, name + oe)
+                        if os.path.exists(candidate):
+                            out_path = candidate
+                            break
+
+                    if not out_path:
+                        skipped += 1
+                        continue
+
+                    try:
+                        with open(inp_path, encoding="utf-8", errors="ignore") as f_in:
+                            inp = f_in.read().strip()
+
+                        with open(out_path, encoding="utf-8", errors="ignore") as f_out:
+                            out = f_out.read().strip()
+
+                        TestCase.objects.create(
+                            problem=problem,
+                            input_data=inp,
+                            expected_output=out
+                        )
+                        imported += 1
+
+                    except Exception:
+                        skipped += 1
+
+        messages.success(request, f"✅ Imported {imported} — 🚫 Skipped {skipped}")
+        return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
+
+    return render(
+        request,
+        "admin/problems/upload_tests.html",
+        {"form": form, "problem": problem}
+    )
 
     ### ✅ View tests
     def view_tests(self, request, problem_id):
