@@ -1,64 +1,42 @@
-from django.contrib import admin
+import os, zipfile, tempfile, io
+from django import forms
+from django.contrib import admin, messages
+from django.shortcuts import render, redirect
+from django.urls import reverse, path
+from django.http import JsonResponse, HttpResponse
 from django.utils.html import format_html
-from django.urls import path
-from django.http import JsonResponse
+
 from .models import Problem, TestCase, Tag
-from .ai_helper import gen_ai_hint, analyze_failed_test, recommend_next, build_learning_path
 
-import zipfile, io, os
+### FORM
+class ProblemAdminForm(forms.ModelForm):
+    class Meta:
+        model = Problem
+        fields = "__all__"
 
-### ========== CUSTOM ADMIN ==========
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            self.initial["statement"] = self.instance.statement
 
+### Upload ZIP form
+class UploadTestZipForm(forms.Form):
+    zip_file = forms.FileField(label="Chọn file .zip test")
+
+### Inline test
 class TestCaseInline(admin.TabularInline):
     model = TestCase
     extra = 0
 
-
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "title", "difficulty", "display_tags", "created_at")
-    search_fields = ("title", "statement", "code")
-    list_filter = ("difficulty", "tags")
+    form = ProblemAdminForm
     inlines = [TestCaseInline]
 
-    fieldsets = (
-        ("Thông tin chính", {
-            "fields": ("title", "code", "difficulty", "tags")
-        }),
-        ("Đề bài", {
-            "fields": ("statement",)
-        }),
-        #("Upload", {
-         #   "fields": ("pdf_file", "zip_tests"),
-        #}),
-    )
+    list_display = ("code","title","difficulty","submission_count","ac_count","view_tests_link")
+    search_fields = ("code","title")
 
-
-    class Media:
-        css = {
-            "all": [
-                "/static/css/admin_markdown.css",
-                "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
-            ]
-        }
-        js = [
-            "/static/js/markdown-it.min.js",
-            "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js",
-            "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js",
-            "/static/js/admin_ai_helper.js",
-            "https://cdn.jsdelivr.net/npm/marked/marked.min.js",
-            "https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js",
-            "/static/js/ai_editor.js",
-        ]
-
-    ### -------- Show Tags --------
-    def display_tags(self, obj):
-        return ", ".join(t.name for t in obj.tags.all()) or "-"
-    display_tags.short_description = "Tags"
-
-    ### -------- Custom Buttons (AI) --------
-    change_form_template = "admin/problems/change_form_with_upload.html"
-
+    ### ✅ Custom URLs
     def get_urls(self):
         urls = super().get_urls()
         custom = [
@@ -85,87 +63,85 @@ class ProblemAdmin(admin.ModelAdmin):
         ]
         return custom + urls
 
+    ### ✅ Link xem test
+    def view_tests_link(self, obj):
+        return format_html(
+            '<a href="{}" class="button" target="_blank">👁</a>',
+            reverse("admin:problems_problem_view_tests", args=[obj.id])
+        )
+    view_tests_link.short_description = "Test cases"
 
+    ### ✅ Upload ZIP xử lý test
+    def upload_tests(self, request, problem_id):
+        problem = Problem.objects.get(pk=problem_id)
+        form = UploadTestZipForm(request.POST or None, request.FILES or None)
 
-    def admin_ai_generate(self, request):
-        title = request.POST.get("title", "")
-        statement = ai_generate_statement(title)
-        return JsonResponse({"statement": statement})
+        if request.method == "POST" and form.is_valid():
+            f = request.FILES["zip_file"]
+            imported = skipped = 0
 
-    def admin_ai_samples(self, request):
-        statement = request.POST.get("statement", "")
-        samples = ai_generate_samples(statement)
-        return JsonResponse(samples)
+            with tempfile.TemporaryDirectory() as tmp:
+                zip_path = os.path.join(tmp, "t.zip")
+                with open(zip_path, "wb") as zf:
+                    for c in f.chunks(): zf.write(c)
 
-    def admin_ai_check(self, request):
-        text = request.POST.get("statement", "")
-        msg = ai_check_format(text)
-        return JsonResponse({"message": msg})
+                with zipfile.ZipFile(zip_path) as z: z.extractall(tmp)
 
-    def admin_ai_autotag(self, request):
-        text = request.POST.get("statement", "")
-        tags = ai_suggest_tags(text)
-        tag_list = []
-        for t in tags:
-            tag, _ = Tag.objects.get_or_create(name=t)
-            tag_list.append(t)
-        return JsonResponse({"tags": tag_list})
+                valid_in = (".in", ".inp", ".txt")
+                valid_out = (".out", ".ans", ".txt")
 
-    ### -------- Auto fill code, difficulty, tags --------
-    def save_model(self, request, obj, form, change):
-        # Auto generate code if empty
-        if not obj.code:
-            last = Problem.objects.all().order_by("-id").first()
-            next_id = (last.id + 1) if last else 1
-            obj.code = f"P{next_id:03d}"
+                for root, _, files in os.walk(tmp):
+                    for fl in files:
+                        name, ext = os.path.splitext(fl)
+                        if ext not in valid_in: continue
+                        inp = os.path.join(root, fl)
+                        out = None
+                        for oe in valid_out:
+                            p2 = os.path.join(root, name + oe)
+                            if os.path.exists(p2):
+                                out = p2
+                                break
+                        if not out:
+                            skipped += 1; continue
 
-        # Auto-difficulty based on keywords
-        text = (obj.statement or "").lower()
-        if not obj.difficulty:
-            if any(w in text for w in ["dp", "graph", "bfs", "dfs", "n^2", "segment"]):
-                obj.difficulty = "Hard"
-            elif any(w in text for w in ["prefix", "sort", "binary", "stack"]):
-                obj.difficulty = "Medium"
-            else:
-                obj.difficulty = "Easy"
+                        TestCase.objects.create(
+                            problem=problem,
+                            input_data=open(inp).read().strip(),
+                            expected_output=open(out).read().strip()
+                        )
+                        imported += 1
 
-        # Auto-tags simple rule
-        tag_rules = {
-            "prefix": "Prefix Sum",
-            "sort": "Sorting",
-            "search": "Binary Search",
-            "graph": "Graph",
-            "tree": "Tree",
-            "dfs": "DFS",
-            "bfs": "BFS",
-            "dp": "Dynamic Programming",
-            "mod": "Math",
-            "prime": "Math",
-            "gcd": "Math",
-            "stack": "Stack",
-            "queue": "Queue",
-            "segment": "Segment Tree",
-        }
+            messages.success(request, f"✅ Imported {imported} | 🚫 Skipped {skipped}")
+            return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
 
-        super().save_model(request, obj, form, change)
+        return render(request, "admin/problems/upload_tests.html",
+                      {"problem": problem, "form": form})
 
-        for key, t in tag_rules.items():
-            if key in text:
-                tag, _ = Tag.objects.get_or_create(name=t)
-                obj.tags.add(tag)
+    ### ✅ View tests
+    def view_tests(self, request, problem_id):
+        return render(request, "admin/problems/view_tests.html", {
+            "problem": Problem.objects.get(pk=problem_id),
+            "testcases": TestCase.objects.filter(problem_id=problem_id)
+        })
 
-        # Handle ZIP import for testcases
-        if obj.zip_tests:
-            z = zipfile.ZipFile(obj.zip_tests)
-            for name in z.namelist():
-                if name.endswith(".in") or name.endswith(".inp"):
-                    case_name = os.path.splitext(name)[0]
-                    input_txt = z.read(name).decode("utf8")
-                    out_file = case_name + ".out"
-                    output_txt = z.read(out_file).decode("utf8") if out_file in z.namelist() else ""
+    ### ✅ Delete test
+    def delete_test(self, request, problem_id, test_id):
+        try:
+            TestCase.objects.get(id=test_id, problem_id=problem_id).delete()
+            return JsonResponse({"status":"ok"})
+        except:
+            return JsonResponse({"status":"error"})
 
-                    TestCase.objects.create(
-                        problem=obj,
-                        input_data=input_txt,
-                        output_data=output_txt
-                    )
+    ### ✅ Download tests
+    def download_tests(self, request, problem_id):
+        p = Problem.objects.get(pk=problem_id)
+        buff = io.BytesIO(); z = zipfile.ZipFile(buff,"w")
+
+        for i,t in enumerate(TestCase.objects.filter(problem=p),1):
+            z.writestr(f"{p.code}/test{i:02}.inp", t.input_data)
+            z.writestr(f"{p.code}/test{i:02}.out", t.expected_output)
+
+        z.close(); buff.seek(0)
+        resp = HttpResponse(buff, content_type="application/zip")
+        resp["Content-Disposition"] = f"attachment; filename={p.code}_tests.zip"
+        return resp
