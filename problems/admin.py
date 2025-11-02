@@ -32,7 +32,7 @@ class TestCaseInline(admin.TabularInline):
 class ProblemAdmin(admin.ModelAdmin):
     form = ProblemAdminForm
     inlines = [TestCaseInline]
-
+    change_form_template = "admin/problems/change_form_with_upload.html"
     list_display = ("code","title","difficulty","submission_count","ac_count","view_tests_link")
     search_fields = ("code","title")
 
