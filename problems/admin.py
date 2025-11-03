@@ -11,7 +11,7 @@ from django.contrib import admin, messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import path, reverse
-
+from django.utils.html import format_html
 from .models import Problem, TestCase, Tag
 
 
@@ -119,9 +119,8 @@ class ProblemAdmin(admin.ModelAdmin):
 
     # Link xem test ngay trên list
     def view_tests_link(self, obj):
-        return f'<a href="{reverse("admin:view_tests", args=[obj.id])}">👁 Test</a>'
-    view_tests_link.allow_tags = True
-    view_tests_link.short_description = "Test cases"
+        url = reverse("admin:view_tests", args=[obj.id])
+        return format_html('<a href="{}">👁 Test</a>', url)
 
     # Đảm bảo extra_context để template cũ hoạt động
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
