@@ -110,7 +110,7 @@ class TestCaseInline(admin.TabularInline):
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     form = ProblemAdminForm
-    inlines = [TestCaseInline]
+    #inlines = [TestCaseInline]
 
     change_form_template = "admin/problems/change_form_with_upload.html"
 
