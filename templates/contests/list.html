@@ -1,11 +1,75 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<h2>Contests</h2>
-<ul>
-  {% for c in contests %}
-  <li><a href="/contests/{{ c.id }}/">{{ c.name }}</a> ({{ c.start_time }} – {{ c.end_time }})</li>
-  {% empty %}
-  <li>No contests yet.</li>
-  {% endfor %}
-</ul>
+<style>
+    .cf-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    .cf-table th, .cf-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    .cf-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1a73e8;
+        text-decoration: none;
+    }
+    .cf-badge {
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+    .cf-upcoming { background: #0d6efd; }
+    .cf-running { background: #16a34a; }
+    .cf-finished { background: #6c757d; }
+</style>
+
+<h2>🏆 Codeforces-style Contests</h2>
+<table class="cf-table">
+<tr>
+    <th style="text-align:left;">Contest</th>
+    <th>Status</th>
+    <th>Start</th>
+    <th>Duration</th>
+</tr>
+
+{% for c in contests %}
+<tr>
+    <td>
+        <a class="cf-title" href="/contests/{{ c.id }}/">
+            {{ c.title }}
+        </a>
+        {% if c.description %}
+            <div style="color:#777; font-size:14px;">{{ c.description|truncatewords:12 }}</div>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if c.status == "upcoming" %}
+            <span class="cf-badge cf-upcoming">UPCOMING</span>
+        {% elif c.status == "running" %}
+            <span class="cf-badge cf-running">RUNNING</span>
+        {% else %}
+            <span class="cf-badge cf-finished">FINISHED</span>
+        {% endif %}
+    </td>
+
+    <td>{{ c.start_time|date:"d/m/Y H:i" }}</td>
+    <td>
+        {% if c.end_time %}
+            {{ c.end_time|timeuntil:c.start_time }}
+        {% else %}
+            — 
+        {% endif %}
+    </td>
+</tr>
+{% empty %}
+<tr><td colspan="4">❗ No contests yet.</td></tr>
+{% endfor %}
+</table>
+
 {% endblock %}
