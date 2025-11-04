@@ -14,9 +14,15 @@ def contest_list(request):
         else:
             c.status = "running"
 
-    return render(request, "contests/list_cf.html", {"contests": contests})
+    return render(request, "contests/list.html", {"contests": contests})
 
-
-def contest_detail(request, contest_id):
+def contest_rank(request, contest_id):
     contest = get_object_or_404(Contest, pk=contest_id)
-    return render(request, "contests/detail_cf.html", {"contest": contest})
+
+    # TODO: sau này kéo bảng điểm từ DB submissions
+    rankings = []  # tạm thời để trống, tránh lỗi
+
+    return render(request, "contests/rank.html", {
+        "contest": contest,
+        "rankings": rankings
+    })
