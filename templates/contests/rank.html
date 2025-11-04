@@ -1,17 +1,51 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<h2>🏆 Ranking – {{ contest.name }}</h2>
-<table border="1" cellpadding="6">
-  <tr><th>#</th><th>User</th><th>Score</th><th>Total Time</th></tr>
-  {% for r in ranks %}
-  <tr>
-    <td>{{ forloop.counter }}</td>
-    <td>{{ r.user__username }}</td>
-    <td>{{ r.score }}</td>
-    <td>{{ r.total_time|floatformat:2 }}s</td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="4">No accepted submissions yet.</td></tr>
-  {% endfor %}
+
+<style>
+.table-rank {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.table-rank th, .table-rank td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+.rank-1 { background: #fff8e1; font-weight: bold; }
+.rank-2 { background: #eef5ff; font-weight: bold; }
+.rank-3 { background: #e8fff3; font-weight: bold; }
+.rank-col { width: 60px; text-align:center; font-weight:bold; }
+.user-col a { color:#1976d2; font-weight:bold; text-decoration:none; }
+.user-col a:hover { text-decoration:underline; }
+</style>
+
+<h2>🏆 Contest Ranking — {{ contest.title }}</h2>
+
+<table class="table-rank">
+<thead>
+<tr>
+    <th class="rank-col">Rank</th>
+    <th>User</th>
+    <th>Score</th>
+    <th>Time</th>
+</tr>
+</thead>
+<tbody>
+
+{% for r in rankings %}
+<tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
+    <td class="rank-col">{{ forloop.counter }}</td>
+    <td class="user-col"><a href="#">{{ r.user }}</a></td>
+    <td><b>{{ r.score }}</b></td>
+    <td>{{ r.time|default:"—" }}</td>
+</tr>
+{% empty %}
+<tr><td colspan="4">❗ Chưa có người tham gia.</td></tr>
+{% endfor %}
+
+</tbody>
 </table>
+
+<a href="/contests/{{ contest.id }}/" style="margin-top:20px; display:inline-block;">⬅️ Quay lại contest</a>
 {% endblock %}
