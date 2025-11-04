@@ -1,68 +1,37 @@
-{% extends "admin/change_form.html" %}
+<!-- path: templates/admin/problems/change_form_with_upload.html -->
+{% extends "admin/base_site.html" %}
 {% load static %}
+{% block content %}
+<div class="container">
+  <h2>{{ original.code }} – {{ original.title }}</h2>
 
-{# ==== CSS/JS bổ sung (editor, KaTeX, AI) ==== #}
-{% block extrahead %}
-{{ block.super }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ adminform.form.as_p }}
+    <div class="submit-row">
+      <input type="submit" value="💾 Lưu thay đổi" class="default">
+    </div>
+  </form>
 
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-<script src="{% static 'js/ai_editor.js' %}"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Chỉ gắn editor vào đúng textarea của Django Admin
-  const textarea = document.querySelector("#id_statement");
-  if (textarea) {
-    new SimpleMDE({
-      element: textarea,
-      spellChecker: false,
-      autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
-      toolbar: [
-        "bold","italic","heading","|","quote","unordered-list","ordered-list","|",
-        "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"
-      ],
-      placeholder: "✏️ Nhập nội dung bài toán (Markdown + KaTeX: $a^2+b^2=c^2$)..."
-    });
-  }
-});
-</script>
-
-<style>
-/* Một ít style nhỏ, không ảnh hưởng core admin */
-.ai-section .button { margin-right: 6px; margin-bottom: 6px; }
-a.button-link {
-  display:inline-block; background:#3c8dbc; color:#fff; padding:6px 12px;
-  border-radius:6px; text-decoration:none;
-}
-a.button-link:hover { background:#337ab7; }
-</style>
-{% endblock %}
-
-{# ==== Chèn thêm khối sau phần field sets mặc định của admin ==== #}
-{% block after_field_sets %}
-<div class="ai-section" style="margin-top: 16px;">
   <hr>
   <h3>🤖 AI Hỗ trợ nhập liệu</h3>
-  <div>
+  <div class="ai-buttons">
     <button type="button" class="button" onclick="aiGenerateStatement()">✨ Tạo đề bài</button>
     <button type="button" class="button" onclick="aiFixLatex()">🧠 Sửa LaTeX</button>
     <button type="button" class="button" onclick="aiAutoTag()">🏷️ Gợi ý Tags + Code + Difficulty</button>
   </div>
   <p id="aiResult" style="margin-top:10px;color:#333;"></p>
-</div>
 
-<hr>
-<h3>👁 Test Cases</h3>
-{% if original and original.id %}
-  <p>
-    <a class="button-link" target="_blank" href="{% url 'admin:view_tests' original.id %}">👁 Mở danh sách test</a>
-  </p>
+  <hr>
+  <h3>👁 Test Cases</h3>
+  {% if original and original.id %}
+    <!-- dùng namespace 'admin' theo đúng get_urls -->
+    <a href="{% url 'admin:view_tests' original.id %}" target="_blank" class="button">👁 Mở danh sách test</a>
+  {% else %}
+    <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem test case.</p>
+  {% endif %}
 
+  {% if show_upload_button and original and original.id %}
   <hr>
   <h3>📦 Upload ZIP Test Cases</h3>
   <p style="margin:6px 0 10px;">
@@ -70,16 +39,46 @@ a.button-link:hover { background:#337ab7; }
     <code>thumuc/test01.in, test01.out</code> hoặc
     <code>tenbai/test01/tenbai.inp, tenbai.out</code>
   </p>
-  <form method="post" action="{% url 'admin:upload_tests' original.id %}" enctype="multipart/form-data">
+  <form action="{% url 'admin:upload_tests' original.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <input type="file" name="zip_file" accept=".zip" required>
-    <button type="submit" class="default btn btn-success" style="margin-top:6px;">
-      ⬆️ Upload và Import
-    </button>
+    <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
+    <button type="submit" class="default btn btn-success">⬆️ Upload và Import</button>
   </form>
-{% else %}
-  <p style="color:gray;">💡 Hãy lưu bài toán trước khi xem hoặc upload test case.</p>
-{% endif %}
-{% endblock %}
+  {% endif %}
+</div>
 
-{# Không override các block khác để giữ nguyên nút Lưu/Save chuẩn của Django Admin #}
+<!-- KaTeX + Marked -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- SimpleMDE Markdown Editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<!-- AI Editor logic -->
+<script src="{% static 'js/ai_editor.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const textarea = document.querySelector("#id_statement");
+  if (textarea) {
+    new SimpleMDE({
+      element: textarea,
+      spellChecker: false,
+      autosave: { enabled: true, delay: 1500, uniqueId: "problem_statement" },
+      toolbar: ["bold","italic","heading","|","quote","unordered-list","ordered-list","|",
+                "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"],
+      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown (hỗ trợ KaTeX: $a^2+b^2=c^2$)..."
+    });
+  }
+});
+</script>
+
+<style>
+.container{max-width:900px;margin:auto;font-family:sans-serif;}
+a.button{display:inline-block;background:#3c8dbc;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;}
+a.button:hover{background:#337ab7;}
+.ai-buttons .button{margin-right:6px;}
+</style>
+{% endblock %}
