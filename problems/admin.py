@@ -205,11 +205,15 @@ class ProblemAdmin(admin.ModelAdmin):
         )
 
     def delete_test(self, request, problem_id, test_id):
+        from django.views.decorators.csrf import csrf_exempt
         try:
-            TestCase.objects.get(id=test_id, problem_id=problem_id).delete()
+            testcase = TestCase.objects.get(id=test_id, problem_id=problem_id)
+            testcase.delete()
             return JsonResponse({"status": "ok"})
         except TestCase.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "Not found"}, status=404)
+            return JsonResponse({"status": "error", "message": "not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
     def download_tests(self, request, problem_id):
         problem = Problem.objects.get(pk=problem_id)
