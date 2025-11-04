@@ -48,22 +48,41 @@
 </table>
 
 <script>
+function getCSRF() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
 function deleteTest(testId) {
   if (!confirm("Bạn có chắc muốn xoá test này?")) return;
-  fetch(`/admin/problems/problem/{{ problem.id }}/delete_test/${testId}/`, {
+
+  fetch(`/admin/problems/problem/{{ problem.id }}/tests/${testId}/delete/`, {
     method: "POST",
-    headers: {"X-CSRFToken": "{{ csrf_token }}"}
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "ok") {
-      document.getElementById(`row-${testId}`).remove();
-    } else {
-      alert("❌ Lỗi: " + (data.message || "Không thể xoá"));
+    headers: {
+      "X-CSRFToken": getCSRF(),
+      "Accept": "application/json"
     }
+  })
+  .then(async res => {
+      const text = await res.text();
+      try { 
+          return JSON.parse(text);
+      } catch {
+          console.error("Server returned HTML instead of JSON:", text);
+          throw new Error("Server did not return JSON");
+      }
+  })
+  .then(data => {
+      if (data.status === "ok") {
+          document.getElementById(`row-${testId}`).remove();
+      } else {
+          alert("❌ Lỗi: " + (data.message || "Không thể xoá"));
+      }
   })
   .catch(err => alert("⚠️ Lỗi mạng: " + err));
 }
 </script>
+
 
 {% endblock %}
