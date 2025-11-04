@@ -5,39 +5,34 @@
 <div class="container">
   <h2>{{ original.code }} – {{ original.title }}</h2>
 
-  <!-- FORM CHÍNH -->
-  <form id="problem-form" method="post" enctype="multipart/form-data" novalidate>
+  <!-- === FORM CHÍNH === -->
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {{ adminform.form.as_p }}
 
     <div class="submit-row">
-      <input type="submit" value="💾 Lưu thay đổi" class="default">
+      <button type="submit" class="default">💾 Lưu thay đổi</button>
     </div>
   </form>
 
   <hr>
-
-  <!-- AI HỖ TRỢ -->
   <h3>🤖 AI Hỗ trợ nhập liệu</h3>
   <div class="ai-buttons">
-    <button type="button" class="button" onclick="aiGenerateStatement()">✨ Tạo đề bài</button>
-    <button type="button" class="button" onclick="aiFixLatex()">🧠 Sửa LaTeX</button>
-    <button type="button" class="button" onclick="aiAutoTag()">🏷️ Gợi ý Tags + Code + Difficulty</button>
+    <button class="button" onclick="aiGenerateStatement()">✨ Tạo đề bài</button>
+    <button class="button" onclick="aiFixLatex()">🧠 Sửa LaTeX</button>
+    <button class="button" onclick="aiAutoTag()">🏷️ Gợi ý Tags + Code + Difficulty</button>
   </div>
-  <p id="aiResult" style="margin-top:10px;color:#333;"></p>
+
+  <p id="aiResult" style="margin-top:10px;"></p>
 
   <hr>
-
-  <!-- TEST CASE VIEW -->
   <h3>👁 Test Cases</h3>
   {% if original and original.id %}
     <a href="{% url 'admin:view_tests' original.id %}"
        target="_blank"
-       class="button">
-       👁 Mở danh sách test
-    </a>
+       class="button">👁 Mở danh sách test</a>
   {% else %}
-    <p style="color:gray;">💡 Lưu bài toán trước khi xem test.</p>
+    <p style="color:gray;">💡 Lưu bài toán trước để xem test</p>
   {% endif %}
 
   {% if original and original.id %}
@@ -45,36 +40,24 @@
   <h3>📦 Upload ZIP Test Cases</h3>
   <p style="margin-bottom:8px;">
     Hỗ trợ:
-    <code>thumuc/test01.in/out</code> hoặc
-    <code>tenbai/test01/tenbai.inp/out</code>
+    <code>folder/test01.in, test01.out</code> hoặc
+    <code>problem/test01/problem.inp, problem.out</code>
   </p>
 
-  <!-- INPUT FILE KHÔNG TRONG FORM CHÍNH -->
-  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-  <input type="file" id="zip_file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
-
-  <!-- NÚT SUBMIT ĐI RIÊNG -->
-  <button type="submit"
-          formaction="{% url 'admin:upload_tests' original.id %}"
-          formmethod="post"
-          formenctype="multipart/form-data"
-          class="default btn btn-success">
-    ⬆️ Upload & Import
-  </button>
+  <!-- === FORM UPLOAD RIÊNG BIỆT === -->
+  <form action="{% url 'admin:upload_tests' original.id %}"
+        method="post"
+        enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" name="zip_file" accept=".zip" required style="margin-bottom:10px;">
+      <button type="submit" class="default btn btn-success">⬆️ Upload & Import</button>
+  </form>
   {% endif %}
 </div>
 
-<!-- KaTeX + Marked -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-<!-- SimpleMDE Markdown Editor -->
+<!-- Scripts -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
-<!-- AI Editor -->
-<script src="{% static 'js/ai_editor.js' %}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -87,12 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
         enabled: true,
         delay: 1500,
         uniqueId: "problem_statement_{{ original.id|default:'new' }}"
-      },
-      toolbar: [
-        "bold","italic","heading","|","quote","unordered-list","ordered-list","|",
-        "link","image","table","code","|","preview","side-by-side","fullscreen","|","guide"
-      ],
-      placeholder: "✏️ Nhập nội dung bài toán bằng Markdown (hỗ trợ LaTeX: $a^2+b^2=c^2$)..."
+      }
     });
   }
 });
@@ -100,9 +78,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <style>
 .container{max-width:900px;margin:auto;font-family:sans-serif;}
-a.button{display:inline-block;background:#3c8dbc;color:white;padding:6px 12px;border-radius:6px;text-decoration:none;}
-a.button:hover{background:#337ab7;}
+.button{background:#3c8dbc;color:#fff;padding:6px 12px;border-radius:6px;text-decoration:none;}
+.button:hover{background:#337ab7;}
 .ai-buttons .button{margin-right:6px;}
 </style>
-
 {% endblock %}
