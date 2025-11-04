@@ -55,9 +55,32 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <style>
-.container{max-width:900px;margin:auto;font-family:sans-serif;}
-.button{background:#3c8dbc;color:#fff;padding:6px 12px;border-radius:6px;text-decoration:none;}
-.button:hover{background:#337ab7;}
-.ai-buttons .button{margin-right:6px;}
+.container {
+    max-width: 1200px;
+    margin: auto;
+    font-family: sans-serif;
+}
+
+.button {
+    background:#3c8dbc;
+    color:#fff;
+    padding:6px 12px;
+    border-radius:6px;
+    text-decoration:none;
+}
+.button:hover { background:#337ab7; }
+
+.ai-buttons .button { margin-right:6px; }
+
+/* ✅ mở rộng vùng nhập statement */
+#id_statement {
+    min-height: 500px;
+}
+
+/* ✅ SimpleMDE fullscreen styling fix */
+.CodeMirror, .CodeMirror-scroll {
+    min-height: 500px !important;
+}
 </style>
+
 {% endblock %}
