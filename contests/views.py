@@ -1,21 +1,22 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Sum, Count, Min
-from submissions.models import Submission
 from .models import Contest
+from django.utils import timezone
 
 def contest_list(request):
-    return render(request, 'contests/list.html', { 'contests': Contest.objects.all() })
+    now = timezone.now()
+    contests = Contest.objects.all().order_by("-start_time")
+
+    for c in contests:
+        if c.start_time > now:
+            c.status = "upcoming"
+        elif c.end_time and c.end_time < now:
+            c.status = "finished"
+        else:
+            c.status = "running"
+
+    return render(request, "contests/list_cf.html", {"contests": contests})
+
 
 def contest_detail(request, contest_id):
-    c = get_object_or_404(Contest, id=contest_id)
-    return render(request, 'contests/detail.html', { 'contest': c })
-
-def contest_rank(request, contest_id):
-    c = get_object_or_404(Contest, id=contest_id)
-    # Score = number of Accepted submissions per user within contest problems
-    qs = (Submission.objects
-          .filter(problem__in=c.problems.all(), verdict='Accepted')
-          .values('user__username')
-          .annotate(score=Count('id'), total_time=Sum('exec_time'))
-          .order_by('-score', 'total_time'))
-    return render(request, 'contests/rank.html', { 'contest': c, 'ranks': qs })
+    contest = get_object_or_404(Contest, pk=contest_id)
+    return render(request, "contests/detail_cf.html", {"contest": contest})
