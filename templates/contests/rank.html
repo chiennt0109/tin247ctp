@@ -24,29 +24,33 @@
         </thead>
         <tbody>
           {% for r in rankings %}
-          {% if forloop.counter == 1 %}
-            {% set rank_color = "gold" %}
-          {% elif forloop.counter == 2 %}
-            {% set rank_color = "silver" %}
-          {% elif forloop.counter == 3 %}
-            {% set rank_color = "#cd7f32" %}
-          {% else %}
-            {% set rank_color = "inherit" %}
-          {% endif %}
-          <tr style="background-color:{% if forloop.counter <= 3 %}rgba(255,223,0,0.1){% endif %};">
-            <td class="fw-bold" style="color:{{ rank_color }};">
-              {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% endif %}
-              {{ forloop.counter }}
-            </td>
-            <td class="fw-semibold">{{ r.user.username }}</td>
-            <td class="text-center text-success fw-semibold">
-              {{ r.score|divisibleby:100 }}/{{ total_problems }}
-            </td>
-            <td class="text-center fw-bold text-primary">{{ r.score }}</td>
-            <td class="text-center text-muted">{{ r.penalty }}</td>
-            <td class="text-center">{{ r.last_submit|date:"d/m/Y H:i" }}</td>
-          </tr>
+            {% if forloop.counter == 1 %}
+              {% set_color = "gold" %}
+            {% elif forloop.counter == 2 %}
+              {% set_color = "silver" %}
+            {% elif forloop.counter == 3 %}
+              {% set_color = "#cd7f32" %}
+            {% endif %}
+            <tr style="background-color:{% if forloop.counter <= 3 %}rgba(255,223,0,0.1){% endif %};">
+              <td class="fw-bold" style="
+                {% if forloop.counter == 1 %}color:gold;
+                {% elif forloop.counter == 2 %}color:silver;
+                {% elif forloop.counter == 3 %}color:#cd7f32;
+                {% endif %}
+              ">
+                {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% endif %}
+                {{ forloop.counter }}
+              </td>
+              <td class="fw-semibold">{{ r.user.username }}</td>
+              <td class="text-center text-success fw-semibold">
+                {{ r.score|divisibleby:100 }}/{{ total_problems }}
+              </td>
+              <td class="text-center fw-bold text-primary">{{ r.score }}</td>
+              <td class="text-center text-muted">{{ r.penalty }}</td>
+              <td class="text-center">{{ r.last_submit|date:"d/m/Y H:i" }}</td>
+            </tr>
           {% endfor %}
+
         </tbody>
       </table>
 
