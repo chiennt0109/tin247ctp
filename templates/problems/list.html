@@ -123,8 +123,7 @@
 
       {% for i in problems.paginator.page_range %}
         <li class="page-item {% if problems.number == i %}active{% endif %}">
-          <a class="page-link rounded-pill"
-             href="?page={{ i }}&tag={{ selected_tag }}&difficulty={{ selected_difficulty }}">{{ i }}</a>
+          <a class="page-link rounded-pill" href="?page={{ i }}&tag={{ problems.tag_param }}&difficulty={{ problems.diff_param }}"> {{ i }} </a>
         </li>
       {% endfor %}
 
