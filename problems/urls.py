@@ -1,10 +1,14 @@
 # path: problems/urls.py
 from django.urls import path
 from . import views, views_admin
+from . import views_profile
 
 urlpatterns = [
     path('', views.problem_list, name="problem_list"),
     path('<int:pk>/', views.problem_detail, name="problem_detail"),
+
+    path("profile/", views_profile.profile_view, name="profile"),
+    path("change-password/", views_profile.change_password_view, name="change_password"),
 
     # AI cho user
     path('<int:pk>/ai_hint/', views.ai_hint, name="ai_hint"),
