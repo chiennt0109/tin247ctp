@@ -28,6 +28,8 @@ urlpatterns = [
     path("submissions/", include("submissions.urls")),
     path("admin/problems/ai_analyze_problem/", views_admin.ai_analyze_problem, name="ai_analyze_problem"),
     path("contests/", include("contests.urls")),
+    path("accounts/", include("allauth.urls")),
+    path("problems/", include(("problems.urls", "problems"), namespace="problems")),
 
 
     # ✅ Allauth auth routes (restore login/logout)
