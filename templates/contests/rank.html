@@ -1,51 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold mb-0">🏅 Bảng xếp hạng – {{ contest.name }}</h3>
+    <a href="{% url 'contest_detail' contest.id %}" class="btn btn-outline-secondary rounded-pill">
+      ← Quay lại contest
+    </a>
+  </div>
+
+  {% if rankings %}
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width:60px;">#</th>
+            <th>Người tham gia</th>
+            <th class="text-center">Điểm</th>
+            <th class="text-center">Penalty</th>
+            <th class="text-center">Lần nộp cuối</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rankings %}
+          <tr>
+            <td class="fw-bold">{{ forloop.counter }}</td>
+            <td>{{ r.user.username }}</td>
+            <td class="text-center fw-semibold text-success">{{ r.score|floatformat:2 }}</td>
+            <td class="text-center text-muted">{{ r.penalty }}</td>
+            <td class="text-center">{{ r.last_submit|date:"d/m/Y H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+    <p class="text-muted text-center py-4">❗ Chưa có ai tham gia cuộc thi này.</p>
+  {% endif %}
+</div>
 
 <style>
-.table-rank {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-.table-rank th, .table-rank td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #ddd;
-    font-size: 14px;
-}
-.rank-1 { background: #fff8e1; font-weight: bold; }
-.rank-2 { background: #eef5ff; font-weight: bold; }
-.rank-3 { background: #e8fff3; font-weight: bold; }
-.rank-col { width: 60px; text-align:center; font-weight:bold; }
-.user-col a { color:#1976d2; font-weight:bold; text-decoration:none; }
-.user-col a:hover { text-decoration:underline; }
+.table-hover tbody tr:hover { background-color:#f8fafc !important; }
+.table th, .table td { vertical-align: middle; }
 </style>
-
-<h2>🏆 Contest Ranking — {{ contest.title }}</h2>
-
-<table class="table-rank">
-<thead>
-<tr>
-    <th class="rank-col">Rank</th>
-    <th>User</th>
-    <th>Score</th>
-    <th>Time</th>
-</tr>
-</thead>
-<tbody>
-
-{% for r in rankings %}
-<tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
-    <td class="rank-col">{{ forloop.counter }}</td>
-    <td class="user-col"><a href="#">{{ r.user }}</a></td>
-    <td><b>{{ r.score }}</b></td>
-    <td>{{ r.time|default:"—" }}</td>
-</tr>
-{% empty %}
-<tr><td colspan="4">❗ Chưa có người tham gia.</td></tr>
-{% endfor %}
-
-</tbody>
-</table>
-
-<a href="/contests/{{ contest.id }}/" style="margin-top:20px; display:inline-block;">⬅️ Quay lại contest</a>
 {% endblock %}
