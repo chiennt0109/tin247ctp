@@ -56,16 +56,24 @@
 
         {% for p in problems %}
           <tr>
-            <td class="fw-bold text-primary"><h5 class="fw-bold text-dark mb-1">
-              <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.code }}</a></h5>
-            </td>
-
-            <td><h5 class="fw-bold text-dark mb-1">
-              <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.title }}</a></h5>
+            <td class="fw-bold">
+              <h5 class="fw-bold mb-1">
+                <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">
+                  {{ p.code }}
+                </a>
+              </h5>
             </td>
 
             <td>
-              {% if p.tags.all %}
+              <h5 class="fw-bold mb-1">
+                <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">
+                  {{ p.title }}
+                </a>
+              </h5>
+            </td>
+
+            <td>
+              {% if p.tags.all|length %}
                 {% for t in p.tags.all %}
                   <span class="badge bg-info-subtle text-info-emphasis rounded-pill">{{ t.name }}</span>
                 {% endfor %}
@@ -84,15 +92,19 @@
               {% endif %}
             </td>
 
-            <td style="min-width:150px;">
-              <div class="small text-muted">{{ p.ac_count }}/{{ p.submit_count }} ✅</div>
-              <div class="progress" style="height:6px;">
-                {% if p.submit_count > 0 %}
-                  <div class="progress-bar bg-success" style="width: {{ p.ac_pct }}%"></div>
-                {% else %}
+            <td style="min-width:180px;">
+              {% if p.submission_count and p.submission_count > 0 %}
+                {% widthratio p.ac_count p.submission_count 100 as ac_pct %}
+                <div class="small text-muted">{{ p.ac_count }}/{{ p.submission_count }} ✅ ({{ ac_pct }}%)</div>
+                <div class="progress" style="height:6px;">
+                  <div class="progress-bar bg-success" style="width: {{ ac_pct }}%"></div>
+                </div>
+              {% else %}
+                <div class="small text-muted">⏳ No submissions yet</div>
+                <div class="progress" style="height:6px;">
                   <div class="progress-bar bg-secondary" style="width:0%"></div>
-                {% endif %}
-              </div>
+                </div>
+              {% endif %}
             </td>
 
             <td class="text-center">
@@ -109,36 +121,46 @@
     </div>
   </div>
 
+  <!-- ✅ Pagination: giữ bộ lọc khi chuyển trang -->
   <nav>
-  <ul class="pagination justify-content-center mt-4">
+    <ul class="pagination justify-content-center mt-4">
 
-    {% if problems.has_previous %}
-    <li class="page-item"><a class="page-link rounded-pill" href="?page={{ problems.previous_page_number }}">⬅ Trước</a></li>
-    {% endif %}
+      {% if problems.has_previous %}
+      <li class="page-item">
+        <a class="page-link rounded-pill"
+           href="?page={{ problems.previous_page_number }}{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}">
+           ⬅ Trước
+        </a>
+      </li>
+      {% endif %}
 
-    {% for i in problems.paginator.page_range %}
-    <li class="page-item {% if problems.number == i %}active{% endif %}">
-      <a class="page-link rounded-pill" href="?page={{ i }}">{{ i }}</a>
-    </li>
-    {% endfor %}
+      {% for i in problems.paginator.page_range %}
+      <li class="page-item {% if problems.number == i %}active{% endif %}">
+        <a class="page-link rounded-pill"
+           href="?page={{ i }}{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}">
+           {{ i }}
+        </a>
+      </li>
+      {% endfor %}
 
-    {% if problems.has_next %}
-    <li class="page-item"><a class="page-link rounded-pill" href="?page={{ problems.next_page_number }}">Sau ➡</a></li>
-    {% endif %}
+      {% if problems.has_next %}
+      <li class="page-item">
+        <a class="page-link rounded-pill"
+           href="?page={{ problems.next_page_number }}{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}">
+           Sau ➡
+        </a>
+      </li>
+      {% endif %}
 
-  </ul>
-</nav>
-
+    </ul>
+  </nav>
 
 </div>
 
 <style>
-.table-hover tbody tr:hover {
-  background-color: #f8fafc !important;
-}
-.badge {
-  font-size: 0.72rem;
-}
+.table-hover tbody tr:hover { background-color: #f8fafc !important; }
+.badge { font-size: 0.72rem; }
+.hover-underline:hover { text-decoration: underline !important; }
 </style>
 
 {% endblock %}
