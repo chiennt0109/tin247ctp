@@ -2,28 +2,27 @@
 {% load static %}
 
 {% block content %}
+<div class="container py-4">
 
-<div class="container mt-4">
-
-  <h2 class="fw-bold mb-1">🧠 Ngân hàng bài tập</h2>
-  <p class="text-muted mb-4">Chọn bài phù hợp với trình độ, hoặc bắt đầu từ Easy ✨</p>
+  <div class="mb-3">
+      <h2 class="fw-bold">🧠 Ngân hàng bài tập</h2>
+      <p class="text-muted mb-1">Học theo từng cấp độ — bắt đầu từ dễ và tiến lên! 🚀</p>
+  </div>
 
   <!-- Filters -->
   <form method="get" class="row g-2 mb-3">
       <div class="col-md-3">
-          <select name="tag" class="form-select rounded-pill">
-              <option value="">🔖 Tất cả chủ đề</option>
+          <select name="tag" class="form-select rounded-pill shadow-sm">
+              <option value="">🔖 Chủ đề</option>
               {% for tag in tags %}
-              <option value="{{ tag.slug }}" {% if tag.slug == selected_tag %}selected{% endif %}>
-                  {{ tag.name }}
-              </option>
+              <option value="{{ tag.slug }}" {% if tag.slug == selected_tag %}selected{% endif %}>{{ tag.name }}</option>
               {% endfor %}
           </select>
       </div>
 
       <div class="col-md-3">
-          <select name="difficulty" class="form-select rounded-pill">
-              <option value="">🎯 Tất cả độ khó</option>
+          <select name="difficulty" class="form-select rounded-pill shadow-sm">
+              <option value="">🎯 Độ khó</option>
               {% for d in difficulty_levels %}
               <option value="{{ d }}" {% if d == selected_difficulty %}selected{% endif %}>{{ d }}</option>
               {% endfor %}
@@ -31,136 +30,121 @@
       </div>
 
       <div class="col-md-2 d-grid">
-          <button class="btn btn-primary rounded-pill">Lọc</button>
+          <button class="btn btn-primary rounded-pill shadow-sm">Lọc</button>
       </div>
       <div class="col-md-2 d-grid">
-          <a href="/problems/" class="btn btn-outline-secondary rounded-pill">Reset</a>
+          <a href="/problems/" class="btn btn-outline-secondary rounded-pill shadow-sm">Reset</a>
       </div>
   </form>
 
-  <!-- ✅ Datasheet Table -->
-  <div class="card border-0 shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>Mã</th>
-            <th>Tên bài</th>
-            <th>Tags</th>
-            <th>Độ khó</th>
-            <th>Tiến độ</th>
-            <th class="text-center">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
+  <!-- Problems List -->
+  <div class="card border-0 shadow-sm rounded-4">
+      <div class="table-responsive">
+          <table class="table table-hover align-middle">
+              <thead class="table-light">
+                  <tr>
+                      <th class="small">Mã</th>
+                      <th class="small">Tên bài</th>
+                      <th class="small">Tags</th>
+                      <th class="small">Độ khó</th>
+                      <th class="small">Tiến độ</th>
+                      <th class="small text-center" style="width:140px;">Thao tác</th>
+                  </tr>
+              </thead>
+              <tbody>
+              {% for p in problems %}
+                  <tr>
+                      <td class="fw-semibold text-primary">
+                          <a href="{% url 'problem_detail' p.id %}" class="text-decoration-none">{{ p.code }}</a>
+                      </td>
 
-        {% for p in problems %}
-          <tr>
-            <td class="fw-bold">
-              <h5 class="fw-bold mb-1">
-                <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">
-                  {{ p.code }}
-                </a>
-              </h5>
-            </td>
+                      <td class="fw-semibold">
+                          <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.title }}</a>
+                      </td>
 
-            <td>
-              <h5 class="fw-bold mb-1">
-                <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">
-                  {{ p.title }}
-                </a>
-              </h5>
-            </td>
+                      <td>
+                          {% if p.tags.all %}
+                            {% for t in p.tags.all %}
+                              <span class="badge bg-light text-dark border rounded-pill">{{ t.name }}</span>
+                            {% endfor %}
+                          {% else %}
+                            <span class="text-muted small">—</span>
+                          {% endif %}
+                      </td>
 
-            <td>
-              {% if p.tags.all|length %}
-                {% for t in p.tags.all %}
-                  <span class="badge bg-info-subtle text-info-emphasis rounded-pill">{{ t.name }}</span>
-                {% endfor %}
-              {% else %}
-                <span class="text-muted">—</span>
-              {% endif %}
-            </td>
+                      <td>
+                          {% if p.difficulty == "Easy" %}
+                            <span class="badge bg-success rounded-pill">Easy</span>
+                          {% elif p.difficulty == "Medium" %}
+                            <span class="badge bg-warning rounded-pill">Medium</span>
+                          {% else %}
+                            <span class="badge bg-danger rounded-pill">Hard</span>
+                          {% endif %}
+                      </td>
 
-            <td>
-              {% if p.difficulty == "Easy" %}
-                <span class="badge bg-success-subtle text-success-emphasis rounded-pill">Easy</span>
-              {% elif p.difficulty == "Medium" %}
-                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Medium</span>
-              {% else %}
-                <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Hard</span>
-              {% endif %}
-            </td>
+                      <td style="min-width:150px;">
+                          {% widthratio p.ac_count p.submission_count 100 as pct %}
+                          <div class="small text-muted">{{ p.ac_count }}/{{ p.submission_count }} ✅ ({{ pct }}%)</div>
+                          <div class="progress" style="height:5px;">
+                              <div class="progress-bar bg-success" style="width: {{ pct }}%"></div>
+                          </div>
+                      </td>
 
-            <td style="min-width:180px;">
-              {% if p.submission_count and p.submission_count > 0 %}
-                {% widthratio p.ac_count p.submission_count 100 as ac_pct %}
-                <div class="small text-muted">{{ p.ac_count }}/{{ p.submission_count }} ✅ ({{ ac_pct }}%)</div>
-                <div class="progress" style="height:6px;">
-                  <div class="progress-bar bg-success" style="width: {{ ac_pct }}%"></div>
-                </div>
-              {% else %}
-                <div class="small text-muted">⏳ No submissions yet</div>
-                <div class="progress" style="height:6px;">
-                  <div class="progress-bar bg-secondary" style="width:0%"></div>
-                </div>
-              {% endif %}
-            </td>
-
-            <td class="text-center">
-              <a href="{% url 'problem_detail' p.id %}" class="btn btn-outline-primary btn-sm rounded-pill">👁 Xem</a>
-              <a href="{% url 'submission_create' p.id %}" class="btn btn-success btn-sm rounded-pill ms-1">🚀 Nộp</a>
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="6" class="text-center text-muted py-3">Không tìm thấy bài nào</td></tr>
-        {% endfor %}
-
-        </tbody>
-      </table>
-    </div>
+                      <td class="text-center">
+                          <a href="{% url 'problem_detail' p.id %}" class="btn btn-light btn-sm rounded-pill border">
+                              👁
+                          </a>
+                          <a href="{% url 'submission_create' p.id %}" class="btn btn-success btn-sm rounded-pill ms-1">
+                              🚀
+                          </a>
+                      </td>
+                  </tr>
+              {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-3">Không có bài nào</td></tr>
+              {% endfor %}
+              </tbody>
+          </table>
+      </div>
   </div>
 
-  <!-- ✅ Pagination: giữ bộ lọc khi chuyển trang -->
-  <nav>
-    <ul class="pagination justify-content-center mt-4">
+  <!-- Pagination -->
+  {% if problems.paginator.num_pages > 1 %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
 
       {% if problems.has_previous %}
-      <li class="page-item">
-        <a class="page-link rounded-pill"
-           href="?page={{ problems.previous_page_number }}{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}">
-           ⬅ Trước
-        </a>
-      </li>
+        <li class="page-item">
+          <a class="page-link rounded-pill"
+             href="?page={{ problems.previous_page_number }}&tag={{ selected_tag }}&difficulty={{ selected_difficulty }}">
+             ⬅ Trước
+          </a>
+        </li>
       {% endif %}
 
       {% for i in problems.paginator.page_range %}
-      <li class="page-item {% if problems.number == i %}active{% endif %}">
-        <a class="page-link rounded-pill"
-           href="?page={{ i }}{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}">
-           {{ i }}
-        </a>
-      </li>
+        <li class="page-item {% if problems.number == i %}active{% endif %}">
+          <a class="page-link rounded-pill"
+             href="?page={{ i }}&tag={{ selected_tag }}&difficulty={{ selected_difficulty }}">{{ i }}</a>
+        </li>
       {% endfor %}
 
       {% if problems.has_next %}
-      <li class="page-item">
-        <a class="page-link rounded-pill"
-           href="?page={{ problems.next_page_number }}{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}">
-           Sau ➡
-        </a>
-      </li>
+        <li class="page-item">
+          <a class="page-link rounded-pill"
+             href="?page={{ problems.next_page_number }}&tag={{ selected_tag }}&difficulty={{ selected_difficulty }}">
+            Sau ➡
+          </a>
+        </li>
       {% endif %}
-
     </ul>
   </nav>
-
+  {% endif %}
 </div>
 
 <style>
-.table-hover tbody tr:hover { background-color: #f8fafc !important; }
-.badge { font-size: 0.72rem; }
-.hover-underline:hover { text-decoration: underline !important; }
+.table-hover tbody tr:hover { background-color:#f8fafc !important; }
+.hover-underline:hover { text-decoration: underline!important; }
+.card { border-radius: 14px!important; }
 </style>
 
 {% endblock %}
