@@ -11,11 +11,18 @@ class UserProgress(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="progress")
-    problem = models.ForeignKey("Problem", on_delete=models.CASCADE)
+    problem = models.ForeignKey("Problem", on_delete=models.CASCADE, related_name="user_progress")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="not_started")
     attempts = models.PositiveIntegerField(default=0)
-    last_submit = models.DateTimeField(auto_now=True)
     best_score = models.FloatField(default=0)
+    last_submit = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "problem")
+        indexes = [
+            models.Index(fields=["user", "status"]),
+            models.Index(fields=["problem"]),
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.problem.code} ({self.status})"
