@@ -4,6 +4,8 @@ from .models import Submission
 from problems.models import Problem
 from judge.grader import grade_submission
 from contests.utils import update_participation
+from contests.models import Contest, Participation
+
 
 @login_required
 def submission_create(request, problem_id):
