@@ -2,143 +2,84 @@
 {% load static %}
 
 {% block content %}
+<div class="problems-container">
+    <h2 class="page-title">📘 Problem Bank</h2>
 
-<div class="container mt-4">
-
-  <h2 class="fw-bold mb-1">🧠 Ngân hàng bài tập</h2>
-  <p class="text-muted mb-4">Chọn bài phù hợp với trình độ, hoặc bắt đầu từ Easy ✨</p>
-
-  <!-- Filters -->
-  <form method="get" class="row g-2 mb-3">
-      <div class="col-md-3">
-          <select name="tag" class="form-select rounded-pill">
-              <option value="">🔖 Tất cả chủ đề</option>
-              {% for tag in tags %}
-              <option value="{{ tag.slug }}" {% if tag.slug == selected_tag %}selected{% endif %}>
-                  {{ tag.name }}
-              </option>
-              {% endfor %}
-          </select>
-      </div>
-
-      <div class="col-md-3">
-          <select name="difficulty" class="form-select rounded-pill">
-              <option value="">🎯 Tất cả độ khó</option>
-              {% for d in difficulty_levels %}
-              <option value="{{ d }}" {% if d == selected_difficulty %}selected{% endif %}>{{ d }}</option>
-              {% endfor %}
-          </select>
-      </div>
-
-      <div class="col-md-2 d-grid">
-          <button class="btn btn-primary rounded-pill">Lọc</button>
-      </div>
-      <div class="col-md-2 d-grid">
-          <a href="/problems/" class="btn btn-outline-secondary rounded-pill">Reset</a>
-      </div>
-  </form>
-
-  <!-- ✅ Datasheet Table -->
-  <div class="card border-0 shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>Mã</th>
-            <th>Tên bài</th>
-            <th>Tags</th>
-            <th>Độ khó</th>
-            <th>Tiến độ</th>
-            <th class="text-center">Thao tác</th>
-          </tr>
+    <table class="problem-table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Problem</th>
+                <th>Difficulty</th>
+                <th>Progress</th>
+            </tr>
         </thead>
         <tbody>
+            {% for problem in page_obj %}
+            <tr>
+                <td class="code-column">{{ problem.code }}</td>
 
-        {% for p in problems %}
-          <tr>
-            <td class="fw-bold text-primary"><h5 class="fw-bold text-dark mb-1">
-              <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.code }}</a></h5>
-            </td>
+                <!-- giữ thẻ <a> cho tên bài -->
+                <td>
+                    <a class="problem-link" href="{% url 'problem_detail' problem.id %}">
+                        {{ problem.title }}
+                    </a>
+                </td>
 
-            <td><h5 class="fw-bold text-dark mb-1">
-              <a href="{% url 'problem_detail' p.id %}" class="text-dark text-decoration-none hover-underline">{{ p.title }}</a></h5>
-            </td>
+                <td>
+                    <span class="badge badge-{{ problem.difficulty|lower }}">
+                        {{ problem.difficulty }}
+                    </span>
+                </td>
 
-            <td>
-              {% if p.tags.all %}
-                {% for t in p.tags.all %}
-                  <span class="badge bg-info-subtle text-info-emphasis rounded-pill">{{ t.name }}</span>
-                {% endfor %}
-              {% else %}
-                <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-
-            <td>
-              {% if p.difficulty == "Easy" %}
-                <span class="badge bg-success-subtle text-success-emphasis rounded-pill">Easy</span>
-              {% elif p.difficulty == "Medium" %}
-                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Medium</span>
-              {% else %}
-                <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Hard</span>
-              {% endif %}
-            </td>
-
-            <td style="min-width:150px;">
-              <div class="small text-muted">{{ p.ac_count }}/{{ p.submit_count }} ✅</div>
-              <div class="progress" style="height:6px;">
-                {% if p.submit_count > 0 %}
-                  <div class="progress-bar bg-success" style="width: {{ p.ac_pct }}%"></div>
-                {% else %}
-                  <div class="progress-bar bg-secondary" style="width:0%"></div>
-                {% endif %}
-              </div>
-            </td>
-
-            <td class="text-center">
-              <a href="{% url 'problem_detail' p.id %}" class="btn btn-outline-primary btn-sm rounded-pill">👁 Xem</a>
-              <a href="{% url 'submission_create' p.id %}" class="btn btn-success btn-sm rounded-pill ms-1">🚀 Nộp</a>
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="6" class="text-center text-muted py-3">Không tìm thấy bài nào</td></tr>
-        {% endfor %}
-
+                <td>
+                    {% if problem.submission_count > 0 %}
+                        ✅ {{ problem.ac_count }}/{{ problem.submission_count }}
+                    {% else %}
+                        ⏳ No submissions yet
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No problems found.</td></tr>
+            {% endfor %}
         </tbody>
-      </table>
+    </table>
+
+    <!-- ✅ Pagination -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+        {% endif %}
     </div>
-  </div>
-
-  <nav>
-  <ul class="pagination justify-content-center mt-4">
-
-    {% if problems.has_previous %}
-    <li class="page-item"><a class="page-link rounded-pill" href="?page={{ problems.previous_page_number }}">⬅ Trước</a></li>
-    {% endif %}
-
-    {% for i in problems.paginator.page_range %}
-    <li class="page-item {% if problems.number == i %}active{% endif %}">
-      <a class="page-link rounded-pill" href="?page={{ i }}">{{ i }}</a>
-    </li>
-    {% endfor %}
-
-    {% if problems.has_next %}
-    <li class="page-item"><a class="page-link rounded-pill" href="?page={{ problems.next_page_number }}">Sau ➡</a></li>
-    {% endif %}
-
-  </ul>
-</nav>
-
-
 </div>
 
 <style>
-.table-hover tbody tr:hover {
-  background-color: #f8fafc !important;
-}
-.badge {
-  font-size: 0.72rem;
-}
+.problems-container { max-width: 900px; margin: auto; font-family: Inter, sans-serif; }
+.page-title { font-size: 26px; margin-bottom: 18px; font-weight: 600; }
+
+.problem-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.problem-table th { background:#f7faff; font-weight:600; padding:10px; }
+.problem-table td { padding:10px; border-top:1px solid #eee; }
+.problem-link { color:#2563eb; font-weight:500; text-decoration:none; }
+.problem-link:hover { text-decoration:underline; }
+
+.code-column { font-family: monospace; }
+
+.badge { padding:4px 8px; border-radius:6px; font-size:13px; color:white; }
+.badge-easy { background:#16a34a; }
+.badge-medium { background:#f59e0b; }
+.badge-hard { background:#dc2626; }
+
+.pagination { margin-top:18px; text-align:center; }
+.pagination a { margin:0 8px; padding:6px 10px; background:#2563eb; color:white; border-radius:5px; text-decoration:none; }
+.pagination span { margin:0 10px; }
 </style>
 
 {% endblock %}
