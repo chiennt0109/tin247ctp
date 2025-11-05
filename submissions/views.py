@@ -33,6 +33,7 @@ def submission_create(request, problem_id):
         sub.save()
         # cap nhat contest
         update_participation(request.user, sub.problem)
+        
         contest = Contest.objects.filter(problems=sub.problem).first()
         if contest:
             return redirect("contest_rank", contest_id=contest.id)
