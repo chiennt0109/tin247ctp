@@ -12,8 +12,10 @@ def contest_list(request):
 
 def contest_detail(request, contest_id):
     contest = get_object_or_404(Contest, pk=contest_id)
+    problems = contest.problems.all().order_by("code")  # Lấy bài trong contest
     return render(request, "contests/detail.html", {
-        "contest": contest
+        "contest": contest,
+        "problems": problems,
     })
 
 def contest_rank(request, contest_id):
