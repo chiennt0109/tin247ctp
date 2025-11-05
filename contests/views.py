@@ -1,10 +1,13 @@
 from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 from .models import Contest  # tên model của bạn
 
 def contest_list(request):
-    contests = Contest.objects.all().order_by('-start_time') if hasattr(Contest, 'start_time') else Contest.objects.all()
+    contests = Contest.objects.all().order_by('-start_time')
+    now = timezone.now()
     return render(request, "contests/list.html", {
-        "contests": contests
+        "contests": contests,
+        "now": now,
     })
 
 def contest_detail(request, contest_id):
