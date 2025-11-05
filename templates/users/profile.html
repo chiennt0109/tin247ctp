@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h3 class="fw-bold mb-3">👤 Hồ sơ học tập: {{ user.username }}</h3>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+        <h6 class="text-muted">Đã AC</h6>
+        <h2 class="fw-bold text-success">{{ solved }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+        <h6 class="text-muted">Đang làm</h6>
+        <h2 class="fw-bold text-warning">{{ in_progress }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+        <h6 class="text-muted">Chưa làm</h6>
+        <h2 class="fw-bold text-secondary">{{ not_started }}</h2>
+      </div>
+    </div>
+    <div class="col-md-3 text-center d-flex align-items-center justify-content-center">
+      <a href="{% url 'change_password' %}" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">🔒 Đổi mật khẩu</a>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-light fw-semibold">📈 Tiến trình học</div>
+      <div class="table-responsive">
+          <table class="table align-middle mb-0">
+              <thead class="table-light">
+                  <tr>
+                      <th>Bài toán</th>
+                      <th>Trạng thái</th>
+                      <th>Lần thử</th>
+                      <th>Điểm cao nhất</th>
+                      <th>Cập nhật</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for p in progresses %}
+                  <tr>
+                      <td><a href="{% url 'problem_detail' p.problem.id %}" class="text-decoration-none">{{ p.problem.title }}</a></td>
+                      <td>
+                          {% if p.status == 'solved' %}
+                              <span class="badge bg-success">Đã AC</span>
+                          {% elif p.status == 'in_progress' %}
+                              <span class="badge bg-warning text-dark">Đang làm</span>
+                          {% else %}
+                              <span class="badge bg-secondary">Chưa làm</span>
+                          {% endif %}
+                      </td>
+                      <td>{{ p.attempts }}</td>
+                      <td>{{ p.best_score }}</td>
+                      <td>{{ p.last_submit|date:"d/m/Y H:i" }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="5" class="text-center text-muted py-3">Chưa có dữ liệu tiến trình.</td></tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+{% endblock %}
