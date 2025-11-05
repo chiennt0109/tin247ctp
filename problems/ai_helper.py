@@ -6,6 +6,8 @@ Nếu sau này bạn muốn dùng API thật, chỉ cần sửa phần gen_ai_re
 """
 
 import random
+from problems.models import Problem, UserProgress
+from submissions.models import Submission
 
 # ======================
 # 🧠 AI Hint Generator
@@ -75,3 +77,45 @@ def build_learning_path(user, solved_count: int, avg_difficulty: str):
         "recommendations": plan
     }
 
+# 🚀 AI Recommend dựa theo hồ sơ người dùng
+def recommend_next_personal(user):
+    """
+    Gợi ý bài tiếp theo dựa vào tiến trình học (UserProgress + Submission).
+    """
+    if not user.is_authenticated:
+        return "🔒 Bạn cần đăng nhập để nhận gợi ý cá nhân hóa."
+
+    # 1️⃣ Lấy toàn bộ bài đã làm
+    solved = Submission.objects.filter(user=user, verdict="Accepted").values_list("problem__id", flat=True)
+    total = solved.count()
+
+    if total == 0:
+        # Người mới -> bắt đầu Easy
+        easy = Problem.objects.filter(difficulty="Easy").order_by("?").first()
+        return f"🔰 Bạn chưa làm bài nào. Hãy thử bắt đầu với bài **{easy.title}** (mức Easy)."
+
+    # 2️⃣ Tính độ khó trung bình đã làm
+    probs = Problem.objects.filter(id__in=solved)
+    diff_level = {"Easy": 1, "Medium": 2, "Hard": 3}
+    avg = sum(diff_level[p.difficulty] for p in probs) / len(probs)
+
+    # 3️⃣ Chọn mức gợi ý kế tiếp
+    if avg < 1.5:
+        next_diff = "Medium"
+    elif avg < 2.5:
+        next_diff = "Hard"
+    else:
+        next_diff = "Hard"
+
+    # 4️⃣ Gợi ý bài chưa làm trong mức đó
+    next_prob = (
+        Problem.objects.filter(difficulty=next_diff)
+        .exclude(id__in=solved)
+        .order_by("?")
+        .first()
+    )
+
+    if not next_prob:
+        return "🎉 Bạn đã hoàn thành hầu hết các bài trong mức này! Thử quay lại luyện tập các chủ đề yếu hơn nhé."
+
+    return f"🎯 Dựa trên tiến trình của bạn, hãy thử bài **{next_prob.title}** (mức {next_diff})."
