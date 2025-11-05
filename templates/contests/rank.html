@@ -49,7 +49,29 @@
           {% endfor %}
         </tbody>
       </table>
-    </div>
+
+      <div class="text-center mt-4">
+        <button id="aiReportBtn" class="btn btn-outline-info rounded-pill">
+          🤖 Xem phân tích AI cá nhân
+        </button>
+        <pre id="aiReportOutput" class="mt-3 p-3 bg-light rounded" style="display:none;"></pre>
+        </div>
+        
+        <script>
+        document.getElementById("aiReportBtn").addEventListener("click", async () => {
+          const res = await fetch(window.location.pathname + "ai_report/");
+          const data = await res.json();
+          const pre = document.getElementById("aiReportOutput");
+          pre.style.display = "block";
+          pre.innerHTML =
+            "📊 " + data.summary + "\n" +
+            "❌ Số lần nộp sai: " + data.wrong_subs + "\n\n" +
+            "🎯 Gợi ý học tập tiếp theo:\n" +
+            data.ai_path.map((s, i) => `${i+1}. ${s}`).join("\n");
+        });
+        </script>
+
+      </div>
   </div>
   {% else %}
     <p class="text-muted text-center py-4">❗ Chưa có ai tham gia cuộc thi này.</p>
