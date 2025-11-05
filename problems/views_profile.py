@@ -8,6 +8,8 @@ from django.db import connection
 from submissions.models import Submission
 from .models import Problem
 
+
+
 def _table_exists(table_name: str) -> bool:
     with connection.cursor() as cursor:
         return table_name in connection.introspection.table_names()
@@ -56,15 +58,20 @@ def profile_view(request):
 
 @login_required
 def change_password_view(request):
+    """
+    Trang đổi mật khẩu chuyên nghiệp (có đo độ mạnh và hiện/ẩn mật khẩu)
+    """
+    user = request.user
     if request.method == "POST":
-        form = PasswordChangeForm(request.user, request.POST)
+        form = PasswordChangeForm(user, request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             update_session_auth_hash(request, user)
-            messages.success(request, "✅ Mật khẩu đã được thay đổi thành công!")
+            messages.success(request, "✅ Mật khẩu đã được cập nhật thành công!")
             return redirect("profile")
         else:
-            messages.error(request, "❌ Có lỗi xảy ra. Vui lòng thử lại.")
+            messages.error(request, "⚠️ Có lỗi xảy ra, vui lòng kiểm tra lại.")
     else:
-        form = PasswordChangeForm(request.user)
+        form = PasswordChangeForm(user)
+
     return render(request, "users/change_password.html", {"form": form})
