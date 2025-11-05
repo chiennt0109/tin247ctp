@@ -16,6 +16,7 @@
           <tr>
             <th style="width:60px;">#</th>
             <th>Người tham gia</th>
+            <th class="text-center">AC/Tổng</th>
             <th class="text-center">Điểm</th>
             <th class="text-center">Penalty</th>
             <th class="text-center">Lần nộp cuối</th>
@@ -23,10 +24,25 @@
         </thead>
         <tbody>
           {% for r in rankings %}
-          <tr>
-            <td class="fw-bold">{{ forloop.counter }}</td>
-            <td>{{ r.user.username }}</td>
-            <td class="text-center fw-semibold text-success">{{ r.score|floatformat:2 }}</td>
+          {% if forloop.counter == 1 %}
+            {% set rank_color = "gold" %}
+          {% elif forloop.counter == 2 %}
+            {% set rank_color = "silver" %}
+          {% elif forloop.counter == 3 %}
+            {% set rank_color = "#cd7f32" %}
+          {% else %}
+            {% set rank_color = "inherit" %}
+          {% endif %}
+          <tr style="background-color:{% if forloop.counter <= 3 %}rgba(255,223,0,0.1){% endif %};">
+            <td class="fw-bold" style="color:{{ rank_color }};">
+              {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% endif %}
+              {{ forloop.counter }}
+            </td>
+            <td class="fw-semibold">{{ r.user.username }}</td>
+            <td class="text-center text-success fw-semibold">
+              {{ r.score|divisibleby:100 }}/{{ total_problems }}
+            </td>
+            <td class="text-center fw-bold text-primary">{{ r.score }}</td>
             <td class="text-center text-muted">{{ r.penalty }}</td>
             <td class="text-center">{{ r.last_submit|date:"d/m/Y H:i" }}</td>
           </tr>
@@ -39,11 +55,7 @@
     <p class="text-muted text-center py-4">❗ Chưa có ai tham gia cuộc thi này.</p>
   {% endif %}
 </div>
-<div class="text-start mt-3">
-  <a href="{% url 'contest_detail' contest.id %}" class="btn btn-outline-secondary rounded-pill">
-    ← Quay lại contest
-  </a>
-</div>
+
 <style>
 .table-hover tbody tr:hover { background-color:#f8fafc !important; }
 .table th, .table td { vertical-align: middle; }
