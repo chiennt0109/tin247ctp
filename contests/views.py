@@ -25,13 +25,10 @@ def contest_detail(request, contest_id):
 def contest_rank(request, contest_id):
     contest = get_object_or_404(Contest, pk=contest_id)
     total_problems = contest.problems.count()
-
-    # Lấy toàn bộ problems trong contest (cache 1 lần)
     contest_problems = list(contest.problems.all())
 
-    # ✅ Cập nhật điểm và penalty cho từng participant
+    # ✅ Cập nhật điểm và penalty
     for part in Participation.objects.filter(contest=contest).select_related("user"):
-        # số bài AC khác nhau
         ac_count = (
             Submission.objects.filter(
                 user=part.user,
@@ -43,30 +40,27 @@ def contest_rank(request, contest_id):
             .count()
         )
 
-        # số lần WA
         wrong_count = Submission.objects.filter(
             user=part.user,
             problem__in=contest_problems,
             verdict="Wrong Answer"
         ).count()
 
-        # thời gian nộp cuối cùng
         last_submit = (
             Submission.objects.filter(
                 user=part.user,
                 problem__in=contest_problems
             )
-            .aggregate(last=Max("submit_time"))["last"]
+            .aggregate(last=Max("created_at"))["last"]
         )
 
-        # ✅ Tính điểm + penalty
         part.score = ac_count * 100
         part.penalty = wrong_count * 10
         if last_submit:
             part.last_submit = last_submit
         part.save(update_fields=["score", "penalty", "last_submit"])
 
-    # ✅ Lấy danh sách xếp hạng
+    # ✅ Lấy bảng xếp hạng
     rankings = (
         Participation.objects.filter(contest=contest)
         .select_related("user")
