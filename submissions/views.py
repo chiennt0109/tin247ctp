@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Submission
 from problems.models import Problem
 from judge.grader import grade_submission
+from contests.utils import update_participation
 
 @login_required
 def submission_create(request, problem_id):
@@ -30,7 +31,8 @@ def submission_create(request, problem_id):
         sub.total_tests = total
         sub.debug_info = str(debug)
         sub.save()
-
+        # cap nhat contest
+        update_participation(request.user, submission.problem)
         return redirect("submission_detail", submission_id=sub.id)
 
     return render(request, "submissions/submit.html", {"problem": problem})
