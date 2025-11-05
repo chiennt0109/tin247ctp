@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import Contest, Participation
 from django.db.models import Count
 from submissions.models import Submission
+from .ai_analysis import analyze_user_performance
 
 def contest_list(request):
     contests = Contest.objects.all().order_by('-start_time')
@@ -47,4 +48,15 @@ def contest_rank(request, contest_id):
         "rankings": rankings,
         "total_problems": total_problems,
     })
+
+
+
+def contest_ai_report(request, contest_id):
+    contest = get_object_or_404(Contest, pk=contest_id)
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Bạn cần đăng nhập để xem phân tích."}, status=403)
+
+    report = analyze_user_performance(request.user, contest)
+    return JsonResponse(report)
+
 
