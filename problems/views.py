@@ -26,69 +26,51 @@ from .ai.ai_hint import get_hint
 def problem_list(request):
     tag_slug = request.GET.get("tag", "").strip()
     difficulty = request.GET.get("difficulty", "").strip()
+    search_query = request.GET.get("q", "").strip()
+    sort_by = request.GET.get("sort", "").strip()
 
     qs = Problem.objects.all().order_by("code")
 
+    # --- Lọc theo tag ---
     if tag_slug:
         qs = qs.filter(tags__slug=tag_slug)
+
+    # --- Lọc theo độ khó ---
     if difficulty:
-        qs = qs.filter(difficulty=difficulty)
+        qs = qs.filter(difficulty__iexact=difficulty)
 
-    # Kiểm tra có field ac_count / submit_count sẵn không để tránh trùng tên annotate
-    has_ac_field = False
-    has_submit_field = False
-    try:
-        Problem._meta.get_field("ac_count")
-        has_ac_field = True
-    except Exception:
-        pass
-    try:
-        Problem._meta.get_field("submit_count")
-        has_submit_field = True
-    except Exception:
-        pass
+    # --- Tìm kiếm theo tên bài ---
+    if search_query:
+        qs = qs.filter(Q(title__icontains=search_query) | Q(code__icontains=search_query))
 
-    if has_ac_field or has_submit_field:
-        qs = qs.annotate(
-            submit_count_agg=Count("submission", distinct=True),
-            ac_count_agg=Count("submission", filter=Q(submission__verdict="Accepted"), distinct=True),
-        )
-        problems = list(qs)
-        for p in problems:
-            if not hasattr(p, "submit_count") or p.submit_count is None:
-                setattr(p, "submit_count", getattr(p, "submit_count_agg", 0))
-            if not hasattr(p, "ac_count") or p.ac_count is None:
-                setattr(p, "ac_count", getattr(p, "ac_count_agg", 0))
-    else:
-        qs = qs.annotate(
-            submit_count=Count("submission", distinct=True),
-            ac_count=Count("submission", filter=Q(submission__verdict="Accepted"), distinct=True),
-        )
-        problems = list(qs)
+    # --- Sắp xếp theo yêu cầu ---
+    if sort_by == "difficulty":
+        qs = qs.order_by("difficulty", "code")
+    elif sort_by == "popularity":
+        qs = qs.order_by("-ac_count", "code")
 
-    # ✅ TÍNH SẴN % AC (tránh filter tùy biến trong template)
-    for p in problems:
-        sc = int(getattr(p, "submit_count", 0) or 0)
-        ac = int(getattr(p, "ac_count", 0) or 0)
-        p.ac_pct = int(ac * 100 / sc) if sc > 0 else 0
+    # --- Pagination ---
+    paginator = Paginator(qs, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-    tags = Tag.objects.all()
-    difficulties = ["Easy", "Medium", "Hard"]
+    # --- Danh sách tag & mức độ ---
+    tags = Tag.objects.all().order_by("name")
+    difficulty_levels = ["Easy", "Medium", "Hard"]
 
-    paginator = Paginator(problems, 9)  # 9 bài / trang
-    page = request.GET.get("page", 1)
-    problems_page = paginator.get_page(page)
-    problems_page.tag_param = tag_slug
-    problems_page.diff_param = difficulty
-    
-    context = {
-        "problems": problems_page,
-        "tags": tags,
-        "difficulty_levels": difficulties,
-        "selected_tag": tag_slug,
-        "selected_difficulty": difficulty,
-    }
-    return render(request, "problems/list.html", context)
+    return render(
+        request,
+        "problems/list.html",
+        {
+            "problems": page_obj,
+            "tags": tags,
+            "difficulty_levels": difficulty_levels,
+            "selected_tag": tag_slug,
+            "selected_difficulty": difficulty,
+            "search_query": search_query,
+            "sort_by": sort_by,
+        },
+    )
 
 # ===========================
 # 📘 CHI TIẾT BÀI TOÁN
