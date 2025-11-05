@@ -1,31 +1,8 @@
 # path: problems/models.py
 from django.db import models
-from django.utils import timezone  # ✅ Thêm dòng này để dùng timezone.now
 from django.contrib.auth.models import User
+from django.utils import timezone  # ✅ Thêm dòng này để dùng timezone.now
 
-class UserProgress(models.Model):
-    STATUS_CHOICES = [
-        ("not_started", "Chưa bắt đầu"),
-        ("in_progress", "Đang làm"),
-        ("solved", "Đã AC"),
-    ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="progress")
-    problem = models.ForeignKey("Problem", on_delete=models.CASCADE, related_name="user_progress")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="not_started")
-    attempts = models.PositiveIntegerField(default=0)
-    best_score = models.FloatField(default=0)
-    last_submit = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ("user", "problem")
-        indexes = [
-            models.Index(fields=["user", "status"]),
-            models.Index(fields=["problem"]),
-        ]
-
-    def __str__(self):
-        return f"{self.user.username} - {self.problem.code} ({self.status})"
 
 class Tag(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -71,3 +48,28 @@ class TestCase(models.Model):
 
     def __str__(self):
         return f"TestCase for {self.problem.code}"
+
+
+class UserProgress(models.Model):
+    STATUS_CHOICES = [
+        ("not_started", "Chưa bắt đầu"),
+        ("in_progress", "Đang làm"),
+        ("solved", "Đã AC"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="progress")
+    problem = models.ForeignKey("Problem", on_delete=models.CASCADE, related_name="user_progress")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="not_started")
+    attempts = models.PositiveIntegerField(default=0)
+    best_score = models.FloatField(default=0)
+    last_submit = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "problem")
+        indexes = [
+            models.Index(fields=["user", "status"]),
+            models.Index(fields=["problem"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.problem.code} ({self.status})"
