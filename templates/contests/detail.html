@@ -55,7 +55,11 @@
     <p class="text-muted text-center">❗ Cuộc thi này chưa có bài nào được thêm.</p>
   {% endif %}
 </div>
-
+<div class="text-end mt-3">
+  <a href="{% url 'contest_rank' contest.id %}" class="btn btn-outline-success rounded-pill">
+    🏅 Xem bảng xếp hạng
+  </a>
+</div>
 <style>
 .table-hover tbody tr:hover { background-color:#f8fafc !important; }
 .badge { font-size:0.85rem; }
