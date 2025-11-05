@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.db.models import Count, Q
 from django.core.paginator import Paginator
 import random
-
+from .ai_helper import recommend_next_personal
 from .models import Problem, Tag
 from submissions.models import Submission
 
@@ -19,7 +19,13 @@ from .ai_helper import (
 # AI hint LLM
 from .ai.ai_hint import get_hint
 
-
+def ai_recommend_personal(request):
+    """
+    Gợi ý bài tiếp theo dựa trên hồ sơ cá nhân.
+    """
+    user = request.user
+    res = recommend_next_personal(user)
+    return JsonResponse({"result": res})
 # ===========================
 # 🌈 DANH SÁCH BÀI TOÁN + PAGINATION
 # ===========================
