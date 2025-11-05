@@ -4,28 +4,54 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from .models import UserProgress
+from django.db import connection
+from submissions.models import Submission
+from .models import Problem
+
+def _table_exists(table_name: str) -> bool:
+    with connection.cursor() as cursor:
+        return table_name in connection.introspection.table_names()
 
 @login_required
 def profile_view(request):
     user = request.user
-    progresses = UserProgress.objects.filter(user=user).select_related("problem")
-    solved = progresses.filter(status="solved").count()
-    in_progress = progresses.filter(status="in_progress").count()
-    not_started = progresses.filter(status="not_started").count()
 
+    # Fallback: nếu chưa migrate UserProgress, vẫn hiển thị thông tin cơ bản từ Submission
+    has_userprogress = _table_exists("problems_userprogress")
+
+    solved_qs = Submission.objects.filter(user=user, verdict="Accepted")
+    solved = solved_qs.count()
+
+    # Estimate in-progress: có submission nhưng chưa AC
+    attempted_ids = Submission.objects.filter(user=user).values_list("problem_id", flat=True).distinct()
+    solved_ids = solved_qs.values_list("problem_id", flat=True).distinct()
+    in_progress = len(set(attempted_ids) - set(solved_ids))
+    not_started = max(0, Problem.objects.count() - len(set(attempted_ids)))
+
+    # Per-tag solved stats
     tags_data = {}
-    for p in progresses.filter(status="solved"):
-        for t in p.problem.tags.all():
+    for s in solved_qs.select_related("problem").prefetch_related("problem__tags"):
+        for t in s.problem.tags.all():
             tags_data[t.name] = tags_data.get(t.name, 0) + 1
+
+    # Optional detailed list:
+    progresses = []
+    if has_userprogress:
+        from .models import UserProgress
+        progresses = (
+            UserProgress.objects.filter(user=user)
+            .select_related("problem")
+            .order_by("-last_submit")
+        )
 
     return render(request, "users/profile.html", {
         "user": user,
-        "progresses": progresses,
+        "progresses": progresses,  # empty if table missing
         "solved": solved,
         "in_progress": in_progress,
         "not_started": not_started,
         "tags_data": tags_data,
+        "has_userprogress": has_userprogress,
     })
 
 @login_required
