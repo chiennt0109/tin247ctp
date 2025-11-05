@@ -47,7 +47,7 @@
         {% endif %}
     </td>
 
-    <td>
+   <td>
         {% if c.status == "upcoming" %}
             <span class="cf-badge cf-upcoming">UPCOMING</span>
         {% elif c.status == "running" %}
@@ -56,6 +56,9 @@
             <span class="cf-badge cf-finished">FINISHED</span>
         {% endif %}
     </td>
+    
+    <td>{{ c.start_time|date:"d/m/Y H:i" }}</td>
+    <td>{{ c.duration }}</td>
 
     <td>{{ c.start_time|date:"d/m/Y H:i" }}</td>
     <td>
