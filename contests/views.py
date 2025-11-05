@@ -27,7 +27,7 @@ def contest_rank(request, contest_id):
     total_problems = contest.problems.count()
     contest_problems = list(contest.problems.all())
 
-    # ✅ Cập nhật điểm và penalty
+    # ✅ Cập nhật điểm, penalty, và thời gian nộp gần nhất
     for part in Participation.objects.filter(contest=contest).select_related("user"):
         ac_count = (
             Submission.objects.filter(
@@ -46,6 +46,7 @@ def contest_rank(request, contest_id):
             verdict="Wrong Answer"
         ).count()
 
+        # ⚠️ Dùng created_at thay cho submit_time
         last_submit = (
             Submission.objects.filter(
                 user=part.user,
@@ -60,7 +61,7 @@ def contest_rank(request, contest_id):
             part.last_submit = last_submit
         part.save(update_fields=["score", "penalty", "last_submit"])
 
-    # ✅ Lấy bảng xếp hạng
+    # ✅ Xếp hạng
     rankings = (
         Participation.objects.filter(contest=contest)
         .select_related("user")
@@ -76,7 +77,6 @@ def contest_rank(request, contest_id):
             "total_problems": total_problems,
         },
     )
-
 
 
 def contest_ai_report(request, contest_id):
