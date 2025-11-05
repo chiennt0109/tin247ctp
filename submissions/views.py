@@ -32,7 +32,7 @@ def submission_create(request, problem_id):
         sub.debug_info = str(debug)
         sub.save()
         # cap nhat contest
-        update_participation(request.user, submission.problem)
+        #update_participation(request.user, submission.problem)
         return redirect("submission_detail", submission_id=sub.id)
 
     return render(request, "submissions/submit.html", {"problem": problem})
