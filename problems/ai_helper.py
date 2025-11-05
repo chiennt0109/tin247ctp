@@ -6,8 +6,9 @@ Nếu sau này bạn muốn dùng API thật, chỉ cần sửa phần gen_ai_re
 """
 
 import random
-from problems.models import Problem, UserProgress
 from submissions.models import Submission
+from problems.models import Problem, UserProgress
+
 
 # ======================
 # 🧠 AI Hint Generator
@@ -79,43 +80,52 @@ def build_learning_path(user, solved_count: int, avg_difficulty: str):
 
 # 🚀 AI Recommend dựa theo hồ sơ người dùng
 def recommend_next_personal(user):
-    """
-    Gợi ý bài tiếp theo dựa vào tiến trình học (UserProgress + Submission).
-    """
-    if not user.is_authenticated:
-        return "🔒 Bạn cần đăng nhập để nhận gợi ý cá nhân hóa."
+    if not user or not user.is_authenticated:
+        return {"message": "🔒 Bạn cần đăng nhập để nhận gợi ý cá nhân hóa."}
 
-    # 1️⃣ Lấy toàn bộ bài đã làm
-    solved = Submission.objects.filter(user=user, verdict="Accepted").values_list("problem__id", flat=True)
-    total = solved.count()
+    solved_ids = set(
+        Submission.objects.filter(user=user, verdict="Accepted")
+        .values_list("problem_id", flat=True)
+    )
+    total = len(solved_ids)
 
     if total == 0:
-        # Người mới -> bắt đầu Easy
-        easy = Problem.objects.filter(difficulty="Easy").order_by("?").first()
-        return f"🔰 Bạn chưa làm bài nào. Hãy thử bắt đầu với bài **{easy.title}** (mức Easy)."
+        first_easy = Problem.objects.filter(difficulty="Easy").order_by("code").first()
+        if not first_easy:
+            return {"message": "Chưa có bài Easy trong hệ thống."}
+        return {
+            "message": f"🔰 Bắt đầu từ bài **{first_easy.title}** (Easy).",
+            "problem_id": first_easy.id,
+            "problem_title": first_easy.title,
+            "difficulty": first_easy.difficulty,
+        }
 
-    # 2️⃣ Tính độ khó trung bình đã làm
-    probs = Problem.objects.filter(id__in=solved)
-    diff_level = {"Easy": 1, "Medium": 2, "Hard": 3}
-    avg = sum(diff_level[p.difficulty] for p in probs) / len(probs)
+    # Compute average difficulty of solved
+    diff_map = {"Easy": 1, "Medium": 2, "Hard": 3}
+    solved_probs = Problem.objects.filter(id__in=solved_ids)
+    if not solved_probs:
+        return {"message": "Không lấy được dữ liệu bài đã giải."}
 
-    # 3️⃣ Chọn mức gợi ý kế tiếp
-    if avg < 1.5:
-        next_diff = "Medium"
-    elif avg < 2.5:
-        next_diff = "Hard"
-    else:
-        next_diff = "Hard"
+    avg = sum(diff_map.get(p.difficulty, 2) for p in solved_probs) / len(solved_probs)
+    next_diff = "Medium" if avg < 1.5 else "Hard" if avg < 2.5 else "Hard"
 
-    # 4️⃣ Gợi ý bài chưa làm trong mức đó
-    next_prob = (
+    # pick an unsolved problem at target difficulty
+    candidate = (
         Problem.objects.filter(difficulty=next_diff)
-        .exclude(id__in=solved)
-        .order_by("?")
+        .exclude(id__in=solved_ids)
+        .order_by("-ac_count", "code")
         .first()
     )
 
-    if not next_prob:
-        return "🎉 Bạn đã hoàn thành hầu hết các bài trong mức này! Thử quay lại luyện tập các chủ đề yếu hơn nhé."
+    if not candidate:
+        # fallback to any unsolved
+        candidate = Problem.objects.exclude(id__in=solved_ids).order_by("-ac_count", "code").first()
+        if not candidate:
+            return {"message": "🎉 Tuyệt! Bạn gần như đã làm hết các bài! Hãy luyện đề theo tag yêu thích."}
 
-    return f"🎯 Dựa trên tiến trình của bạn, hãy thử bài **{next_prob.title}** (mức {next_diff})."
+    return {
+        "message": f"🎯 Dựa trên tiến trình của bạn, hãy thử bài **{candidate.title}** (mức {candidate.difficulty}).",
+        "problem_id": candidate.id,
+        "problem_title": candidate.title,
+        "difficulty": candidate.difficulty,
+    }
