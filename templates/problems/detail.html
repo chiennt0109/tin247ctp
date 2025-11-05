@@ -3,22 +3,20 @@
 {% block content %}
 
 <style>
-/* 📄 Layout chính */
 .problem-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  margin: 1.5rem auto;
   position: relative;
-  margin: 1rem auto;
-  padding-right: 70px; /* chừa chỗ cho toolbar bên phải */
 }
 .problem-paper {
   max-width: 880px;
   flex: 1;
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, .06);
+  box-shadow: 0 6px 24px rgba(0,0,0,.06);
   padding: 24px 22px;
   border: 1px solid #eef2f7;
 }
@@ -29,55 +27,38 @@
   margin-bottom: 4px;
 }
 
-/* 🧾 Markdown */
-.markdown-body {
-  line-height: 1.65;
-  color: #111827;
-  font-size: 16px;
-}
-.markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  margin-top: 1.15em;
-  font-weight: 700;
-}
-.markdown-body code { background: #f6f8fa; padding: .15rem .35rem; border-radius: 6px; }
-.markdown-body pre code { display: block; padding: 12px; border-radius: 10px; overflow: auto; }
-.markdown-body table { border-collapse: collapse; margin: 10px 0; width: 100%; }
-.markdown-body th, .markdown-body td { border: 1px solid #e5e7eb; padding: 6px 10px; }
-.katex-display { margin: 1rem 0; text-align: center; }
-
-/* 🎯 Toolbar cố định bên phải */
-.toolbar-fixed {
-  position: fixed;
-  right: 20px;
-  top: 35%;
+/* ======================
+   🎛 Thanh công cụ bên phải (sát giấy)
+====================== */
+.toolbar-side {
+  position: sticky;
+  top: 120px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  z-index: 100;
+  align-items: flex-start;
 }
-.toolbar-fixed button,
-.toolbar-fixed a {
+.toolbar-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 10px 12px;
-  border-radius: 50%;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
   border: none;
-  cursor: pointer;
-  font-size: 18px;
   color: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  cursor: pointer;
   transition: transform .15s ease;
+  width: 170px;
 }
-.toolbar-fixed button:hover,
-.toolbar-fixed a:hover { transform: scale(1.07); }
+.toolbar-btn:hover { transform: scale(1.04); }
 .btn-back { background: #6b7280; }
 .btn-submit { background: #16a34a; }
 .btn-ai { background: #2563eb; }
 .btn-next { background: #0ea5e9; }
 .btn-copy { background: #374151; }
 
-/* 💬 Kết quả AI */
 .alert-soft {
   background: #f8fafc;
   border: 1px solid #e5e7eb;
@@ -89,24 +70,32 @@
 .badge-soft { border-radius: 999px; padding: .25rem .6rem; font-weight: 600; font-size: .82rem; }
 .badge-easy { background: #ecfdf5; color: #064e3b; }
 .badge-info { background: #eff6ff; color: #1d4ed8; }
+
+/* Markdown + code */
+.markdown-body { line-height: 1.65; color: #111827; font-size: 16px; }
+.markdown-body code { background: #f6f8fa; padding: .15rem .35rem; border-radius: 6px; }
+.markdown-body pre code { display: block; padding: 12px; border-radius: 10px; overflow: auto; }
+.markdown-body table { border-collapse: collapse; margin: 10px 0; width: 100%; }
+.markdown-body th, .markdown-body td { border: 1px solid #e5e7eb; padding: 6px 10px; }
+.katex-display { margin: 1rem 0; text-align: center; }
 </style>
 
 <div class="problem-container">
 
-  <!-- 🎯 Toolbar bên phải -->
-  <div class="toolbar-fixed">
+  <!-- ✅ Thanh công cụ sát bên phải -->
+  <div class="toolbar-side">
     {% if request.GET.contest_id %}
-      <a href="{% url 'contests:contest_detail' request.GET.contest_id %}" title="Back to Contest" class="btn-back">⬅</a>
+      <a href="{% url 'contests:contest_detail' request.GET.contest_id %}" class="toolbar-btn btn-back">⬅ Quay lại Contest</a>
     {% else %}
-      <a href="{% url 'problems:problem_list' %}" title="Back to Problems" class="btn-back">⬅</a>
+      <a href="{% url 'problems:problem_list' %}" class="toolbar-btn btn-back">⬅ Quay lại Problems</a>
     {% endif %}
-    <a href="{% url 'submission_create' problem.id %}" title="Submit Code" class="btn-submit">🚀</a>
-    <button id="btn-ai-hint" title="AI Hint" class="btn-ai">💡</button>
-    <button id="btn-ai-next" title="AI Recommend" class="btn-next">📌</button>
-    <button id="btn-ai-copy" title="Copy Problem" class="btn-copy">📋</button>
+    <a href="{% url 'submission_create' problem.id %}" class="toolbar-btn btn-submit">🚀 Nộp bài</a>
+    <button id="btn-ai-hint" class="toolbar-btn btn-ai">💡 Gợi ý AI</button>
+    <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế tiếp</button>
+    <button id="btn-ai-copy" class="toolbar-btn btn-copy">📋 Copy đề</button>
   </div>
 
-  <!-- 📜 Nội dung đề -->
+  <!-- 📄 Nội dung bài toán -->
   <div class="problem-paper">
     <div class="problem-title">{{ problem.title }}</div>
     <div class="text-muted mb-2">{{ problem.code }}</div>
@@ -121,17 +110,16 @@
     <hr class="my-3">
     <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
     <div id="problem-statement" class="markdown-body"></div>
-    <hr class="my-3">
 
+    <hr class="my-3">
     <div class="text-success fw-semibold">
       ✅ Đã AC: {{ ac_count }} / {{ submit_count }} submissions
     </div>
-
     <div id="aiBox" class="alert-soft"></div>
   </div>
 </div>
 
-<!-- 🔗 Assets -->
+<!-- Assets -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -141,9 +129,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
 <script>
-// =====================
-// 🧩 Markdown Render
-// =====================
+// Markdown render
 (function(){
   const src = document.getElementById('md-src');
   const out = document.getElementById('problem-statement');
@@ -170,16 +156,12 @@
   out.querySelectorAll('pre code').forEach(el => { try { hljs.highlightElement(el) } catch(e){} });
 })();
 
-// =====================
-// 🤖 AI Functions
-// =====================
+// AI helpers
 function showAI(text, type='info'){
   const box = document.getElementById('aiBox');
   box.style.display = 'block';
-  box.className = 'alert-soft';
   box.innerHTML = (type==='error' ? '⚠️ ' : '🤖 ') + text;
 }
-
 document.getElementById('btn-ai-hint').addEventListener('click', async () => {
   try {
     const res = await fetch("{% url 'ai_hint' problem.id %}");
@@ -188,7 +170,6 @@ document.getElementById('btn-ai-hint').addEventListener('click', async () => {
     showAI(data.hint || data.result || 'Không có gợi ý.');
   } catch { showAI('Không gọi được gợi ý AI.', 'error'); }
 });
-
 document.getElementById('btn-ai-next').addEventListener('click', async () => {
   try {
     const res = await fetch("{% url 'ai_recommend' problem.id %}");
@@ -197,7 +178,6 @@ document.getElementById('btn-ai-next').addEventListener('click', async () => {
     showAI(data.result || 'Không có đề xuất.');
   } catch { showAI('Không gọi được gợi ý bài kế tiếp.', 'error'); }
 });
-
 document.getElementById('btn-ai-copy').addEventListener('click', async () => {
   const txt = document.getElementById('problem-statement').innerText;
   try { await navigator.clipboard.writeText(txt); showAI('Đã copy nội dung đề ✅'); }
