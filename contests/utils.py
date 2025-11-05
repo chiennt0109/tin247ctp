@@ -1,27 +1,45 @@
-from .models import Participation, Contest
+# path: contests/utils.py
+from django.db.models import Max
+from contests.models import Contest, Participation
 from submissions.models import Submission
-from django.utils import timezone
 
 def update_participation(user, problem):
-    """Khi người dùng nộp bài, tự động cập nhật điểm vào Participation."""
-    # Tìm contest chứa problem này
+    """Cập nhật điểm và penalty của người dùng trong contest chứa problem đó."""
+
+    # Xác định contest nào chứa problem này
     contests = Contest.objects.filter(problems=problem)
+
     for contest in contests:
-        part, _ = Participation.objects.get_or_create(contest=contest, user=user)
+        # lấy (hoặc tạo) bản ghi Participation
+        part, _ = Participation.objects.get_or_create(user=user, contest=contest)
 
-        # Đếm số bài đã AC trong contest
-        ac_count = Submission.objects.filter(
-            user=user, problem__in=contest.problems.all(), verdict="Accepted"
-        ).count()
+        # các bài trong contest
+        contest_problems = list(contest.problems.all())
 
-        # Tổng điểm = 100 * số bài AC
-        part.score = ac_count * 100
-        part.last_submit = timezone.now()
+        # đếm số bài AC khác nhau
+        ac_count = (
+            Submission.objects.filter(
+                user=user, problem__in=contest_problems, verdict="Accepted"
+            )
+            .values("problem")
+            .distinct()
+            .count()
+        )
 
-        # Phạt (penalty) = số lần nộp sai trước khi AC
+        # đếm số lần Wrong Answer
         wrong_count = Submission.objects.filter(
-            user=user, problem__in=contest.problems.all(), verdict="Wrong Answer"
+            user=user, problem__in=contest_problems, verdict="Wrong Answer"
         ).count()
-        part.penalty = wrong_count * 10
 
-        part.save()
+        # thời điểm nộp gần nhất
+        last_submit = (
+            Submission.objects.filter(user=user, problem__in=contest_problems)
+            .aggregate(last=Max("created_at"))["last"]
+        )
+
+        # ✅ Cập nhật Participation
+        part.score = ac_count * 100
+        part.penalty = wrong_count * 10
+        if last_submit:
+            part.last_submit = last_submit
+        part.save(update_fields=["score", "penalty", "last_submit"])
