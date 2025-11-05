@@ -28,6 +28,17 @@
               {% endfor %}
           </select>
       </div>
+      <div class="col-md-3">
+          <input type="text" name="q" value="{{ search_query }}" placeholder="🔍 Tìm bài..." class="form-control rounded-pill shadow-sm">
+      </div>
+      
+      <div class="col-md-2">
+          <select name="sort" class="form-select rounded-pill shadow-sm">
+              <option value="">⚙️ Sắp xếp</option>
+              <option value="difficulty" {% if sort_by == "difficulty" %}selected{% endif %}>Theo độ khó</option>
+              <option value="popularity" {% if sort_by == "popularity" %}selected{% endif %}>Theo độ phổ biến</option>
+          </select>
+      </div>
 
       <div class="col-md-2 d-grid">
           <button class="btn btn-primary rounded-pill shadow-sm">Lọc</button>
