@@ -9,6 +9,8 @@ urlpatterns = [
 
     path("profile/", views_profile.profile_view, name="profile"),
     path("change-password/", views_profile.change_password_view, name="change_password"),
+    path("ai_recommend_personal/", views.ai_recommend_personal, name="ai_recommend_personal"),
+
 
     # AI cho user
     path('<int:pk>/ai_hint/', views.ai_hint, name="ai_hint"),
