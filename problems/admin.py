@@ -14,7 +14,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from .models import Problem, TestCase, Tag
 
-
+from .models import UserProgress
 # ----- Helpers -----
 
 IN_EXTS = {".in", ".inp", ".txt"}
@@ -106,7 +106,12 @@ class TestCaseInline(admin.TabularInline):
 
 
 # ----- Admin -----
-
+@admin.register(UserProgress)
+class UserProgressAdmin(admin.ModelAdmin):
+    list_display = ("user", "problem", "status", "attempts", "best_score", "last_submit")
+    list_filter  = ("status",)
+    search_fields = ("user__username", "problem__title", "problem__code")
+    
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     form = ProblemAdminForm
@@ -307,3 +312,5 @@ class ProblemAdmin(admin.ModelAdmin):
             "Sinh đề đồ thị dạng BFS/DFS cơ bản.",
         ]
         return JsonResponse({"samples": samples})
+
+
