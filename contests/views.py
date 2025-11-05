@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from .models import Contest  # tên model của bạn
+from .models import Contest, Participation
 
 def contest_list(request):
     contests = Contest.objects.all().order_by('-start_time')
@@ -20,8 +20,15 @@ def contest_detail(request, contest_id):
 
 def contest_rank(request, contest_id):
     contest = get_object_or_404(Contest, pk=contest_id)
-    rankings = []  # tạm thời để không lỗi
+    rankings = (
+        Participation.objects.filter(contest=contest)
+        .select_related("user")
+        .order_by("-score", "penalty", "last_submit")
+    )
+
     return render(request, "contests/rank.html", {
         "contest": contest,
-        "rankings": rankings
+        "rankings": rankings,
     })
+
+
