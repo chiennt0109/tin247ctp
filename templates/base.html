@@ -128,15 +128,15 @@
         <ul class="navbar-nav ms-auto align-items-center">
           {% if user.is_authenticated %}
             <li class="nav-item dropdown">
-                 <a class="nav-link dropdown-toggle fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    👤 {{ user.username }}
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="{% url 'profile' %}">📈 Hồ sơ học tập</a></li>
-                    <li><a class="dropdown-item" href="{% url 'change_password' %}">🔒 Đổi mật khẩu</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    
-                </ul>
+              <a class="nav-link dropdown-toggle fw-semibold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                👤 {{ user.username }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                <!-- ✅ sửa namespace -->
+                <li><a class="dropdown-item" href="{% url 'problems:profile' %}">📈 Hồ sơ học tập</a></li>
+                <li><a class="dropdown-item" href="{% url 'problems:change_password' %}">🔒 Đổi mật khẩu</a></li>
+                <li><hr class="dropdown-divider"></li>
+              </ul>
             </li>
             <li class="nav-item">
               <form method="post" action="/accounts/logout/" style="display:inline;">
@@ -184,12 +184,9 @@
   <div id="hotline-popup"
        class="hidden fixed bottom-0 left-0 w-full transition-all duration-300 transform translate-y-full z-[9999]">
     <div class="bg-white backdrop-blur-md rounded-t-3xl border-t border-gray-200 p-5 max-w-md mx-auto">
-
       <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
 
-      
       <div class="text-center my-3">
-        
         <div>
           <p class="fw-semibold mb-0 text-gray-800">Học trò tri ân</p>
           <small class="text-gray-500">☕ Một ly cà phê sẻ chia</small>
@@ -197,7 +194,6 @@
       </div>
 
       <div class="text-center my-3">
-        
         <div>
           <p class="fw-semibold mb-0 text-gray-800">Bạn bè ủng hộ</p>
           <small class="text-gray-500">🍜 Một bát phở ấm lòng</small>
@@ -213,7 +209,7 @@
       <a href="https://zalo.me/0934353569" target="_blank"
          class="btn w-100 text-white fw-semibold shadow-sm py-2"
          style="background: linear-gradient(to right, #00a8ff, #0077cc); border-radius:12px;">
-         💬 Liên hệ Zalo nhé!
+         💬 Liên hệ Zalo!
       </a>
 
       <div class="text-center mt-3">
