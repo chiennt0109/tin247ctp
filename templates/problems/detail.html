@@ -33,48 +33,30 @@
   top: 120px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
+  gap: 12px;
+  align-items: flex-end;
+  margin-left: auto;
 }
 .toolbar-btn {
-  position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 15px;
   border: none;
   color: #fff;
   cursor: pointer;
-  transition: transform .15s ease;
-  width: 170px;
+  transition: transform .15s ease, box-shadow .15s ease;
+  min-width: 180px;
+  text-align: left;
 }
-.toolbar-btn:hover { transform: scale(1.04); }
-
-/* Tooltip */
-.toolbar-btn[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  right: 110%;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 13px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .15s ease, transform .15s ease;
+.toolbar-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-.toolbar-btn:hover::after {
-  opacity: 1;
-  transform: translate(-4px, -50%);
-}
-
 .btn-back { background: #6b7280; }
 .btn-submit { background: #16a34a; }
 .btn-ai { background: #2563eb; }
@@ -88,54 +70,86 @@
   padding: 12px 14px;
   margin-top: 14px;
   display: none;
+  line-height: 1.5;
 }
 .badge-soft { border-radius: 999px; padding: .25rem .6rem; font-weight: 600; font-size: .82rem; }
 .badge-easy { background: #ecfdf5; color: #064e3b; }
 .badge-info { background: #eff6ff; color: #1d4ed8; }
 
-/* Markdown */
 .markdown-body { line-height: 1.65; color: #111827; font-size: 16px; }
 .markdown-body code { background: #f6f8fa; padding: .15rem .35rem; border-radius: 6px; }
 .markdown-body pre code { display: block; padding: 12px; border-radius: 10px; overflow: auto; }
 .markdown-body table { border-collapse: collapse; margin: 10px 0; width: 100%; }
 .markdown-body th, .markdown-body td { border: 1px solid #e5e7eb; padding: 6px 10px; }
 .katex-display { margin: 1rem 0; text-align: center; }
+
+/* 📱 Floating button cho mobile */
+#ai-fab {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #2563eb;
+  color: #fff;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 26px;
+  border: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  z-index: 999;
+}
+#ai-menu {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  padding: 10px;
+  z-index: 999;
+}
+#ai-menu button, #ai-menu a {
+  display: block;
+  width: 180px;
+  margin: 6px 0;
+  text-align: left;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-weight: 600;
+  color: #fff;
+}
+#ai-menu .btn-back { background: #6b7280; }
+#ai-menu .btn-submit { background: #16a34a; }
+#ai-menu .btn-ai { background: #2563eb; }
+#ai-menu .btn-next { background: #0ea5e9; }
+#ai-menu .btn-copy { background: #374151; }
+
+@media (max-width: 768px) {
+  .toolbar-side { display: none; }
+  #ai-fab { display: block; }
+}
 </style>
 
 <div class="problem-container">
 
-  <!-- 🎯 Thanh công cụ sát giấy -->
+  <!-- ✅ Thanh công cụ bên phải -->
   <div class="toolbar-side">
     {% if request.GET.contest_id %}
-      <a href="{% url 'contests:contest_detail' request.GET.contest_id %}"
-         class="toolbar-btn btn-back"
-         data-tooltip="Quay lại contest">
-         ⬅ Quay lại Contest
-      </a>
+      <a href="{% url 'contests:contest_detail' request.GET.contest_id %}" class="toolbar-btn btn-back">⬅ Quay lại Contest</a>
     {% else %}
-      <a href="{% url 'problems:problem_list' %}"
-         class="toolbar-btn btn-back"
-         data-tooltip="Quay lại danh sách bài tập">
-         ⬅ Quay lại Problems
-      </a>
+      <a href="{% url 'problems:problem_list' %}" class="toolbar-btn btn-back">⬅ Quay lại Problems</a>
     {% endif %}
-    <a href="{% url 'submission_create' problem.id %}"
-       class="toolbar-btn btn-submit"
-       data-tooltip="Nộp bài code của bạn">
-       🚀 Nộp bài
-    </a>
-    <button id="btn-ai-hint" class="toolbar-btn btn-ai" data-tooltip="Nhận gợi ý từ AI">
-      💡 Gợi ý
-    </button>
-    <button id="btn-ai-next" class="toolbar-btn btn-next" data-tooltip="Gợi ý bài tiếp theo phù hợp">
-      📌 Bài kế tiếp
-    </button>
-    <button id="btn-ai-copy" class="toolbar-btn btn-copy" data-tooltip="Sao chép toàn bộ nội dung đề">
-      📋 Copy đề
-    </button>
+    <a href="{% url 'submission_create' problem.id %}" class="toolbar-btn btn-submit">🚀 Nộp bài</a>
+    <button id="btn-ai-hint" class="toolbar-btn btn-ai">💡 Gợi ý AI</button>
+    <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế tiếp</button>
+    <button id="btn-ai-copy" class="toolbar-btn btn-copy">📋 Copy đề</button>
   </div>
 
-  <!-- 📜 Nội dung đề -->
+  <!-- 📄 Giấy đề -->
   <div class="problem-paper">
     <div class="problem-title">{{ problem.title }}</div>
     <div class="text-muted mb-2">{{ problem.code }}</div>
@@ -157,6 +171,20 @@
     </div>
     <div id="aiBox" class="alert-soft"></div>
   </div>
+</div>
+
+<!-- ⚙️ Nút mobile -->
+<button id="ai-fab">⚙️</button>
+<div id="ai-menu">
+  {% if request.GET.contest_id %}
+    <a href="{% url 'contests:contest_detail' request.GET.contest_id %}" class="btn-back">⬅ Quay lại Contest</a>
+  {% else %}
+    <a href="{% url 'problems:problem_list' %}" class="btn-back">⬅ Quay lại Problems</a>
+  {% endif %}
+  <a href="{% url 'submission_create' problem.id %}" class="btn-submit">🚀 Nộp bài</a>
+  <button id="btn-ai-hint-m" class="btn-ai">💡 Gợi ý AI</button>
+  <button id="btn-ai-next-m" class="btn-next">📌 Bài kế</button>
+  <button id="btn-ai-copy-m" class="btn-copy">📋 Copy đề</button>
 </div>
 
 <!-- Assets -->
@@ -196,32 +224,39 @@
   out.querySelectorAll('pre code').forEach(el => { try { hljs.highlightElement(el) } catch(e){} });
 })();
 
-// AI helpers
+// AI interaction
 function showAI(text, type='info'){
   const box = document.getElementById('aiBox');
   box.style.display = 'block';
   box.innerHTML = (type==='error' ? '⚠️ ' : '🤖 ') + text;
 }
-document.getElementById('btn-ai-hint').addEventListener('click', async () => {
+
+async function callAI(api){
   try {
-    const res = await fetch("{% url 'ai_hint' problem.id %}");
+    const res = await fetch(api);
     if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
     showAI(data.hint || data.result || 'Không có gợi ý.');
   } catch { showAI('Không gọi được gợi ý AI.', 'error'); }
-});
-document.getElementById('btn-ai-next').addEventListener('click', async () => {
-  try {
-    const res = await fetch("{% url 'ai_recommend' problem.id %}");
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-    showAI(data.result || 'Không có đề xuất.');
-  } catch { showAI('Không gọi được gợi ý bài kế tiếp.', 'error'); }
-});
-document.getElementById('btn-ai-copy').addEventListener('click', async () => {
+}
+
+document.getElementById('btn-ai-hint').onclick = () => callAI("{% url 'ai_hint' problem.id %}");
+document.getElementById('btn-ai-next').onclick = () => callAI("{% url 'ai_recommend' problem.id %}");
+document.getElementById('btn-ai-copy').onclick = copyText;
+document.getElementById('btn-ai-hint-m').onclick = () => callAI("{% url 'ai_hint' problem.id %}");
+document.getElementById('btn-ai-next-m').onclick = () => callAI("{% url 'ai_recommend' problem.id %}");
+document.getElementById('btn-ai-copy-m').onclick = copyText;
+
+async function copyText(){
   const txt = document.getElementById('problem-statement').innerText;
   try { await navigator.clipboard.writeText(txt); showAI('Đã copy nội dung đề ✅'); }
   catch { showAI('Không copy được nội dung.', 'error'); }
+}
+
+// Mobile toggle
+document.getElementById('ai-fab').addEventListener('click', () => {
+  const menu = document.getElementById('ai-menu');
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
 });
 </script>
 
