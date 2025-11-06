@@ -1,50 +1,95 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container py-4">
-  <h3 class="fw-bold mb-4">🏅 Bảng xếp hạng cuộc thi: {{ contest.name }}</h3>
-
-  {% if rankings %}
-  <div class="table-responsive">
-    <table class="table table-bordered align-middle text-center shadow-sm rounded-4">
-      <thead class="table-light">
-        <tr>
-          <th>Hạng</th>
-          <th>Người dùng</th>
-          <th>Điểm</th>
-          <th>Phạt</th>
-          <th>Thời gian nộp cuối</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for part in rankings %}
-        <tr class="{% if forloop.first %}table-warning{% endif %}">
-          <td>{{ forloop.counter }}</td>
-          <td>{{ part.user.username }}</td>
-          <td class="fw-semibold text-success">{{ part.score }}</td>
-          <td class="text-danger">{{ part.penalty }}</td>
-          <td>{{ part.last_submit|date:"d/m/Y H:i" }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Thông tin tổng quan -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body d-flex flex-wrap align-items-center justify-content-between">
+      <div>
+        <h3 class="fw-bold mb-1 text-primary">{{ contest.name }}</h3>
+        <p class="text-muted mb-1">
+          🕒 <b>Bắt đầu:</b> {{ contest.start_time|date:"d/m/Y H:i" }}<br>
+          ⏳ <b>Kết thúc:</b> {{ contest.end_time|date:"d/m/Y H:i" }}
+        </p>
+      </div>
+      <div class="text-end">
+        <span class="badge bg-light text-dark px-3 py-2 fs-6 shadow-sm">
+          📘 Tổng bài: <b>{{ total_problems }}</b>
+        </span>
+        <span class="badge bg-light text-dark px-3 py-2 fs-6 shadow-sm ms-2">
+          👥 Thí sinh: <b>{{ rankings|length }}</b>
+        </span>
+      </div>
+    </div>
   </div>
-  {% else %}
-    <p class="text-center text-muted py-4">❗ Chưa có ai nộp bài trong cuộc thi này.</p>
-  {% endif %}
 
-  <div class="text-center mt-4">
-    <!-- ✅ Sửa lại namespace cho đúng -->
-    <a href="{% url 'contests:contest_detail' contest.id %}" class="btn btn-outline-secondary rounded-pill me-2">
-      ⬅ Quay lại contest
+  <!-- Bảng xếp hạng -->
+  <div class="card border-0 shadow rounded-4">
+    <div class="card-header bg-gradient fw-semibold text-white"
+         style="background:linear-gradient(90deg,#2563eb,#1d4ed8);">
+      🏅 Bảng xếp hạng cuộc thi
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle mb-0 table-hover text-center">
+        <thead class="table-light">
+          <tr>
+            <th style="width:80px;">Hạng</th>
+            <th>Người dùng</th>
+            <th>Điểm</th>
+            <th>Phạt</th>
+            <th>Thời gian nộp cuối</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for part in rankings %}
+          {% if forloop.counter == 1 %}
+          <tr class="table-warning fw-bold">
+            <td>🥇 {{ forloop.counter }}</td>
+          {% elif forloop.counter == 2 %}
+          <tr class="table-secondary fw-bold">
+            <td>🥈 {{ forloop.counter }}</td>
+          {% elif forloop.counter == 3 %}
+          <tr class="table-danger fw-bold">
+            <td>🥉 {{ forloop.counter }}</td>
+          {% else %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+          {% endif %}
+            <td class="text-start ps-4">
+              <i class="bi bi-person-circle text-primary me-2"></i>{{ part.user.username }}
+            </td>
+            <td class="fw-semibold text-success">{{ part.score }}</td>
+            <td class="text-danger">{{ part.penalty }}</td>
+            <td class="text-muted">{{ part.last_submit|date:"d/m/Y H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="py-4 text-muted">❗ Chưa có ai nộp bài trong cuộc thi này.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Điều hướng -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <a href="{% url 'contests:contest_detail' contest.id %}" class="btn btn-outline-secondary rounded-pill px-4">
+      ← Quay lại contest
     </a>
-    <a href="{% url 'problems:problem_list' %}" class="btn btn-outline-primary rounded-pill">
-      🔍 Xem danh sách bài tập
-    </a>
+    <div>
+      <a href="{% url 'problems:problem_list' %}" class="btn btn-outline-primary rounded-pill px-4 me-2">
+        🔍 Danh sách bài tập
+      </a>
+      <a href="{% url 'contests:contest_list' %}" class="btn btn-outline-dark rounded-pill px-4">
+        🏆 Tất cả contest
+      </a>
+    </div>
   </div>
 </div>
 
+<!-- CSS phụ -->
 <style>
-.table th, .table td { vertical-align: middle; }
-.table-warning td { font-weight: 600; }
+.table-hover tbody tr:hover { background-color: #f8fafc !important; transition: 0.2s; }
+.table-warning, .table-secondary, .table-danger { font-size: 1.02rem; }
+.badge { font-size: 0.95rem; }
+.card-header { letter-spacing: 0.3px; }
 </style>
 {% endblock %}
