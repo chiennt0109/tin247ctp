@@ -1,57 +1,68 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container-fluid py-4" style="max-width:1200px;">
-  <div class="card border-0 shadow-sm rounded-4 p-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap">
-      <div>
-        <h3 class="fw-bold text-primary mb-1">🚀 Nộp bài: {{ problem.title }}</h3>
-        <div class="text-muted">
-          ⏱ Giới hạn thời gian: <b>{{ problem.time_limit|default:"6" }}</b> giây
-          {% if contest_id %}<br>🏆 Thuộc cuộc thi ID: {{ contest_id }}{% endif %}
+<div class="container-fluid py-3" style="max-width:1450px;">
+  <div class="row g-4">
+    <!-- Cột trái: đề bài -->
+    <div class="col-lg-5 col-md-12">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4" style="font-size:14px;">
+        <h5 class="fw-bold text-primary mb-2">🧩 {{ problem.title }}</h5>
+        <div class="text-muted small mb-2">
+          Mã: <b>{{ problem.code }}</b> &nbsp;|&nbsp; ⏱ Giới hạn: {{ problem.time_limit|default:"6" }}s
+        </div>
+        <hr>
+        <div id="statement" class="markdown-body" style="max-height:70vh; overflow:auto;">
+          {{ problem.statement|safe }}
         </div>
       </div>
-      <a href="{% if contest_id %}/contests/{{ contest_id }}/{% else %}/problems/{% endif %}"
-         class="btn btn-outline-secondary rounded-pill">
-        ⬅️ Quay lại
-      </a>
     </div>
 
-    <hr>
+    <!-- Cột phải: code editor -->
+    <div class="col-lg-7 col-md-12 position-relative">
+      <div class="card border-0 shadow-sm rounded-4 p-3" style="font-size:14px;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+          <h5 class="fw-semibold text-dark mb-2">🚀 Nộp bài</h5>
+          <a href="{% if contest_id %}/contests/{{ contest_id }}/{% else %}/problems/{% endif %}" 
+             class="btn btn-sm btn-outline-secondary rounded-pill shadow-sm">
+            ⬅️ Quay lại
+          </a>
+        </div>
 
-    <form method="POST" id="submitForm" class="mt-2">
-      {% csrf_token %}
-      <input type="hidden" name="contest_id" value="{{ contest_id|default:'' }}">
+        <form method="POST" id="submitForm">
+          {% csrf_token %}
+          <input type="hidden" name="contest_id" value="{{ contest_id|default:'' }}">
 
-      <!-- Ngôn ngữ -->
-      <div class="mb-3">
-        <label for="language" class="form-label fw-semibold">Ngôn ngữ lập trình</label>
-        <select class="form-select shadow-sm" id="language" name="language" required onchange="changeMode()">
-          <option value="">-- Chọn ngôn ngữ --</option>
-          <option value="python">🐍 Python 3</option>
-          <option value="pypy">⚡ PyPy 3</option>
-          <option value="cpp">💻 C++17</option>
-          <option value="java">☕ Java</option>
-        </select>
+          <!-- Ngôn ngữ -->
+          <div class="mb-2">
+            <label for="language" class="form-label small fw-semibold">Ngôn ngữ</label>
+            <select class="form-select form-select-sm" id="language" name="language" required onchange="changeMode()">
+              <option value="">-- Chọn ngôn ngữ --</option>
+              <option value="python">🐍 Python 3</option>
+              <option value="pypy">⚡ PyPy 3</option>
+              <option value="cpp">💻 C++17</option>
+              <option value="java">☕ Java</option>
+            </select>
+          </div>
+
+          <!-- Ace Editor -->
+          <div class="position-relative mb-3">
+            <div id="editor" class="rounded-3 border shadow-sm" style="height:500px;"># Viết code của bạn tại đây...</div>
+            <textarea name="source" id="source" style="display:none;"></textarea>
+          </div>
+        </form>
       </div>
 
-      <!-- Ace Editor -->
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Mã nguồn</label>
-        <div id="editor" class="border rounded-3 shadow-sm" style="height:480px;"># Viết code của bạn tại đây...</div>
-        <textarea name="source" id="source" style="display:none;"></textarea>
-      </div>
-
-      <!-- Nút thao tác -->
-      <div class="d-flex justify-content-between align-items-center mt-4">
-        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+      <!-- Nút cố định -->
+      <div class="fixed-btns d-flex justify-content-end gap-2 p-2">
+        <button form="submitForm" type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
           💾 Nộp bài
         </button>
-        <div class="text-muted small">
-          💡 Gợi ý: Bạn có thể sao chép code từ IDE của mình và dán trực tiếp tại đây.
-        </div>
+        <a href="{% if contest_id %}/contests/{{ contest_id }}/{% else %}/problems/{% endif %}" 
+           class="btn btn-outline-secondary rounded-pill px-3 py-2 shadow-sm">
+          ⬅️ Quay lại
+        </a>
       </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -61,15 +72,16 @@
 
 <script>
   const editor = ace.edit("editor");
-  editor.setTheme("ace/theme/monokai");
+  editor.setTheme("ace/theme/github");
   editor.session.setMode("ace/mode/python");
   editor.setOptions({
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
     showPrintMargin: false,
-    fontSize: "15px",
+    fontSize: "13px",
     wrap: true,
     highlightActiveLine: true,
+    fontFamily: "Fira Code, monospace",
   });
 
   function changeMode() {
@@ -79,50 +91,44 @@
     else editor.session.setMode("ace/mode/python");
   }
 
-  document.getElementById("submitForm").addEventListener("submit", function (e) {
+  document.getElementById("submitForm").addEventListener("submit", function(e) {
     const code = editor.getValue().trim();
     const lang = document.getElementById("language").value;
 
-    if (!lang) {
-      e.preventDefault();
-      alert("⚠️ Bạn chưa chọn ngôn ngữ!");
-      return false;
-    }
-    if (code.length === 0) {
-      e.preventDefault();
-      alert("⚠️ Bạn chưa nhập mã nguồn!");
-      return false;
-    }
+    if (!lang) { e.preventDefault(); alert("⚠️ Bạn chưa chọn ngôn ngữ!"); return false; }
+    if (code.length === 0) { e.preventDefault(); alert("⚠️ Bạn chưa nhập mã nguồn!"); return false; }
 
     document.getElementById("source").value = code;
   });
 </script>
 
 <style>
-/* Tùy chỉnh mượt mà và thoáng */
-.card {
-  background: #ffffff;
-  border-radius: 18px;
-  transition: 0.2s;
+.markdown-body pre code {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 6px 10px;
 }
-.card:hover { box-shadow: 0 8px 22px rgba(0,0,0,0.08); }
+select.form-select { border-radius: 10px; padding: 0.4rem 0.8rem; }
 
-select.form-select {
-  border-radius: 10px;
-  padding: 0.6rem 1rem;
+.fixed-btns {
+  position: sticky;
+  bottom: 10px;
+  right: 0;
+  background: rgba(255,255,255,0.9);
+  border-top: 1px solid #e5e7eb;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, #2563eb, #1e40af);
+  background: linear-gradient(90deg, #2563eb, #1e3a8a);
   border: none;
+  font-size: 13px;
 }
-.btn-primary:hover {
-  background: linear-gradient(90deg, #1d4ed8, #1e3a8a);
-}
+.btn-primary:hover { background: linear-gradient(90deg, #1d4ed8, #1e40af); }
 
-#editor {
-  font-family: "Fira Code", monospace;
-  border: 1px solid #e5e7eb;
+.btn-outline-secondary {
+  font-size: 13px;
 }
 </style>
 {% endblock %}
