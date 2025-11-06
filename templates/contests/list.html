@@ -19,8 +19,8 @@
         {% for c in contests %}
         <tr>
           <td class="fw-semibold">
-            <a href="{% url 'contest_detail' c.id %}" class="text-decoration-none text-primary">
-              {{ c.name }}
+            <a class="cf-title" href="{% url 'contests:contest_detail' c.id %}">
+                {{ c.name }}
             </a>
           </td>
           <td>
