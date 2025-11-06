@@ -41,7 +41,7 @@
               {% endif %}
             </td>
             <td class="text-center">
-              <a href="{% url 'problem_detail' p.id %}" class="btn btn-outline-primary btn-sm rounded-pill">
+              <a href="{% url 'problem_detail' p.id %}?contest_id={{ contest.id }}">              
                 Làm bài 🚀
               </a>
             </td>
