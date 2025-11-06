@@ -98,32 +98,34 @@
     <div id="aiBox" class="alert-soft"></div>
   </div>
 
-  <div class="toolbar-side">
-    {% if contest_id %}
-      <a href="{% url 'contests:contest_detail' contest_id %}" class="toolbar-btn btn-back">⬅ Contest</a>
-    {% else %}
-      <a href="{% url 'problems:problem_list' %}" class="toolbar-btn btn-back">⬅ Problems</a>
-    {% endif %}
-    <a href="{% url 'submission_create' problem.id %}{% if contest_id %}?contest_id={{ contest_id }}{% endif %}" class="toolbar-btn btn-submit">🚀 Nộp bài</a>
-    <button id="btn-ai-hint" class="toolbar-btn btn-ai">💡 Gợi ý AI</button>
-    <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế</button>
-    <button id="btn-ai-copy" class="toolbar-btn btn-copy">📋 Copy đề</button>
-  </div>
+ <div class="toolbar-side">
+  {% if contest_id %}
+    <!-- ✅ dùng path tuyệt đối, không gọi reverse -->
+    <a href="/contests/{{ contest_id }}/" class="toolbar-btn btn-back">⬅ Contest</a>
+  {% else %}
+    <a href="/problems/" class="toolbar-btn btn-back">⬅ Problems</a>
+  {% endif %}
+  <a href="{% url 'submission_create' problem.id %}{% if contest_id %}?contest_id={{ contest_id }}{% endif %}" class="toolbar-btn btn-submit">🚀 Nộp bài</a>
+  <button id="btn-ai-hint" class="toolbar-btn btn-ai">💡 Gợi ý AI</button>
+  <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế</button>
+  <button id="btn-ai-copy" class="toolbar-btn btn-copy">📋 Copy đề</button>
 </div>
 
 <!-- Floating menu for mobile -->
 <button id="ai-fab">⚙️</button>
 <div id="ai-menu">
   {% if contest_id %}
-    <a href="{% url 'contests:contest_detail' contest_id %}" class="btn-back">⬅ Contest</a>
+    <!-- ✅ dùng path tuyệt đối -->
+    <a href="/contests/{{ contest_id }}/" class="btn-back">⬅ Contest</a>
   {% else %}
-    <a href="{% url 'problems:problem_list' %}" class="btn-back">⬅ Problems</a>
+    <a href="/problems/" class="btn-back">⬅ Problems</a>
   {% endif %}
   <a href="{% url 'submission_create' problem.id %}{% if contest_id %}?contest_id={{ contest_id }}{% endif %}" class="btn-submit">🚀 Nộp bài</a>
   <button id="btn-ai-hint-m" class="btn-ai">💡 Gợi ý</button>
   <button id="btn-ai-next-m" class="btn-next">📌 Bài kế</button>
   <button id="btn-ai-copy-m" class="btn-copy">📋 Copy</button>
 </div>
+
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
