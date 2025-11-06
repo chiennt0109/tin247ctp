@@ -85,7 +85,7 @@ def change_password_view(request):
             update_session_auth_hash(request, user)
             messages.success(request, "✅ Mật khẩu đã được cập nhật thành công!")
             # ⚙️ Sửa redirect đúng namespace
-            return redirect("problems:profile")
+            return redirect("/problems/profile/")
         else:
             messages.error(request, "⚠️ Có lỗi xảy ra, vui lòng kiểm tra lại.")
     else:
