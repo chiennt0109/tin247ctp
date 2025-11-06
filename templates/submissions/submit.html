@@ -27,23 +27,10 @@
           </a>
         </div>
 
-        <!-- Các nút hành động -->
-        <div class="d-flex gap-2 mb-3">
-          <button id="submitBtn" type="button" class="btn btn-primary rounded-pill px-3 py-1 fw-semibold shadow-sm">
-            💾 Nộp bài
-          </button>
-          <button id="clearBtn" type="button" class="btn btn-outline-secondary rounded-pill px-3 py-1 shadow-sm">
-            🧹 Xóa code
-          </button>
-          <button id="sampleBtn" type="button" class="btn btn-outline-info rounded-pill px-3 py-1 shadow-sm">
-            📋 Copy mẫu
-          </button>
-        </div>
-
         <form method="POST" id="submitForm">
           {% csrf_token %}
           <input type="hidden" name="contest_id" value="{{ contest_id|default:'' }}">
-          <div class="mb-2">
+          <div class="mb-3">
             <label for="language" class="form-label small fw-semibold">Ngôn ngữ lập trình</label>
             <select class="form-select form-select-sm" id="language" name="language" required onchange="changeMode()">
               <option value="">-- Chọn ngôn ngữ --</option>
@@ -54,6 +41,7 @@
             </select>
           </div>
 
+          <!-- 🖊️ Code Editor -->
           <div class="position-relative mb-3">
             <div id="editor" class="rounded-3 border shadow-sm" style="height:480px;"># Viết code của bạn tại đây...</div>
             <textarea name="source" id="source" style="display:none;"></textarea>
@@ -62,6 +50,17 @@
           <!-- 🔍 Kết quả -->
           <div id="result-box" class="border rounded-3 p-3 bg-light" style="display:none;">
             <div id="result-text" class="fw-semibold text-center text-muted small">⏳ Đang chấm...</div>
+          </div>
+
+          <!-- Nút hành động -->
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button id="submitBtn" type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm">
+              💾 Nộp bài
+            </button>
+            <a href="{% if contest_id %}/contests/{{ contest_id }}/{% else %}/problems/{% endif %}" 
+               class="btn btn-outline-secondary rounded-pill px-3 py-2 shadow-sm">
+              ⬅️ Quay lại
+            </a>
           </div>
         </form>
       </div>
@@ -118,11 +117,7 @@ function changeMode(){
   else editor.session.setMode("ace/mode/python");
 }
 
-// ✅ Các nút
-document.getElementById("clearBtn").onclick=()=>editor.setValue("");
-document.getElementById("sampleBtn").onclick=()=>{
-  editor.setValue(`#include <bits/stdc++.h>\nusing namespace std;\nint main(){\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    // Code here\n    return 0;\n}`);
-};
+// ✅ Gửi bài & cập nhật kết quả thực tế
 document.getElementById("submitBtn").addEventListener("click", async function(){
   const lang=document.getElementById("language").value;
   const code=editor.getValue().trim();
@@ -131,19 +126,40 @@ document.getElementById("submitBtn").addEventListener("click", async function(){
   if(!lang)return alert("⚠️ Bạn chưa chọn ngôn ngữ!");
   if(code.length===0)return alert("⚠️ Bạn chưa nhập mã nguồn!");
   const box=document.getElementById("result-box"),text=document.getElementById("result-text");
-  box.style.display="block"; text.innerHTML="⏳ Đang chấm...";
+  box.style.display="block"; text.innerHTML="⏳ Đang nộp và chấm...";
+
   try{
-    const res=await fetch(window.location.href,{
+    const res = await fetch(window.location.href,{
       method:"POST",
       headers:{"X-CSRFToken":csrf,"Content-Type":"application/x-www-form-urlencoded"},
       body:new URLSearchParams({language:lang,source:code,contest_id})
     });
-    if(res.ok){
-      text.innerHTML="✅ Đã nộp bài. Hệ thống đang chấm...";
-      setTimeout(()=>{text.innerHTML="🎯 Kết quả: <span class='text-success'>Accepted</span><br>⏱ 0.45s – 100/100 điểm";},2000);
-    }else text.innerHTML="⚠️ Lỗi khi gửi bài.";
+    const redirectUrl = res.url || "";
+    if(res.redirected && redirectUrl.includes("/submissions/")){
+      const submissionId = redirectUrl.split("/submissions/")[1].split("/")[0];
+      checkResult(submissionId);
+    } else text.innerHTML = "⚠️ Gửi bài không thành công.";
   }catch(e){text.innerHTML="❌ Không thể kết nối tới máy chủ.";}
 });
+
+// 🔁 Poll kết quả thực từ server
+async function checkResult(submissionId){
+  const text=document.getElementById("result-text");
+  try{
+    let verdict="Pending";
+    for(let i=0;i<8;i++){
+      const res=await fetch(`/submissions/${submissionId}/`);
+      const html=await res.text();
+      if(html.includes("Accepted")){verdict="Accepted";break;}
+      if(html.includes("Wrong Answer")){verdict="Wrong Answer";break;}
+      if(html.includes("Runtime Error")){verdict="Runtime Error";break;}
+      if(html.includes("Time Limit")){verdict="Time Limit Exceeded";break;}
+      await new Promise(r=>setTimeout(r,1500));
+    }
+    const color = verdict==="Accepted"?"text-success":(verdict==="Pending"?"text-warning":"text-danger");
+    text.innerHTML = `🎯 Kết quả: <span class="${color}">${verdict}</span>`;
+  }catch{ text.innerHTML="⚠️ Không đọc được kết quả."; }
+}
 </script>
 
 <style>
