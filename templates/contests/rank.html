@@ -1,55 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container py-4">
-  <h2 class="fw-bold mb-4">🏁 Bảng xếp hạng — {{ contest.name }}</h2>
+  <h3 class="fw-bold mb-4">🏅 Bảng xếp hạng cuộc thi: {{ contest.name }}</h3>
 
-  {% if not rankings %}
-    <div class="alert alert-info text-center rounded-3 shadow-sm">
-      😅 Chưa có ai nộp bài trong contest này.
-    </div>
-  {% else %}
+  {% if rankings %}
   <div class="table-responsive">
-    <table class="table table-striped align-middle shadow-sm rounded-3">
-      <thead class="table-primary">
+    <table class="table table-bordered align-middle text-center shadow-sm rounded-4">
+      <thead class="table-light">
         <tr>
-          <th class="text-center">#</th>
-          <th>Người tham gia</th>
-          <th class="text-center">AC/Tổng</th>
-          <th class="text-center">Điểm</th>
-          <th class="text-center">Penalty</th>
-          <th class="text-center">Lần nộp cuối</th>
+          <th>Hạng</th>
+          <th>Người dùng</th>
+          <th>Điểm</th>
+          <th>Phạt</th>
+          <th>Thời gian nộp cuối</th>
         </tr>
       </thead>
       <tbody>
-        {% for r in rankings %}
-        <tr class="{% if forloop.counter <= 3 %}table-warning{% endif %}">
-          <td class="text-center fw-bold" style="font-size:18px;">
-            {% if forloop.counter == 1 %}
-              🥇
-            {% elif forloop.counter == 2 %}
-              🥈
-            {% elif forloop.counter == 3 %}
-              🥉
-            {% else %}
-              {{ forloop.counter }}
-            {% endif %}
-          </td>
-          <td class="fw-semibold">{{ r.user.username }}</td>
-          <td class="text-center text-success fw-semibold">
-            {{ r.ac_count }}/{{ total_problems }}
-          </td>
-          <td class="text-center fw-bold">{{ r.score }}</td>
-          <td class="text-center text-muted">{{ r.penalty }}</td>
-          <td class="text-center">{{ r.last_submit|date:"d/m/Y H:i" }}</td>
+        {% for part in rankings %}
+        <tr class="{% if forloop.first %}table-warning{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ part.user.username }}</td>
+          <td class="fw-semibold text-success">{{ part.score }}</td>
+          <td class="text-danger">{{ part.penalty }}</td>
+          <td>{{ part.last_submit|date:"d/m/Y H:i" }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  {% else %}
+    <p class="text-center text-muted py-4">❗ Chưa có ai nộp bài trong cuộc thi này.</p>
   {% endif %}
 
   <div class="text-center mt-4">
-    <a href="{% url 'contest_detail' contest.id %}" class="btn btn-outline-secondary rounded-pill me-2">
+    <!-- ✅ Sửa lại namespace cho đúng -->
+    <a href="{% url 'contests:contest_detail' contest.id %}" class="btn btn-outline-secondary rounded-pill me-2">
       ⬅ Quay lại contest
     </a>
     <a href="{% url 'problems:problem_list' %}" class="btn btn-outline-primary rounded-pill">
@@ -59,11 +44,7 @@
 </div>
 
 <style>
-.table th, .table td {
-  vertical-align: middle;
-}
-.table-warning td {
-  background-color: rgba(255, 239, 170, 0.3) !important;
-}
+.table th, .table td { vertical-align: middle; }
+.table-warning td { font-weight: 600; }
 </style>
 {% endblock %}
