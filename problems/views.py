@@ -8,6 +8,7 @@ from .ai_helper import recommend_next_personal
 from .models import Problem, Tag
 from submissions.models import Submission
 
+
 # AI helpers
 from .ai_helper import (
     gen_ai_hint,
@@ -85,6 +86,7 @@ def problem_detail(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
     submit_count = Submission.objects.filter(problem=problem).count()
     ac_count = Submission.objects.filter(problem=problem, verdict="Accepted").count()
+    contest_id = request.GET.get("contest_id")
 
     return render(
         request,
@@ -93,6 +95,7 @@ def problem_detail(request, pk):
             "problem": problem,
             "submit_count": submit_count,
             "ac_count": ac_count,
+            "contest_id": contest_id,  # ✅ thêm để template nhận biết
         },
     )
 
