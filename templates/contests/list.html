@@ -20,7 +20,7 @@
         <tr>
           <td class="fw-semibold">
             <a class="cf-title" href="{% url 'contests:contest_detail' c.id %}">
-                {{ c.name }}
+                {{ c.title }}
             </a>
           </td>
           <td>
@@ -37,7 +37,7 @@
           <td>{{ c.duration }}</td>
           <td class="text-center">
             {% if c.status == "running" %}
-              <a href="{% url 'contest_detail' c.id %}" class="btn btn-success btn-sm rounded-pill">
+              <a href="{% url 'contests:contest_detail' c.id %}" class="btn btn-success btn-sm rounded-pill">
                 🚀 Bắt đầu ngay
               </a>
             {% elif c.status == "upcoming" %}
@@ -45,7 +45,7 @@
                 ⏳ Chưa bắt đầu
               </button>
             {% else %}
-              <a href="{% url 'contest_detail' c.id %}" class="btn btn-outline-primary btn-sm rounded-pill">
+              <a href="{% url 'contests:contest_detail' c.id %}" class="btn btn-outline-primary btn-sm rounded-pill">
                 🏁 Xem kết quả
               </a>
             {% endif %}
