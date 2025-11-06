@@ -17,6 +17,7 @@ def submission_create(request, problem_id):
         lang = request.POST.get("language")
         code = request.POST.get("source")
 
+        # ✅ Tạo submission mới
         sub = Submission.objects.create(
             user=request.user,
             problem=problem,
@@ -25,6 +26,7 @@ def submission_create(request, problem_id):
             verdict="Pending"
         )
 
+        # ✅ Chấm tự động
         verdict, exec_time, passed, total, debug = grade_submission(sub)
         sub.verdict = verdict
         sub.exec_time = float(exec_time)
@@ -33,35 +35,48 @@ def submission_create(request, problem_id):
         sub.debug_info = str(debug)
         sub.save()
 
-        # ✅ Cập nhật điểm contest
+        # ✅ Cập nhật bảng điểm contest (nếu có)
         update_participation(request.user, sub.problem)
 
         # ✅ Điều hướng hợp lý
         if contest_id:
-            return redirect(f"/submissions/{sub.id}/detail/?contest_id={contest_id}")
+            # Có contest: quay lại kết quả + tham chiếu contest_id
+            return redirect(f"/submissions/{sub.id}/?contest_id={contest_id}")
         else:
+            # Nếu problem thuộc contest nào đó → tự gán contest_id
             contest = Contest.objects.filter(problems=sub.problem).first()
             if contest:
-                return redirect(f"/submissions/{sub.id}/detail/?contest_id={contest.id}")
-            return redirect("submission_detail", submission_id=sub.id)
+                return redirect(f"/submissions/{sub.id}/?contest_id={contest.id}")
+            # Ngược lại: chỉ hiển thị kết quả bình thường
+            return redirect("submissions:submission_detail", submission_id=sub.id)
 
-    return render(request, "submissions/submit.html", {"problem": problem, "contest_id": contest_id})
+    return render(
+        request,
+        "submissions/submit.html",
+        {"problem": problem, "contest_id": contest_id},
+    )
 
 
 @login_required
 def submission_detail(request, submission_id):
     sub = get_object_or_404(Submission, id=submission_id)
     contest_id = request.GET.get("contest_id")
-    return render(request, "submissions/result.html", {
-        "result": sub,
-        "problem": sub.problem,
-        "contest_id": contest_id,
-        "submissions": Submission.objects.filter(
-            user=request.user, problem=sub.problem
-        ).order_by("-created_at")
-    })
+
+    return render(
+        request,
+        "submissions/result.html",
+        {
+            "result": sub,
+            "problem": sub.problem,
+            "contest_id": contest_id,
+            "submissions": Submission.objects.filter(
+                user=request.user, problem=sub.problem
+            ).order_by("-created_at"),
+        },
+    )
 
 
+@login_required
 def my_submissions(request):
     subs = Submission.objects.filter(user=request.user).order_by("-id")
     return render(request, "submissions/my_submissions.html", {"submissions": subs})
