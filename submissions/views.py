@@ -1,15 +1,17 @@
+# path: submissions/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Submission
 from problems.models import Problem
 from judge.grader import grade_submission
 from contests.utils import update_participation
-from contests.models import Contest, Participation
+from contests.models import Contest
 
 
 @login_required
 def submission_create(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
+    contest_id = request.GET.get("contest_id") or request.POST.get("contest_id")
 
     if request.method == "POST":
         lang = request.POST.get("language")
@@ -23,37 +25,42 @@ def submission_create(request, problem_id):
             verdict="Pending"
         )
 
-        # ✅ Gọi grader (định dạng mới)
         verdict, exec_time, passed, total, debug = grade_submission(sub)
-
-        # ✅ Lưu kết quả
         sub.verdict = verdict
         sub.exec_time = float(exec_time)
         sub.passed_tests = passed
         sub.total_tests = total
         sub.debug_info = str(debug)
         sub.save()
-        # cap nhat contest
+
+        # ✅ Cập nhật điểm contest
         update_participation(request.user, sub.problem)
-        
-        contest = Contest.objects.filter(problems=sub.problem).first()
-        if contest:
-            return redirect("contest_rank", contest_id=contest.id)
+
+        # ✅ Điều hướng hợp lý
+        if contest_id:
+            return redirect(f"/submissions/{sub.id}/detail/?contest_id={contest_id}")
         else:
+            contest = Contest.objects.filter(problems=sub.problem).first()
+            if contest:
+                return redirect(f"/submissions/{sub.id}/detail/?contest_id={contest.id}")
             return redirect("submission_detail", submission_id=sub.id)
 
-    return render(request, "submissions/submit.html", {"problem": problem})
+    return render(request, "submissions/submit.html", {"problem": problem, "contest_id": contest_id})
+
 
 @login_required
 def submission_detail(request, submission_id):
     sub = get_object_or_404(Submission, id=submission_id)
+    contest_id = request.GET.get("contest_id")
     return render(request, "submissions/result.html", {
         "result": sub,
         "problem": sub.problem,
+        "contest_id": contest_id,
         "submissions": Submission.objects.filter(
             user=request.user, problem=sub.problem
         ).order_by("-created_at")
     })
+
 
 def my_submissions(request):
     subs = Submission.objects.filter(user=request.user).order_by("-id")
