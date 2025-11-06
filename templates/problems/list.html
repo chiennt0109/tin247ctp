@@ -66,11 +66,11 @@
               {% for p in problems %}
                   <tr class="hover-row">
                       <td class="fw-semibold text-primary small">
-                          <a href="{% url 'problem_detail' p.id %}" class="text-decoration-none">{{ p.code }}</a>
+                          <a href="{% url 'problems:problem_detail' p.id %}" class="text-decoration-none">{{ p.code }}</a>
                       </td>
 
                       <td>
-                          <a href="{% url 'problem_detail' p.id %}" class="fw-semibold text-dark text-decoration-none hover-underline">
+                        <a href="{% url 'problems:problem_detail' p.id %}" class="fw-semibold text-dark text-decoration-none hover-underline">
                               {{ p.title }}
                           </a>
                       </td>
@@ -106,8 +106,8 @@
                       </td>
 
                       <td class="text-center">
-                          <a href="{% url 'problem_detail' p.id %}" class="btn btn-sm btn-light border rounded-pill">👁</a>
-                          <a href="{% url 'submission_create' p.id %}" class="btn btn-sm btn-success rounded-pill ms-1">🚀</a>
+                         <a href="{% url 'problems:problem_detail' p.id %}" class="btn btn-sm btn-light border rounded-pill">👁</a>
+                          <a href="{% url 'problems:problem_detail' p.id %}" class="btn btn-sm btn-success rounded-pill ms-1">🚀</a>
                       </td>
                   </tr>
               {% empty %}
