@@ -3,87 +3,79 @@
 {% block content %}
 
 <style>
-/* ===== Layout tổng ===== */
 .problem-wrap{
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  margin:18px auto;
-  max-width:1180px;
-  padding:0 8px;
+  display:flex;justify-content:center;align-items:flex-start;
+  gap:24px;margin:20px auto;max-width:1280px;padding:0 16px;
 }
 
-/* ===== “Tờ giấy” đề bài (bên trái) ===== */
+/* Paper */
 .problem-paper{
-  flex:1 1 880px;
-  max-width:880px;
-  background:#fff;
-  border-radius:16px;
-  box-shadow:0 6px 24px rgba(0,0,0,.06);
-  border:1px solid #eef2f7;
-  padding:24px 22px;
+  flex:1 1 880px;background:#fff;border-radius:14px;
+  box-shadow:0 4px 16px rgba(0,0,0,.06);border:1px solid #e5e7eb;
+  padding:24px 26px;
 }
-.problem-title{font-size:28px;font-weight:800;color:#0f172a;margin-bottom:4px}
-
-.markdown-body{line-height:1.65;color:#111827;font-size:16px}
-.markdown-body code{background:#f6f8fa;padding:.15rem .35rem;border-radius:6px}
-.markdown-body pre code{display:block;padding:12px;border-radius:10px;overflow:auto}
-.markdown-body table{border-collapse:collapse;margin:10px 0;width:100%}
-.markdown-body th,.markdown-body td{border:1px solid #e5e7eb;padding:6px 10px}
-.katex-display{margin:1rem 0;text-align:center}
-
+.problem-title{font-size:26px;font-weight:800;color:#0f172a;margin-bottom:4px}
+.markdown-body{line-height:1.65;font-size:16px;color:#111827}
+.markdown-body pre code{display:block;padding:10px;border-radius:10px;overflow:auto;background:#f6f8fa}
 .badge-soft{border-radius:999px;padding:.25rem .6rem;font-weight:600;font-size:.82rem}
 .badge-easy{background:#ecfdf5;color:#064e3b}
 .badge-info{background:#eff6ff;color:#1d4ed8}
+.alert-soft{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-top:14px;display:none}
 
-.alert-soft{
-  background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;
-  padding:12px 14px;margin-top:14px;display:none;line-height:1.5
-}
-
-/* ===== Thanh nút (bên phải) ===== */
+/* === Buttons cột phải === */
 .toolbar-side{
-  flex:0 0 220px;           /* chiều rộng cột nút */
-  align-self:flex-start;
-  position:sticky; top:110px;
-  display:flex; flex-direction:column; gap:12px;
+  flex:0 0 180px;
+  position:sticky;
+  top:82px; /* canh đúng với navbar fixed 64px + margin nhỏ */
+  display:flex;flex-direction:column;gap:10px;
+  align-items:flex-end; /* căn mép phải */
+  margin-right:8px; /* canh thẳng nút học tập */
 }
 .toolbar-btn{
-  display:flex; align-items:center; gap:8px;
-  padding:10px 14px; border-radius:10px; font-weight:600; font-size:15px;
-  border:none; color:#fff; cursor:pointer;
-  min-width:220px; text-align:left;
-  transition:transform .15s ease, box-shadow .15s ease;
+  display:flex;align-items:center;justify-content:flex-start;
+  gap:8px;padding:8px 14px;border-radius:8px;font-weight:600;
+  font-size:14px;border:none;color:#fff;cursor:pointer;
+  min-width:180px;transition:all .15s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,0.12);
 }
-.toolbar-btn:hover{ transform:scale(1.03); box-shadow:0 4px 10px rgba(0,0,0,.15) }
+.toolbar-btn:hover{transform:translateY(-1px)}
 .btn-back{background:#6b7280}
 .btn-submit{background:#16a34a}
 .btn-ai{background:#2563eb}
 .btn-next{background:#0ea5e9}
 .btn-copy{background:#374151}
 
-/* ===== Mobile: chuyển sang FAB ===== */
-#ai-fab{display:none;position:fixed;bottom:24px;right:24px;background:#2563eb;color:#fff;
-  width:56px;height:56px;border-radius:50%;font-size:26px;border:none;
-  box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:999}
-#ai-menu{display:none;position:fixed;bottom:90px;right:24px;background:#fff;border:1px solid #e5e7eb;
-  border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:10px;z-index:999}
-#ai-menu button,#ai-menu a{display:block;width:200px;margin:6px 0;text-align:left;border:none;border-radius:8px;padding:8px 10px;font-weight:600;color:#fff}
+/* === Mobile: đặt góc trên phải === */
+#ai-fab{
+  display:none;position:fixed;top:72px;right:18px;
+  width:44px;height:44px;border-radius:50%;
+  border:none;background:#2563eb;color:#fff;
+  font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.25);
+  z-index:9999;
+}
+#ai-menu{
+  display:none;position:fixed;top:126px;right:16px;background:#fff;
+  border:1px solid #ddd;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,.15);
+  padding:8px;z-index:9999;
+}
+#ai-menu button,#ai-menu a{
+  display:block;width:180px;margin:4px 0;text-align:left;
+  border:none;border-radius:6px;padding:7px 10px;font-weight:600;
+  color:#fff;font-size:14px;
+}
 #ai-menu .btn-back{background:#6b7280}
 #ai-menu .btn-submit{background:#16a34a}
 #ai-menu .btn-ai{background:#2563eb}
 #ai-menu .btn-next{background:#0ea5e9}
 #ai-menu .btn-copy{background:#374151}
 
-@media (max-width: 992px){
-  .problem-wrap{gap:10px}
+@media(max-width:992px){
   .toolbar-side{display:none}
   #ai-fab{display:block}
 }
 </style>
 
 <div class="problem-wrap">
-  <!-- 📄 Tờ giấy nằm bên trái -->
   <div class="problem-paper">
     <div class="problem-title">{{ problem.title }}</div>
     <div class="text-muted mb-2">{{ problem.code }}</div>
@@ -93,52 +85,46 @@
     {% endif %}
     {% for t in problem.tags.all %}
       <span class="badge-soft badge-info">#{{ t.name }}</span>
-    {% empty %}{% endfor %}
+    {% endfor %}
 
     <hr class="my-3">
-    <!-- markdown source (ẩn) -->
     <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
-    <!-- HTML đã render -->
     <div id="problem-statement" class="markdown-body"></div>
 
     <hr class="my-3">
     <div class="text-success fw-semibold">
       ✅ Đã AC: {{ ac_count }} / {{ submit_count }} submissions
     </div>
-
-    <!-- Tip box khi click AI -->
     <div id="aiBox" class="alert-soft"></div>
   </div>
 
-  <!-- 🎛 Cột nút nằm BÊN PHẢI tờ giấy -->
   <div class="toolbar-side">
-    {% if request.GET.contest_id %}
-      <a href="{% url 'contests:contest_detail' request.GET.contest_id %}" class="toolbar-btn btn-back">⬅ Quay lại Contest</a>
+    {% if contest_id %}
+      <a href="{% url 'contests:contest_detail' contest_id %}" class="toolbar-btn btn-back">⬅ Contest</a>
     {% else %}
-      <a href="{% url 'problems:problem_list' %}" class="toolbar-btn btn-back">⬅ Quay lại Problems</a>
+      <a href="{% url 'problems:problem_list' %}" class="toolbar-btn btn-back">⬅ Problems</a>
     {% endif %}
-    <a href="{% url 'submission_create' problem.id %}" class="toolbar-btn btn-submit">🚀 Nộp bài</a>
+    <a href="{% url 'submission_create' problem.id %}{% if contest_id %}?contest_id={{ contest_id }}{% endif %}" class="toolbar-btn btn-submit">🚀 Nộp bài</a>
     <button id="btn-ai-hint" class="toolbar-btn btn-ai">💡 Gợi ý AI</button>
-    <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế tiếp</button>
+    <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế</button>
     <button id="btn-ai-copy" class="toolbar-btn btn-copy">📋 Copy đề</button>
   </div>
 </div>
 
-<!-- ⚙️ FAB cho mobile -->
+<!-- Floating menu for mobile -->
 <button id="ai-fab">⚙️</button>
 <div id="ai-menu">
-  {% if request.GET.contest_id %}
-    <a href="{% url 'contests:contest_detail' request.GET.contest_id %}" class="btn-back">⬅ Quay lại Contest</a>
+  {% if contest_id %}
+    <a href="{% url 'contests:contest_detail' contest_id %}" class="btn-back">⬅ Contest</a>
   {% else %}
-    <a href="{% url 'problems:problem_list' %}" class="btn-back">⬅ Quay lại Problems</a>
+    <a href="{% url 'problems:problem_list' %}" class="btn-back">⬅ Problems</a>
   {% endif %}
-  <a href="{% url 'submission_create' problem.id %}" class="btn-submit">🚀 Nộp bài</a>
-  <button id="btn-ai-hint-m" class="btn-ai">💡 Gợi ý AI</button>
+  <a href="{% url 'submission_create' problem.id %}{% if contest_id %}?contest_id={{ contest_id }}{% endif %}" class="btn-submit">🚀 Nộp bài</a>
+  <button id="btn-ai-hint-m" class="btn-ai">💡 Gợi ý</button>
   <button id="btn-ai-next-m" class="btn-next">📌 Bài kế</button>
-  <button id="btn-ai-copy-m" class="btn-copy">📋 Copy đề</button>
+  <button id="btn-ai-copy-m" class="btn-copy">📋 Copy</button>
 </div>
 
-<!-- Assets -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -148,64 +134,47 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
 <script>
-/* Markdown render */
 (function(){
-  const src = document.getElementById('md-src');
-  const out = document.getElementById('problem-statement');
+  const src=document.getElementById('md-src');
+  const out=document.getElementById('problem-statement');
   marked.setOptions({
-    breaks:true, gfm:true, smartLists:true,
+    breaks:true,gfm:true,
     highlight:(code,lang)=>{try{return hljs.highlight(code,{language:lang||'plaintext'}).value}catch{return code}}
   });
-  const html = marked.parse(src.value || '');
-  const clean = DOMPurify.sanitize(html, {USE_PROFILES:{html:true}});
-  out.innerHTML = clean;
+  const html=marked.parse(src.value||'');
+  out.innerHTML=DOMPurify.sanitize(html,{USE_PROFILES:{html:true}});
   if(window.renderMathInElement){
-    renderMathInElement(out,{
-      delimiters:[
-        {left:"$$",right:"$$",display:true},
-        {left:"$",right:"$",display:false},
-        {left:"\\(",right:"\\)",display:false},
-        {left:"\\[",right:"\\]",display:true}
-      ],
-      throwOnError:false
-    });
+    renderMathInElement(out,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false});
   }
-  out.querySelectorAll('pre code').forEach(el=>{try{hljs.highlightElement(el)}catch(e){}});
+  out.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
 })();
-
-/* Tip box cho AI */
-function showAI(text, type='info'){
-  const box = document.getElementById('aiBox');
-  box.style.display = 'block';
-  box.innerHTML = (type==='error'?'⚠️ ':'🤖 ') + text;
+function showAI(text,type='info'){
+  const box=document.getElementById('aiBox');
+  box.style.display='block';
+  box.innerHTML=(type==='error'?'⚠️ ':'🤖 ')+text;
 }
 async function callAI(api){
   try{
-    const res = await fetch(api);
-    if(!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-    showAI(data.hint || data.result || 'Không có gợi ý.');
-  }catch(e){ showAI('Không gọi được gợi ý AI.', 'error'); }
+    const res=await fetch(api);
+    if(!res.ok)throw new Error(await res.text());
+    const data=await res.json();
+    showAI(data.hint||data.result||'Không có gợi ý.');
+  }catch(e){showAI('Không gọi được gợi ý AI.','error');}
 }
 async function copyText(){
-  const txt = document.getElementById('problem-statement').innerText;
-  try{ await navigator.clipboard.writeText(txt); showAI('Đã copy nội dung đề ✅'); }
-  catch{ showAI('Không copy được nội dung.', 'error'); }
+  const txt=document.getElementById('problem-statement').innerText;
+  try{await navigator.clipboard.writeText(txt);showAI('✅ Đã copy đề');}
+  catch{showAI('Không copy được.','error');}
 }
-
-document.getElementById('btn-ai-hint').onclick = ()=>callAI("{% url 'ai_hint' problem.id %}");
-document.getElementById('btn-ai-next').onclick = ()=>callAI("{% url 'ai_recommend' problem.id %}");
-document.getElementById('btn-ai-copy').onclick = copyText;
-
-document.getElementById('btn-ai-hint-m').onclick = ()=>callAI("{% url 'ai_hint' problem.id %}");
-document.getElementById('btn-ai-next-m').onclick = ()=>callAI("{% url 'ai_recommend' problem.id %}");
-document.getElementById('btn-ai-copy-m').onclick = copyText;
-
-/* Mobile menu toggle */
-document.getElementById('ai-fab').addEventListener('click', ()=>{
-  const m = document.getElementById('ai-menu');
-  m.style.display = (m.style.display==='block' ? 'none' : 'block');
+document.getElementById('btn-ai-hint').onclick=()=>callAI("{% url 'ai_hint' problem.id %}");
+document.getElementById('btn-ai-next').onclick=()=>callAI("{% url 'ai_recommend' problem.id %}");
+document.getElementById('btn-ai-copy').onclick=copyText;
+document.getElementById('btn-ai-hint-m').onclick=()=>callAI("{% url 'ai_hint' problem.id %}");
+document.getElementById('btn-ai-next-m').onclick=()=>callAI("{% url 'ai_recommend' problem.id %}");
+document.getElementById('btn-ai-copy-m').onclick=copyText;
+document.getElementById('ai-fab').addEventListener('click',()=>{
+  const m=document.getElementById('ai-menu');
+  m.style.display=(m.style.display==='block'?'none':'block');
 });
 </script>
-
 {% endblock %}
