@@ -1,69 +1,309 @@
-<h2>🎯 Mục tiêu bài học</h2>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Bài giảng Stack – Queue – Deque</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #f2f5f9;
+        color: #333;
+    }
+
+    /* --- Sidebar Mục lục --- */
+    .sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        width: 260px;
+        height: 100%;
+        background: #1f2a44;
+        color: #fff;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .sidebar h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #445;
+        padding-bottom: 8px;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .sidebar a {
+        text-decoration: none;
+        color: #aaccff;
+        display: block;
+        padding: 6px 0;
+        font-size: 15px;
+    }
+
+    .sidebar a:hover {
+        color: #fff;
+    }
+
+    /* --- Nội dung --- */
+    .content {
+        margin-left: 280px;
+        padding: 30px;
+    }
+
+    h2 {
+        margin-top: 40px;
+        color: #2e4a9e;
+    }
+
+    h3 {
+        color: #445;
+        margin-top: 25px;
+    }
+
+    p {
+        font-size: 16px;
+    }
+
+    pre {
+        background: #fff;
+        border-left: 4px solid #2e4a9e;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 4px;
+        overflow-x: auto;
+    }
+
+    /* Nút mở lời giải */
+    details {
+        background: #fff;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #dce3f2;
+    }
+
+    summary {
+        font-weight: bold;
+        cursor: pointer;
+        color: #1f4fcc;
+        font-size: 16px;
+    }
+
+    details[open] {
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+</style>
+</head>
+
+<body>
+
+<!-- ========== SIDEBAR ========== -->
+<div class="sidebar">
+    <h2>📑 Mục lục</h2>
+    <ul>
+        <li><a href="#intro">🎯 Mục tiêu bài học</a></li>
+        <li><a href="#stack">📘 Lý thuyết Stack</a></li>
+        <li><a href="#queue">📘 Lý thuyết Queue</a></li>
+        <li><a href="#deque">📘 Lý thuyết Deque</a></li>
+        <li><a href="#vidu">💻 Ví dụ minh họa</a></li>
+        <li><a href="#baitap">🧩 Bài tập</a></li>
+    </ul>
+</div>
+
+<!-- ========== CONTENT ========== -->
+<div class="content">
+
+<!-- ====================== -->
+<!-- ✅ MỤC TIÊU BÀI HỌC -->
+<!-- ====================== -->
+
+<h2 id="intro">🎯 Mục tiêu bài học</h2>
 <ul>
   <li>Phân biệt rõ ba cấu trúc: Stack (ngăn xếp), Queue (hàng đợi), Deque (hai đầu).</li>
-  <li>Hiểu ứng dụng thực tế của từng loại trong xử lý dữ liệu luồng.</li>
+  <li>Hiểu ứng dụng thực tế của từng loại.</li>
 </ul>
 
 <hr>
 
-<h2>📘 Lý thuyết cơ bản</h2>
+<!-- ====================== -->
+<!-- ✅ LÝ THUYẾT STACK -->
+<!-- ====================== -->
+
+<h2 id="stack">📘 PHẦN I – LÝ THUYẾT CHI TIẾT VỀ STACK</h2>
+
+<h3>A. MỞ ĐẦU</h3>
 <p>
-🔹 <b>Stack (Ngăn xếp)</b>: Lấy ra phần tử cuối cùng được thêm vào (“Last In, First Out”).<br>
-🔹 <b>Queue (Hàng đợi)</b>: Lấy ra phần tử đầu tiên được thêm vào (“First In, First Out”).<br>
-🔹 <b>Deque (Double-ended Queue)</b>: Có thể thêm/xóa ở cả hai đầu.
+Trong lập trình, ta phải lưu trữ và tổ chức dữ liệu sao cho dễ truy cập.  
+Stack là một cấu trúc dữ liệu đặc biệt, hoạt động theo nguyên lý:
+</p>
+
+<p><b>➡️ LIFO – Last In First Out (Vào sau – Ra trước)</b></p>
+
+<p>
+Stack giống như một chồng sách: cuốn đặt lên cuối cùng sẽ được lấy ra đầu tiên.  
+Chuyên đề giúp học sinh yếu – trung bình hiểu và sử dụng Stack giải các bài toán cơ bản.
+</p>
+
+<h3>B. KIẾN THỨC CƠ BẢN VỀ STACK TRONG C++</h3>
+
+<p><b>1. Khai báo thư viện:</b></p>
+<pre><code>#include &lt;stack&gt;</code></pre>
+
+<p><b>2. Khai báo Stack:</b></p>
+<pre><code>stack&lt;int&gt; mystack;</code></pre>
+
+<p><b>3. Ví dụ đơn giản:</b></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+
+int main() {
+    stack&lt;int&gt; mystack;
+
+    mystack.push(0);
+    mystack.push(1);
+    mystack.push(2);
+
+    while (!mystack.empty()) {
+        cout &lt;&lt; mystack.top() &lt;&lt; " ";
+        mystack.pop();
+    }
+}</code></pre>
+
+<h3>C. CÁC PHÉP TOÁN TRÊN STACK</h3>
+
+<h4>✅ 1. empty() – kiểm tra rỗng</h4>
+<p>Trả về true nếu stack rỗng.</p>
+<pre><code>if (mystack.empty()) ...</code></pre>
+
+<h4>✅ 2. size() – kích thước stack</h4>
+<pre><code>cout &lt;&lt; mystack.size();</code></pre>
+
+<h4>✅ 3. push(x) – thêm phần tử vào đỉnh</h4>
+<pre><code>mystack.push(5);</code></pre>
+
+<h4>✅ 4. top() – xem phần tử trên đỉnh</h4>
+<pre><code>cout &lt;&lt; mystack.top();</code></pre>
+
+<h4>✅ 5. pop() – xoá phần tử trên đỉnh</h4>
+<pre><code>mystack.pop();</code></pre>
+
+<hr>
+
+
+<!-- ====================== -->
+<!-- ✅ QUEUE (Placeholder) -->
+<!-- ====================== -->
+
+<h2 id="queue">📘 PHẦN II – LÝ THUYẾT QUEUE (HÀNG ĐỢI)</h2>
+
+<p><i>🔧 Phần này bạn sẽ thay nội dung chi tiết sau. Tạm thời dùng bản rút gọn:</i></p>
+
+<p>
+✅ Queue hoạt động theo mô hình FIFO – First In First Out (vào trước ra trước).<br>
+✅ Dùng trong mô phỏng xếp hàng, xử lý dữ liệu luồng, bộ lập lịch hệ điều hành...<br>
+✅ Thư viện: <code>#include &lt;queue&gt;</code><br>
+✅ Hàm quan trọng: <code>push(), pop(), front(), back(), empty(), size()</code>
 </p>
 
 <hr>
 
-<h2>💻 Ví dụ minh họa</h2>
+<!-- ====================== -->
+<!-- ✅ DEQUE (Placeholder) -->
+<!-- ====================== -->
 
-<h4>C++</h4>
+<h2 id="deque">📘 PHẦN III – LÝ THUYẾT DEQUE (HAI ĐẦU)</h2>
+
+<p><i>🔧 Phần này cũng để trống để bạn thay sau:</i></p>
+
+<p>
+✅ Deque là cấu trúc cho phép thêm/xoá ở cả hai đầu.<br>
+✅ Linh hoạt hơn Queue và Stack.<br>
+✅ Thư viện: <code>#include &lt;deque&gt;</code><br>
+✅ Hàm quan trọng: <code>push_back(), push_front(), pop_back(), pop_front()</code>
+</p>
+
+<hr>
+
+<!-- ====================== -->
+<!-- ✅ VÍ DỤ -->
+<!-- ====================== -->
+
+<h2 id="vidu">💻 Ví dụ minh họa</h2>
+
+<h3>C++</h3>
 <pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int main(){
+
+int main() {
     stack&lt;int&gt; st;
     queue&lt;int&gt; q;
     deque&lt;int&gt; dq;
-    for(int i=1;i&lt;=3;i++){
+
+    for (int i = 1; i &lt;= 3; i++) {
         st.push(i);
         q.push(i);
         dq.push_back(i);
     }
-    cout&lt;&lt;"Stack top: "&lt;&lt;st.top()&lt;&lt;"\\n";
-    cout&lt;&lt;"Queue front: "&lt;&lt;q.front()&lt;&lt;"\\n";
-    cout&lt;&lt;"Deque back: "&lt;&lt;dq.back()&lt;&lt;"\\n";
-}</code></pre>
 
-<h4>Python</h4>
+    cout &lt;&lt; "Stack top: " &lt;&lt; st.top() &lt;&lt; "\n";
+    cout &lt;&lt; "Queue front: " &lt;&lt; q.front() &lt;&lt; "\n";
+    cout &lt;&lt; "Deque back: " &lt;&lt; dq.back() &lt;&lt; "\n";
+}
+</code></pre>
+
+<h3>Python</h3>
 <pre><code>from collections import deque
+
 st = []
 q = deque()
 dq = deque()
 
-for i in range(1,4):
+for i in range(1, 4):
     st.append(i)
     q.append(i)
     dq.append(i)
 
 print("Stack top:", st[-1])
 print("Queue front:", q[0])
-print("Deque back:", dq[-1])</code></pre>
+print("Deque back:", dq[-1])
+</code></pre>
 
 <hr>
 
-<h2>🧩 Bài tập luyện tập</h2>
+<!-- ====================== -->
+<!-- ✅ BÀI TẬP -->
+<!-- ====================== -->
+
+<h2 id="baitap">🧩 Bài tập luyện tập</h2>
+
 <ol>
   <li>Viết chương trình đảo ngược chuỗi bằng Stack.</li>
   <li>Mô phỏng người xếp hàng (Queue) vào rạp chiếu phim.</li>
-  <li>Sử dụng Deque để cài đặt hàng đợi 2 đầu.</li>
+  <li>Sử dụng Deque để cài đặt hàng đợi hai đầu.</li>
 </ol>
 
 <details>
-  <summary><b>💡 Lời giải mẫu 1: Đảo chuỗi</b></summary>
+  <summary>💡 Lời giải mẫu 1 – Đảo chuỗi bằng Stack</summary>
   <pre><code>s = input()
 st = []
 for ch in s:
     st.append(ch)
 while st:
-    print(st.pop(), end="")</code></pre>
+    print(st.pop(), end="")
+  </code></pre>
 </details>
+
+</div>
+</body>
+</html>
