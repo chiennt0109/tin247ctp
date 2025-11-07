@@ -7,14 +7,13 @@
 <style>
 :root {
   --blue-main: #2563eb;
-  --blue-light: #60a5fa;
   --blue-dark: #1e3a8a;
   --text-color: #1e293b;
   --bg-page: #f8fafc;
   --sidebar-bg: linear-gradient(180deg, #1e40af 0%, #2563eb 100%);
 }
 
-/* ======= PAGE RESET ======= */
+/* ====== PAGE RESET ====== */
 body {
   margin: 0;
   font-family: "Segoe UI", Arial, sans-serif;
@@ -23,7 +22,7 @@ body {
   display: flex;
 }
 
-/* ======= SIDEBAR ======= */
+/* ====== SIDEBAR ====== */
 .sidebar {
   width: 260px;
   background: var(--sidebar-bg);
@@ -36,86 +35,37 @@ body {
   overflow-y: auto;
   box-shadow: 2px 0 6px rgba(0,0,0,0.1);
 }
-
 .sidebar h2 {
   font-size: 19px;
   margin-bottom: 15px;
   border-bottom: 1px solid rgba(255,255,255,0.25);
   padding-bottom: 6px;
 }
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar li {
-  margin: 10px 0;
-}
-
+.sidebar ul { list-style: none; padding: 0; margin: 0; }
+.sidebar li { margin: 10px 0; }
 .sidebar a {
   color: #e0ecff;
   text-decoration: none;
   font-size: 15px;
   padding: 8px 10px;
-  display: flex;
-  align-items: center;
+  display: block;
   border-radius: 6px;
-  transition: background 0.25s, color 0.25s, transform 0.2s;
+  transition: background 0.25s, transform 0.2s;
 }
+.sidebar a:hover { background: rgba(255,255,255,0.15); color: #fff; transform: translateX(3px); }
 
-.sidebar a:hover {
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  transform: translateX(3px);
-}
-
-.sidebar a.active {
-  background: rgba(255,255,255,0.25);
-  color: #fff;
-  font-weight: 600;
-}
-
-/* ======= MAIN CONTENT ======= */
+/* ====== CONTENT ====== */
 .content {
   margin-left: 280px;
   flex: 1;
   padding: 40px 60px;
   max-width: 1250px;
 }
-
-h1 {
-  color: var(--blue-dark);
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-h2 {
-  color: var(--blue-main);
-  border-left: 6px solid var(--blue-main);
-  padding-left: 10px;
-  margin-top: 35px;
-}
-
-h3 {
-  color: #334155;
-  margin-top: 25px;
-}
-
-p, li {
-  font-size: 16.5px;
-  line-height: 1.7;
-}
-
-code {
-  background: #e2e8f0;
-  padding: 2px 5px;
-  border-radius: 4px;
-  font-family: "Consolas", monospace;
-}
-
-/* ======= CODE BLOCK ======= */
+h1 { color: var(--blue-dark); font-size: 28px; }
+h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
+h3 { color: #334155; margin-top: 25px; }
+p, li { font-size: 16.5px; line-height: 1.7; }
+code { background: #e2e8f0; padding: 2px 5px; border-radius: 4px; font-family: Consolas, monospace; }
 pre {
   background: #f1f5f9;
   border-left: 4px solid var(--blue-main);
@@ -124,53 +74,39 @@ pre {
   border-radius: 8px;
   overflow-x: auto;
 }
+table {
+  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
+}
+th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
 
-/* ======= STACK DEMO ======= */
+/* ====== STACK ANIMATION ====== */
 .stack-demo {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  justify-content: flex-end;
-  height: 320px;
-  width: 240px;
-  background: #fff;
-  border: 2px solid var(--blue-main);
-  border-radius: 10px;
-  margin: 25px auto;
-  padding: 10px;
-  position: relative;
+  display: flex; flex-direction: column-reverse; align-items: center;
+  height: 320px; width: 240px; background: #fff;
+  border: 2px solid var(--blue-main); border-radius: 10px;
+  margin: 25px auto; padding: 10px; position: relative;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 .block {
-  width: 170px;
-  height: 42px;
-  background: var(--blue-main);
-  color: #fff;
-  font-weight: bold;
-  text-align: center;
-  line-height: 42px;
-  margin: 4px 0;
-  border-radius: 6px;
-  opacity: 0;
-  transform: translateY(80px);
+  width: 170px; height: 42px; background: var(--blue-main); color: #fff;
+  font-weight: bold; text-align: center; line-height: 42px;
+  margin: 4px 0; border-radius: 6px; opacity: 0; transform: translateY(80px);
   animation: pushUp 0.9s ease forwards;
 }
-.block:nth-child(2) { animation-delay: 1s; }
-.block:nth-child(3) { animation-delay: 2s; }
-.block:nth-child(4) { animation-delay: 3s; }
+.block:nth-child(2){animation-delay:1s;}
+.block:nth-child(3){animation-delay:2s;}
+.block:nth-child(4){animation-delay:3s;}
 .stack-label {
-  position: absolute;
-  bottom: -40px;
-  font-weight: bold;
-  color: var(--blue-main);
+  position: absolute; bottom: -40px; font-weight: bold; color: var(--blue-main);
   text-transform: uppercase;
 }
 @keyframes pushUp {
-  from { opacity: 0; transform: translateY(80px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {opacity:0;transform:translateY(80px);}
+  to {opacity:1;transform:translateY(0);}
 }
 
-/* ======= DETAILS & LOCK ======= */
+/* ====== DETAILS / LOCK ====== */
 details {
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -179,40 +115,10 @@ details {
   margin: 16px 0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-summary {
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--blue-main);
-  font-size: 16px;
-}
-.locked {
-  color: #6b7280;
-  font-style: italic;
-  text-align: center;
-  padding: 10px;
-}
+summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size: 16px; }
+.locked { color: #6b7280; font-style: italic; text-align: center; padding: 10px; }
 
-/* ======= TABLE ======= */
-table {
-  border-collapse: collapse;
-  width: 100%;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 20px 0;
-}
-th, td {
-  border: 1px solid #e2e8f0;
-  padding: 10px;
-  text-align: left;
-}
-th {
-  background: #f0f6ff;
-  color: var(--blue-main);
-  font-weight: 600;
-}
-
-/* ======= RESPONSIVE ======= */
+/* ====== RESPONSIVE ====== */
 @media (max-width: 992px) {
   .sidebar { position: relative; width: 100%; height: auto; }
   .content { margin-left: 0; padding: 20px; }
@@ -247,9 +153,17 @@ th {
   <li>Hiểu ứng dụng thực tế của từng loại.</li>
 </ul>
 
-<h2 id="stack">📗 Lý thuyết chi tiết về Stack</h2>
-<p><b>A. Mở đầu</b> – Khi lập trình, chúng ta thường cần cấu trúc tổ chức dữ liệu giúp truy cập và xử lý nhanh. Stack hoạt động theo nguyên lý <b>LIFO – Last In, First Out</b>.</p>
+<h2 id="stack">📗 Phần I – Lý thuyết chi tiết về Stack</h2>
 
+<h3>A. MỞ ĐẦU</h3>
+<p>Khi lập trình, chúng ta thường phải lưu trữ dữ liệu. Tuy nhiên, chỉ lưu trữ thôi thì chưa đủ — ta cần tổ chức dữ liệu sao cho dễ truy cập, dễ xử lý và dễ cập nhật. Đó chính là lý do các <b>cấu trúc dữ liệu</b> ra đời.</p>
+<p>Trong C++, thư viện STL cung cấp rất nhiều cấu trúc dữ liệu mạnh mẽ như <code>vector</code>, <code>queue</code>, <code>map</code>, <code>set</code>… Mỗi cấu trúc lại có ưu điểm riêng và phù hợp giải quyết một kiểu bài toán nhất định.</p>
+<p>Hôm nay chúng ta tìm hiểu về <b>Stack (ngăn xếp)</b> — một cấu trúc dữ liệu rất phổ biến, hoạt động theo nguyên tắc:</p>
+<p style="text-align:center;font-size:18px;font-weight:bold;color:var(--blue-main);">LIFO — Last In, First Out (Vào sau – Ra trước)</p>
+<p>Bạn có thể tưởng tượng stack giống như <b>chồng sách</b>: cuốn nào đặt lên cuối cùng, thì phải lấy ra trước.</p>
+<p>Trong chuyên đề này, chúng ta sẽ làm quen với stack và sử dụng nó để giải quyết các bài toán ở mức độ đơn giản nhất, phù hợp cho học sinh chưa vững lập trình. Từ đó, các em có thể mở rộng để giải các bài khó hơn.</p>
+
+<!-- animation -->
 <div class="stack-demo">
   <div class="block">Phần tử 3</div>
   <div class="block">Phần tử 2</div>
@@ -259,55 +173,156 @@ th {
 </div>
 <p style="text-align:center;color:#555;"><i>Minh họa nguyên lý “Vào sau – Ra trước”.</i></p>
 
-<h3>B. Các thao tác cơ bản</h3>
-<table>
-<tr><th>Lệnh</th><th>Ý nghĩa</th><th>Độ phức tạp</th></tr>
-<tr><td><code>push(x)</code></td><td>Thêm phần tử vào đỉnh</td><td>O(1)</td></tr>
-<tr><td><code>pop()</code></td><td>Xoá phần tử ở đỉnh</td><td>O(1)</td></tr>
-<tr><td><code>top()</code></td><td>Xem phần tử ở đỉnh</td><td>O(1)</td></tr>
-<tr><td><code>empty()</code></td><td>Kiểm tra rỗng</td><td>O(1)</td></tr>
-</table>
+<h3>B. MỘT SỐ KIẾN THỨC CƠ BẢN VỀ STACK TRONG C++</h3>
+<p><b>✅ 1. Stack là gì?</b></p>
+<p>Stack là một danh sách đặc biệt, nơi ta chỉ được thêm hoặc lấy phần tử ở một đầu duy nhất, gọi là <b>đỉnh (top)</b>.</p>
+<ul>
+  <li>Khi thêm (<code>push</code>) → thêm vào đỉnh.</li>
+  <li>Khi lấy ra (<code>pop</code>) → lấy từ đỉnh.</li>
+  <li>Không truy cập giữa hay cuối danh sách.</li>
+</ul>
+<p>→ Vì vào sau ra trước, stack còn gọi là danh sách kiểu <b>LIFO</b>.</p>
 
-<h2 id="queue">📘 Lý thuyết Queue (Hàng đợi)</h2>
-<p>Queue tuân theo <b>FIFO – First In First Out</b>: phần tử vào trước được lấy ra trước.  
-Ứng dụng trong xử lý luồng dữ liệu, mô phỏng hàng chờ, lập lịch CPU...</p>
-<p><i>💡 Nội dung chi tiết và ví dụ sẽ được bổ sung sau.</i></p>
+<p><b>✅ 2. Cách khai báo và sử dụng Stack trong C++</b></p>
+<p>a. Khai báo thư viện:</p>
+<pre><code>#include &lt;stack&gt;</code></pre>
+<p>b. Khai báo biến stack:</p>
+<pre><code>stack&lt;kiểu_dữ_liệu&gt; tên_biến;</code></pre>
+<p>Ví dụ:</p>
+<pre><code>stack&lt;int&gt; mystack;</code></pre>
 
-<h2 id="deque">📙 Lý thuyết Deque (Hai đầu)</h2>
-<p>Deque (Double Ended Queue) cho phép thêm hoặc xoá ở cả hai đầu, linh hoạt hơn Stack/Queue.</p>
-<p><i>💡 Nội dung chi tiết và ví dụ sẽ được bổ sung sau.</i></p>
-
-<h2 id="vidu">💻 Ví dụ minh họa</h2>
-<p>Ví dụ C++:</p>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+<p><b>✅ 3. Ví dụ đơn giản về Stack</b></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
 using namespace std;
 int main() {
-    stack&lt;int&gt; st;
-    queue&lt;int&gt; q;
-    deque&lt;int&gt; dq;
-    for(int i=1;i&lt;=3;i++){
-        st.push(i); q.push(i); dq.push_back(i);
+    stack&lt;int&gt; mystack;
+    mystack.push(0);
+    mystack.push(1);
+    mystack.push(2);
+    while (!mystack.empty()) {
+        cout &lt;&lt; ' ' &lt;&lt; mystack.top();
+        mystack.pop();
     }
-    cout&lt;&lt;"Stack top: "&lt;&lt;st.top()&lt;&lt;"\\n";
-    cout&lt;&lt;"Queue front: "&lt;&lt;q.front()&lt;&lt;"\\n";
-    cout&lt;&lt;"Deque back: "&lt;&lt;dq.back()&lt;&lt;"\\n";
-}
-</code></pre>
+}</code></pre>
+<p>Giải thích:</p>
+<ul>
+  <li>push 0 → stack = [0]</li>
+  <li>push 1 → stack = [0, 1]</li>
+  <li>push 2 → stack = [0, 1, 2]</li>
+</ul>
+<p>Khi in: <b>2 1 0</b></p>
+
+<h3>C. CÁC THAO TÁC CƠ BẢN TRÊN STACK</h3>
+
+<p><b>✅ 1. Kiểm tra stack rỗng – empty()</b></p>
+<pre><code>if (mystack.empty()) ...</code></pre>
+
+<p>Ví dụ:</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main() {
+    stack&lt;int&gt; mystack;
+    mystack.push(1);
+    if (mystack.empty()) cout &lt;&lt; "True";
+    else cout &lt;&lt; "False";
+}</code></pre>
+
+<p><b>✅ 2. Lấy kích thước stack – size()</b></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main() {
+    int sum=0;
+    stack&lt;int&gt; mystack;
+    mystack.push(1);
+    mystack.push(8);
+    mystack.push(3);
+    mystack.push(6);
+    mystack.push(2);
+    while (mystack.size()>0){
+        sum+=mystack.top();
+        mystack.pop();
+    }
+    cout&lt;&lt;sum;
+}</code></pre>
+
+<p><b>✅ 3. Thêm phần tử vào stack – push()</b></p>
+<pre><code>mystack.push(0);
+mystack.push(1);
+mystack.push(2);</code></pre>
+
+<p><b>✅ 4. Xem phần tử ở đỉnh stack – top()</b></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main(){
+    stack&lt;int&gt; mystack;
+    mystack.push(5);
+    mystack.push(1);
+    mystack.push(2);
+    cout&lt;&lt;mystack.top(); //2
+}</code></pre>
+
+<p><b>✅ 5. Xoá phần tử ở đỉnh stack – pop()</b></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main(){
+    stack&lt;int&gt; mystack;
+    mystack.push(1);
+    mystack.push(2);
+    mystack.push(3);
+    mystack.push(4);
+    mystack.pop();
+    mystack.pop(); //bỏ 4 và 3
+    while(!mystack.empty()){
+        cout&lt;&lt;' '&lt;&lt;mystack.top();
+        mystack.pop();
+    }
+}</code></pre>
+<p>Kết quả: 2 1</p>
+
+<h3>✅ TÓM TẮT KIẾN THỨC CHÍNH</h3>
+<table>
+<tr><th>Lệnh</th><th>Ý nghĩa</th><th>Độ phức tạp</th></tr>
+<tr><td>push(x)</td><td>Thêm x vào đỉnh</td><td>O(1)</td></tr>
+<tr><td>pop()</td><td>Xoá phần tử ở đỉnh</td><td>O(1)</td></tr>
+<tr><td>top()</td><td>Lấy giá trị ở đỉnh</td><td>O(1)</td></tr>
+<tr><td>empty()</td><td>Kiểm tra rỗng</td><td>O(1)</td></tr>
+<tr><td>size()</td><td>Đếm số phần tử</td><td>O(1)</td></tr>
+</table>
+
+<h3>✅ LỜI KẾT – ĐỊNH HƯỚNG HỌC TẬP</h3>
+<p>Stack là một cấu trúc đơn giản nhưng xuất hiện trong rất nhiều bài toán quan trọng như:</p>
+<ul>
+  <li>Kiểm tra dấu ngoặc</li>
+  <li>Đảo ngược chuỗi</li>
+  <li>Duyệt cây, duyệt đồ thị</li>
+  <li>Biểu thức toán học</li>
+  <li>Thuật toán quay lui (backtracking)</li>
+</ul>
+<p>Học tốt phần này sẽ giúp các em giải được nhiều dạng bài từ cơ bản đến nâng cao.</p>
+
+<h2 id="queue">📘 Lý thuyết Queue</h2>
+<p><i>Phần nội dung chi tiết về Queue sẽ được bổ sung sau.</i></p>
+
+<h2 id="deque">📙 Lý thuyết Deque</h2>
+<p><i>Phần nội dung chi tiết về Deque sẽ được bổ sung sau.</i></p>
 
 <h2 id="baitap">🧩 Bài tập luyện tập</h2>
-
 <ol>
-  <li>Viết chương trình đảo chuỗi bằng Stack.</li>
-  <li>Mô phỏng hàng chờ vào rạp phim bằng Queue.</li>
-  <li>Cài đặt Deque hai đầu cho phép thêm/xoá cả hai phía.</li>
+  <li>Viết chương trình đảo ngược chuỗi bằng Stack.</li>
+  <li>Mô phỏng người xếp hàng (Queue) vào rạp chiếu phim.</li>
+  <li>Sử dụng Deque để cài đặt hàng đợi hai đầu.</li>
 </ol>
 
-<!-- Locked solution -->
 <details>
   <summary>💡 Lời giải mẫu – Đảo chuỗi bằng Stack</summary>
-  <div id="solutionStack" class="locked">🔒 Vui lòng <a href="/login">đăng nhập</a> để xem lời giải.</div>
-  <pre id="solutionCode" style="display:none;"><code>
-s = input("Nhập chuỗi: ")
+  <div id="locked" class="locked">🔒 Vui lòng <a href="/login">đăng nhập</a> để xem lời giải.</div>
+  <pre id="sol" style="display:none;"><code>
+s = input()
 st = []
 for ch in s:
     st.append(ch)
@@ -318,14 +333,11 @@ while st:
 
 </div>
 
-<!-- JS kiểm tra đăng nhập -->
 <script>
-// Giả lập: nếu bạn có backend Django, hãy thay biến này bằng true/false từ context
-const isLoggedIn = false; // đổi thành true nếu người dùng đã đăng nhập
-
-if (isLoggedIn) {
-  document.getElementById("solutionStack").style.display = "none";
-  document.getElementById("solutionCode").style.display = "block";
+const isLoggedIn = false; // backend: {{ user.is_authenticated|yesno:"true,false" }}
+if(isLoggedIn){
+  document.getElementById("locked").style.display="none";
+  document.getElementById("sol").style.display="block";
 }
 </script>
 </body>
