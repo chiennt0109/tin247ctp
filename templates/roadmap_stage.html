@@ -1,51 +1,75 @@
 {% extends 'base.html' %}
-{% block title %}{{ stage.title }} | IT Contest OJ{% endblock %}
+{% block title %}{{ stage.title }} | CodePath{% endblock %}
 
 {% block extra_head %}
 <style>
   body { background-color: #f8fafc; }
-  pre { white-space: pre-wrap; font-size: 0.95rem; }
-  textarea { font-family: "Fira Code", monospace; font-size: 0.95rem; }
+
   .topic-item {
-    cursor: pointer; border-left: 4px solid transparent; transition: 0.25s;
-    border-radius: 4px; padding: 6px 10px;
+    cursor: pointer;
+    padding: 10px 12px;
+    border-left: 4px solid transparent;
+    border-radius: 5px;
+    transition: 0.25s;
   }
-  .topic-item:hover { background-color: #f1f5f9; }
-  .topic-item.active { background-color: #e0f2fe; border-left-color: #0d6efd; }
-  .code-box { font-family: "Fira Code", monospace; font-size: 0.9rem; }
-  #output-box { min-height: 120px; max-height: 400px; overflow-y: auto; }
-  #topic-content { opacity: 0; transition: opacity 0.4s ease-in-out; }
+  .topic-item:hover { background-color: #eef6ff; }
+  .topic-item.active {
+    background-color: #e0f2fe;
+    border-left-color: #0d6efd;
+  }
+
+  #topic-content {
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+  }
   #topic-content.show { opacity: 1; }
 
-  /* 🧭 Nút chuyển giai đoạn cố định */
+  pre {
+    background: #f1f5f9;
+    border-left: 4px solid #0d6efd;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: "Fira Code", monospace;
+    font-size: 0.9rem;
+    overflow-x: auto;
+  }
+
+  #output-box {
+    min-height: 120px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  /* Nút chuyển giai đoạn */
   .stage-nav-btn {
     position: fixed;
-    bottom: 50px;
-    z-index: 1000;
-    background: #0d6efd;
-    color: #fff;
-    border-radius: 50px;
+    bottom: 40px;
+    z-index: 1200;
     padding: 10px 20px;
-    font-size: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 40px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: white;
+    background: #0d6efd;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     text-decoration: none;
     transition: all 0.3s ease;
   }
   .stage-nav-btn:hover { background: #2563eb; transform: scale(1.05); }
-  .stage-prev { left: 30px; }
-  .stage-next { right: 30px; }
+  .stage-prev { left: 25px; }
+  .stage-next { right: 25px; }
   .stage-nav-btn[data-tooltip]:hover::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: 120%;
+    bottom: 115%;
     left: 50%;
     transform: translateX(-50%);
+    white-space: nowrap;
     background: rgba(30,41,59,0.9);
     color: #fff;
     font-size: 13px;
     padding: 6px 10px;
     border-radius: 6px;
-    white-space: nowrap;
   }
 
   @media (max-width: 992px) {
@@ -64,9 +88,9 @@
     <h5 class="fw-semibold text-secondary mb-3">📘 Nội dung</h5>
     <div id="topic-list">
       {% for topic in stage.topics %}
-        <div class="topic-item mb-1" data-index="{{ forloop.counter0 }}">
-          <span class="fw-semibold text-primary">{{ topic.title }}</span><br>
-          <small class="text-muted">{{ topic.summary|truncatechars:60 }}</small>
+        <div class="topic-item mb-2" data-index="{{ forloop.counter0 }}">
+          <div class="fw-semibold text-primary">{{ topic.title }}</div>
+          <small class="text-muted">{{ topic.summary|truncatechars:70 }}</small>
         </div>
       {% empty %}
         <p class="text-muted fst-italic">Chưa có nội dung cho giai đoạn này.</p>
@@ -77,13 +101,12 @@
   <!-- NỘI DUNG CHI TIẾT -->
   <div class="col-lg-8 ps-4">
     <div id="topic-content" class="show">
-      <h6 class="fw-bold text-primary">
-        👉 Hãy chọn một mục ở cột trái để xem nội dung chi tiết.
-      </h6>
+      <h6 class="fw-bold text-primary">👈 Chọn một mục ở cột trái để xem nội dung chi tiết.</h6>
     </div>
 
     <hr class="my-4">
 
+    <!-- KHUNG THỰC HÀNH -->
     <h5 class="fw-bold text-secondary mb-3">🧮 Thực hành – Viết và chạy code</h5>
     <form id="run-form" class="mb-3">
       {% csrf_token %}
@@ -118,16 +141,12 @@
   </div>
 </div>
 
-<!-- 🌟 NÚT CHUYỂN GIAI ĐOẠN -->
+<!-- NÚT CHUYỂN GIAI ĐOẠN -->
 {% if prev_stage %}
-  <a href="/roadmap/stage/{{ prev_stage.id }}/"
-     class="stage-nav-btn stage-prev"
-     data-tooltip="{{ prev_stage.title }}">⬅️ Trước</a>
+  <a href="/roadmap/stage/{{ prev_stage.id }}/" class="stage-nav-btn stage-prev" data-tooltip="{{ prev_stage.title }}">⬅️ Trước</a>
 {% endif %}
 {% if next_stage %}
-  <a href="/roadmap/stage/{{ next_stage.id }}/"
-     class="stage-nav-btn stage-next"
-     data-tooltip="{{ next_stage.title }}">Sau ➡️</a>
+  <a href="/roadmap/stage/{{ next_stage.id }}/" class="stage-nav-btn stage-next" data-tooltip="{{ next_stage.title }}">Sau ➡️</a>
 {% endif %}
 {% endblock %}
 
@@ -141,16 +160,12 @@
   const outputBox = document.getElementById("output-box");
   let currentIndex = -1;
 
-  function fadeIn(html) {
+  // hiệu ứng hiển thị
+  function showContent(html) {
     topicContent.classList.remove("show");
     setTimeout(() => {
       topicContent.innerHTML = html;
       topicContent.classList.add("show");
-      const isLoggedIn = {{ user.is_authenticated|yesno:"true,false" }};
-      if (isLoggedIn && document.getElementById("locked")) {
-        document.getElementById("locked").style.display = "none";
-        document.getElementById("sol").style.display = "block";
-      }
     }, 200);
   }
 
@@ -164,12 +179,13 @@
     const t = topics[currentIndex];
     if (!t) return;
 
-    // Chỉ load nội dung, không lồng <html> để tránh lỗi click
-    fetch(t.html_file)
-      .then(res => res.text())
-      .then(html => fadeIn(html))
-      .catch(() => fadeIn(`<p class='text-danger'>❌ Không tải được nội dung.</p>`));
+    // tải nội dung file HTML (an toàn, không phá DOM)
+    fetch("/static/" + t.html_file)
+      .then(r => r.text())
+      .then(data => showContent(data))
+      .catch(() => showContent("<p class='text-danger'>⚠️ Không tải được nội dung.</p>"));
 
+    // hiển thị ví dụ code
     const lang = document.getElementById("language").value;
     codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
     outputBox.textContent = "";
@@ -186,8 +202,8 @@
 
   document.getElementById("run-form").addEventListener("submit", async e => {
     e.preventDefault();
-    const data = new FormData(e.target);
     outputBox.textContent = "⏳ Đang chạy code...";
+    const data = new FormData(e.target);
     try {
       const resp = await fetch("/roadmap/run/", { method: "POST", body: data });
       const res = await resp.json();
