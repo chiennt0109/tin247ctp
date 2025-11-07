@@ -1,93 +1,70 @@
 {% extends 'base.html' %}
-
 {% block title %}{{ stage.title }} | IT Contest OJ{% endblock %}
 
 {% block extra_head %}
 <style>
+  body { background-color: #f8fafc; }
   pre { white-space: pre-wrap; font-size: 0.95rem; }
   textarea { font-family: "Fira Code", monospace; font-size: 0.95rem; }
-  .topic-item { cursor: pointer; border-left: 4px solid transparent; transition: 0.25s; }
+  .topic-item {
+    cursor: pointer; border-left: 4px solid transparent; transition: 0.25s;
+    border-radius: 4px; padding: 6px 10px;
+  }
   .topic-item:hover { background-color: #f1f5f9; }
   .topic-item.active { background-color: #e0f2fe; border-left-color: #0d6efd; }
   .code-box { font-family: "Fira Code", monospace; font-size: 0.9rem; }
   #output-box { min-height: 120px; max-height: 400px; overflow-y: auto; }
-  .section-header { border-left: 5px solid #0d6efd; padding-left: 10px; }
-
-  /* 🌈 Hiệu ứng mượt khi thay đổi nội dung */
-  #topic-content {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-  }
+  #topic-content { opacity: 0; transition: opacity 0.4s ease-in-out; }
   #topic-content.show { opacity: 1; }
 
-  /* 🎯 Nút chuyển giai đoạn cố định ở biên */
+  /* 🧭 Nút chuyển giai đoạn cố định */
   .stage-nav-btn {
     position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1055; /* cao hơn sidebar ở topic detail */
-    padding: 10px 14px;
-    font-size: 0.95rem;
-    border-radius: 50px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-    transition: all 0.3s ease;
-    white-space: nowrap;
-  }
-  .stage-nav-btn:hover {
-    transform: translateY(-50%) scale(1.05);
-    text-decoration: none;
-  }
-  .stage-prev {
-    left: 15px;
-    background-color: #f3f4f6;
-    color: #0d6efd;
-    border: 1px solid #dbeafe;
-  }
-  .stage-next {
-    right: 15px;
-    background-color: #0d6efd;
+    bottom: 50px;
+    z-index: 1000;
+    background: #0d6efd;
     color: #fff;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-decoration: none;
+    transition: all 0.3s ease;
   }
-
-  /* Tooltip tùy chỉnh */
+  .stage-nav-btn:hover { background: #2563eb; transform: scale(1.05); }
+  .stage-prev { left: 30px; }
+  .stage-next { right: 30px; }
   .stage-nav-btn[data-tooltip]:hover::after {
     content: attr(data-tooltip);
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    white-space: nowrap;
-    background: rgba(30, 41, 59, 0.9);
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(30,41,59,0.9);
     color: #fff;
     font-size: 13px;
     padding: 6px 10px;
     border-radius: 6px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-    pointer-events: none;
-  }
-  .stage-prev[data-tooltip]:hover::after {
-    left: 110%;
-  }
-  .stage-next[data-tooltip]:hover::after {
-    right: 110%;
+    white-space: nowrap;
   }
 
   @media (max-width: 992px) {
-    .stage-nav-btn { display: none; } /* Ẩn trên mobile để tránh che nội dung */
+    .stage-nav-btn { display: none; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<h3 class="fw-bold text-primary">{{ stage.title }}</h3>
+<h4 class="fw-bold text-danger">{{ stage.title }}</h4>
 <p class="text-muted mb-4">{{ stage.summary }}</p>
 
 <div class="row">
-  <!-- CỘT TRÁI -->
-  <div class="col-md-4 border-end">
+  <!-- SIDEBAR TRÁI -->
+  <div class="col-lg-4 border-end">
     <h5 class="fw-semibold text-secondary mb-3">📘 Nội dung</h5>
     <div id="topic-list">
       {% for topic in stage.topics %}
-        <div class="p-2 topic-item" data-index="{{ forloop.counter0 }}">
+        <div class="topic-item mb-1" data-index="{{ forloop.counter0 }}">
           <span class="fw-semibold text-primary">{{ topic.title }}</span><br>
           <small class="text-muted">{{ topic.summary|truncatechars:60 }}</small>
         </div>
@@ -97,15 +74,16 @@
     </div>
   </div>
 
-  <!-- CỘT PHẢI -->
-  <div class="col-md-8 ps-4">
+  <!-- NỘI DUNG CHI TIẾT -->
+  <div class="col-lg-8 ps-4">
     <div id="topic-content" class="show">
-      <h5 class="fw-bold text-primary">👈 Hãy chọn một mục ở cột trái để xem nội dung chi tiết.</h5>
+      <h6 class="fw-bold text-primary">
+        👉 Hãy chọn một mục ở cột trái để xem nội dung chi tiết.
+      </h6>
     </div>
 
     <hr class="my-4">
 
-    <!-- KHUNG EDITOR -->
     <h5 class="fw-bold text-secondary mb-3">🧮 Thực hành – Viết và chạy code</h5>
     <form id="run-form" class="mb-3">
       {% csrf_token %}
@@ -125,7 +103,7 @@
       </div>
 
       <label class="form-label fw-semibold">💻 Code của bạn</label>
-      <textarea id="source-code" name="code" rows="12" class="form-control" placeholder="Nhập code tại đây..."></textarea>
+      <textarea id="source-code" name="code" rows="10" class="form-control" placeholder="Nhập code tại đây..."></textarea>
 
       <div class="text-end mt-3">
         <button type="button" id="reset-btn" class="btn btn-outline-secondary btn-sm me-2">↩️ Reset ví dụ</button>
@@ -140,21 +118,16 @@
   </div>
 </div>
 
-<!-- 🌟 Nút chuyển giai đoạn cố định -->
+<!-- 🌟 NÚT CHUYỂN GIAI ĐOẠN -->
 {% if prev_stage %}
   <a href="/roadmap/stage/{{ prev_stage.id }}/"
      class="stage-nav-btn stage-prev"
-     data-tooltip="{{ prev_stage.title }}">
-     ⬅️
-  </a>
+     data-tooltip="{{ prev_stage.title }}">⬅️ Trước</a>
 {% endif %}
-
 {% if next_stage %}
   <a href="/roadmap/stage/{{ next_stage.id }}/"
      class="stage-nav-btn stage-next"
-     data-tooltip="{{ next_stage.title }}">
-     ➡️
-  </a>
+     data-tooltip="{{ next_stage.title }}">Sau ➡️</a>
 {% endif %}
 {% endblock %}
 
@@ -166,29 +139,24 @@
   const codeBox = document.getElementById("source-code");
   const resetBtn = document.getElementById("reset-btn");
   const outputBox = document.getElementById("output-box");
-
   let currentIndex = -1;
 
-  // 💡 Hiệu ứng fade khi load nội dung mới
-  function fadeInContent(html) {
+  function fadeIn(html) {
     topicContent.classList.remove("show");
     setTimeout(() => {
       topicContent.innerHTML = html;
       topicContent.classList.add("show");
-
-      // xử lý ẩn/hiện lời giải sau khi load
       const isLoggedIn = {{ user.is_authenticated|yesno:"true,false" }};
       if (isLoggedIn && document.getElementById("locked")) {
         document.getElementById("locked").style.display = "none";
         document.getElementById("sol").style.display = "block";
       }
-    }, 250);
+    }, 200);
   }
 
-  topicList.addEventListener("click", (e) => {
+  topicList.addEventListener("click", e => {
     const item = e.target.closest(".topic-item");
     if (!item) return;
-
     topicList.querySelectorAll(".topic-item").forEach(i => i.classList.remove("active"));
     item.classList.add("active");
 
@@ -196,28 +164,11 @@
     const t = topics[currentIndex];
     if (!t) return;
 
-    // Nếu có nội dung chi tiết
-    if (t.detail && t.detail.length > 100) {
-      fadeInContent(t.detail);
-    } else {
-      const shortHtml = `
-        <div class="d-flex justify-content-between align-items-center">
-          <h4 class="fw-bold text-primary mb-2">${t.title}</h4>
-          <a href="${t.more_url}" class="btn btn-outline-primary btn-sm">📖 Xem chi tiết</a>
-        </div>
-        <p>${t.summary}</p>
-        <div class="row">
-          <div class="col-md-6">
-            <h6 class="text-danger fw-semibold">💻 C++</h6>
-            <pre class="border rounded bg-light p-3 code-box">${t.sample_cpp}</pre>
-          </div>
-          <div class="col-md-6">
-            <h6 class="text-success fw-semibold">🐍 Python</h6>
-            <pre class="border rounded bg-light p-3 code-box">${t.sample_py}</pre>
-          </div>
-        </div>`;
-      fadeInContent(shortHtml);
-    }
+    // Chỉ load nội dung, không lồng <html> để tránh lỗi click
+    fetch(t.html_file)
+      .then(res => res.text())
+      .then(html => fadeIn(html))
+      .catch(() => fadeIn(`<p class='text-danger'>❌ Không tải được nội dung.</p>`));
 
     const lang = document.getElementById("language").value;
     codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
@@ -233,7 +184,7 @@
     }
   });
 
-  document.getElementById("run-form").addEventListener("submit", async (e) => {
+  document.getElementById("run-form").addEventListener("submit", async e => {
     e.preventDefault();
     const data = new FormData(e.target);
     outputBox.textContent = "⏳ Đang chạy code...";
