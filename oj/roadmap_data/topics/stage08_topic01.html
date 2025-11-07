@@ -9,9 +9,10 @@
 body {
   margin: 0;
   font-family: "Segoe UI", Arial, sans-serif;
-  background: #f6f8fb;
+  background: #f7faff;
   color: #222;
-  line-height: 1.6;
+  line-height: 1.65;
+  overflow-x: hidden;
 }
 
 /* ======== SIDEBAR ======== */
@@ -19,20 +20,21 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px;
+  width: 260px;
   height: 100%;
-  background: linear-gradient(180deg, #23395d, #1b2a4a);
+  background: linear-gradient(180deg, #1f4fcc 0%, #274b99 100%);
   color: #fff;
-  padding: 25px 20px;
+  padding: 25px 22px;
   box-shadow: 2px 0 8px rgba(0,0,0,0.15);
   overflow-y: auto;
 }
 
 .sidebar h2 {
-  font-size: 19px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  padding-bottom: 6px;
+  font-size: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  padding-bottom: 8px;
   margin-bottom: 10px;
+  color: #fff;
 }
 
 .sidebar ul {
@@ -42,27 +44,29 @@ body {
 }
 
 .sidebar li {
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
 .sidebar a {
   text-decoration: none;
-  color: #bcd4ff;
+  color: #d7e3ff;
   display: block;
-  padding: 6px 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.25s ease;
 }
 
 .sidebar a:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   color: #fff;
+  transform: translateX(2px);
 }
 
 /* ======== MAIN CONTENT ======== */
 .content {
-  margin-left: 270px;
-  padding: 30px 40px;
+  margin-left: 280px;
+  padding: 50px 60px;
+  max-width: 1100px;
 }
 
 h2 {
@@ -74,20 +78,26 @@ h2 {
 
 h3 {
   color: #333;
-  margin-top: 25px;
+  margin-top: 28px;
 }
 
 p, li {
-  font-size: 16px;
+  font-size: 17px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #dcdcdc;
+  margin: 35px 0;
 }
 
 /* ======== CODE BLOCK ======== */
 pre {
-  background: #eef1f7;
+  background: #eef2fa;
   border-left: 4px solid #1f4fcc;
-  padding: 12px 16px;
-  font-size: 14px;
-  border-radius: 6px;
+  padding: 14px 18px;
+  font-size: 15px;
+  border-radius: 8px;
   overflow-x: auto;
 }
 
@@ -96,7 +106,7 @@ table {
   border-collapse: collapse;
   width: 100%;
   background: #fff;
-  margin: 10px 0;
+  margin: 15px 0;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -111,7 +121,7 @@ table th {
   font-weight: 600;
 }
 
-/* ======== DETAILS (Lời giải) ======== */
+/* ======== DETAILS ======== */
 details {
   background: #fff;
   border: 1px solid #dbe2f2;
@@ -130,24 +140,58 @@ summary:hover {
   color: #003399;
 }
 
-/* ======== HR & RESPONSIVE ======== */
-hr {
-  border: none;
-  border-top: 1px solid #dcdcdc;
-  margin: 35px 0;
+/* ======== STACK ANIMATION ======== */
+.stack-demo {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  height: 300px;
+  width: 220px;
+  background: #fff;
+  border: 2px solid #1f4fcc;
+  border-radius: 10px;
+  margin: 20px auto;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-@media (max-width: 900px) {
-  .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    box-shadow: none;
-  }
-  .content {
-    margin-left: 0;
-    padding: 20px;
-  }
+.block {
+  width: 160px;
+  height: 40px;
+  background: #3a6eff;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  line-height: 40px;
+  margin: 4px 0;
+  border-radius: 6px;
+  transform: translateY(100px);
+  opacity: 0;
+  animation: pushBlock 1s ease forwards;
+}
+
+.block:nth-child(2) { animation-delay: 1s; }
+.block:nth-child(3) { animation-delay: 2s; }
+.block:nth-child(4) { animation-delay: 3s; }
+
+@keyframes pushBlock {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.stack-label {
+  position: absolute;
+  bottom: -40px;
+  font-weight: bold;
+  color: #1f4fcc;
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 950px) {
+  .sidebar { position: relative; width: 100%; height: auto; box-shadow: none; }
+  .content { margin-left: 0; padding: 20px; }
 }
 </style>
 </head>
@@ -198,6 +242,16 @@ Hôm nay chúng ta tìm hiểu về <b>Stack (ngăn xếp)</b> — một cấu t
 LIFO — Last In, First Out (Vào sau – Ra trước)
 </p>
 
+<!-- STACK ANIMATION -->
+<div class="stack-demo">
+  <div class="block">Phần tử 3</div>
+  <div class="block">Phần tử 2</div>
+  <div class="block">Phần tử 1</div>
+  <div class="block">Phần tử 0</div>
+  <div class="stack-label">TOP ↑</div>
+</div>
+<p style="text-align:center; color:#333;"><i>Minh họa nguyên lý “Vào sau – Ra trước” của Stack.</i></p>
+
 <p>
 Bạn có thể tưởng tượng stack giống như <b>chồng sách</b>: cuốn nào đặt lên cuối cùng thì phải lấy ra trước.
 </p>
@@ -223,7 +277,6 @@ Stack là một danh sách đặc biệt, nơi ta chỉ được thêm hoặc l�
 <p>→ Vì vào sau ra trước, stack còn gọi là danh sách kiểu <b>LIFO</b>.</p>
 
 <p><b>✅ 2. Cách khai báo và sử dụng Stack trong C++</b></p>
-
 <p><b>a. Khai báo thư viện</b></p>
 <pre><code>#include &lt;stack&gt;</code></pre>
 
@@ -262,13 +315,10 @@ int main() {
 <hr>
 
 <h3>C. CÁC THAO TÁC CƠ BẢN TRÊN STACK</h3>
-
 <p><b>✅ 1. Kiểm tra stack rỗng – <code>empty()</code></b></p>
 <pre><code>stackname.empty()</code></pre>
-<p>
-Trả về <b>true</b> nếu stack rỗng, ngược lại là <b>false</b>.  
-Độ phức tạp: <code>O(1)</code>
-</p>
+
+<p>Trả về <b>true</b> nếu stack rỗng, ngược lại là <b>false</b>.</p>
 
 <pre><code>#include &lt;iostream&gt;
 #include &lt;stack&gt;
@@ -277,7 +327,6 @@ using namespace std;
 int main() {
     stack&lt;int&gt; mystack;
     mystack.push(1);
-
     if (mystack.empty())
         cout &lt;&lt; "True";
     else
@@ -288,11 +337,6 @@ int main() {
 
 <p><b>✅ 2. Lấy kích thước stack – <code>size()</code></b></p>
 <pre><code>stackname.size()</code></pre>
-<p>
-→ Trả về số phần tử trong stack.<br>
-→ Độ phức tạp: <code>O(1)</code>
-</p>
-
 <pre><code>#include &lt;iostream&gt;
 #include &lt;stack&gt;
 using namespace std;
@@ -300,13 +344,11 @@ using namespace std;
 int main() {
     int sum = 0;
     stack&lt;int&gt; mystack;
-
     mystack.push(1);
     mystack.push(8);
     mystack.push(3);
     mystack.push(6);
     mystack.push(2);
-
     while (mystack.size() > 0) {
         sum = sum + mystack.top();
         mystack.pop();
@@ -317,8 +359,6 @@ int main() {
 <hr>
 
 <p><b>✅ 3. Thêm phần tử vào stack – <code>push()</code></b></p>
-<pre><code>stackname.push(giá_trị);</code></pre>
-
 <pre><code>stack&lt;int&gt; mystack;
 mystack.push(0);
 mystack.push(1);
@@ -327,10 +367,6 @@ mystack.push(2);</code></pre>
 <hr>
 
 <p><b>✅ 4. Xem phần tử ở đỉnh – <code>top()</code></b></p>
-<pre><code>stackname.top()</code></pre>
-
-<p>→ Trả về giá trị phần tử trên cùng (không xoá).</p>
-
 <pre><code>#include &lt;iostream&gt;
 #include &lt;stack&gt;
 using namespace std;
@@ -346,24 +382,18 @@ int main() {
 <hr>
 
 <p><b>✅ 5. Xoá phần tử ở đỉnh – <code>pop()</code></b></p>
-<pre><code>stackname.pop();</code></pre>
-<p>→ Xoá phần tử trên cùng (không trả về giá trị).</p>
-
 <pre><code>#include &lt;iostream&gt;
 #include &lt;stack&gt;
 using namespace std;
 
 int main() {
     stack&lt;int&gt; mystack;
-
     mystack.push(1);
     mystack.push(2);
     mystack.push(3);
     mystack.push(4);
-
     mystack.pop();
-    mystack.pop(); // bỏ 4 và 3
-
+    mystack.pop();
     while (!mystack.empty()) {
         cout &lt;&lt; ' ' &lt;&lt; mystack.top();
         mystack.pop();
@@ -374,8 +404,7 @@ int main() {
 
 <hr>
 
-<h3>✅ TÓM TẮT KIẾN THỨC CHÍNH (Dành cho học sinh yếu)</h3>
-
+<h3>✅ TÓM TẮT KIẾN THỨC CHÍNH</h3>
 <table>
   <tr><th>Lệnh</th><th>Ý nghĩa</th><th>Độ phức tạp</th></tr>
   <tr><td><code>push(x)</code></td><td>Thêm x vào đỉnh</td><td>O(1)</td></tr>
@@ -398,43 +427,7 @@ Stack là một cấu trúc đơn giản nhưng xuất hiện trong rất nhiề
   <li>Biểu thức toán học</li>
   <li>Thuật toán quay lui (backtracking)</li>
 </ul>
-<p>
-Học tốt phần này sẽ giúp các em giải được nhiều dạng bài từ cơ bản đến nâng cao.
-</p>
-
-<hr>
-
-<h2 id="queue">📘 PHẦN II – LÝ THUYẾT QUEUE (HÀNG ĐỢI)</h2>
-<p><i>🔧 Sẽ bổ sung nội dung chi tiết sau...</i></p>
-
-<hr>
-
-<h2 id="deque">📘 PHẦN III – LÝ THUYẾT DEQUE (HAI ĐẦU)</h2>
-<p><i>🔧 Sẽ bổ sung nội dung chi tiết sau...</i></p>
-
-<hr>
-
-<h2 id="vidu">💻 Ví dụ minh họa</h2>
-<p><i>Ví dụ C++, Python về Stack – Queue – Deque sẽ được thêm sau.</i></p>
-
-<hr>
-
-<h2 id="baitap">🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Viết chương trình đảo ngược chuỗi bằng Stack.</li>
-  <li>Mô phỏng người xếp hàng (Queue) vào rạp chiếu phim.</li>
-  <li>Sử dụng Deque để cài đặt hàng đợi hai đầu.</li>
-</ol>
-
-<details>
-  <summary>💡 Lời giải mẫu – Đảo chuỗi bằng Stack</summary>
-  <pre><code>s = input()
-st = []
-for ch in s:
-    st.append(ch)
-while st:
-    print(st.pop(), end="")</code></pre>
-</details>
+<p>Học tốt phần này sẽ giúp các em giải được nhiều dạng bài từ cơ bản đến nâng cao.</p>
 
 </div>
 </body>
