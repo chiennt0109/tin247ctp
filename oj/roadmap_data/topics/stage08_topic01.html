@@ -1,71 +1,17 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<title>8.1. Stack, Queue, Deque</title>
-
 <style>
 :root {
   --blue-main: #2563eb;
   --blue-dark: #1e3a8a;
   --text-color: #1e293b;
-  --bg-page: #f8fafc;
-  --sidebar-bg: linear-gradient(180deg, #1e40af 0%, #2563eb 100%);
 }
 
-/* ====== PAGE RESET ====== */
-body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: var(--bg-page);
-  color: var(--text-color);
-  display: flex;
-}
-
-/* ====== SIDEBAR ====== */
-.sidebar {
-  width: 260px;
-  background: var(--sidebar-bg);
-  color: #fff;
-  padding: 25px 20px;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  overflow-y: auto;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
-}
-.sidebar h2 {
-  font-size: 19px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid rgba(255,255,255,0.25);
-  padding-bottom: 6px;
-}
-.sidebar ul { list-style: none; padding: 0; margin: 0; }
-.sidebar li { margin: 10px 0; }
-.sidebar a {
-  color: #e0ecff;
-  text-decoration: none;
-  font-size: 15px;
-  padding: 8px 10px;
-  display: block;
-  border-radius: 6px;
-  transition: background 0.25s, transform 0.2s;
-}
-.sidebar a:hover { background: rgba(255,255,255,0.15); color: #fff; transform: translateX(3px); }
-
-/* ====== CONTENT ====== */
-.content {
-  margin-left: 280px;
-  flex: 1;
-  padding: 40px 60px;
-  max-width: 1250px;
-}
-h1 { color: var(--blue-dark); font-size: 28px; }
+/* ====== PAGE STYLES ====== */
+h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
 h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
 h3 { color: #334155; margin-top: 25px; }
-p, li { font-size: 16.5px; line-height: 1.7; }
-code { background: #e2e8f0; padding: 2px 5px; border-radius: 4px; font-family: Consolas, monospace; }
+p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
+ul { margin-left: 1.5rem; }
+code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
 pre {
   background: #f1f5f9;
   border-left: 4px solid var(--blue-main);
@@ -117,33 +63,9 @@ details {
 }
 summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size: 16px; }
 .locked { color: #6b7280; font-style: italic; text-align: center; padding: 10px; }
-
-/* ====== RESPONSIVE ====== */
-@media (max-width: 992px) {
-  .sidebar { position: relative; width: 100%; height: auto; }
-  .content { margin-left: 0; padding: 20px; }
-}
 </style>
-</head>
 
-<body>
-
-<!-- Sidebar -->
-<div class="sidebar">
-  <h2>📘 Mục lục</h2>
-  <ul>
-    <li><a href="#muctieu">🎯 Mục tiêu bài học</a></li>
-    <li><a href="#stack">📗 Lý thuyết Stack</a></li>
-    <li><a href="#queue">📘 Lý thuyết Queue</a></li>
-    <li><a href="#deque">📙 Lý thuyết Deque</a></li>
-    <li><a href="#vidu">💻 Ví dụ minh họa</a></li>
-    <li><a href="#baitap">🧩 Bài tập</a></li>
-  </ul>
-</div>
-
-<!-- Content -->
-<div class="content">
-
+<!-- ====== BẮT ĐẦU NỘI DUNG ====== -->
 <h1>8.1. Stack, Queue, Deque</h1>
 <p>Các cấu trúc dữ liệu tuyến tính đặc biệt dùng để xử lý luồng dữ liệu.</p>
 
@@ -163,7 +85,7 @@ summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size:
 <p>Bạn có thể tưởng tượng stack giống như <b>chồng sách</b>: cuốn nào đặt lên cuối cùng, thì phải lấy ra trước.</p>
 <p>Trong chuyên đề này, chúng ta sẽ làm quen với stack và sử dụng nó để giải quyết các bài toán ở mức độ đơn giản nhất, phù hợp cho học sinh chưa vững lập trình. Từ đó, các em có thể mở rộng để giải các bài khó hơn.</p>
 
-<!-- animation -->
+<!-- Animation minh họa -->
 <div class="stack-demo">
   <div class="block">Phần tử 3</div>
   <div class="block">Phần tử 2</div>
@@ -214,7 +136,6 @@ int main() {
 <p>Khi in: <b>2 1 0</b></p>
 
 <h3>C. CÁC THAO TÁC CƠ BẢN TRÊN STACK</h3>
-
 <p><b>✅ 1. Kiểm tra stack rỗng – empty()</b></p>
 <pre><code>if (mystack.empty()) ...</code></pre>
 
@@ -331,8 +252,6 @@ while st:
   </code></pre>
 </details>
 
-</div>
-
 <script>
 const isLoggedIn = false; // backend: {{ user.is_authenticated|yesno:"true,false" }}
 if(isLoggedIn){
@@ -340,5 +259,3 @@ if(isLoggedIn){
   document.getElementById("sol").style.display="block";
 }
 </script>
-</body>
-</html>
