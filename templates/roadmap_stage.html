@@ -8,12 +8,25 @@
     body { background-color: #f8fafc; }
     pre { white-space: pre-wrap; font-size: 0.95rem; }
     textarea { font-family: "Fira Code", monospace; font-size: 0.95rem; }
-    .topic-item { cursor: pointer; border-left: 4px solid transparent; }
+    .topic-item { cursor: pointer; border-left: 4px solid transparent; border-radius: 4px; padding: 6px 10px; }
     .topic-item:hover { background-color: #f1f5f9; }
     .topic-item.active { background-color: #e0f2fe; border-left-color: #0d6efd; }
     #output-box { min-height: 120px; max-height: 400px; overflow-y: auto; }
-    .section-header { border-left: 5px solid #0d6efd; padding-left: 10px; }
     .code-box { font-family: "Fira Code", monospace; font-size: 0.9rem; }
+    #topic-content { transition: opacity 0.2s ease; }
+
+    /* Nút chuyển giai đoạn fixed biên (không che sidebar) */
+    .stage-nav-fixed {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1040;
+    }
+    .stage-prev-fixed { left: 8px; }
+    .stage-next-fixed { right: 8px; }
+    @media (max-width: 992px) {
+      .stage-nav-fixed { display: none; }
+    }
   </style>
 </head>
 
@@ -24,6 +37,7 @@
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a href="/problems/" class="nav-link">Problems</a></li>
         <li class="nav-item"><a href="/contests/" class="nav-link">Contests</a></li>
+        <li class="nav-item"><a href="/roadmap/" class="nav-link">Roadmap</a></li>
       </ul>
     </div>
   </nav>
@@ -38,7 +52,7 @@
         <h5 class="fw-semibold text-secondary mb-3">📘 Các mục trong giai đoạn</h5>
         <div id="topic-list">
           {% for topic in stage.topics %}
-            <div class="p-2 topic-item" data-index="{{ forloop.counter0 }}">
+            <div class="topic-item mb-1" data-index="{{ forloop.counter0 }}" tabindex="0" role="button">
               <span class="fw-semibold text-primary">{{ topic.title }}</span><br>
               <small class="text-muted">{{ topic.summary|truncatechars:60 }}</small>
             </div>
@@ -90,22 +104,44 @@
         </div>
       </div>
     </div>
-
-    <div class="d-flex justify-content-between my-5">
-      {% if prev_stage %}
-        <a href="/roadmap/stage/{{ prev_stage.id }}/" class="btn btn-outline-secondary">⬅️ {{ prev_stage.title }}</a>
-      {% endif %}
-      {% if next_stage %}
-        <a href="/roadmap/stage/{{ next_stage.id }}/" class="btn btn-primary">{{ next_stage.title }} ➡️</a>
-      {% endif %}
-    </div>
   </main>
+
+  <!-- ===== Nút chuyển giai đoạn cố định 2 bên (không che sidebar/topic) ===== -->
+  {% if prev_stage %}
+  <a href="/roadmap/stage/{{ prev_stage.id }}/"
+     class="btn btn-outline-secondary stage-nav-fixed stage-prev-fixed"
+     title="{{ prev_stage.title }}">⬅️</a>
+  {% endif %}
+  {% if next_stage %}
+  <a href="/roadmap/stage/{{ next_stage.id }}/"
+     class="btn btn-primary stage-nav-fixed stage-next-fixed"
+     title="{{ next_stage.title }}">➡️</a>
+  {% endif %}
 
   <footer class="text-center mt-5 mb-3 text-muted small">
     © 2025 Chuyên Trần Phú - IT Contest OJ
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Modal xem chi tiết (không rời trang) -->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="detailModalLabel" class="modal-title">Chi tiết bài học</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div id="detailModalBody" class="modal-body">
+          <!-- nội dung sẽ được nạp bằng JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= SCRIPT ======================= -->
   <script>
+  document.addEventListener("DOMContentLoaded", () => {
     const topics = {{ stage.topics|safe }};
     const topicList = document.getElementById("topic-list");
     const topicContent = document.getElementById("topic-content");
@@ -115,61 +151,130 @@
 
     let currentIndex = -1;
 
-    topicList.addEventListener("click", (e) => {
+    function sanitizeBody(html) {
+      const match = html.match(/<body[^>]*>([\\s\\S]*)<\\/body>/i);
+      return match ? match[1] : html;
+    }
+    function fadeIn(html) {
+      topicContent.style.opacity = 0;
+      setTimeout(() => {
+        topicContent.innerHTML = html;
+        topicContent.style.opacity = 1;
+
+        // gắn handler cho nút "Xem chi tiết" vừa render (nếu có)
+        const viewBtn = topicContent.querySelector('[data-role="view-detail"]');
+        if (viewBtn) {
+          viewBtn.addEventListener('click', async (ev) => {
+            ev.preventDefault(); // ❗ chặn điều hướng
+            const idx = viewBtn.getAttribute('data-index');
+            await openDetailModal(parseInt(idx, 10));
+          });
+        }
+      }, 120);
+    }
+
+    async function loadTopicHTML(t) {
+      // Ưu tiên html_content (nếu đã nhúng từ Python)
+      if (t.html_content) return t.html_content;
+
+      // Không có thì fetch (nhưng vẫn chèn vào trang, KHÔNG điều hướng)
+      const url = t.html_file || t.more_url;
+      if (!url) return "<p class='text-muted'>Chưa có nội dung chi tiết.</p>";
+      const res = await fetch(url, { credentials: 'same-origin' });
+      const text = await res.text();
+      return sanitizeBody(text);
+    }
+
+    async function openDetailModal(index) {
+      const t = topics[index];
+      if (!t) return;
+      const modalTitle = document.getElementById('detailModalLabel');
+      const modalBody = document.getElementById('detailModalBody');
+      modalTitle.textContent = t.title;
+
+      try {
+        const html = await loadTopicHTML(t);
+        modalBody.innerHTML = html;
+      } catch (e) {
+        modalBody.innerHTML = "<p class='text-danger'>Không tải được nội dung chi tiết.</p>";
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+      modal.show();
+    }
+
+    // Click 1 topic trong cột trái
+    topicList.addEventListener("click", async (e) => {
       const item = e.target.closest(".topic-item");
       if (!item) return;
 
       topicList.querySelectorAll(".topic-item").forEach(i => i.classList.remove("active"));
       item.classList.add("active");
 
-      currentIndex = parseInt(item.dataset.index);
+      currentIndex = parseInt(item.dataset.index, 10);
       const t = topics[currentIndex];
       if (!t) return;
 
-      topicContent.innerHTML = `
+      // render khung tóm tắt + nút xem chi tiết (nút KHÔNG điều hướng)
+      const summaryHTML = `
         <div class="d-flex justify-content-between align-items-center">
           <h4 class="fw-bold text-primary mb-2">${t.title}</h4>
-          <a href="${t.more_url}" class="btn btn-outline-primary btn-sm">📖 Xem chi tiết</a>
+          <a href="#" class="btn btn-outline-primary btn-sm"
+             data-role="view-detail" data-index="${currentIndex}">
+             📖 Xem chi tiết
+          </a>
         </div>
-        <p>${t.summary}</p>
+        <p>${t.summary || ""}</p>
         <div class="row">
           <div class="col-md-6">
             <h6 class="text-danger fw-semibold">💻 C++</h6>
-            <pre class="border rounded bg-light p-3 code-box">${t.sample_cpp}</pre>
+            <pre class="border rounded bg-light p-3 code-box">${t.sample_cpp || ""}</pre>
           </div>
           <div class="col-md-6">
             <h6 class="text-success fw-semibold">🐍 Python</h6>
-            <pre class="border rounded bg-light p-3 code-box">${t.sample_py}</pre>
+            <pre class="border rounded bg-light p-3 code-box">${t.sample_py || ""}</pre>
           </div>
         </div>
       `;
+      fadeIn(summaryHTML);
 
+      // nạp code ví dụ vào editor
       const lang = document.getElementById("language").value;
-      codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
+      codeBox.value = (lang === "cpp") ? (t.sample_cpp || "") : (t.sample_py || "");
       outputBox.textContent = "";
     });
 
-    resetBtn.addEventListener("click", () => {
-      if (currentIndex >= 0) {
-        const t = topics[currentIndex];
-        const lang = document.getElementById("language").value;
-        codeBox.value = (lang === "cpp") ? t.sample_cpp : t.sample_py;
-        outputBox.textContent = "";
+    // Cho phép Enter chọn topic (accessibility)
+    topicList.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        const item = e.target.closest(".topic-item");
+        if (item) item.click();
       }
     });
 
+    // Reset code
+    resetBtn.addEventListener("click", () => {
+      if (currentIndex < 0) return;
+      const t = topics[currentIndex];
+      const lang = document.getElementById("language").value;
+      codeBox.value = (lang === "cpp") ? (t.sample_cpp || "") : (t.sample_py || "");
+      outputBox.textContent = "";
+    });
+
+    // Chạy code
     document.getElementById("run-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = new FormData(e.target);
       outputBox.textContent = "⏳ Đang chạy code...";
       try {
-        const resp = await fetch("/roadmap/run/", { method: "POST", body: data });
+        const resp = await fetch("/roadmap/run/", { method: "POST", body: data, credentials: 'same-origin' });
         const res = await resp.json();
         outputBox.textContent = (res.output || res.error || "").trim();
       } catch (err) {
-        outputBox.textContent = "❌ Lỗi khi gửi yêu cầu: " + err;
+        outputBox.textContent = "❌ Lỗi khi gửi yêu cầu: " + err.message;
       }
     });
+  });
   </script>
 </body>
 </html>
