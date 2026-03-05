@@ -31,6 +31,7 @@ from django.utils.safestring import mark_safe
 
 from .models import ProblemEditorial, EditorialPurchase
 
+CHECKER_CUSTOM = "custom"
 
 # ===== SANDBOX EXPORT PATH =====
 SANDBOX_ROOT = "/srv/judge/testcases"
@@ -158,6 +159,9 @@ class ProblemAdmin(admin.ModelAdmin):
                 "tags", 
                 "has_editorial",
                 "ai_supported",
+                "checker_type",
+                "checker_file",
+                "checker_config",
             )
         }),
     )
