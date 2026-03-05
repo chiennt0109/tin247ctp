@@ -63,8 +63,20 @@ def _check_output(problem, tc, contestant_output):
     else:
         log = run_builtin_checker(checker_type, tc.input_data, contestant_output, tc.expected_output, config=checker_config)
 
-    # 0 -> AC, 1/2 -> WA
-    ok = int(log.get("return_code", 1)) == 0
+    # Special judge verdict is determined ONLY by checker exit code.
+    exit_code = int(log.get("return_code", 1))
+    if exit_code == 0:
+        checker_verdict = "Accepted"
+        ok = True
+    elif exit_code == 2:
+        checker_verdict = "Presentation Error"
+        ok = False
+    else:
+        checker_verdict = "Wrong Answer"
+        ok = False
+
+    log["checker_exit_code"] = exit_code
+    log["checker_verdict"] = checker_verdict
     log["mode"] = f"checker:{checker_type}"
     return ok, log
 
@@ -121,8 +133,10 @@ def grade_submission(submission):
                 f"[TEST {idx}] time={elapsed:.3f}s\n"
                 f"IN:\n{tc.input_data}\nOUT:\n{out}\nEXP:\n{tc.expected_output}\n"
                 f"checker_input: mode={checker_log.get('mode')}\n"
-                f"checker_output: {checker_log.get('stdout','')}\n"
-                f"checker_error: {checker_log.get('stderr','')}\n---\n"
+                f"checker_exit_code: {checker_log.get('checker_exit_code', checker_log.get('return_code'))}\n"
+                f"checker_stdout: {checker_log.get('stdout','')}\n"
+                f"checker_stderr: {checker_log.get('stderr','')}\n"
+                f"checker_verdict: {checker_log.get('checker_verdict','')}\n---\n"
             )
 
             if ok:

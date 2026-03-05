@@ -40,6 +40,24 @@ class CustomCheckerRunnerTests(unittest.TestCase):
         res = run_custom_checker(self.problem_code, "IN", "OUT", "EXP", config="custom_order=in_exp_out")
         self.assertEqual(res["return_code"], 0)
 
+    def test_exit_code_has_priority_over_stdout_text(self):
+        self._write_checker(
+            "#!/usr/bin/env bash\n"
+            "echo Accepted\n"
+            "exit 1\n"
+        )
+        res = run_custom_checker(self.problem_code, "IN", "OUT", "EXP")
+        self.assertEqual(res["return_code"], 1)
+
+    def test_exit_code_zero_accepts_even_without_accepted_text(self):
+        self._write_checker(
+            "#!/usr/bin/env bash\n"
+            "echo whatever\n"
+            "exit 0\n"
+        )
+        res = run_custom_checker(self.problem_code, "IN", "OUT", "EXP")
+        self.assertEqual(res["return_code"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
