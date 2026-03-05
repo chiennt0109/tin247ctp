@@ -2,174 +2,244 @@ import math
 import time
 from collections import Counter
 
-from .result import SpecialJudgeResult
 from .utils import parse_config
 
 
-def _tok(s):
+def _tokens(s: str):
     return (s or "").split()
 
 
-def _ints(s):
-    return [int(x) for x in _tok(s)]
+def _ints(s: str):
+    return [int(x) for x in _tokens(s)]
 
 
-def _ok(msg="OK"):
-    return SpecialJudgeResult(return_code=0, stdout=msg, mode="builtin")
+def _ret(code: int, out: str = "", err: str = ""):
+    return {"return_code": code, "stdout": out, "stderr": err}
 
 
-def _wa(msg):
-    return SpecialJudgeResult(return_code=1, stderr=msg, mode="builtin")
-
-
-def _pe(msg):
-    return SpecialJudgeResult(return_code=2, stderr=msg, mode="builtin")
-
-
-def checker_permutation(inp, out, exp, config=""):
-    vals = _ints(inp)
+def check_permutation(input_data, contestant_output, expected_output, config=""):
+    vals = _ints(input_data)
     if not vals:
-        return _wa("missing n")
+        return _ret(1, err="missing n")
     n = vals[0]
-    p = _ints(out)
-    return _ok() if len(p) == n and set(p) == set(range(1, n + 1)) else _wa("not permutation")
+    arr = _ints(contestant_output)
+    if len(arr) != n:
+        return _ret(1, err="length mismatch")
+    if any(x < 1 or x > n for x in arr):
+        return _ret(1, err="value out of range")
+    return _ret(0) if len(set(arr)) == n else _ret(1, err="duplicate values")
 
 
-def checker_matching(inp, out, exp, config=""):
-    vals = _ints(inp)
-    if len(vals) < 3:
-        return _wa("invalid input")
-    n1, n2, m = vals[0], vals[1], vals[2]
-    flat = vals[3:]
-    if len(flat) < 2 * m:
-        return _wa("invalid edges")
-    edges = {(flat[2 * i], flat[2 * i + 1]) for i in range(m)}
-    o = _ints(out)
-    if len(o) % 2:
-        return _wa("invalid matching output")
-    pairs = [(o[i], o[i + 1]) for i in range(0, len(o), 2)]
-    if any(a < 1 or a > n1 or b < 1 or b > n2 for a, b in pairs):
-        return _wa("vertex out of range")
-    if any((a, b) not in edges for a, b in pairs):
-        return _wa("edge missing")
-    if any(v > 1 for v in Counter(a for a, _ in pairs).values()):
-        return _wa("left duplicated")
-    if any(v > 1 for v in Counter(b for _, b in pairs).values()):
-        return _wa("right duplicated")
-    return _ok()
+def check_set_compare(input_data, contestant_output, expected_output, config=""):
+    return _ret(0) if set(_tokens(contestant_output)) == set(_tokens(expected_output)) else _ret(1, err="set mismatch")
 
 
-def checker_set_compare(inp, out, exp, config=""):
-    return _ok() if sorted(_tok(out)) == sorted(_tok(exp)) else _wa("set mismatch")
-
-
-def checker_numeric_tolerance(inp, out, exp, config=""):
+def check_numeric(input_data, contestant_output, expected_output, config=""):
     cfg = parse_config(config)
     eps = float(cfg.get("eps", "1e-6"))
-    a = [float(x) for x in _tok(out)]
-    b = [float(x) for x in _tok(exp)]
+    a = [float(x) for x in _tokens(contestant_output)]
+    b = [float(x) for x in _tokens(expected_output)]
     if len(a) != len(b):
-        return _wa("token mismatch")
+        return _ret(1, err="token count mismatch")
     for x, y in zip(a, b):
         if math.fabs(x - y) > eps:
-            return _wa("difference exceeds eps")
-    return _ok()
+            return _ret(1, err="difference exceeds eps")
+    return _ret(0)
 
 
-def checker_euler_path(inp, out, exp, config=""):
-    vals = _ints(inp)
+def _parse_graph(input_data):
+    vals = _ints(input_data)
     if len(vals) < 2:
-        return _wa("invalid input")
+        return None
     n, m = vals[0], vals[1]
     flat = vals[2:]
     if len(flat) < 2 * m:
-        return _wa("invalid edges")
+        return None
     edges = [(flat[2 * i], flat[2 * i + 1]) for i in range(m)]
+    return n, m, edges
 
-    o = _tok(out)
-    e = _tok(exp)
+
+def check_euler(input_data, contestant_output, expected_output, config=""):
+    parsed = _parse_graph(input_data)
+    if not parsed:
+        return _ret(1, err="invalid input")
+    n, m, edges = parsed
+
+    out_tok = _tokens(contestant_output)
+    exp_tok = _tokens(expected_output)
     impossible = {"-1", "NO", "IMPOSSIBLE", "NONE"}
-    if o and o[0].upper() in impossible:
-        return _ok() if e and e[0].upper() in impossible else _wa("claimed impossible")
+    if out_tok and out_tok[0].upper() in impossible:
+        return _ret(0) if exp_tok and exp_tok[0].upper() in impossible else _ret(1, err="claimed impossible")
 
-    if o and o[0].upper() in {"YES", "POSSIBLE"}:
-        o = o[1:]
+    if out_tok and out_tok[0].upper() in {"YES", "POSSIBLE"}:
+        out_tok = out_tok[1:]
     try:
-        path = [int(x) for x in o]
+        path = [int(x) for x in out_tok]
     except Exception:
-        return _pe("invalid output format")
+        return _ret(2, err="non-integer output")
     if len(path) == m + 2 and path[0] == m + 1:
         path = path[1:]
     if len(path) != m + 1:
-        return _wa("path length")
+        return _ret(1, err="path length mismatch")
     if any(x < 1 or x > n for x in path):
-        return _wa("vertex range")
+        return _ret(1, err="vertex out of range")
 
-    cfg = parse_config(config)
-    directed = cfg.get("directed", "0") in {"1", "true", "yes"}
-
+    directed = parse_config(config).get("directed", "0") in {"1", "true", "yes"}
     cnt = Counter((u, v) if directed else (min(u, v), max(u, v)) for u, v in edges)
     for i in range(m):
         u, v = path[i], path[i + 1]
-        k = (u, v) if directed else (min(u, v), max(u, v))
-        if cnt[k] <= 0:
-            return _wa("invalid edge usage")
-        cnt[k] -= 1
-    if any(v != 0 for v in cnt.values()):
-        return _wa("not all edges used")
-    return _ok()
+        key = (u, v) if directed else (min(u, v), max(u, v))
+        if cnt[key] <= 0:
+            return _ret(1, err="invalid edge usage")
+        cnt[key] -= 1
+    return _ret(0) if all(v == 0 for v in cnt.values()) else _ret(1, err="not all edges used")
 
 
-def checker_grid(inp, out, exp, config=""):
-    vals = _ints(inp)
+def check_graph_path(input_data, contestant_output, expected_output, config=""):
+    parsed = _parse_graph(input_data)
+    if not parsed:
+        return _ret(1, err="invalid input")
+    n, _m, edges = parsed
+    directed = parse_config(config).get("directed", "0") in {"1", "true", "yes"}
+    edge_set = set(edges)
+    if not directed:
+        edge_set |= {(v, u) for (u, v) in edge_set}
+    try:
+        path = [int(x) for x in _tokens(contestant_output)]
+    except Exception:
+        return _ret(2, err="non-integer output")
+    if not path:
+        return _ret(2, err="empty path")
+    if any(x < 1 or x > n for x in path):
+        return _ret(1, err="vertex out of range")
+    for i in range(len(path) - 1):
+        if (path[i], path[i + 1]) not in edge_set:
+            return _ret(1, err="edge missing")
+    return _ret(0)
+
+
+def check_matching(input_data, contestant_output, expected_output, config=""):
+    vals = _ints(input_data)
+    if len(vals) < 3:
+        return _ret(1, err="invalid input")
+    n1, n2, m = vals[0], vals[1], vals[2]
+    flat = vals[3:]
+    if len(flat) < 2 * m:
+        return _ret(1, err="invalid edges")
+    edges = {(flat[2 * i], flat[2 * i + 1]) for i in range(m)}
+    out = _ints(contestant_output)
+    if len(out) % 2:
+        return _ret(2, err="invalid pair formatting")
+    pairs = [(out[i], out[i + 1]) for i in range(0, len(out), 2)]
+    used_left, used_right = set(), set()
+    for a, b in pairs:
+        if not (1 <= a <= n1 and 1 <= b <= n2):
+            return _ret(1, err="vertex out of range")
+        if (a, b) not in edges:
+            return _ret(1, err="edge missing")
+        if a in used_left or b in used_right:
+            return _ret(1, err="duplicate matched vertex")
+        used_left.add(a)
+        used_right.add(b)
+    return _ret(0)
+
+
+def check_constructive(input_data, contestant_output, expected_output, config=""):
+    cfg = parse_config(config)
+    if cfg.get("non_empty", "1") in {"1", "true", "yes"} and not _tokens(contestant_output):
+        return _ret(1, err="empty output")
+    return _ret(0)
+
+
+def check_grid(input_data, contestant_output, expected_output, config=""):
+    vals = _ints(input_data)
     if len(vals) < 2:
-        return _wa("invalid input")
-    r, c = vals[0], vals[1]
-    lines = [x.strip() for x in (out or "").splitlines() if x.strip()]
-    if len(lines) != r:
-        return _wa("row mismatch")
-    rows = [ln.split() for ln in lines]
-    if any(len(row) != c for row in rows):
-        return _wa("col mismatch")
-    return _ok()
+        return _ret(1, err="invalid input")
+    n, m = vals[0], vals[1]
+    rows = [ln.split() for ln in (contestant_output or "").strip().splitlines() if ln.strip()]
+    if len(rows) != n:
+        return _ret(1, err="row mismatch")
+    if any(len(r) != m for r in rows):
+        return _ret(1, err="col mismatch")
+    cfg = parse_config(config)
+    if "values" in cfg:
+        allowed = set(x.strip() for x in cfg["values"].split("|" if "|" in cfg["values"] else ","))
+        for r in rows:
+            for x in r:
+                if x not in allowed:
+                    return _ret(1, err="value out of allowed set")
+    return _ret(0)
 
 
-def checker_constructive(inp, out, exp, config=""):
-    if not _tok(out):
-        return _wa("empty output")
-    return _ok()
-
-
-def checker_geometry(inp, out, exp, config=""):
-    # Generic geometry fallback: compare as set of tokens unless eps provided for floats.
+def check_geometry(input_data, contestant_output, expected_output, config=""):
     cfg = parse_config(config)
     if "eps" in cfg:
-        return checker_numeric_tolerance(inp, out, exp, config)
-    return checker_set_compare(inp, out, exp, config)
+        return check_numeric(input_data, contestant_output, expected_output, config)
+    # fallback: order-insensitive token compare
+    return check_set_compare(input_data, contestant_output, expected_output, config)
 
 
-BUILTIN = {
-    "permutation": checker_permutation,
-    "matching": checker_matching,
-    "set_compare": checker_set_compare,
-    "numeric_tolerance": checker_numeric_tolerance,
-    "float_tolerance": checker_numeric_tolerance,
-    "euler_path": checker_euler_path,
-    "grid": checker_grid,
-    "geometry": checker_geometry,
-    "constructive": checker_constructive,
+def check_tree(input_data, contestant_output, expected_output, config=""):
+    vals = _ints(input_data)
+    if not vals:
+        return _ret(1, err="missing n")
+    n = vals[0]
+    out = _ints(contestant_output)
+    if len(out) != 2 * (n - 1):
+        return _ret(1, err="must output n-1 edges")
+    parent = list(range(n + 1))
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra == rb:
+            return False
+        parent[ra] = rb
+        return True
+
+    for i in range(0, len(out), 2):
+        u, v = out[i], out[i + 1]
+        if not (1 <= u <= n and 1 <= v <= n) or u == v:
+            return _ret(1, err="invalid edge")
+        if not union(u, v):
+            return _ret(1, err="cycle detected")
+
+    root = find(1)
+    for x in range(2, n + 1):
+        if find(x) != root:
+            return _ret(1, err="graph not connected")
+    return _ret(0)
+
+
+CHECKERS = {
+    "permutation": check_permutation,
+    "set_compare": check_set_compare,
+    "numeric_tolerance": check_numeric,
+    "float_tolerance": check_numeric,
+    "euler_path": check_euler,
+    "graph_path": check_graph_path,
+    "matching": check_matching,
+    "constructive": check_constructive,
+    "grid": check_grid,
+    "geometry": check_geometry,
+    "tree": check_tree,
 }
 
 
-def run_builtin_checker(checker_type, input_data, output_data, expected_data, config="") -> SpecialJudgeResult:
+def run_builtin_checker(checker_type, input_data, contestant_output, expected_output, config=""):
     start = time.perf_counter()
-    fn = BUILTIN.get(checker_type)
-    if not fn:
-        res = SpecialJudgeResult(return_code=3, stderr=f"unknown builtin checker: {checker_type}", mode="builtin")
+    checker = CHECKERS.get((checker_type or "").strip().lower())
+    if not checker:
+        res = _ret(3, err=f"Unknown checker: {checker_type}")
     else:
         try:
-            res = fn(input_data, output_data, expected_data, config)
+            res = checker(input_data, contestant_output, expected_output, config)
         except Exception as exc:
-            res = SpecialJudgeResult(return_code=3, stderr=f"builtin checker exception: {exc}", mode="builtin")
-    res.time = time.perf_counter() - start
+            res = _ret(3, err=f"Checker exception: {exc}")
+    res["time"] = time.perf_counter() - start
     return res

@@ -15,4 +15,4 @@ def run_special_judge(problem_code, checker_type, input_data, contestant_output,
     if checker_type == CHECKER_CUSTOM:
         return run_custom_checker(problem_code, input_data, contestant_output, expected_output, config=config).to_dict()
 
-    return run_builtin_checker(checker_type, input_data, contestant_output, expected_output, config=config).to_dict()
+    return run_builtin_checker(checker_type, input_data, contestant_output, expected_output, config=config)
