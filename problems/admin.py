@@ -158,6 +158,9 @@ class ProblemAdmin(admin.ModelAdmin):
                 "tags", 
                 "has_editorial",
                 "ai_supported",
+                "checker_type",
+                "checker_file",
+                "checker_config",
             )
         }),
     )
