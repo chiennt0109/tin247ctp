@@ -5,7 +5,7 @@
 from django import forms
 from django.http import QueryDict
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .models import Problem, Tag
+from .models import Problem, Tag, CHECKER_CUSTOM
 
 CHECKER_CUSTOM = "custom"
 
