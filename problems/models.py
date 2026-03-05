@@ -14,6 +14,23 @@ class Tag(models.Model):
         return self.name
 
 
+
+
+class CheckerType(models.TextChoices):
+    NONE = "none", "None"
+    CUSTOM = "custom", "Custom Checker"
+    EULER_PATH = "euler_path", "Euler Path"
+    PERMUTATION = "permutation", "Permutation"
+    MATCHING = "matching", "Matching"
+    GRAPH_PATH = "graph_path", "Graph Path"
+    GRID = "grid", "Grid Construction"
+    SET_COMPARE = "set_compare", "Set Compare"
+    FLOAT_TOLERANCE = "float_tolerance", "Numeric Tolerance"
+    PERMUTATION_CONSTRAINTS = "permutation_constraints", "Permutation With Constraints"
+    ASSIGNMENT = "assignment", "Assignment"
+    CONSTRUCTIVE = "constructive", "Constructive"
+
+
 class Problem(models.Model):
     DIFFICULTY_CHOICES = [
         ('Easy', 'Easy'),
@@ -33,6 +50,9 @@ class Problem(models.Model):
     ac_count = models.IntegerField(default=0)
     submission_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)  # ✅ Giữ duy nhất dòng này
+    checker = models.CharField(max_length=50, choices=CheckerType.choices, default=CheckerType.NONE)
+    checker_file = models.CharField(max_length=255, blank=True, default="")
+    checker_config = models.TextField(blank=True, default="")
     
     class Meta:
         ordering = ["code"]
