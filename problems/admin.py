@@ -106,6 +106,63 @@ def _compile_custom_checker_from_zip(problem_code: str, tmp_root: str) -> bool:
 
 # ========== FORMS ==========
 
+
+
+def _import_tests_and_checker(problem, zip_file, checker_upload=None):
+    imported = skipped = 0
+    checker_compiled = False
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_zip = os.path.join(tmpdir, "tests.zip")
+        with open(tmp_zip, "wb") as f:
+            for chunk in zip_file.chunks():
+                f.write(chunk)
+
+        with zipfile.ZipFile(tmp_zip) as z:
+            z.extractall(tmpdir)
+
+        pairs = _collect_pairs(tmpdir)
+        sandbox_dir = os.path.join(SANDBOX_ROOT, problem.code)
+        in_dir, out_dir = [os.path.join(sandbox_dir, sub) for sub in ("in", "out")]
+        os.makedirs(in_dir, exist_ok=True)
+        os.makedirs(out_dir, exist_ok=True)
+
+        TestCase.objects.filter(problem=problem).delete()
+        for d in (in_dir, out_dir):
+            for fname in os.listdir(d):
+                os.remove(os.path.join(d, fname))
+
+        for i, (_k, (inp, outp)) in enumerate(sorted(pairs.items()), 1):
+            if not inp or not outp:
+                skipped += 1
+                continue
+            in_data = _read_text(inp)
+            out_data = _read_text(outp)
+            TestCase.objects.create(problem=problem, input_data=in_data, expected_output=out_data)
+            with open(os.path.join(in_dir, f"{i:02d}.inp"), "w", encoding="utf-8") as fi:
+                fi.write(in_data + "\n")
+            with open(os.path.join(out_dir, f"{i:02d}.out"), "w", encoding="utf-8") as fo:
+                fo.write(out_data + "\n")
+            imported += 1
+
+        if getattr(problem, "checker", CheckerType.NONE) == CheckerType.CUSTOM:
+            if checker_upload:
+                _compile_custom_checker(problem.code, checker_upload.read())
+                if hasattr(problem, "checker_file"):
+                    problem.checker_file = "checker.cpp"
+                    problem.save(update_fields=["checker_file"])
+                checker_compiled = True
+            else:
+                checker_compiled = _compile_custom_checker_from_zip(problem.code, tmpdir)
+                if checker_compiled and hasattr(problem, "checker_file") and not problem.checker_file:
+                    problem.checker_file = "checker.cpp"
+                    problem.save(update_fields=["checker_file"])
+                if not checker_compiled:
+                    raise forms.ValidationError("Custom Checker cần checker.cpp (upload riêng hoặc nằm trong zip).")
+
+    return imported, skipped, checker_compiled
+
+
 class UploadTestZipForm(forms.Form):
     zip_file = forms.FileField(label="Chọn file .zip chứa test cases")
     checker_file = forms.FileField(
@@ -159,32 +216,17 @@ class ProblemAdmin(admin.ModelAdmin):
                 "tags", 
                 "has_editorial",
                 "ai_supported",
-                "checker_type",
+                "checker",
                 "checker_file",
                 "checker_config",
+                "test_zip_file",
+                "checker_source_file",
             )
         }),
     )
     list_display = ("title", "checker", "code", "difficulty", "submission_count", "ac_count", "view_tests_link")
     search_fields = ("code", "title")
 
-    def get_fieldsets(self, request, obj=None):
-        base = list(super().get_fieldsets(request, obj))
-        checker_fields = []
-        for fname in ("checker", "checker_file", "checker_config"):
-            try:
-                Problem._meta.get_field(fname)
-                checker_fields.append(fname)
-            except Exception:
-                pass
-
-        if checker_fields:
-            fields = list(base[0][1].get("fields", ()))
-            for fname in checker_fields:
-                if fname not in fields:
-                    fields.append(fname)
-            base[0][1]["fields"] = tuple(fields)
-        return tuple(base)
 
     # --- VIEW LINK ---
     def view_tests_link(self, obj):
@@ -368,6 +410,12 @@ class ProblemAdmin(admin.ModelAdmin):
         # Lưu ManyToMany
         if hasattr(form, "save_m2m"):
             form.save_m2m()
+
+        test_zip_file = form.cleaned_data.get("test_zip_file")
+        checker_source_file = form.cleaned_data.get("checker_source_file")
+        if test_zip_file:
+            imported, skipped, checker_compiled = _import_tests_and_checker(obj, test_zip_file, checker_source_file)
+            messages.info(request, f"Đã import test ngay trên form: {imported} (skip {skipped}), checker_compiled={checker_compiled}")
 
         messages.success(request, "Lưu bài toán thành công!")
 
