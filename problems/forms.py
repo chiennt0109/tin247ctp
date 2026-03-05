@@ -11,6 +11,8 @@ CHECKER_CUSTOM = "custom"
 
 CHECKER_CUSTOM = "custom"
 
+CHECKER_CUSTOM = "custom"
+
 
 class ProblemAdminForm(forms.ModelForm):
     tags = forms.ModelMultipleChoiceField(
