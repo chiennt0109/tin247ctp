@@ -26,29 +26,63 @@ def checker_euler_path(input_file: str, contestant_output: str, expected_output:
     ints = read_ints(input_file)
     if len(ints) < 2:
         return _wa("Invalid input format")
+
     n, m = ints[0], ints[1]
     flat = ints[2:]
     if len(flat) < 2 * m:
         return _wa("Not enough edges")
     edges = [(flat[2 * i], flat[2 * i + 1]) for i in range(m)]
-    path = read_ints(contestant_output)
+
+    out_tokens = tokens(contestant_output)
+    exp_tokens = tokens(expected_output)
+
+    def is_impossible(tok_list):
+        if not tok_list:
+            return False
+        t0 = tok_list[0].upper()
+        return t0 in {"-1", "NO", "IMPOSSIBLE", "NONE"}
+
+    if is_impossible(out_tokens):
+        return _ok() if is_impossible(exp_tokens) else _wa("Euler path exists but contestant said impossible")
+
+    # Common formats supported:
+    # 1) v1 v2 ... v(m+1)
+    # 2) (m+1) v1 v2 ... v(m+1)
+    # 3) YES v1 v2 ... v(m+1)
+    if out_tokens and out_tokens[0].upper() in {"YES", "POSSIBLE"}:
+        out_tokens = out_tokens[1:]
+
+    try:
+        path = [int(x) for x in out_tokens]
+    except Exception:
+        return _pe("Output must be integer path")
+
+    if len(path) == m + 2 and path[0] == m + 1:
+        path = path[1:]
+
     if len(path) != m + 1:
         return _wa("Path length must be m+1")
-    # multiset edge use check (undirected)
-    edge_count = {}
-    for u, v in edges:
-        k = (min(u, v), max(u, v))
-        edge_count[k] = edge_count.get(k, 0) + 1
-    for i in range(m):
-        u, v = path[i], path[i + 1]
-        k = (min(u, v), max(u, v))
-        if edge_count.get(k, 0) <= 0:
-            return _wa("Edge used invalid or too many times")
-        edge_count[k] -= 1
-    if any(v != 0 for v in edge_count.values()):
-        return _wa("Not all edges are used")
+
     if any(x < 1 or x > n for x in path):
         return _wa("Vertex out of range")
+
+    directed = "directed=1" in (config or "") or "directed=true" in (config or "").lower()
+
+    edge_count = {}
+    for u, v in edges:
+        key = (u, v) if directed else (min(u, v), max(u, v))
+        edge_count[key] = edge_count.get(key, 0) + 1
+
+    for i in range(m):
+        u, v = path[i], path[i + 1]
+        key = (u, v) if directed else (min(u, v), max(u, v))
+        if edge_count.get(key, 0) <= 0:
+            return _wa("Edge used invalid or too many times")
+        edge_count[key] -= 1
+
+    if any(c != 0 for c in edge_count.values()):
+        return _wa("Not all edges are used")
+
     return _ok()
 
 

@@ -21,6 +21,24 @@ class BuiltinCheckerTests(unittest.TestCase):
         res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "1 2", "")
         self.assertEqual(res["return_code"], 1)
 
+    def test_euler_path_accept_with_length_prefix(self):
+        # format: k + path, where k = m+1
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "3 1 2 3", "")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_accept_yes_prefix(self):
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "YES 1 2 3", "")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_impossible_case(self):
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "-1", "-1")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_directed(self):
+        # directed edges 1->2,2->3; path 1 2 3 valid only in directed mode
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "1 2 3", "", config="directed=1")
+        self.assertEqual(res["return_code"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
