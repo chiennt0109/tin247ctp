@@ -59,7 +59,7 @@ def _check_output(problem, tc, contestant_output):
         checker_type = "numeric_tolerance"
 
     if checker_type == CHECKER_CUSTOM:
-        log = run_custom_checker(problem.code, tc.input_data, contestant_output, tc.expected_output, timeout=1.0)
+        log = run_custom_checker(problem.code, tc.input_data, contestant_output, tc.expected_output, timeout=1.0, config=checker_config)
     else:
         log = run_builtin_checker(checker_type, tc.input_data, contestant_output, tc.expected_output, config=checker_config)
 

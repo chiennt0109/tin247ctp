@@ -19,7 +19,7 @@ def run_builtin_checker(name: str, input_data: str, contestant_output: str, expe
         return {"return_code": 1, "stdout": "", "stderr": f"Checker exception: {exc}"}
 
 
-def run_custom_checker(problem_code: str, input_data: str, contestant_output: str, expected_output: str, timeout: float = 1.0) -> Dict[str, object]:
+def run_custom_checker(problem_code: str, input_data: str, contestant_output: str, expected_output: str, timeout: float = 1.0, config: str = "") -> Dict[str, object]:
     checker_bin = f"/srv/judge/testcases/{problem_code}/checker"
     if not os.path.exists(checker_bin):
         return {"return_code": 1, "stdout": "", "stderr": f"Custom checker not found: {checker_bin}"}
@@ -32,13 +32,25 @@ def run_custom_checker(problem_code: str, input_data: str, contestant_output: st
             with open(path, "w", encoding="utf-8") as f:
                 f.write(content or "")
 
-        proc = subprocess.run(
-            [checker_bin, in_path, out_path, ans_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            timeout=timeout,
-        )
+        order = "in_out_exp"
+        cfg = (config or "").lower()
+        if "custom_order=in_exp_out" in cfg or "checker_order=in_exp_out" in cfg:
+            order = "in_exp_out"
+
+        argv = [checker_bin, in_path, out_path, ans_path] if order == "in_out_exp" else [checker_bin, in_path, ans_path, out_path]
+
+        try:
+            proc = subprocess.run(
+                argv,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return {"return_code": 1, "stdout": "", "stderr": f"Custom checker timeout > {timeout}s"}
+        except Exception as exc:
+            return {"return_code": 1, "stdout": "", "stderr": f"Custom checker execution error: {exc}"}
         return {
             "return_code": proc.returncode,
             "stdout": proc.stdout,
