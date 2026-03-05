@@ -167,6 +167,24 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "difficulty", "submission_count", "ac_count", "view_tests_link")
     search_fields = ("code", "title")
 
+    def get_fieldsets(self, request, obj=None):
+        base = list(super().get_fieldsets(request, obj))
+        checker_fields = []
+        for fname in ("checker_type", "checker_file", "checker_config"):
+            try:
+                Problem._meta.get_field(fname)
+                checker_fields.append(fname)
+            except Exception:
+                pass
+
+        if checker_fields:
+            fields = list(base[0][1].get("fields", ()))
+            for fname in checker_fields:
+                if fname not in fields:
+                    fields.append(fname)
+            base[0][1]["fields"] = tuple(fields)
+        return tuple(base)
+
     # --- VIEW LINK ---
     def view_tests_link(self, obj):
         if not obj.id:
@@ -242,15 +260,16 @@ class ProblemAdmin(admin.ModelAdmin):
                         fo.write(out_data + "\n")
                     imported += 1
 
-                if problem.checker_type == CHECKER_CUSTOM:
+                if getattr(problem, "checker_type", "none") == CHECKER_CUSTOM:
                     if checker_upload:
                         checker_bin = _compile_custom_checker(problem.code, checker_upload.read())
-                        problem.checker_file = "checker.cpp"
-                        problem.save(update_fields=["checker_file"])
+                        if hasattr(problem, "checker_file"):
+                            problem.checker_file = "checker.cpp"
+                            problem.save(update_fields=["checker_file"])
                         checker_compiled = True
                     else:
                         checker_compiled = _compile_custom_checker_from_zip(problem.code, tmpdir)
-                        if checker_compiled and not problem.checker_file:
+                        if checker_compiled and hasattr(problem, "checker_file") and not problem.checker_file:
                             problem.checker_file = "checker.cpp"
                             problem.save(update_fields=["checker_file"])
                         if not checker_compiled:
