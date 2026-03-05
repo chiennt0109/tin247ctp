@@ -7,6 +7,7 @@ import io
 import re
 import zipfile
 import tempfile
+import subprocess
 from typing import Dict, Tuple, Optional
 
 from django import forms
@@ -16,7 +17,12 @@ from django.shortcuts import render, redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
 
-from .models import Problem, TestCase, Tag, UserProgress
+from .models import (
+    Problem,
+    TestCase,
+    Tag,
+    UserProgress,
+)
 from .views_admin import ai_analyze_problem, ai_suggest_tags   # <-- AI thật
 from .forms import ProblemAdminForm
 from django.core.exceptions import PermissionDenied
@@ -24,6 +30,7 @@ from django.utils.safestring import mark_safe
 
 from .models import ProblemEditorial, EditorialPurchase
 
+CHECKER_CUSTOM = "custom"
 
 # ===== SANDBOX EXPORT PATH =====
 SANDBOX_ROOT = "/srv/judge/testcases"
@@ -69,10 +76,41 @@ def _collect_pairs(root_tmp: str) -> Dict[str, Tuple[Optional[str], Optional[str
     return pairs
 
 
+def _compile_custom_checker(problem_code: str, checker_bytes: bytes) -> str:
+    checker_dir = os.path.join(SANDBOX_ROOT, problem_code)
+    os.makedirs(checker_dir, exist_ok=True)
+    checker_cpp = os.path.join(checker_dir, "checker.cpp")
+    checker_bin = os.path.join(checker_dir, "checker")
+
+    with open(checker_cpp, "wb") as f:
+        f.write(checker_bytes)
+
+    cmd = ["g++", checker_cpp, "-O2", "-std=c++17", "-o", checker_bin]
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if proc.returncode != 0:
+        raise RuntimeError(proc.stderr.strip() or "checker compile failed")
+    os.chmod(checker_bin, 0o755)
+    return checker_bin
+
+
+def _compile_custom_checker_from_zip(problem_code: str, tmp_root: str) -> bool:
+    for dirpath, _, files in os.walk(tmp_root):
+        for fname in files:
+            if fname.lower() == "checker.cpp":
+                with open(os.path.join(dirpath, fname), "rb") as f:
+                    _compile_custom_checker(problem_code, f.read())
+                return True
+    return False
+
+
 # ========== FORMS ==========
 
 class UploadTestZipForm(forms.Form):
     zip_file = forms.FileField(label="Chọn file .zip chứa test cases")
+    checker_file = forms.FileField(
+        label="checker.cpp (nếu dùng Custom Checker)",
+        required=False,
+    )
 
 
 class TestCaseInline(admin.TabularInline):
@@ -126,6 +164,24 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "difficulty", "submission_count", "ac_count", "view_tests_link")
     search_fields = ("code", "title")
 
+    def get_fieldsets(self, request, obj=None):
+        base = list(super().get_fieldsets(request, obj))
+        checker_fields = []
+        for fname in ("checker_type", "checker_file", "checker_config"):
+            try:
+                Problem._meta.get_field(fname)
+                checker_fields.append(fname)
+            except Exception:
+                pass
+
+        if checker_fields:
+            fields = list(base[0][1].get("fields", ()))
+            for fname in checker_fields:
+                if fname not in fields:
+                    fields.append(fname)
+            base[0][1]["fields"] = tuple(fields)
+        return tuple(base)
+
     # --- VIEW LINK ---
     def view_tests_link(self, obj):
         if not obj.id:
@@ -167,7 +223,9 @@ class ProblemAdmin(admin.ModelAdmin):
         form = UploadTestZipForm(request.POST or None, request.FILES or None)
         if request.method == "POST" and form.is_valid():
             zip_file = request.FILES["zip_file"]
+            checker_upload = request.FILES.get("checker_file")
             imported = skipped = 0
+            checker_compiled = False
             with tempfile.TemporaryDirectory() as tmpdir:
                 tmp_zip = os.path.join(tmpdir, "tests.zip")
                 with open(tmp_zip, "wb") as f:
@@ -199,10 +257,25 @@ class ProblemAdmin(admin.ModelAdmin):
                         fo.write(out_data + "\n")
                     imported += 1
 
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse({"ok": True, "imported": imported, "skipped": skipped})
+                if getattr(problem, "checker_type", "none") == CHECKER_CUSTOM:
+                    if checker_upload:
+                        checker_bin = _compile_custom_checker(problem.code, checker_upload.read())
+                        if hasattr(problem, "checker_file"):
+                            problem.checker_file = "checker.cpp"
+                            problem.save(update_fields=["checker_file"])
+                        checker_compiled = True
+                    else:
+                        checker_compiled = _compile_custom_checker_from_zip(problem.code, tmpdir)
+                        if checker_compiled and hasattr(problem, "checker_file") and not problem.checker_file:
+                            problem.checker_file = "checker.cpp"
+                            problem.save(update_fields=["checker_file"])
+                        if not checker_compiled:
+                            raise forms.ValidationError("Custom Checker cần checker.cpp (upload riêng hoặc nằm trong zip).")
 
-            messages.success(request, f"Imported {imported} — Skipped {skipped}.")
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"ok": True, "imported": imported, "skipped": skipped, "checker_compiled": checker_compiled, "message": f"Imported {imported}, skipped {skipped}."})
+
+            messages.success(request, f"Imported {imported} — Skipped {skipped}. Checker compiled: {checker_compiled}")
             return redirect(reverse("admin:problems_problem_change", args=[problem.id]))
 
         return render(request, "admin/upload_tests.html", {"form": form, "problem": problem})
