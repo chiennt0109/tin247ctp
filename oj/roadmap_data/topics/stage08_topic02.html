@@ -1,0 +1,472 @@
+<style>
+:root {
+  --blue-main: #2563eb;
+  --blue-dark: #1e3a8a;
+  --text-color: #1e293b;
+  --slate-100:#f1f5f9;
+  --slate-200:#e2e8f0;
+  --slate-600:#475569;
+}
+
+h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
+h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
+h3 { color: #334155; margin-top: 25px; }
+p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
+ul { margin-left: 1.5rem; }
+code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
+pre {
+  background: #f1f5f9;
+  border-left: 4px solid var(--blue-main);
+  padding: 14px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
+}
+th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
+
+details {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 12px 14px; margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size: 16px; }
+
+.callout {
+  border-left: 6px solid #10b981; background: #ecfeff; padding: 10px 12px; border-radius:8px; margin: 12px 0;
+}
+
+/* Queue visual */
+.queue-demo {
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 8px; margin: 20px 0; padding: 20px;
+}
+.box {
+  width: 70px; height: 70px; background: var(--blue-main); color: #fff; text-align:center;
+  line-height:70px; border-radius: 8px; font-weight:bold; opacity:0; transform:translateX(-60px);
+  animation: enqueue 0.8s forwards;
+}
+.box:nth-child(2){animation-delay:0.8s;}
+.box:nth-child(3){animation-delay:1.6s;}
+.queue-label {
+  text-align:center; color:var(--blue-main); font-weight:bold; margin-top:10px;
+}
+@keyframes enqueue {
+  from {opacity:0; transform:translateX(-60px);}
+  to {opacity:1; transform:translateX(0);}
+}
+
+.sim-3col {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;
+}
+@media (max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
+
+.col { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; }
+.col h4 { margin-top:0; color: var(--blue-main); }
+
+.queue-visual {
+  height: 220px; display:flex; align-items:center; justify-content:flex-start;
+  border:2px dashed var(--blue-main); border-radius:10px; padding:10px; overflow-x:auto;
+}
+.queue-visual .item {
+  min-width:70px; height:70px; background: var(--blue-main); color:#fff; text-align:center;
+  line-height:70px; border-radius:8px; font-weight:bold; margin-right:6px;
+}
+.queue-visual .item.front { outline:3px solid #22c55e; }
+.badge { background:#111827; color:#fff; padding:3px 8px; border-radius:999px; font-size:12px; display:block; text-align:center; margin-top:8px; }
+
+.btn { border:none; background:var(--blue-main); color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
+.btn.secondary { background:#0ea5e9; }
+.btn.ghost { background:#e5e7eb; color:#111827; }
+</style>
+
+<h1>🚍 Bài giảng: Cấu trúc dữ liệu Queue (Hàng đợi)</h1>
+<p>
+Queue là cấu trúc dữ liệu tuyến tính lưu trữ phần tử theo nguyên tắc <b>FIFO – First In, First Out</b> (vào trước, ra trước).
+Rất nhiều ứng dụng trong đời sống hoạt động giống “hàng chờ”: mua vé, xếp hàng ATM, xử lý tiến trình trong máy tính.
+</p>
+
+<h2>I. Giới thiệu & Ví dụ thực tế</h2>
+<p>Hãy tưởng tượng bạn đang xếp hàng mua trà sữa 🍹. Người vào hàng trước sẽ được phục vụ trước. Người đến sau phải chờ đến lượt mình.</p>
+
+<div class="queue-demo">
+  <div class="box">A</div>
+  <div class="box">B</div>
+  <div class="box">C</div>
+</div>
+<div class="queue-label">Front ⟶ A → B → C ⟶ Rear</div>
+<p style="text-align:center;"><i>Nguyên tắc FIFO – “vào trước ra trước”.</i></p>
+
+<h2>II. Lý thuyết cơ bản</h2>
+<ul>
+  <li><b>Enqueue(x):</b> thêm phần tử x vào cuối hàng (rear).</li>
+  <li><b>Dequeue():</b> loại bỏ phần tử ở đầu hàng (front).</li>
+  <li><b>Front():</b> xem phần tử đầu hàng.</li>
+  <li><b>Empty():</b> kiểm tra hàng có rỗng không.</li>
+  <li><b>Size():</b> số phần tử trong hàng.</li>
+</ul>
+
+<pre><code>#include &lt;iostream&gt;
+#include &lt;queue&gt;
+using namespace std;
+int main() {
+    queue&lt;int&gt; q;
+    q.push(10); // enqueue
+    q.push(20);
+    cout &lt;&lt; q.front() &lt;&lt; "\n"; // 10
+    q.pop();  // dequeue 10
+    cout &lt;&lt; q.size(); // 1
+}</code></pre>
+
+<h2>III. Trình mô phỏng Queue (hình ảnh + mô tả)</h2>
+<p>
+Mô phỏng dưới đây giúp bạn quan sát cách các phần tử đi vào **cuối hàng** và lấy ra **đầu hàng** theo nguyên tắc <b>FIFO – First In, First Out</b>.
+</p>
+
+<div class="sim-3col">
+  <!-- Cột thao tác -->
+  <div class="col">
+    <h4>🖱 Thao tác</h4>
+    <input type="text" id="valIn" placeholder="Giá trị enqueue..." />
+    <div>
+      <button class="btn" id="enqueue">Enqueue</button>
+      <button class="btn secondary" id="front">Front</button>
+      <button class="btn" id="dequeue">Dequeue</button>
+      <button class="btn ghost" id="size">Size</button>
+    </div>
+    <div class="callout" id="explain">💡 Nhập giá trị và chọn thao tác để quan sát Queue.</div>
+    <div id="log"></div>
+  </div>
+
+  <!-- Cột code -->
+  <div class="col">
+    <h4>💻 Code đang thực thi</h4>
+    <div class="codebox" id="codebox">
+      <div class="line" data-k="init">queue&lt;int&gt; q;               // tạo hàng rỗng</div>
+      <div class="line" data-k="push1">int x; cin &gt;&gt; x;              // đọc giá trị</div>
+      <div class="line" data-k="push2">q.push(x);                   // enqueue – thêm vào cuối</div>
+      <div class="line" data-k="front1">if(!q.empty())               // kiểm tra rỗng</div>
+      <div class="line" data-k="front2">cout &lt;&lt; q.front();          // xem phần tử đầu</div>
+      <div class="line" data-k="pop1">if(!q.empty())                // kiểm tra rỗng</div>
+      <div class="line" data-k="pop2">q.pop();                      // dequeue – xoá đầu hàng</div>
+      <div class="line" data-k="size">cout &lt;&lt; q.size();            // kích thước hàng</div>
+    </div>
+  </div>
+
+  <!-- Cột kết quả -->
+  <div class="col">
+    <h4>📊 Kết quả Queue</h4>
+    <div class="queue-visual" id="qvis"></div>
+    <span class="badge" id="qs">size=0</span>
+  </div>
+</div>
+
+<style>
+.sim-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+@media (max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
+
+.col { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; }
+.col h4 { margin-top:0; color: var(--blue-main); }
+
+.queue-visual {
+  height: 180px; display:flex; align-items:center; justify-content:flex-start;
+  border:2px dashed var(--blue-main); border-radius:10px; padding:10px; overflow-x:auto;
+}
+.queue-visual .item {
+  min-width:70px; height:70px; background: var(--blue-main); color:#fff;
+  text-align:center; line-height:70px; border-radius:8px; font-weight:bold; margin-right:6px;
+}
+.queue-visual .item.front { outline:3px solid #22c55e; }
+.badge { background:#111827; color:#fff; padding:3px 8px; border-radius:999px; font-size:12px; display:block; text-align:center; margin-top:8px; }
+
+.codebox { font-family: Consolas, monospace; font-size: 14px; background: #f8fafc; border-radius:8px; padding:10px; }
+.line { padding:3px 6px; border-radius:6px; }
+.line.hl { background:#dbeafe; }
+
+.btn { border:none; background:var(--blue-main); color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
+.btn.secondary { background:#0ea5e9; }
+.btn.ghost { background:#e5e7eb; color:#111827; }
+.callout { margin-top:8px; }
+</style>
+
+<script>
+(function(){
+  const q = [];
+  const vis = document.getElementById('qvis');
+  const explain = document.getElementById('explain');
+  const qs = document.getElementById('qs');
+  const val = document.getElementById('valIn');
+  const log = document.getElementById('log');
+  const code = document.getElementById('codebox');
+
+  function render(){
+    vis.innerHTML = '';
+    q.forEach((v, i) => {
+      const e = document.createElement('div');
+      e.className = 'item' + (i===0 ? ' front':'');
+      e.textContent = v;
+      vis.appendChild(e);
+    });
+    qs.textContent = 'size=' + q.length;
+  }
+  function record(msg){
+    const p = document.createElement('div');
+    p.textContent = '• ' + msg;
+    log.prepend(p);
+  }
+  function hl(keys){
+    code.querySelectorAll('.line').forEach(l=>l.classList.remove('hl'));
+    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
+      const el = code.querySelector(`.line[data-k="${k}"]`);
+      if(el) el.classList.add('hl');
+    });
+  }
+
+  // enqueue
+  document.getElementById('enqueue').onclick=()=>{
+    const v = val.value.trim();
+    if(!v){ explain.textContent='⚠️ Nhập giá trị trước khi enqueue.'; return; }
+    q.push(v); render();
+    hl(['push1','push2']);
+    explain.innerHTML = `Đã enqueue(<b>${v}</b>) vào cuối hàng.`;
+    record(`enqueue(${v})`);
+    val.value='';
+  };
+
+  // front
+  document.getElementById('front').onclick=()=>{
+    if(!q.length){ explain.textContent='⚠️ Queue rỗng, không có phần tử đầu.'; hl(); record('front() thất bại'); return; }
+    hl(['front1','front2']);
+    explain.innerHTML = `<b>front()</b> = <b>${q[0]}</b>`;
+    record(`front()=${q[0]}`);
+  };
+
+  // dequeue
+  document.getElementById('dequeue').onclick=()=>{
+    if(!q.length){ explain.textContent='⚠️ Queue rỗng, không thể dequeue.'; hl(); record('dequeue() thất bại'); return; }
+    const x = q.shift(); render();
+    hl(['pop1','pop2']);
+    explain.innerHTML = `<b>dequeue()</b>: xoá phần tử đầu hàng <b>${x}</b>.`;
+    record(`dequeue(${x})`);
+  };
+
+  // size
+  document.getElementById('size').onclick=()=>{
+    hl(['size']);
+    explain.innerHTML = `Queue hiện có <b>${q.length}</b> phần tử.`;
+    record(`size=${q.length}`);
+  };
+
+  render(); hl(['init']);
+})();
+</script>
+
+
+<h2>IV. Khi nào dùng Queue</h2>
+<table>
+  <thead>
+    <tr><th>Nhóm bài toán</th><th>Mô tả</th><th>Ví dụ</th><th>Lý do dùng Queue</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>1. Xử lý luồng dữ liệu</b></td>
+      <td>Các sự kiện đến và được xử lý theo thứ tự.</td>
+      <td>Máy in, lập lịch tiến trình CPU, xử lý gói mạng.</td>
+      <td>Giúp đảm bảo “đến trước – phục vụ trước”.</td>
+    </tr>
+    <tr>
+      <td><b>2. BFS – duyệt đồ thị theo tầng</b></td>
+      <td>Thuật toán duyệt theo chiều rộng (Breadth-First Search).</td>
+      <td>Duyệt cây, tìm đường đi ngắn nhất trong đồ thị vô hướng.</td>
+      <td>Queue lưu các nút chờ xử lý để mở rộng dần từng lớp.</td>
+    </tr>
+    <tr>
+      <td><b>3. Giải thuật mô phỏng hàng chờ</b></td>
+      <td>Mô phỏng người xếp hàng hoặc tiến trình trong hệ thống.</td>
+      <td>ATM, quầy vé, điều phối tác vụ.</td>
+      <td>Thể hiện đúng bản chất hàng đợi FIFO.</td>
+    </tr>
+    <tr>
+      <td><b>4. Bộ nhớ đệm (Buffer)</b></td>
+      <td>Dữ liệu đến nhanh hơn tốc độ xử lý.</td>
+      <td>Queue lưu tạm gói dữ liệu – ví dụ network buffer, pipeline.</td>
+      <td>Đảm bảo dữ liệu không mất mà vẫn đúng thứ tự.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>V. Bài tập luyện tập</h2>
+<p>
+Queue không chỉ dùng để mô phỏng hàng chờ, mà còn là công cụ cực kỳ mạnh trong thuật toán duyệt đồ thị (BFS) và các bài toán "loang" (lan truyền theo lớp).  
+Dưới đây là hệ thống bài tập chia theo cấp độ: từ cơ bản → ứng dụng → thuật toán loang nâng cao.
+</p>
+
+<h3>📘 Egg – Cơ bản</h3>
+
+<details>
+  <summary>1️⃣ Bài 1: Mô phỏng hàng chờ</summary>
+  <p><b>Đề:</b> Có n thao tác “E x” (enqueue x) và “D” (dequeue). Sau khi thực hiện, in các phần tử còn lại trong queue.</p>
+  <p><b>Ý tưởng:</b> Dùng <code>queue&lt;int&gt;</code>, đọc từng thao tác, thực hiện tương ứng.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+  int n; cin&gt;&gt;n; queue&lt;int&gt; q;
+  while(n--){
+    char c; cin&gt;&gt;c;
+    if(c=='E'){int x;cin&gt;&gt;x;q.push(x);}
+    else if(c=='D' &amp;&amp; !q.empty()) q.pop();
+  }
+  while(!q.empty()){cout&lt;&lt;q.front()&lt;&lt;' ';q.pop();}
+}</code></pre>
+  <p><b>Ví dụ:</b> 
+  <br>Input:  
+  <code>5<br>E 3<br>E 5<br>D<br>E 2<br>E 1</code>  
+  Output: <code>5 2 1</code></p>
+</details>
+
+
+<h3>📗 Chicken – Ứng dụng Queue trong đồ thị</h3>
+
+<details>
+  <summary>2️⃣ Bài 2: Duyệt đồ thị theo tầng (BFS cơ bản)</summary>
+  <p><b>Đề:</b> Cho đồ thị vô hướng n đỉnh m cạnh. In thứ tự duyệt BFS bắt đầu từ đỉnh 1.</p>
+  <p><b>Ý tưởng:</b> Dùng <code>queue</code> lưu các đỉnh đang chờ duyệt; khi lấy ra thì duyệt toàn bộ đỉnh kề chưa thăm.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+  int n,m;cin&gt;&gt;n&gt;&gt;m;
+  vector&lt;vector&lt;int&gt;&gt; g(n+1);
+  for(int i=0,u,v;i&lt;m;i++){cin&gt;&gt;u&gt;&gt;v;g[u].push_back(v);g[v].push_back(u);}
+  vector&lt;int&gt; vis(n+1);
+  queue&lt;int&gt; q;
+  q.push(1); vis[1]=1;
+  while(!q.empty()){
+    int u=q.front(); q.pop(); cout&lt;&lt;u&lt;&lt;' ';
+    for(int v:g[u]) if(!vis[v]){ vis[v]=1; q.push(v); }
+  }
+}</code></pre>
+  <p><b>Kết quả:</b> Thứ tự duyệt theo tầng (1 → các hàng xóm → hàng xóm của hàng xóm...)</p>
+</details>
+
+<details>
+  <summary>3️⃣ Bài 3: Tìm đường đi ngắn nhất trong mê cung (thuật toán loang)</summary>
+  <p><b>Đề:</b> Cho ma trận <code>n x m</code> gồm các ô 0 (đi được) và 1 (tường).  
+  Tìm khoảng cách ngắn nhất từ ô (1,1) đến (n,m), di chuyển 4 hướng.</p>
+  <p><b>Ý tưởng:</b> Dùng <b>thuật toán loang (BFS)</b>: bắt đầu từ (1,1), mỗi bước lan sang 4 ô lân cận hợp lệ, lưu khoảng cách bằng queue.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int dx[4]={-1,1,0,0};
+int dy[4]={0,0,-1,1};
+int main(){
+  int n,m;cin&gt;&gt;n&gt;&gt;m;
+  vector&lt;string&gt; a(n);
+  for(int i=0;i&lt;n;i++) cin&gt;&gt;a[i];
+  vector&lt;vector&lt;int&gt;&gt; d(n, vector&lt;int&gt;(m,-1));
+  queue&lt;pair&lt;int,int&gt;&gt; q;
+  if(a[0][0]=='0'){ q.push({0,0}); d[0][0]=0; }
+  while(!q.empty()){
+    auto [x,y]=q.front(); q.pop();
+    for(int k=0;k&lt;4;k++){
+      int nx=x+dx[k], ny=y+dy[k];
+      if(nx&lt;0||ny&lt;0||nx&gt;=n||ny&gt;=m) continue;
+      if(a[nx][ny]=='1'||d[nx][ny]!=-1) continue;
+      d[nx][ny]=d[x][y]+1;
+      q.push({nx,ny});
+    }
+  }
+  cout&lt;&lt;d[n-1][m-1];
+}</code></pre>
+  <p><b>Ví dụ:</b><br>
+  Input:<br>
+  <code>4 4<br>0001<br>1100<br>0010<br>0000</code><br>
+  Output: <code>6</code></p>
+  <p><b>Giải thích:</b> BFS giúp tìm đường ngắn nhất vì mỗi ô được thăm lần đầu tiên bằng đường đi ngắn nhất.</p>
+</details>
+
+<details>
+  <summary>4️⃣ Bài 4: Lan truyền virus (multi-source BFS)</summary>
+  <p><b>Đề:</b> Cho lưới n×m gồm các ô:  
+  <code>0</code> – chưa nhiễm, <code>1</code> – nhiễm virus ban đầu.  
+  Mỗi phút, virus lan sang 4 hướng. Tính thời gian lan đến toàn bộ ô có thể.</p>
+  <p><b>Ý tưởng:</b> Dùng <b>BFS đa nguồn</b>: ban đầu enqueue tất cả ô có virus (1), sau đó lan đồng thời.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int dx[4]={-1,1,0,0}, dy[4]={0,0,-1,1};
+int main(){
+  int n,m;cin&gt;&gt;n&gt;&gt;m;
+  vector&lt;vector&lt;int&gt;&gt; a(n, vector&lt;int&gt;(m));
+  queue&lt;pair&lt;int,int&gt;&gt; q;
+  for(int i=0;i&lt;n;i++) for(int j=0;j&lt;m;j++){
+    cin&gt;&gt;a[i][j];
+    if(a[i][j]==1) q.push({i,j});
+  }
+  int t=-1;
+  while(!q.empty()){
+    int sz=q.size(); t++;
+    while(sz--){
+      auto [x,y]=q.front(); q.pop();
+      for(int k=0;k&lt;4;k++){
+        int nx=x+dx[k], ny=y+dy[k];
+        if(nx&lt;0||ny&lt;0||nx&gt;=n||ny&gt;=m) continue;
+        if(a[nx][ny]!=0) continue;
+        a[nx][ny]=1; q.push({nx,ny});
+      }
+    }
+  }
+  cout&lt;&lt;t;
+}</code></pre>
+  <p><b>Giải thích:</b> Duyệt từng “lớp” lan truyền trong queue. Mỗi vòng while tương ứng một phút lan toàn mạng.</p>
+</details>
+
+
+<h3>📙 Chicken Farmer – Nâng cao</h3>
+
+<details>
+  <summary>5️⃣ Bài 5: Tìm khoảng cách ngắn nhất giữa nhiều nguồn và nhiều đích</summary>
+  <p><b>Đề:</b> Cho ma trận có các điểm xuất phát (S) và điểm đích (T). Tính khoảng cách ngắn nhất từ bất kỳ S đến bất kỳ T.</p>
+  <p><b>Ý tưởng:</b>  
+  - Đưa tất cả điểm S vào queue ban đầu (multi-source BFS).  
+  - Lan loang đến khi gặp ô T đầu tiên → dừng lại.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int dx[4]={-1,1,0,0}, dy[4]={0,0,-1,1};
+int main(){
+  int n,m;cin&gt;&gt;n&gt;&gt;m;
+  vector&lt;string&gt; a(n); for(auto &s:a) cin&gt;&gt;s;
+  queue&lt;pair&lt;int,int&gt;&gt; q; vector&lt;vector&lt;int&gt;&gt; d(n,vector&lt;int&gt;(m,-1));
+  for(int i=0;i&lt;n;i++) for(int j=0;j&lt;m;j++) if(a[i][j]=='S'){q.push({i,j}); d[i][j]=0;}
+  while(!q.empty()){
+    auto [x,y]=q.front(); q.pop();
+    if(a[x][y]=='T'){ cout&lt;&lt;d[x][y]; return 0; }
+    for(int k=0;k&lt;4;k++){
+      int nx=x+dx[k], ny=y+dy[k];
+      if(nx&lt;0||ny&lt;0||nx&gt;=n||ny&gt;=m) continue;
+      if(a[nx][ny]=='#'||d[nx][ny]!=-1) continue;
+      d[nx][ny]=d[x][y]+1; q.push({nx,ny});
+    }
+  }
+  cout&lt;&lt;-1;
+}</code></pre>
+  <p><b>Ứng dụng:</b>  
+  Các bài như “Tìm khoảng cách từ nhiều ngọn lửa đến người”, “Thoát khỏi mê cung”, “Lũ lụt lan dần”,... đều dùng dạng này.</p>
+</details>
+
+
+<h2>VI. Tổng kết & Mở rộng</h2>
+<ul>
+  <li><b>Queue</b> phù hợp cho bài toán theo trình tự thời gian.</li>
+  <li><b>Deque</b> (Double-ended Queue) mở rộng cho cả hai đầu – cực kỳ hữu ích cho các bài trượt cửa sổ.</li>
+  <li>Hãy thử tự cài đặt Queue bằng mảng/vòng tròn (circular queue) để hiểu cơ chế sâu hơn.</li>
+</ul>
+
+<p style="text-align:center;color:#555;font-style:italic;">
+🚀 Queue – công cụ mạnh mẽ cho các thuật toán theo luồng và hàng chờ.  
+Hiểu chắc FIFO sẽ giúp bạn nắm vững nền tảng của BFS, hệ thống và mô phỏng thực tế.
+</p>

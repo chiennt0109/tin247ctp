@@ -1,0 +1,494 @@
+<style>
+:root {
+  --blue-main: #2563eb;
+  --blue-dark: #1e3a8a;
+  --text-color: #1e293b;
+  --slate-100:#f1f5f9;
+  --slate-200:#e2e8f0;
+  --slate-600:#475569;
+}
+
+h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
+h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
+h3 { color: #334155; margin-top: 25px; }
+p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
+ul { margin-left: 1.5rem; }
+code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
+pre {
+  background: #f1f5f9;
+  border-left: 4px solid var(--blue-main);
+  padding: 14px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* NEW: highlight code line */
+.line { padding: 4px 6px; border-radius: 6px; }
+.line.hl { background: #dbeafe; }
+
+table {
+  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
+}
+th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
+
+.callout {
+  border-left: 6px solid #10b981; background: #ecfeff; padding: 10px 12px; border-radius:8px; margin: 12px 0;
+}
+
+/* Deque visual */
+.deque-visual {
+  display:flex;
+  gap:12px;
+  padding:12px;
+  border:2px dashed var(--blue-main);
+  border-radius:10px;
+  margin:20px 0;
+  overflow-x:auto;
+}
+.deque-visual .item {
+  min-width:70px; height:70px;
+  background:var(--blue-main); color:#fff;
+  border-radius:8px; line-height:70px;
+  text-align:center; font-weight:bold;
+  position:relative;
+}
+.deque-visual .item.front::after {
+  content:"front";
+  position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+  background:#22c55e; padding:2px 6px; border-radius:6px; font-size:12px;
+}
+.deque-visual .item.back::after {
+  content:"back";
+  position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
+  background:#f97316; padding:2px 6px; border-radius:6px; font-size:12px;
+}
+
+.btn { border:none; background:var(--blue-main); color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
+.btn.secondary { background:#0ea5e9; }
+.btn.danger { background:#ef4444; }
+
+.sim-3col {
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:16px;
+}
+@media(max-width:900px){
+  .sim-3col { grid-template-columns: 1fr; }
+}
+.col { background:#fff; padding:12px; border-radius:10px; border:1px solid #e2e8f0; }
+</style>
+
+
+
+<h1>🧮 Bài giảng: Cấu trúc dữ liệu DEQUE (Double-Ended Queue)</h1>
+<p>
+Deque là Queue mở rộng: thay vì chỉ thao tác ở cuối (enqueue) và đầu (dequeue), deque cho phép thao tác ở <b>cả hai đầu</b>.
+</p>
+
+<div class="callout">
+  💡 Deque = kết hợp sức mạnh của cả Stack (LIFO) và Queue (FIFO).
+</div>
+
+
+
+<h2>I. Deque là gì?</h2>
+
+<ul>
+  <li><b>push_front(x)</b> — thêm vào đầu</li>
+  <li><b>push_back(x)</b> — thêm vào cuối</li>
+  <li><b>pop_front()</b> — xoá đầu</li>
+  <li><b>pop_back()</b> — xoá cuối</li>
+  <li><b>front()</b> — xem đầu</li>
+  <li><b>back()</b> — xem cuối</li>
+</ul>
+
+
+
+<h2>II. Minh hoạ trực quan</h2>
+
+<div class="deque-visual">
+  <div class="item front">A</div>
+  <div class="item">B</div>
+  <div class="item back">C</div>
+</div>
+
+
+
+<h2>III. Cú pháp deque trong C++</h2>
+
+<pre><code>#include &lt;deque&gt;
+using namespace std;
+
+int main() {
+    deque&lt;int&gt; dq;
+
+    dq.push_front(3);  // [3]
+    dq.push_back(5);   // [3, 5]
+    dq.push_front(2);  // [2, 3, 5]
+
+    cout &lt;&lt; dq.front(); // 2
+    cout &lt;&lt; dq.back();  // 5
+}
+</code></pre>
+
+
+
+<h2>IV. Mô phỏng Deque (có highlight code)</h2>
+
+<div class="sim-3col">
+
+<!-- Column 1 -->
+<div class="col">
+  <h4>🔧 Thao tác</h4>
+  <input id="inp" placeholder="Giá trị..." />
+
+  <button class="btn" id="pf">push_front</button>
+  <button class="btn" id="pb">push_back</button>
+  <button class="btn danger" id="popf">pop_front</button>
+  <button class="btn danger" id="popb">pop_back</button>
+  <button class="btn secondary" id="view">front/back</button>
+
+  <div id="dq-msg" class="callout">💡 Bấm nút để xem mô phỏng + highlight code.</div>
+</div>
+
+<!-- Column 2 -->
+<div class="col">
+  <h4>💻 Code</h4>
+  <div id="dq-code">
+    <div class="line" data-k="init">deque&lt;int&gt; dq;                 // tạo deque</div>
+    <div class="line" data-k="pf1">int x = input;                   // đọc</div>
+    <div class="line" data-k="pf2">dq.push_front(x);               // thêm đầu</div>
+
+    <div class="line" data-k="pb1">int x = input;                   // đọc</div>
+    <div class="line" data-k="pb2">dq.push_back(x);                // thêm cuối</div>
+
+    <div class="line" data-k="popf1">if(!dq.empty())                // kiểm tra</div>
+    <div class="line" data-k="popf2">dq.pop_front();               // xoá đầu</div>
+
+    <div class="line" data-k="popb1">if(!dq.empty())                // kiểm tra</div>
+    <div class="line" data-k="popb2">dq.pop_back();                // xoá cuối</div>
+
+    <div class="line" data-k="view1">dq.front(); dq.back();        // xem 2 đầu</div>
+  </div>
+</div>
+
+<!-- Column 3 -->
+<div class="col">
+  <h4>📊 Deque</h4>
+  <div id="dq-vis" class="deque-visual"></div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  let dq = [];
+  const vis = document.getElementById("dq-vis");
+  const msg = document.getElementById("dq-msg");
+  const code = document.getElementById("dq-code");
+  const inp = document.getElementById("inp");
+
+  function render(){
+    vis.innerHTML="";
+    dq.forEach((v,i)=>{
+      let e=document.createElement("div");
+      e.className="item";
+      if(i===0) e.classList.add("front");
+      if(i===dq.length-1) e.classList.add("back");
+      e.textContent=v;
+      vis.appendChild(e);
+    });
+  }
+
+  function hl(list){
+    code.querySelectorAll(".line").forEach(l=>l.classList.remove("hl"));
+    list.forEach(k=>{
+      const el = code.querySelector(`.line[data-k="${k}"]`);
+      if(el) el.classList.add("hl");
+    });
+  }
+
+  document.getElementById("pf").onclick=()=>{
+    if(!inp.value.trim()) return msg.innerHTML="⚠️ Nhập giá trị!";
+    let x = inp.value.trim();
+    dq.unshift(x);
+    msg.innerHTML = `push_front(<b>${x}</b>)`;
+    hl(["pf1","pf2"]);
+    inp.value="";
+    render();
+  };
+
+  document.getElementById("pb").onclick=()=>{
+    if(!inp.value.trim()) return msg.innerHTML="⚠️ Nhập giá trị!";
+    let x = inp.value.trim();
+    dq.push(x);
+    msg.innerHTML = `push_back(<b>${x}</b>)`;
+    hl(["pb1","pb2"]);
+    inp.value="";
+    render();
+  };
+
+  document.getElementById("popf").onclick=()=>{
+    if(!dq.length) return msg.innerHTML="Deque rỗng!";
+    let x=dq.shift();
+    msg.innerHTML=`pop_front → xoá <b>${x}</b>`;
+    hl(["popf1","popf2"]);
+    render();
+  };
+
+  document.getElementById("popb").onclick=()=>{
+    if(!dq.length) return msg.innerHTML="Deque rỗng!";
+    let x=dq.pop();
+    msg.innerHTML=`pop_back → xoá <b>${x}</b>`;
+    hl(["popb1","popb2"]);
+    render();
+  };
+
+  document.getElementById("view").onclick=()=>{
+    if(!dq.length) return msg.innerHTML="Deque rỗng!";
+    msg.innerHTML = `front=<b>${dq[0]}</b>, back=<b>${dq[dq.length-1]}</b>`;
+    hl(["view1"]);
+  };
+
+  hl(["init"]);
+  render();
+})();
+</script>
+
+
+
+<h2>V. Khi nào dùng Deque?</h2>
+
+<p>
+Deque không phải để “học cho biết”, mà là công cụ giải quyết <b>nhóm bài toán rất đặc thù</b>.  
+Một học sinh giỏi phải nhận ra deque ngay khi đọc đề: <b>bài này có cửa sổ trượt?</b>  
+<b>có hai đầu?</b> <b>có loại bỏ những phần tử không optimal?</b>  
+Nếu có → chắc chắn cần dùng Deque.
+</p>
+
+<h3>🔍 Các tín hiệu mạnh nhận biết bài toán dùng Deque</h3>
+
+<div class="callout">
+  <b>1) Bài toán cửa sổ trượt (Sliding Window)</b><br>
+  ➡ Xuất hiện từ khóa: “trong mỗi đoạn dài k…”, “cửa sổ trượt kích thước k”, “đoạn con cố định k”.<br>
+  👉 Deque giúp duy trì phần tử tối ưu và loại bỏ phần tử quá cũ trong O(1).
+</div>
+
+<div class="callout">
+  <b>2) Bài toán hai đầu (trái/phải)</b><br>
+  ➡ Đề có cụm: “chọn phần tử trái hoặc phải”, “hai người chơi chọn đầu nào có lợi hơn”.<br>
+  👉 Deque mô phỏng đúng bản chất thao tác hai đầu.
+</div>
+
+<div class="callout">
+  <b>3) Loại bỏ phần tử không còn hữu dụng (Monotonic Deque)</b><br>
+  ➡ Đề yêu cầu: “giữ lại phần tử tốt nhất”, “loại bỏ phần tử kém tối ưu”.<br>
+  👉 Dùng pop_back để duy trì tính đơn điệu.
+</div>
+
+<div class="callout">
+  <b>4) Mô phỏng thực tế có hai phía vào/ra</b><br>
+  ➡ Ví dụ: xe vào/ra từ hai cổng, xử lý khách từ cả hai đầu.<br>
+  👉 Deque mô phỏng chính xác hành vi này.
+</div>
+
+<div class="callout">
+  <b>5) Thuật toán 0-1 BFS</b><br>
+  ➡ Đồ thị có cạnh trọng số chỉ 0 hoặc 1.<br>
+  👉 Cạnh trọng số 0: push_front, trọng số 1: push_back.  
+  Giải nhanh hơn Dijkstra.
+</div>
+
+
+<h2>VI. Bài tập luyện tập – đầy đủ theo phân dạng</h2>
+<p>
+Dưới đây là hệ thống bài tập cho học sinh từ mức độ cơ bản → nâng cao,  
+mỗi bài đều có <b>nhận dạng đề</b> & <b>giải thích tại sao phải dùng deque</b>.
+</p>
+
+<h3>📘 Nhóm 1 — Bài cơ bản về Deque</h3>
+
+<details>
+  <summary>1️⃣ Bài 1: Mô phỏng deque với các thao tác cơ bản</summary>
+
+  <p><b>Nhận dạng:</b> Đề xã xuất hiện các thao tác <code>push_front, push_back, pop_front, pop_back</code> → bắt buộc dùng deque.</p>
+
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    deque&lt;int&gt; dq;
+    while(n--) {
+        string s; cin >> s;
+        if(s=="push_front"){int x; cin >> x; dq.push_front(x);}
+        else if(s=="push_back"){int x; cin >> x; dq.push_back(x);}
+        else if(s=="pop_front" && !dq.empty()) dq.pop_front();
+        else if(s=="pop_back" && !dq.empty()) dq.pop_back();
+    }
+    for(int x : dq) cout << x << " ";
+}
+</code></pre>
+
+</details>
+
+<details>
+  <summary>2️⃣ Bài 2: Đảo ngược dãy bằng deque</summary>
+
+  <p><b>Nhận dạng:</b> Đảo dãy = đẩy phần tử vào đầu → dùng <code>push_front</code>.</p>
+
+  <p><b>Ý tưởng:</b> Đọc từng số a → <code>push_front(a)</code>.</p>
+
+</details>
+
+
+<h3>📗 Nhóm 2 — Hai đầu (Game / Greedy)</h3>
+
+<details>
+  <summary>3️⃣ Bài 3: Hai người lấy số — chọn trái hoặc phải</summary>
+
+  <p><b>Nhận dạng:</b> Từ khóa: “chọn trái hoặc phải”, “chọn đầu có giá trị lớn”. Đây là dạng bài kinh điển → hàng đợi 2 đầu.</p>
+
+  <pre><code>// Người A luôn lấy số lớn hơn ở hai đầu
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    deque&lt;int&gt; dq(n);
+    for(int i=0;i&lt;n;i++) cin >> dq[i];
+
+    long long A = 0;
+    while(!dq.empty()) {
+        if(dq.front() > dq.back())
+            A += dq.front(), dq.pop_front();
+        else
+            A += dq.back(), dq.pop_back();
+    }
+    cout << A;
+}
+</code></pre>
+
+</details>
+
+<details>
+  <summary>4️⃣ Bài 4: Kiểm tra chuỗi palindrome</summary>
+
+  <p><b>Nhận dạng:</b> So sánh đầu – cuối ⇒ pop_front/pop_back.</p>
+
+</details>
+
+
+<h3>📙 Nhóm 3 — Sliding Window (dạng quan trọng nhất)</h3>
+
+<details>
+  <summary>5️⃣ Bài 5: Tìm max trong mỗi đoạn dài k – O(n)</summary>
+
+  <p><b>Nhận dạng:</b> Có cụm từ “mỗi đoạn dài k” → dạng cửa sổ trượt.</p>
+
+  <p><b>Lý do:</b> Deque loại bỏ phần tử quá cũ bằng <code>pop_front</code>  
+  và loại bỏ phần tử kém optimal bằng <code>pop_back</code>.</p>
+
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main(){
+    int n,k; cin >> n >> k;
+    vector&lt;int&gt; a(n);
+    for(int &x:a) cin >> x;
+
+    deque&lt;int&gt; dq;
+    for(int i=0;i&lt;n;i++){
+        while(!dq.empty() && a[dq.back()] <= a[i])
+            dq.pop_back();
+
+        dq.push_back(i);
+
+        if(dq.front() <= i-k)
+            dq.pop_front();
+
+        if(i >= k-1)
+            cout << a[dq.front()] << " ";
+    }
+}
+</code></pre>
+
+</details>
+
+
+<details>
+  <summary>6️⃣ Bài 6: Tìm min trong mỗi đoạn dài k</summary>
+
+  <p><b>Nhận dạng:</b> Giống bài tìm max, nhưng thay điều kiện so sánh.</p>
+
+</details>
+
+<details>
+  <summary>7️⃣ Bài 7: Đếm số phần tử ≥ X trong mỗi đoạn k</summary>
+
+  <p><b>Nhận dạng:</b> Cửa sổ trượt + cần loại bỏ phần tử cũ.</p>
+
+  <p><b>Ý tưởng:</b> Duy trì deque chứa chỉ số phần tử ≥ X.</p>
+
+</details>
+
+
+<h3>🐓 Nhóm 4 — Monotonic Deque nâng cao (Greedy / DP)</h3>
+
+<details>
+  <summary>8️⃣ Bài 8: Giữ dãy đơn điệu để tối ưu hoá</summary>
+
+  <p><b>Nhận dạng:</b> Đề yêu cầu loại bỏ phần tử “kém optimal” → pop_back.</p>
+
+  <p><b>Ý tưởng:</b> Tạo deque tăng dần hoặc giảm dần.</p>
+
+</details>
+
+
+<h3>🐔 Nhóm 5 — Mô phỏng thực tế</h3>
+
+<details>
+  <summary>9️⃣ Bài 9: Trạm thu phí hai đầu</summary>
+
+  <p><b>Nhận dạng:</b> Xe vào/ra từ trái hoặc phải → đúng bản chất deque.</p>
+
+</details>
+
+
+<h3>🐉 Nhóm 6 — 0–1 BFS (chuyên đề HSG – quan trọng)</h3>
+
+<details>
+  <summary>🔟 Bài 10: 0–1 BFS tìm đường đi ngắn nhất</summary>
+
+  <p><b>Nhận dạng:</b> Đề có trọng số là 0 hoặc 1 → tuyệt đối phải dùng deque.</p>
+
+  <pre><code>if(w == 0) dq.push_front(v);
+else dq.push_back(v);
+</code></pre>
+
+  <p><b>Ưu điểm:</b> Chạy O(V+E), nhanh hơn Dijkstra rất nhiều.</p>
+
+</details>
+
+<details>
+  <summary>1️⃣1️⃣ Bài 11: Robot di chuyển trong lưới – phí 0 hoặc 1</summary>
+
+  <p><b>Nhận dạng:</b> “Bấm nút không tốn phí, di chuyển tốn 1” → đúng mẫu 0-1 BFS.</p>
+
+</details>
+
+
+<h2>VII. Tổng kết</h2>
+
+<ul>
+  <li><b>Deque</b> mạnh nhất trong bài cửa sổ trượt và mô phỏng hai đầu.</li>
+  <li><b>Monotonic deque</b> giải quyết nhiều bài greedy/DP trong O(n).</li>
+  <li><b>0–1 BFS</b> là dạng nâng cao, rất quan trọng trong HSG.</li>
+</ul>
+
+<p style="text-align:center; color:#555; font-style:italic;">
+🎯 Nắm chắc các dạng bài trên nghĩa là bạn đã khai thác tối đa sức mạnh của deque.
+</p>
+

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold mb-0">📝 Submission #{{ sub.id }}</h3>
+    <a href="/submissions/my/" class="btn btn-outline-secondary rounded-pill">⬅ Danh sách bài nộp</a>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <p><b>📘 Problem:</b> <a href="{% url 'problem_detail' sub.problem.id %}" class="text-decoration-none text-primary">{{ sub.problem.code }}</a></p>
+    <p><b>⚙️ Status:</b>
+      {% if sub.verdict == "Accepted" %}
+        <span class="text-success fw-semibold">✅ {{ sub.verdict }}</span>
+      {% elif sub.verdict == "Wrong Answer" %}
+        <span class="text-danger fw-semibold">❌ {{ sub.verdict }}</span>
+      {% else %}
+        <span class="text-warning fw-semibold">{{ sub.verdict }}</span>
+      {% endif %}
+    </p>
+    <p><b>⏱️ Exec time:</b> {{ sub.exec_time }}s</p>
+    <p><b>📊 Tests passed:</b> {{ sub.passed_tests }}/{{ sub.total_tests }}</p>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <h5 class="fw-semibold mb-3">💻 Source Code</h5>
+    <pre style="background:#1e1e1e;color:#bfbfbf;padding:15px;border-radius:10px;white-space:pre-wrap;">{{ sub.source_code }}</pre>
+  </div>
+
+  {% if sub.debug_info %}
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <h5 class="fw-semibold mb-3">🧪 Debug Output</h5>
+    <pre style="background:#212529;color:#9ef59e;padding:15px;border-radius:10px;white-space:pre-wrap;">{{ sub.debug_info }}</pre>
+  </div>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    {% if contest %}
+      <a href="{% url 'contest_rank' contest.id %}" class="btn btn-outline-primary rounded-pill me-2">
+        🏁 Quay lại bảng xếp hạng contest
+      </a>
+    {% endif %}
+    <a href="{% url 'problem_detail' sub.problem.id %}" class="btn btn-outline-success rounded-pill">
+      🔁 Làm lại bài này
+    </a>
+  </div>
+</div>
+
+<style>
+pre {
+  font-family: "Fira Code", Consolas, monospace;
+  font-size: 14px;
+}
+.card p {
+  font-size: 15px;
+  margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,6 @@
+● tin247ctp-rqworker.service - RQ Worker for tin247ctp (judge queue)
+     Loaded: loaded (]8;;file://vmi2894488/etc/systemd/system/tin247ctp-rqworker.service/etc/systemd/system/tin247ctp-rqworker.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: activating (auto-restart) (Result: exit-code) since Thu 2025-11-13 10:20:30 +07; 1s ago
+    Process: 1810783 ExecStart=/var/www/tin247ctp/venv/bin/rq worker judge --url redis://127.0.0.1:6379/0 --name tin247ctp-judge [0;1;31m(code=exited, status=1/FAILURE)[0m
+   Main PID: 1810783 (code=exited, status=1/FAILURE)
+        CPU: 337ms

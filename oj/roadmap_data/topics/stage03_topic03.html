@@ -1,0 +1,70 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu khái niệm độ phức tạp thời gian của thuật toán.</li>
+  <li>Biết cách đọc, ước lượng và so sánh hiệu quả giữa các giải pháp.</li>
+  <li>Phân biệt O(1), O(n), O(n log n), O(n²).</li>
+</ul>
+
+<hr>
+
+<h2>📘 Khái niệm cơ bản</h2>
+<p>Độ phức tạp thuật toán mô tả tốc độ tăng của số phép tính khi đầu vào lớn dần.</p>
+<p>Ví dụ: với n phần tử:</p>
+<ul>
+  <li><b>O(1)</b>: Hằng số – truy cập phần tử thứ i trong mảng.</li>
+  <li><b>O(n)</b>: Tuyến tính – duyệt toàn bộ mảng.</li>
+  <li><b>O(n log n)</b>: Hiệu quả – ví dụ Merge Sort, Quick Sort.</li>
+  <li><b>O(n²)</b>: Chậm hơn – ví dụ Bubble Sort, Insertion Sort.</li>
+</ul>
+
+<hr>
+
+<h2>📈 Minh họa bằng code</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n; cin >> n;
+    long long s = 0;
+    for (int i = 1; i <= n; i++) s += i; // O(n)
+    cout << s;
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>n = int(input())
+s = sum(range(1, n+1))  # O(n)
+print(s)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Viết hàm tính tổng từ 1 đến n theo cách tuyến tính (O(n)).</li>
+  <li>Viết công thức trực tiếp tính tổng (O(1)).</li>
+  <li>So sánh thời gian chạy của hai cách trên với n = 10⁶.</li>
+</ol>
+
+<details class="mt-3">
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+import time
+
+def sum_linear(n):
+    s = 0
+    for i in range(1, n + 1):
+        s += i
+    return s
+
+def sum_formula(n):
+    return n * (n + 1) // 2
+
+n = 1000000
+start = time.time()
+sum_linear(n)
+print("O(n):", round(time.time() - start, 6), "s")
+
+start = time.time()
+sum_formula(n)
+print("O(1):", round(time.time() - start, 6), "s")</code></pre>
+</details>

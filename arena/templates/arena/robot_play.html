@@ -1,0 +1,946 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  :root {
+    --blue-main: #2563eb;
+    --blue-dark: #1d4ed8;
+    --accent-neon: #38bdf8;
+    --secret-glow-1: #60a5fa;
+    --secret-glow-2: #93c5fd;
+    --success-glow: #22c55e;
+    --error-glow: #ef4444;
+    --slate-900: #0f172a;
+  }
+
+  /* ====== PAGE WRAPPER ====== */
+  .robot-arena-wrapper {
+    max-width: 1320px;
+    margin: 4px auto 16px auto;
+    padding: 0 8px;
+  }
+
+  .robot-arena-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(15,23,42,0.08);
+    border: 1px solid #e5e7eb;
+    padding: 14px 18px 16px 18px;
+  }
+
+  .robot-header-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .robot-header-title {
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .robot-header-title span.icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 20%, #38bdf8, #1d4ed8);
+    color: #eff6ff;
+    box-shadow: 0 6px 18px rgba(37,99,235,0.6);
+    animation: avatarBob 2.4s ease-in-out infinite;
+  }
+
+  @keyframes avatarBob {
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-3px); }
+  }
+
+  .robot-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .btn-guide {
+    font-size: 12px;
+  }
+
+  /* ====== MISSION BOX ====== */
+  .robot-mission-box {
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: radial-gradient(circle at top left, #dbeafe, #eff6ff 40%, #e0f2fe 80%);
+    box-shadow: 0 10px 22px rgba(37,99,235,0.15);
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .robot-mission-box::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: conic-gradient(
+      from 220deg,
+      rgba(56,189,248,0.12),
+      rgba(37,99,235,0.06),
+      transparent,
+      rgba(56,189,248,0.18)
+    );
+    opacity: 0.7;
+    animation: missionGlow 14s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes missionGlow {
+    0%   { transform: rotate(0deg); }
+    50%  { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .robot-mission-inner {
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    color: #0f172a;
+  }
+
+  .robot-mission-inner b {
+    color: #1d4ed8;
+  }
+
+  /* ====== MAIN GRID (EDITOR + SIM) ====== */
+  .robot-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.3fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  /* ====== EDITOR PANEL ====== */
+  .robot-editor-panel {
+    background: #020617;
+    border-radius: 14px;
+    padding: 10px 12px;
+    box-shadow:
+      0 14px 32px rgba(15,23,42,0.9),
+      0 0 0 1px rgba(30,64,175,0.65);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .robot-editor-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #e5e7eb;
+  }
+
+  .robot-editor-caption .mode-pill {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,0.7);
+    color: #cbd5f5;
+  }
+
+  .robot-editor-panel label {
+    font-size: 12px;
+    color: #e5e7eb;
+  }
+
+  .robot-editor-panel select {
+    background: #020617;
+    color: #e5e7eb;
+    border-radius: 8px;
+    border: 1px solid #4b5563;
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+  .io-card {
+    margin-top: 8px;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: rgba(15,23,42,0.95);
+    color: #e5e7eb;
+    font-size: 12px;
+    border: 1px solid rgba(148,163,184,0.6);
+  }
+
+  .io-card code {
+    background: #0b1120;
+    color: #a5b4fc;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+
+  /* ====== SIM PANEL ====== */
+  .robot-sim-panel {
+    background: radial-gradient(circle at top, #020617, #020617 68%, #000 95%);
+    border-radius: 14px;
+    padding: 10px 12px;
+    color: #e5e7eb;
+    box-shadow:
+      0 18px 40px rgba(15,23,42,0.95),
+      0 0 0 1px rgba(15,23,42,0.9);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .robot-sim-headline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .robot-sim-headline .badge-small {
+    font-size: 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,0.7);
+    padding: 2px 6px;
+    color: #9ca3af;
+  }
+
+  .sim-subtext {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+  }
+
+  /* ====== SECRET KEY ====== */
+  .secret-box {
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(7,15,30,0.95);
+    color: #dbeafe;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(147,197,253,0.65);
+    box-shadow:
+      0 0 10px var(--secret-glow-1),
+      0 0 20px var(--secret-glow-2),
+      0 0 28px rgba(59,130,246,0.55),
+      inset 0 0 18px rgba(15,23,42,0.9);
+    transform-origin: center;
+    animation:
+      secretPop .4s ease-out,
+      neonPulse 1.3s ease-in-out infinite alternate;
+    cursor: default;
+  }
+
+  .secret-box span.key-char {
+    background: #0b1120;
+    border-radius: 999px;
+    padding: 4px 10px;
+    border: 1px solid rgba(147,197,253,0.8);
+    font-size: 13px;
+  }
+
+  .secret-box:hover {
+    box-shadow:
+      0 0 16px var(--secret-glow-2),
+      0 0 32px var(--secret-glow-1);
+    transform: translateY(-1px) scale(1.02);
+  }
+
+  @keyframes secretPop {
+    0% { transform: scale(.3) rotate(-10deg); opacity:0; }
+    60% { transform: scale(1.08) rotate(3deg); opacity:1; }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  @keyframes neonPulse {
+    0% {
+      box-shadow:
+        0 0 8px var(--secret-glow-1),
+        0 0 18px var(--secret-glow-2),
+        inset 0 0 10px rgba(15,23,42,0.9);
+    }
+    100% {
+      box-shadow:
+        0 0 14px var(--secret-glow-2),
+        0 0 26px var(--secret-glow-1),
+        inset 0 0 18px rgba(15,23,42,0.9);
+    }
+  }
+
+  /* ====== GRID ====== */
+  .robot-grid-wrapper {
+    margin-top: 6px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: center;
+    animation: gridAppear .4s ease-out;
+  }
+
+  @keyframes gridAppear {
+    0% { opacity: 0; transform: scale(.85); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .robot-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 24px);
+    gap: 3px;
+    justify-content: center;
+  }
+
+  .cell {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    background: rgba(15,23,42,0.95);
+    box-shadow: inset 0 0 0 1px rgba(30,64,175,0.6);
+    transition: background .23s ease, transform .23s ease, box-shadow .23s ease;
+  }
+
+  .cell.robot {
+    background: radial-gradient(circle at 30% 25%, #fde047, #fb923c 45%, #ea580c 72%);
+    box-shadow:
+      0 0 14px rgba(250,204,21,0.9),
+      0 0 26px rgba(249,115,22,0.7);
+    animation: robotJump .28s ease-out;
+  }
+
+  @keyframes robotJump {
+    0%   { transform: scale(.35) translateY(5px); filter: brightness(.5); }
+    70%  { transform: scale(1.18) translateY(-2px); filter: brightness(1.4); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+
+  .cell.robot-trail {
+    background: radial-gradient(circle, rgba(255,200,90,0.45), rgba(255,200,90,0.08), transparent);
+    box-shadow: 0 0 10px rgba(250,204,21,0.4);
+    animation: trailFade .7s ease-out forwards;
+  }
+
+  @keyframes trailFade {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .robot-grid-status {
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: center;
+  }
+
+  .grid-correct {
+    animation: correctFlash 0.7s ease-out;
+  }
+
+  @keyframes correctFlash {
+    0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.8); }
+    100% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+  }
+
+  .grid-wrong {
+    animation: wrongShake 0.45s ease;
+  }
+
+  @keyframes wrongShake {
+    0%,100% { transform: translateX(0); }
+    25%  { transform: translateX(-4px); }
+    50%  { transform: translateX(3px); }
+    75%  { transform: translateX(-2px); }
+  }
+
+  /* ====== RESULT ====== */
+  .robot-result-box {
+    margin-top: 6px;
+    font-size: 12px;
+    animation: resultType .4s ease-out;
+  }
+
+  @keyframes resultType {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-good { color: #bbf7d0; }
+  .result-bad  { color: #fecaca; }
+
+  /* ====== RUN BUTTON ====== */
+  .btn-run-bot {
+    position: relative;
+    overflow: hidden;
+    font-size: 12px;
+  }
+
+  .btn-run-bot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+    transform: translateX(-120%);
+    opacity: 0.0;
+    pointer-events: none;
+  }
+
+  .btn-run-bot:hover::before {
+    opacity: 1;
+    transform: translateX(120%);
+    transition: transform .55s ease-out;
+  }
+
+  .btn-run-bot:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(37,99,235,0.5);
+  }
+
+  .btn-run-bot:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(15,23,42,0.6);
+  }
+
+  .btn-run-bot .ripple {
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.5);
+    transform: scale(0);
+    animation: ripple 0.45s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes ripple {
+    to {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  /* ====== RANK ====== */
+  .robot-rank-panel {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .rank-list {
+    margin-top: 4px;
+  }
+
+  .rank-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    border-bottom: 1px dashed #e5e7eb;
+    font-size: 12px;
+  }
+
+  .rank-item.me {
+    font-weight: 600;
+    color: var(--blue-dark);
+  }
+
+  .rank-dots {
+    text-align: center;
+    font-size: 11px;
+    color: #9ca3af;
+    padding: 1px 0;
+  }
+
+  /* ====== GUIDE POPUP ====== */
+  .guide-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+
+  .guide-backdrop.show {
+    display: flex;
+  }
+
+  .guide-modal {
+    width: 92%;
+    max-width: 720px;
+    background: #020617;
+    color: #e5e7eb;
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow:
+      0 22px 55px rgba(0,0,0,0.85),
+      0 0 0 1px rgba(148,163,184,0.5);
+    font-size: 13px;
+    animation: guidePop .28s ease-out;
+  }
+
+  @keyframes guidePop {
+    from { opacity: 0; transform: translateY(10px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .guide-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .guide-step-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,0.7);
+    font-size: 12px;
+    cursor: pointer;
+    background: rgba(15,23,42,0.9);
+  }
+
+  .guide-step-pill.active {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #e5e7eb;
+    box-shadow: 0 0 10px rgba(37,99,235,0.8);
+  }
+
+  .guide-step-panel {
+    display: none;
+  }
+
+  .guide-step-panel.active {
+    display: block;
+  }
+
+  .guide-modal pre {
+    background: #020617;
+    border-radius: 8px;
+    padding: 6px 8px;
+    border: 1px solid rgba(51,65,85,0.9);
+    font-size: 12px;
+    color: #e5e7eb;
+    overflow-x: auto;
+  }
+
+  /* ===== CodeMirror custom ===== */
+  .CodeMirror {
+    height: 260px;
+    background: #020617;
+    color: #e5e7eb;
+    border-radius: 10px;
+    border: 1px solid #4b5563;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+  }
+
+  .cm-s-material-darker .CodeMirror-gutters {
+    background: #020617;
+    border-right: 1px solid #374151;
+    color: #6b7280;
+  }
+
+  .cm-s-material-darker .CodeMirror-linenumber {
+    color: #6b7280;
+  }
+
+  .cm-s-material-darker .CodeMirror-cursor {
+    border-left: 1px solid #facc15;
+  }
+
+  .cm-s-material-darker .CodeMirror-selected {
+    background: rgba(59,130,246,0.35) !important;
+  }
+</style>
+
+<div class="robot-arena-wrapper">
+  <div class="robot-arena-card">
+
+    <!-- HEADER -->
+    <div class="robot-header-line">
+      <div>
+        <div class="robot-header-title">
+          <span class="icon">🤖</span>
+          <span>Robot Step – Bài 1: Cin/Cout &amp; If/Else</span>
+        </div>
+        <div class="robot-subtitle">
+          Điều khiển robot đi 1 bước duy nhất theo tín hiệu bí mật U/D/L/R.
+        </div>
+      </div>
+      <button id="btn-open-guide" class="btn btn-outline-primary btn-sm btn-guide">
+        ❓ Hướng dẫn
+      </button>
+    </div>
+
+    <!-- MISSION -->
+    <section class="robot-mission-box">
+      <div class="robot-mission-inner">
+        {{ lesson_scenario|default:"Bạn là kỹ sư điều khiển robot trong phòng thí nghiệm. Mỗi lượt, hệ thống gửi 1 ký tự U/D/L/R vào stdin, nhiệm vụ của bạn là in từ tiếng Anh tương ứng UP/DOWN/LEFT/RIGHT." }}
+        <div class="mt-1">
+          ✅ <b>PASS</b>: điểm ≥ 10 (robot đi hợp lệ trong bản đồ).  
+          ⭐ <b>PERFECT</b>: 15 điểm (đi đúng hướng bí mật).
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN GRID -->
+    <section class="robot-main-grid">
+
+      <!-- EDITOR -->
+      <div class="robot-editor-panel">
+        <div class="robot-editor-caption">
+          <span>✏ Viết chương trình điều khiển robot</span>
+          <span class="mode-pill">Mode: Egg (1 bước)</span>
+        </div>
+
+        <form id="robot-form" method="post">
+          {% csrf_token %}
+
+          <div class="mb-2">
+            <label class="form-label mb-1">Ngôn ngữ</label>
+            {{ form.language }}
+          </div>
+
+          <div class="flex-grow-1 d-flex flex-column">
+            <label class="form-label mb-1">Mã nguồn bot</label>
+            {{ form.source_code }}
+          </div>
+        </form>
+
+        <div class="io-card">
+          📥 <b>Input:</b> 1 ký tự duy nhất <code>U/D/L/R</code><br>
+          📤 <b>Output:</b> 1 từ: <code>UP</code> / <code>DOWN</code> / <code>LEFT</code> / <code>RIGHT</code><br>
+          🔍 Hệ thống chỉ đọc <b>từ đầu tiên</b> bạn in ra.
+        </div>
+      </div>
+
+      <!-- SIM PANEL -->
+      <div class="robot-sim-panel">
+
+        <div class="robot-sim-headline">
+          <div>
+            🎞 Bản đồ 10×10
+            <span class="badge-small ms-1">live replay</span>
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm btn-run-bot"
+            onclick="submitRobotForm(event)">
+            ▶ Chạy bot
+          </button>
+        </div>
+
+        <div class="sim-subtext">
+          {% if run and replay %}
+            🔐 Secret &amp; kết quả lượt chơi mới nhất:
+          {% else %}
+            🔐 Mỗi lượt chạy: hệ thống sinh ngẫu nhiên 1 secret U/D/L/R và gửi vào <code>stdin</code>.
+          {% endif %}
+        </div>
+
+        {% if run and replay %}
+          <div class="secret-box mb-2">
+            <span>Secret:</span>
+            <span class="key-char">{{ replay.secret }}</span>
+            <span>| Bot:</span>
+            <span class="key-char">{{ replay.bot_move|default:"(không in gì)" }}</span>
+          </div>
+        {% endif %}
+
+        <div id="gridOuter" class="robot-grid-wrapper">
+          <div id="robotGrid" class="robot-grid"></div>
+        </div>
+
+        <div class="robot-grid-status">
+          Robot bắt đầu ở giữa bản đồ, sau đó nhảy 1 ô theo lệnh của bot.
+        </div>
+
+        <div class="robot-result-box mt-1">
+          {% if run and replay %}
+            {% if replay.bot_move == replay.secret %}
+              <div class="result-good">
+                ✅ Điểm: <b>{{ run.score }}</b> / 15 – Hướng bot trùng với secret!
+              </div>
+            {% else %}
+              <div class="result-bad">
+                ⚠️ Điểm: <b>{{ run.score }}</b> / 15 – Bot đi khác hướng secret.
+              </div>
+            {% endif %}
+
+            {% if replay.error %}
+              <div class="text-danger mt-1">{{ replay.error }}</div>
+            {% endif %}
+          {% else %}
+            <div class="text-muted">
+              Chưa có lượt chạy. Hãy viết code và bấm <b>Chạy bot</b> để xem robot bước đi.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RANK PANEL -->
+    <section class="robot-rank-panel">
+      <strong>🏆 Top 10 Robot Step</strong>
+      <div class="rank-list">
+        {% for r in top_ranks %}
+          <div class="rank-item">
+            <span>#{{ forloop.counter }} {{ r.user__username }}</span>
+            <span>{{ r.best_score }}</span>
+          </div>
+        {% empty %}
+          <div class="text-muted small">Chưa có ai chơi.</div>
+        {% endfor %}
+      </div>
+      <small class="text-muted">
+        Xếp hạng theo <b>điểm cao nhất</b> mỗi tài khoản đạt được.
+      </small>
+    </section>
+
+  </div>
+</div>
+
+<!-- POPUP HƯỚNG DẪN -->
+<div class="guide-backdrop" id="guideBackdrop">
+  <div class="guide-modal">
+    <div class="d-flex justify-content-between mb-2">
+      <strong>Hướng dẫn từng bước – Robot Step</strong>
+      <button id="btn-close-guide" class="btn btn-sm btn-outline-light">Đóng</button>
+    </div>
+
+    <div class="guide-steps mb-2">
+      <div class="guide-step-pill active" data-step="1">1. Luật chơi</div>
+      <div class="guide-step-pill" data-step="2">2. Input/Output</div>
+      <div class="guide-step-pill" data-step="3">3. Viết code</div>
+      <div class="guide-step-pill" data-step="4">4. Chạy bot</div>
+      <div class="guide-step-pill" data-step="5">5. Điểm &amp; luyện tập</div>
+    </div>
+
+    <div class="guide-step-panel active" id="gstep-1">
+      <ul>
+        <li>Robot đứng ở giữa bản đồ 10×10.</li>
+        <li>Hệ thống sinh ngẫu nhiên 1 ký tự <code>U</code>, <code>D</code>, <code>L</code>, <code>R</code>
+          và gửi vào <code>stdin</code> chương trình của bạn.</li>
+        <li>Bạn in ra 1 từ tương ứng: <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>.</li>
+        <li>Robot nhảy 1 ô theo lệnh bot, hệ thống tính điểm.</li>
+      </ul>
+    </div>
+
+    <div class="guide-step-panel" id="gstep-2">
+      <pre>
+📥 Input:  1 ký tự (ví dụ: U)
+📤 Output: 1 từ (ví dụ: UP)
+Chỉ lấy TỪ ĐẦU TIÊN trong toàn bộ output.
+      </pre>
+    </div>
+
+    <div class="guide-step-panel" id="gstep-3">
+      <pre>
+// C++ gợi ý
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    char c;
+    if (!(cin &gt;&gt; c)) return 0;
+    if (c == 'U') cout &lt;&lt; "UP";
+    else if (c == 'D') cout &lt;&lt; "DOWN";
+    else if (c == 'L') cout &lt;&lt; "LEFT";
+    else if (c == 'R') cout &lt;&lt; "RIGHT";
+    return 0;
+}
+      </pre>
+    </div>
+
+    <div class="guide-step-panel" id="gstep-4">
+      <p>Sau khi viết code, bấm <b>Chạy bot</b>. Robot sẽ nhảy từ vị trí giữa sang vị trí mới trong bản đồ.</p>
+    </div>
+
+    <div class="guide-step-panel" id="gstep-5">
+      <ul>
+        <li>Điểm ≥ 10: pass bài.</li>
+        <li>15 điểm khi bot luôn đi đúng hướng secret.</li>
+        <li>Thử nhiều cách viết code khác nhau để luyện nhập/xuất + if/else.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- CodeMirror CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.min.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+
+<script>
+(function() {
+
+  /*--------------------------------------------------
+      CodeMirror
+  --------------------------------------------------*/
+  const form = document.getElementById("robot-form");
+  let robotEditor = null;
+
+  if (form && window.CodeMirror) {
+    const textarea  = form.querySelector("textarea[name='source_code']");
+    const langSelect = form.querySelector("select[name='language']");
+
+    robotEditor = CodeMirror.fromTextArea(textarea, {
+      lineNumbers: true,
+      theme: "material-darker",
+      mode: "text/x-c++src",
+      tabSize: 2,
+      indentUnit: 2,
+      viewportMargin: Infinity
+    });
+
+    langSelect.addEventListener("change", () => {
+      robotEditor.setOption("mode",
+        langSelect.value.startsWith("py") ? "python" : "text/x-c++src"
+      );
+    });
+  }
+
+
+  /*--------------------------------------------------
+      Build static 10×10 grid (background map)
+  --------------------------------------------------*/
+  const grid = document.getElementById("robotGrid");
+  const gridOuter = document.getElementById("gridOuter");
+
+  function buildGrid() {
+    grid.innerHTML = "";
+    grid.style.position = "relative";
+    grid.style.width = (10 * 27) + "px";
+    grid.style.height = (10 * 27) + "px";
+
+    // 100 cell background
+    for (let i = 0; i < 100; i++) {
+      const c = document.createElement("div");
+      c.className = "cell";
+      c.style.position = "absolute";
+      c.style.left = (i % 10) * 27 + "px";
+      c.style.top  = Math.floor(i / 10) * 27 + "px";
+      grid.appendChild(c);
+    }
+  }
+
+  buildGrid();
+
+
+  /*--------------------------------------------------
+      SINGLE ROBOT SPRITE
+  --------------------------------------------------*/
+  function createRobotSprite(row, col) {
+    const rb = document.createElement("div");
+    rb.id = "robotSprite";
+    rb.style.position = "absolute";
+    rb.style.width = "24px";
+    rb.style.height = "24px";
+    rb.style.borderRadius = "4px";
+    rb.style.background =
+      "radial-gradient(circle at 30% 25%, #fde047, #fb923c 45%, #ea580c 72%)";
+
+    rb.style.boxShadow = `
+      0 0 12px rgba(250,204,21,0.8),
+      0 0 22px rgba(249,115,22,0.6)
+    `;
+
+    rb.style.transition =
+      "transform .28s cubic-bezier(.22,.61,.36,1), rotate .22s ease-out";
+
+    rb.style.transform =
+      `translate3d(${col * 27}px, ${row * 27}px, 0px)`;
+
+    grid.appendChild(rb);
+  }
+
+
+  /*--------------------------------------------------
+      TRAIL EFFECT
+  --------------------------------------------------*/
+  function addTrail(row, col) {
+    const trail = document.createElement("div");
+    trail.className = "cell robot-trail";
+    trail.style.position = "absolute";
+    trail.style.left = (col * 27) + "px";
+    trail.style.top  = (row * 27) + "px";
+    grid.appendChild(trail);
+    setTimeout(() => trail.remove(), 550);
+  }
+
+
+  /*--------------------------------------------------
+      SLIDE ROBOT WITH DIR ROTATION
+  --------------------------------------------------*/
+  function slideRobot(fromX, fromY, toX, toY) {
+    let rb = document.getElementById("robotSprite");
+    if (!rb) {
+      createRobotSprite(fromX, fromY);
+      rb = document.getElementById("robotSprite");
+    }
+
+    // xoay hướng theo vector
+    const dx = toX - fromX;
+    const dy = toY - fromY;
+
+    if (dx === -1) rb.style.rotate = "0deg";     // UP
+    if (dx === 1)  rb.style.rotate = "180deg";   // DOWN
+    if (dy === -1) rb.style.rotate = "-90deg";   // LEFT
+    if (dy === 1)  rb.style.rotate = "90deg";    // RIGHT
+
+    addTrail(fromX, fromY);
+
+    rb.style.transform =
+      `translate3d(${toY * 27}px, ${toX * 27}px, 0px)`;
+  }
+
+
+  /*--------------------------------------------------
+      INITIAL POSITION
+  --------------------------------------------------*/
+  {% if replay %}
+    const before = {{ replay.before|safe }};
+    const after  = {{ replay.after|safe }};
+
+    let sx = 0, sy = 0;
+    for (let r = 0; r < 10; r++)
+      for (let c = 0; c < 10; c++)
+        if (before[r][c] === "R") { sx = r; sy = c; }
+
+    createRobotSprite(sx, sy);
+
+    // find new pos
+    let ex = 0, ey = 0;
+    for (let r = 0; r < 10; r++)
+      for (let c = 0; c < 10; c++)
+        if (after[r][c] === "R") { ex = r; ey = c; }
+
+    setTimeout(() => slideRobot(sx, sy, ex, ey), 80);
+
+    {% if replay.bot_move == replay.secret %}
+      gridOuter.classList.add("grid-correct");
+      setTimeout(()=>gridOuter.classList.remove("grid-correct"),700);
+    {% else %}
+      gridOuter.classList.add("grid-wrong");
+      setTimeout(()=>gridOuter.classList.remove("grid-wrong"),450);
+    {% endif %}
+
+  {% else %}
+    createRobotSprite(4, 4);
+  {% endif %}
+
+})();
+</script>
+
+
+
+
+{% endblock %}

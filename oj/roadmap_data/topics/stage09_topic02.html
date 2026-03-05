@@ -1,0 +1,117 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Biết cách duyệt toàn bộ đồ thị bằng DFS (đệ quy) và BFS (hàng đợi).</li>
+  <li>Hiểu khác biệt giữa duyệt sâu (DFS) và duyệt rộng (BFS).</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>Giả sử đồ thị được lưu bằng danh sách kề <code>adj</code>:</p>
+<ul>
+  <li><b>DFS</b>: đi sâu vào nhánh đầu tiên, dùng <b>ngăn xếp / đệ quy</b>.</li>
+  <li><b>BFS</b>: duyệt từng lớp (level), dùng <b>hàng đợi</b>.</li>
+</ul>
+
+<hr>
+
+<h2>💻 Ví dụ C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m;
+vector&lt;vector&lt;int&gt;&gt; adj;
+vector&lt;int&gt; visited;
+
+void dfs(int u){
+    visited[u]=1;
+    cout&lt;&lt;u&lt;&lt;" ";
+    for(int v:adj[u])
+        if(!visited[v]) dfs(v);
+}
+
+void bfs(int start){
+    queue&lt;int&gt; q;
+    q.push(start);
+    visited[start]=1;
+    while(!q.empty()){
+        int u=q.front();q.pop();
+        cout&lt;&lt;u&lt;&lt;" ";
+        for(int v:adj[u])
+            if(!visited[v]){
+                visited[v]=1;
+                q.push(v);
+            }
+    }
+}
+
+int main(){
+    cin&gt;&gt;n&gt;&gt;m;
+    adj.assign(n+1,{});
+    for(int i=0;i&lt;m;i++){
+        int u,v;cin&gt;&gt;u&gt;&gt;v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    visited.assign(n+1,0);
+    cout&lt;&lt;"DFS: "; dfs(1);
+    cout&lt;&lt;"\\nBFS: ";
+    visited.assign(n+1,0);
+    bfs(1);
+}</code></pre>
+
+<h2>💻 Ví dụ Python</h2>
+<pre><code>from collections import deque
+n,m=map(int,input().split())
+adj=[[] for _ in range(n+1)]
+for _ in range(m):
+    u,v=map(int,input().split())
+    adj[u].append(v)
+    adj[v].append(u)
+
+def dfs(u,vis):
+    vis[u]=True
+    print(u,end=' ')
+    for v in adj[u]:
+        if not vis[v]:
+            dfs(v,vis)
+
+def bfs(start):
+    vis=[False]*(n+1)
+    q=deque([start])
+    vis[start]=True
+    while q:
+        u=q.popleft()
+        print(u,end=' ')
+        for v in adj[u]:
+            if not vis[v]:
+                vis[v]=True
+                q.append(v)
+
+vis=[False]*(n+1)
+print("DFS:",end=' ')
+dfs(1,vis)
+print("\\nBFS:",end=' ')
+bfs(1)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Duyệt DFS từ đỉnh 1, in thứ tự duyệt.</li>
+  <li>Duyệt BFS và tính khoảng cách ngắn nhất từ 1 đến các đỉnh khác.</li>
+  <li>So sánh DFS và BFS trên cùng đồ thị.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 2: Khoảng cách BFS</b></summary>
+  <pre><code>dist=[-1]*(n+1)
+dist[1]=0
+q=deque([1])
+while q:
+    u=q.popleft()
+    for v in adj[u]:
+        if dist[v]==-1:
+            dist[v]=dist[u]+1
+            q.append(v)
+print(dist)</code></pre>
+</details>

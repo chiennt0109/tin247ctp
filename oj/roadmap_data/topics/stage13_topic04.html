@@ -1,0 +1,66 @@
+<h2>🎯 Mục tiêu</h2>
+<ul>
+  <li>Hiểu ứng dụng tìm mẫu trong văn bản lớn (Rabin–Karp).</li>
+  <li>Nhận dạng chuỗi tương tự trong kiểm tra chính tả hoặc AI text match.</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Thuật toán Rabin–Karp</h2>
+<p>Dùng Rolling Hash để so sánh hash của mẫu và mỗi đoạn văn bản dài |P|.</p>
+
+<h4>🌿 Python</h4>
+<pre><code>BASE=257; MOD=10**9+9
+def build_hash(s):
+    n=len(s); pw=[1]*(n+1); h=[0]*(n+1)
+    for i in range(1,n+1):
+        pw[i]=pw[i-1]*BASE%MOD
+        h[i]=(h[i-1]*BASE+ord(s[i-1]))%MOD
+    return pw,h
+def get_hash(l,r,pw,h):
+    return (h[r]-h[l-1]*pw[r-l+1]%MOD+MOD)%MOD
+
+text="hellotherehello"; pat="hello"
+pw,h=build_hash(text)
+hp=0
+for c in pat: hp=(hp*BASE+ord(c))%MOD
+for i in range(1,len(text)-len(pat)+2):
+    if get_hash(i,i+len(pat)-1,pw,h)==hp:
+        print("Match at",i-1)</code></pre>
+
+<h4>🌿 C++</h4>
+<pre><code>const long long BASE=257,MOD=1e9+9;
+vector&lt;long long&gt; pw,h;
+void build(string s){
+    int n=s.size(); pw.assign(n+1,1);h.assign(n+1,0);
+    for(int i=1;i&lt;=n;i++){
+        pw[i]=pw[i-1]*BASE%MOD;
+        h[i]=(h[i-1]*BASE+s[i-1])%MOD;
+    }
+}
+long long getH(int l,int r){
+    return (h[r]-h[l-1]*pw[r-l+1]%MOD+MOD)%MOD;
+}</code></pre>
+
+<hr>
+
+<h2>📗 2️⃣ Ứng dụng thực tế</h2>
+<ul>
+  <li>Phát hiện đoạn văn sao chép (plagiarism check).</li>
+  <li>Tự động gợi ý chính tả – so khớp với từ điển.</li>
+  <li>Phân loại chuỗi trong xử lý ngôn ngữ tự nhiên (NLP).</li>
+</ul>
+
+<hr>
+
+<h2>🧩 Bài tập</h2>
+<ol>
+  <li>Tìm tất cả vị trí P trong T bằng Rabin–Karp.</li>
+  <li>Kiểm tra 2 văn bản có giống nhau khi bỏ dấu chấm và khoảng trắng không.</li>
+  <li>Viết chương trình tự động phát hiện từ viết sai 1 ký tự (bằng so sánh hash gần đúng).</li>
+</ol>
+
+<details><summary><b>💡 Gợi ý bài 3</b></summary>
+<pre><code># So sánh hash khi bỏ qua 1 vị trí
+# hoặc tính rolling hash cho từng từ rồi so sánh khoảng cách Levenshtein</code></pre>
+</details>

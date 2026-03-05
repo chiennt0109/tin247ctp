@@ -1,0 +1,102 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cơ chế sắp xếp chia để trị: Merge Sort và Quick Sort.</li>
+  <li>Phân tích độ phức tạp O(n log n).</li>
+</ul>
+
+<hr>
+
+<h2>📘 1. Merge Sort</h2>
+<p>Ý tưởng: chia đôi mảng → sắp xếp từng nửa → trộn hai nửa đã sắp xếp.</p>
+
+<h4>Python</h4>
+<pre><code>def merge_sort(a):
+    if len(a) <= 1: return a
+    mid = len(a)//2
+    L = merge_sort(a[:mid])
+    R = merge_sort(a[mid:])
+    res=[]; i=j=0
+    while i&lt;len(L) and j&lt;len(R):
+        if L[i]&lt;=R[j]: res.append(L[i]); i+=1
+        else: res.append(R[j]); j+=1
+    res+=L[i:]+R[j:]
+    return res
+print(*merge_sort(list(map(int,input().split()))))</code></pre>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+void merge(vector&lt;int&gt;& a, int l, int m, int r){
+    vector&lt;int&gt; L(a.begin()+l, a.begin()+m+1);
+    vector&lt;int&gt; R(a.begin()+m+1, a.begin()+r+1);
+    int i=0,j=0,k=l;
+    while(i&lt;L.size()&&j&lt;R.size())
+        a[k++]=(L[i]&lt;=R[j])?L[i++]:R[j++];
+    while(i&lt;L.size())a[k++]=L[i++];
+    while(j&lt;R.size())a[k++]=R[j++];
+}
+void mergeSort(vector&lt;int&gt;& a,int l,int r){
+    if(l&gt;=r)return;
+    int m=(l+r)/2;
+    mergeSort(a,l,m);
+    mergeSort(a,m+1,r);
+    merge(a,l,m,r);
+}
+int main(){
+    int n;cin>>n;
+    vector&lt;int&gt; a(n);
+    for(int i=0;i&lt;n;i++)cin>>a[i];
+    mergeSort(a,0,n-1);
+    for(int x:a)cout&lt;&lt;x&lt;&lt;" ";
+}</code></pre>
+
+<hr>
+
+<h2>📘 2. Quick Sort</h2>
+<p>Ý tưởng: chọn một phần tử (pivot), chia mảng thành hai phần nhỏ hơn và lớn hơn pivot, rồi sắp xếp đệ quy.</p>
+
+<h4>Python</h4>
+<pre><code>def quick_sort(a):
+    if len(a) <= 1: return a
+    pivot = a[0]
+    less = [x for x in a[1:] if x <= pivot]
+    greater = [x for x in a[1:] if x > pivot]
+    return quick_sort(less) + [pivot] + quick_sort(greater)
+print(*quick_sort(list(map(int, input().split()))))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Cài đặt Merge Sort để sắp xếp mảng giảm dần.</li>
+  <li>Cài đặt Quick Sort không dùng list comprehension.</li>
+  <li>So sánh thời gian Merge Sort và Bubble Sort với n = 10⁴.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python
+import random, time
+
+def bubble(a):
+    for i in range(len(a)-1):
+        for j in range(len(a)-i-1):
+            if a[j] > a[j+1]:
+                a[j], a[j+1] = a[j+1], a[j]
+
+def merge_sort(a):
+    if len(a)<=1:return a
+    mid=len(a)//2
+    L=merge_sort(a[:mid])
+    R=merge_sort(a[mid:])
+    res=[];i=j=0
+    while i&lt;len(L) and j&lt;len(R):
+        if L[i]&lt;R[j]:res.append(L[i]);i+=1
+        else:res.append(R[j]);j+=1
+    return res+L[i:]+R[j:]
+
+a=[random.randint(0,10000) for _ in range(10000)]
+b=a[:]
+t1=time.time();merge_sort(a);print("Merge:",time.time()-t1)
+t2=time.time();bubble(b);print("Bubble:",time.time()-t2)</code></pre>
+</details>

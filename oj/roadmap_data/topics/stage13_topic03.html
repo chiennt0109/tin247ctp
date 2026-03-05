@@ -1,0 +1,66 @@
+<h2>🎯 Mục tiêu</h2>
+<ul>
+  <li>Hiểu chuỗi đối xứng (Palindrome).</li>
+  <li>Biết cách kiểm tra và tìm chuỗi đối xứng dài nhất.</li>
+  <li>Làm quen kỹ thuật mở rộng hai con trỏ.</li>
+</ul>
+
+<hr>
+
+<h2>📘 1️⃣ Kiểm tra Palindrome</h2>
+<pre><code>def is_pal(s):
+    return s == s[::-1]</code></pre>
+
+<hr>
+
+<h2>📘 2️⃣ Tìm Palindrome dài nhất – Expand Around Center</h2>
+<p>Mỗi vị trí có thể là tâm (lẻ hoặc chẵn). Mở rộng trái phải đến khi không còn khớp.</p>
+
+<h4>🌿 Python</h4>
+<pre><code>def longest_pal(s):
+    res=""
+    for i in range(len(s)):
+        # tâm lẻ
+        l=r=i
+        while l>=0 and r&lt;len(s) and s[l]==s[r]:
+            if r-l+1&gt;len(res): res=s[l:r+1]
+            l-=1; r+=1
+        # tâm chẵn
+        l,r=i,i+1
+        while l>=0 and r&lt;len(s) and s[l]==s[r]:
+            if r-l+1&gt;len(res): res=s[l:r+1]
+            l-=1; r+=1
+    return res
+print(longest_pal("babad"))</code></pre>
+
+<h4>🌿 C++</h4>
+<pre><code>string longestPal(string s){
+    int n=s.size(),start=0,len=1;
+    for(int i=0;i&lt;n;i++){
+        int l=i,r=i;
+        while(l>=0&&r&lt;n&&s[l]==s[r]){
+            if(r-l+1&gt;len){len=r-l+1;start=l;}
+            l--;r++;
+        }
+        l=i;r=i+1;
+        while(l>=0&&r&lt;n&&s[l]==s[r]){
+            if(r-l+1&gt;len){len=r-l+1;start=l;}
+            l--;r++;
+        }
+    }
+    return s.substr(start,len);
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập</h2>
+<ol>
+  <li>Liệt kê tất cả các palindrome trong chuỗi.</li>
+  <li>Tìm palindrome dài nhất ≤ k ký tự.</li>
+  <li>Đếm số chuỗi con đối xứng trong S.</li>
+</ol>
+
+<details><summary><b>💡 Gợi ý bài 3</b></summary>
+<pre><code># Duyệt mọi tâm, đếm mỗi khi s[l]==s[r]
+count += 1 mỗi lần mở rộng hợp lệ</code></pre>
+</details>

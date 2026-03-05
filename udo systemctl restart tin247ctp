@@ -1,0 +1,23 @@
+[0;1;32m●[0m tin247ctp.service - Gunicorn service for tin247ctp
+     Loaded: loaded (]8;;file://vmi2894488/etc/systemd/system/tin247ctp.service/etc/systemd/system/tin247ctp.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Wed 2025-11-12 06:24:05 +07; 8s ago
+   Main PID: 1422098 (gunicorn)
+      Tasks: 4 (limit: 9483)
+     Memory: 154.9M (peak: 155.2M)
+        CPU: 2.729s
+     CGroup: /system.slice/tin247ctp.service
+             ├─[0;38;5;245m1422098 /var/www/tin247ctp/venv/bin/python3 /var/www/tin247ctp/venv/bin/gunicorn --workers 3 --bind unix:/var/www/tin247ctp/tin247ctp.sock oj.wsgi:application[0m
+             ├─[0;38;5;245m1422101 /var/www/tin247ctp/venv/bin/python3 /var/www/tin247ctp/venv/bin/gunicorn --workers 3 --bind unix:/var/www/tin247ctp/tin247ctp.sock oj.wsgi:application[0m
+             ├─[0;38;5;245m1422102 /var/www/tin247ctp/venv/bin/python3 /var/www/tin247ctp/venv/bin/gunicorn --workers 3 --bind unix:/var/www/tin247ctp/tin247ctp.sock oj.wsgi:application[0m
+             └─[0;38;5;245m1422103 /var/www/tin247ctp/venv/bin/python3 /var/www/tin247ctp/venv/bin/gunicorn --workers 3 --bind unix:/var/www/tin247ctp/tin247ctp.sock oj.wsgi:application[0m
+
+Nov 12 06:24:05 vmi2894488 gunicorn[1422098]: [2025-11-12 06:24:05 +0700] [1422098] [INFO] Using worker: sync
+Nov 12 06:24:05 vmi2894488 gunicorn[1422101]: [2025-11-12 06:24:05 +0700] [1422101] [INFO] Booting worker with pid: 1422101
+Nov 12 06:24:05 vmi2894488 gunicorn[1422102]: [2025-11-12 06:24:05 +0700] [1422102] [INFO] Booting worker with pid: 1422102
+Nov 12 06:24:06 vmi2894488 gunicorn[1422103]: [2025-11-12 06:24:06 +0700] [1422103] [INFO] Booting worker with pid: 1422103
+Nov 12 06:24:07 vmi2894488 gunicorn[1422103]: /var/www/tin247ctp/venv/lib/python3.12/site-packages/django/db/backends/utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+Nov 12 06:24:07 vmi2894488 gunicorn[1422103]:   warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+Nov 12 06:24:07 vmi2894488 gunicorn[1422101]: /var/www/tin247ctp/venv/lib/python3.12/site-packages/django/db/backends/utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+Nov 12 06:24:07 vmi2894488 gunicorn[1422101]:   warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+Nov 12 06:24:07 vmi2894488 gunicorn[1422102]: /var/www/tin247ctp/venv/lib/python3.12/site-packages/django/db/backends/utils.py:98: RuntimeWarning: Accessing the database during app initialization is discouraged. To fix this warning, avoid executing queries in AppConfig.ready() or when your app modules are imported.
+Nov 12 06:24:07 vmi2894488 gunicorn[1422102]:   warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)

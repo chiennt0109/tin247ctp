@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+.problem-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 20px auto;
+  max-width: 1280px;
+  padding: 0 16px;
+}
+
+/* Paper */
+.problem-paper {
+  flex: 1 1 880px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+  border: 1px solid #e5e7eb;
+  padding: 24px 26px;
+}
+
+.problem-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+/* Markdown giống submit */
+.markdown-body {
+  line-height: 1.65;
+  font-size: 16px;
+  color: #111827;
+}
+
+/* Code block */
+.markdown-body pre code {
+  background:#f8fafc;
+  padding:6px 10px;
+  border-radius:8px;
+  display:block;
+  overflow:auto;
+}
+
+/* TABLE border */
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+}
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid #cbd5e1;
+  padding: 6px 10px;
+}
+.markdown-body thead {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+/* Badge */
+.badge-soft {
+  border-radius: 999px;
+  padding: .25rem .6rem;
+  font-weight: 600;
+  font-size: .82rem;
+}
+.badge-easy {
+  background: #ecfdf5;
+  color: #064e3b;
+}
+.badge-info {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* AI alert */
+.alert-soft {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 14px;
+  display: none;
+}
+
+/* Cột phải */
+.toolbar-side {
+  flex: 0 0 180px;
+  position: sticky;
+  top: 82px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  margin-right: 8px;
+}
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  min-width: 180px;
+  transition: all .15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.toolbar-btn:hover { transform: translateY(-1px); }
+
+.btn-back   { background: #6b7280; }
+.btn-submit { background: #16a34a; }
+.btn-ai     { background: #2563eb; }
+.btn-next   { background: #0ea5e9; }
+.btn-copy   { background: #374151; }
+
+/* Mobile FAB menu */
+#ai-fab {
+  display: none;
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+  z-index: 9999;
+}
+#ai-menu {
+  display: none;
+  position: fixed;
+  top: 126px;
+  right: 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .15);
+  padding: 8px;
+  z-index: 9999;
+}
+#ai-menu button,
+#ai-menu a {
+  display: block;
+  width: 180px;
+  margin: 4px 0;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-weight: 600;
+  color: #fff;
+  font-size: 14px;
+}
+#ai-menu .btn-back   { background: #6b7280; }
+#ai-menu .btn-submit { background: #16a34a; }
+#ai-menu .btn-ai     { background: #2563eb; }
+#ai-menu .btn-next   { background: #0ea5e9; }
+#ai-menu .btn-copy   { background: #374151; }
+
+@media(max-width:992px) {
+  .toolbar-side { display: none; }
+  #ai-fab { display: block; }
+}
+</style>
+
+
+
+<div class="problem-wrap">
+
+  <!-- LEFT: STATEMENT -->
+  <div class="problem-paper">
+
+    <div class="problem-title">{{ problem.title }}</div>
+    <div class="text-muted mb-2">{{ problem.code }}</div>
+
+    {% if not contest_id and not practice %}
+      {% if problem.difficulty %}
+        <span class="badge-soft badge-easy">🟢 {{ problem.difficulty }}</span>
+      {% endif %}
+      {% for t in problem.tags.all %}
+        <span class="badge-soft badge-info">#{{ t.name }}</span>
+      {% endfor %}
+    {% endif %}
+
+    <hr>
+
+    <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
+    <div id="statement" class="markdown-body"></div>
+
+    <hr>
+    <div class="text-success fw-semibold">
+      ✅ Đã AC: {{ ac_count }} / {{ submit_count }} submissions
+    </div>
+
+    <div id="aiBox" class="alert-soft"></div>
+    <!-- ============================================================
+         📘 LỜI GIẢI (EDITORIAL)
+    ============================================================ -->
+    {% if mode != "contest" %}
+        {% if editorial_exists %}
+            <h3 class="mt-4 fw-bold text-primary">📘 Lời giải</h3>
+    
+            {% if can_view_editorial %}
+                <!-- Nếu editorial là HTML -->
+                {% if editorial_format == "html" %}
+                    <div class="card p-3 mt-2"
+                         style="background:#f8fafc; border-left:4px solid #2563eb;">
+                        {{ editorial|safe }}
+                    </div>
+                {% else %}
+                    <!-- Nếu editorial là MARKDOWN -->
+                    <textarea id="editorial-md-src" hidden>{{ editorial }}</textarea>
+                    <div id="editorial-render"
+                         class="card p-3 mt-2 markdown-body"
+                         style="background:#f8fafc; border-left:4px solid #2563eb;">
+                    </div>
+                {% endif %}
+    
+            {% else %}
+                <div class="alert alert-warning mt-3">
+                    🔒 Bạn chưa có quyền xem lời giải bài này.
+    
+                    {% if requires_editorial_payment %}
+                    <a href="{% url 'problems:buy_editorial' problem.id %}"
+                       class="btn btn-success btn-sm ms-2">
+                        Mua 20 xu
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+
+
+
+  </div>
+
+
+
+  <!-- RIGHT TOOLBAR -->
+  <div class="toolbar-side">
+
+    <!-- Back đúng nguồn -->
+    {% if practice %}
+      <a href="{% url 'contests:contest_practice' contest_id %}" class="toolbar-btn btn-back">⬅ Practice</a>
+
+    {% elif contest_id %}
+      <a href="{% url 'contests:contest_detail' contest_id %}" class="toolbar-btn btn-back">⬅ Contest</a>
+
+    {% else %}
+      <a href="{% url 'problems:problem_list' %}" class="toolbar-btn btn-back">⬅ Problems</a>
+    {% endif %}
+
+
+    <!-- Nộp bài đúng nguồn -->
+    {% if practice %}
+      <a href="{% url 'submissions:submission_page' problem.id %}?contest_id={{ contest_id }}&practice=1"
+         class="toolbar-btn btn-submit">🚀 Nộp bài </a>
+
+    {% elif contest_id %}
+      <a href="{% url 'submissions:submission_page' problem.id %}?contest_id={{ contest_id }}"
+         class="toolbar-btn btn-submit">🚀 Nộp bài</a>
+
+    {% else %}
+      <a href="{% url 'submissions:submission_page' problem.id %}"
+         class="toolbar-btn btn-submit">🚀 Nộp bài</a>
+    {% endif %}
+
+
+    <button id="btn-ai-hint" class="toolbar-btn btn-ai">💡 Gợi ý AI</button>
+    <button id="btn-ai-next" class="toolbar-btn btn-next">📌 Bài kế</button>
+    <button id="btn-ai-copy" class="toolbar-btn btn-copy">📋 Copy đề</button>
+
+  </div>
+
+</div>
+
+
+
+<!-- MOBILE -->
+<button id="ai-fab">⚙️</button>
+<div id="ai-menu">
+
+  {% if practice %}
+    <a href="{% url 'contests:contest_practice' contest_id %}" class="btn-back">⬅ Practice</a>
+  {% elif contest_id %}
+    <a href="{% url 'contests:contest_detail' contest_id %}" class="btn-back">⬅ Contest</a>
+  {% else %}
+    <a href="{% url 'problems:problem_list' %}" class="btn-back">⬅ Problems</a>
+  {% endif %}
+
+  {% if practice %}
+    <a href="{% url 'submissions:submission_page' problem.id %}?contest_id={{ contest_id }}&practice=1"
+       class="btn-submit">🚀 Nộp bài</a>
+
+  {% elif contest_id %}
+    <a href="{% url 'submissions:submission_page' problem.id %}?contest_id={{ contest_id }}"
+       class="btn-submit">🚀 Nộp bài</a>
+
+  {% else %}
+    <a href="{% url 'submissions:submission_page' problem.id %}" class="btn-submit">🚀 Nộp bài</a>
+  {% endif %}
+
+  <button id="btn-ai-hint-m" class="btn-ai">💡 Gợi ý</button>
+  <button id="btn-ai-next-m" class="btn-next">📌 Bài kế</button>
+  <button id="btn-ai-copy-m" class="btn-copy">📋 Copy</button>
+
+</div>
+
+
+<!-- ==========================
+     LIBRARIES
+========================== -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+
+<!-- ==========================
+     RENDER MARKDOWN + LATEX
+========================== -->
+<script>
+(function(){
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+    highlight: (code, lang) => {
+      try { return hljs.highlight(code, { language: lang }).value; }
+      catch { return code; }
+    }
+  });
+
+  const out = document.getElementById("statement");
+  const src = document.getElementById("md-src");
+
+  out.innerHTML = DOMPurify.sanitize(marked.parse(src.value || ""), {
+    ADD_ATTR: ['target'],
+    ADD_TAGS: ['iframe']
+  });
+
+  if (window.renderMathInElement) {
+    renderMathInElement(out, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false }
+      ]
+    });
+  }
+
+  out.querySelectorAll("pre code").forEach(el => hljs.highlightElement(el));
+})();
+</script>
+
+
+<script>
+(function(){
+  const src = document.getElementById("editorial-md-src");
+  const out = document.getElementById("editorial-render");
+  if(!src || !out) return;
+
+  out.innerHTML = DOMPurify.sanitize(marked.parse(src.value || ""), {
+    ADD_ATTR:['target'],
+    ADD_TAGS:['iframe']
+  });
+
+  if(window.renderMathInElement){
+    renderMathInElement(out,{
+      delimiters:[
+        {left:"$$",right:"$$",display:true},
+        {left:"$", right:"$", display:false}
+      ]
+    });
+  }
+
+  out.querySelectorAll("pre code").forEach(el => hljs.highlightElement(el));
+})();
+</script>
+
+
+<!-- ==========================
+     AI BUTTONS
+========================== -->
+<script>
+function showAI(text,type='info'){
+  const box=document.getElementById('aiBox');
+  box.style.display='block';
+  box.innerHTML=(type==='error'?'⚠️ ':'🤖 ')+text;
+}
+
+async function callAI(api){
+  try{
+    const res=await fetch(api);
+    if(!res.ok) throw new Error(await res.text());
+    const data=await res.json();
+    showAI(data.hint || data.result || 'Không có gợi ý.');
+  }catch(e){
+    showAI('Không gọi được gợi ý AI.','error');
+  }
+}
+
+async function copyText(){
+  const txt=document.getElementById('statement').innerText;
+  try{
+    await navigator.clipboard.writeText(txt);
+    showAI('✅ Đã copy đề');
+  }catch{
+    showAI('Không copy được.','error');
+  }
+}
+
+document.getElementById('btn-ai-hint').onclick =
+  () => callAI("{% url 'problems:ai_hint' problem.id %}");
+document.getElementById('btn-ai-next').onclick =
+  () => callAI("{% url 'problems:ai_recommend' problem.id %}");
+document.getElementById('btn-ai-copy').onclick = copyText;
+
+document.getElementById('btn-ai-hint-m').onclick =
+  () => callAI("{% url 'problems:ai_hint' problem.id %}");
+document.getElementById('btn-ai-next-m').onclick =
+  () => callAI("{% url 'problems:ai_recommend' problem.id %}");
+document.getElementById('btn-ai-copy-m').onclick = copyText;
+
+document.getElementById('ai-fab').addEventListener('click', () => {
+  const m = document.getElementById('ai-menu');
+  m.style.display = (m.style.display === 'block' ? 'none' : 'block');
+});
+</script>
+
+{% endblock %}

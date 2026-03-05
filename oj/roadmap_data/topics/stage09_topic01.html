@@ -1,0 +1,371 @@
+<style>
+:root {
+  --blue-main: #2563eb;
+  --blue-dark: #1e3a8a;
+  --text-color: #1e293b;
+}
+
+/* ====== TEXT ======= */
+h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
+h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
+h3 { color: #334155; margin-top: 25px; }
+p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
+ul { margin-left: 1.4rem; }
+
+/* ====== CODE BLOCK ====== */
+pre {
+  background: #f1f5f9;
+  border-left: 4px solid var(--blue-main);
+  padding: 14px 18px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 15px;
+}
+code { font-family: Consolas, monospace; }
+
+/* ====== CALLOUT ======= */
+.callout {
+  border-left: 6px solid #10b981;
+  background: #ecfeff;
+  padding: 10px 12px;
+  border-radius:8px;
+  margin: 12px 0;
+}
+
+/* ====== SIMPLE GRAPH VISUAL ====== */
+.graph-demo {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  margin: 25px 0;
+}
+.node {
+  width: 70px; height: 70px;
+  background: var(--blue-main); color: white;
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:bold; font-size:20px;
+}
+.edge {
+  margin-top:25px;
+  font-size:28px; color:var(--blue-main);
+}
+</style>
+
+
+<h1>🕸️ Bài giảng: ĐỒ THỊ – GRAPH (Từ cơ bản → nâng cao)</h1>
+
+<p>
+Đồ thị (Graph) là một trong những chủ đề quan trọng nhất của Tin học.  
+Đồ thị xuất hiện trong: mạng xã hội, đường đi ngắn nhất, robot di chuyển, cây thư mục, lịch thi…  
+Các nội dung cần nắm bắt:
+</p>
+
+<ul>
+  <li>→ Hiểu được đỉnh, cạnh.</li>
+  <li>→ Biết lưu đồ thị, BFS/DFS.</li>
+  <li>→ Làm được bài connected component, đường đi.</li>
+  <li>→ Quy hoạch đồ thị, chu trình, bridge, articulation.</li>
+  <li>→ Khai thác sâu hơn: SCC, topo sort, DAG DP.</li>
+</ul>
+
+
+<!-- ===================================================== -->
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu các khái niệm cơ bản: đỉnh (vertex), cạnh (edge).</li>
+  <li>Phân biệt đồ thị có hướng / vô hướng.</li>
+  <li>Biết 2 cách lưu trữ: ma trận kề – danh sách kề.</li>
+  <li>Sử dụng được các thuật toán cơ bản: BFS, DFS.</li>
+  <li>Nhận diện dạng bài áp dụng đồ thị.</li>
+</ul>
+
+
+<!-- ===================================================== -->
+<h2>I. Đồ thị là gì?</h2>
+<p>
+Một đồ thị G gồm 2 phần:
+</p>
+<ul>
+  <li><b>V</b> – tập đỉnh</li>
+  <li><b>E</b> – tập cạnh nối giữa các đỉnh</li>
+</ul>
+
+<div class="callout">
+💡 Hãy hình dung: <b>mỗi đỉnh là 1 thành phố</b>, và <b>cạnh là đường nối</b>.
+</div>
+
+
+<!-- ===================================================== -->
+<h2>II. Ví dụ trực quan về đồ thị</h2>
+
+<p>Xét đồ thị vô hướng gồm <b>4 đỉnh</b> và <b>4 cạnh</b> như sau:</p>
+
+<div class="callout">
+<b>Tập đỉnh:</b> V = {1, 2, 3, 4}<br>
+<b>Tập cạnh:</b> E = {(1,2), (1,3), (2,4), (3,4)}
+</div>
+
+<h3>📌 1. Danh sách cạnh (Edge List)</h3>
+<pre><code>(1, 2)
+(1, 3)
+(2, 4)
+(3, 4)</code></pre>
+
+<h3>📌 2. Danh sách kề (Adjacency List)</h3>
+<pre><code>1: 2 3
+2: 1 4
+3: 1 4
+4: 2 3</code></pre>
+
+<h3>📌 3. Ma trận kề (Adjacency Matrix)</h3>
+<table>
+<thead>
+<tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
+</thead>
+<tbody>
+<tr><th>1</th><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><th>2</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><th>3</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><th>4</th><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+</tbody>
+</table>
+
+<h3>📌 4. Sơ đồ đồ thị</h3>
+
+<!-- Khung căn giữa -->
+<div style="
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  margin:20px 0;
+">
+  <div class="mermaid" style="text-align:center;">
+graph TD
+    %% Tầng 1
+    A1((1))
+
+    %% Tầng 2
+    A2((2))
+    A3((3))
+
+    %% Tầng 3
+    A4((4))
+    A5((5))
+    A6((6))
+    A7((7))
+
+    %% Tầng 4
+    A8((8))
+    A9((9))
+
+    %% Các cạnh
+    A1 --- A2
+    A1 --- A3
+
+    A2 --- A4
+    A2 --- A5
+
+    A3 --- A6
+    A3 --- A7
+
+    A4 --- A8
+    A6 --- A9
+  </div>
+</div>
+
+<!-- Mermaid JS CDN -->
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true });
+</script>
+
+
+
+
+
+
+
+<!-- ===================================================== -->
+<h2>III. Hai cách lưu trữ đồ thị</h2>
+
+<h3>1. Ma trận kề (Adjacency Matrix)</h3>
+<p>
+Ma trận A[n][n], trong đó:
+</p>
+
+<ul>
+  <li>A[u][v] = 1 nếu có cạnh u → v</li>
+  <li>A[u][v] = 0 nếu không có cạnh</li>
+</ul>
+
+<p><b>Ưu điểm:</b> nhanh kiểm tra có cạnh không O(1)<br>
+<b>Nhược điểm:</b> tốn bộ nhớ O(n²)</p>
+
+<h3>2. Danh sách kề (Adjacency List)</h3>
+<p>
+Mỗi đỉnh lưu danh sách các đỉnh kề.
+</p>
+
+<p><b>Ưu điểm:</b> tiết kiệm bộ nhớ, duyệt cạnh rất nhanh O(V+E)<br>
+<b>Nhược điểm:</b> kiểm tra tồn tại cạnh chậm hơn</p>
+
+<h4>💻 C++ – Tạo danh sách kề</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main(){
+    int n,m; cin >> n >> m;
+    vector&lt;vector&lt;int&gt;&gt; adj(n+1);
+
+    for(int i=0;i<m;i++){
+        int u,v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u); // vô hướng
+    }
+
+    for(int i=1;i<=n;i++){
+        cout << "Đỉnh " << i << ": ";
+        for(int v : adj[i]) cout << v << " ";
+        cout << "\n";
+    }
+}
+</code></pre>
+
+<h4>💻 Python</h4>
+<pre><code>n,m=map(int,input().split())
+adj=[[] for _ in range(n+1)]
+
+for _ in range(m):
+    u,v=map(int,input().split())
+    adj[u].append(v)
+    adj[v].append(u)
+
+for i in range(1,n+1):
+    print("Đỉnh",i,":",*adj[i])
+</code></pre>
+
+
+<!-- ===================================================== -->
+<h2>IV. Duyệt đồ thị – BFS & DFS</h2>
+
+<h3>1. BFS – Duyệt theo tầng</h3>
+
+<div class="callout">
+💡 BFS giống như “lan truyền” hoặc “xếp hàng tại ATM”.  
+Dùng Queue để duyệt lần lượt từng tầng.
+</div>
+
+<pre><code>// BFS từ đỉnh 1
+vector<int> vis(n+1);
+queue<int> q;
+q.push(1);
+vis[1]=1;
+
+while(!q.empty()){
+    int u=q.front(); q.pop();
+    for(int v:adj[u]){
+        if(!vis[v]){
+            vis[v]=1;
+            q.push(v);
+        }
+    }
+}
+</code></pre>
+
+<h3>2. DFS – Duyệt sâu</h3>
+<pre><code>void dfs(int u){
+    vis[u]=1;
+    for(int v:adj[u]){
+        if(!vis[v]) dfs(v);
+    }
+}
+</code></pre>
+
+
+<!-- ===================================================== -->
+<h2>V. Dạng bài quan trọng (HỌC SINH GIỎI CẦN BIẾT)</h2>
+
+<div class="callout"><b>1) Connected Components – số thành phần liên thông</b></div>
+<div class="callout"><b>2) Đường đi ngắn nhất BFS (trên đồ thị không trọng số)</b></div>
+<div class="callout"><b>3) Chu trình đồ thị (cycle detection)</b></div>
+<div class="callout"><b>4) Topo Sort – sắp xếp topo đồ thị có hướng</b></div>
+<div class="callout"><b>5) SCC – Thành phần liên thông mạnh (Kosaraju/Tarjan)</b></div>
+<div class="callout"><b>6) Tree DP – Quy hoạch động trên cây</b></div>
+
+
+<!-- ===================================================== -->
+<h2>VI. Nhận biết bài dùng đồ thị</h2>
+
+<div class="callout">
+<b>🟦 1) Bài có “lan truyền”, “mỗi bước đi 4 hướng”</b>  
+→ Dùng BFS.
+</div>
+
+<div class="callout">
+<b>🟩 2) Bài “đường đi ngắn nhất” nhưng trọng số = 1</b>  
+→ BFS.
+</div>
+
+<div class="callout">
+<b>🟧 3) Bài “có phụ thuộc”, “thứ tự làm việc”</b>  
+→ Topo Sort.
+</div>
+
+<div class="callout">
+<b>🟥 4) Bài nhiều nguồn – nhiều đích</b>  
+→ Multi-source BFS.
+</div>
+
+<div class="callout">
+<b>🟪 5) Bài cần xác định chu kỳ</b>  
+→ DFS.
+</div>
+
+
+<!-- ===================================================== -->
+<h2>VII. Bài tập luyện tập</h2>
+<p>Bài tập được chia theo cấp độ để học sinh yếu → giỏi đều theo được.</p>
+
+<h3>📘 Cơ bản – dành cho học sinh yếu</h3>
+<ol>
+  <li>Tạo danh sách kề từ input.</li>
+  <li>Đếm bậc (degree) của từng đỉnh.</li>
+  <li>Kiểm tra xem đồ thị có cạnh song song không.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý lời giải – Đếm bậc</b></summary>
+  <pre><code>for(int i=1;i<=n;i++)
+    cout << "deg(" << i << ") = " << adj[i].size();</code></pre>
+</details>
+
+
+<h3>📗 Trung bình – dành cho học sinh khá</h3>
+<ol>
+  <li>Tìm số thành phần liên thông (dùng DFS hoặc BFS).</li>
+  <li>Kiểm tra đồ thị có phải cây không.</li>
+  <li>Tìm đường đi từ s → t.</li>
+</ol>
+
+
+<h3>📙 Nâng cao – học sinh giỏi</h3>
+<ol>
+  <li>Tìm chu trình trong đồ thị vô hướng.</li>
+  <li>Tìm chu trình trong đồ thị có hướng (cycle detection).</li>
+  <li>Topo Sort.</li>
+</ol>
+
+
+<h3>🐉 HSG – Chuyên sâu</h3>
+<ol>
+  <li>Thuật toán Kosaraju tìm SCC.</li>
+  <li>Thuật toán Tarjan tìm articulation point / bridge.</li>
+  <li>DP trên cây: subtree size, đường kính cây.</li>
+</ol>
+
+
+<p style="text-align:center; color:#666; font-style:italic; margin-top:20px;">
+✨ Đồ thị là chủ đề cực lớn. Nắm vững cơ bản, BFS, DFS, và cách lưu trữ chính là chìa khóa để giải quyết 80% bài thi.
+</p>

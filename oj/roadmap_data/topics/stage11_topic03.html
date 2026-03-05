@@ -1,0 +1,58 @@
+<h2>🎯 Mục tiêu</h2>
+<ul>
+  <li>Biết cách tính nhanh tổng đoạn, cực trị bằng cây phân đoạn.</li>
+  <li>Hiểu cơ chế lưu mảng ở dạng cây để truy vấn O(log n).</li>
+</ul>
+
+<hr>
+
+<h2>💻 Segment Tree (C++)</h2>
+<pre><code>struct Seg{
+  int n;vector&lt;long long&gt; st;
+  Seg(int n):n(n){st.assign(4*n,0);}
+  void update(int id,int l,int r,int p,long long v){
+    if(l==r){st[id]=v;return;}
+    int m=(l+r)/2;
+    if(p&lt;=m)update(id*2,l,m,p,v);
+    else update(id*2+1,m+1,r,p,v);
+    st[id]=st[id*2]+st[id*2+1];
+  }
+  long long query(int id,int l,int r,int u,int v){
+    if(v&lt;l||r&lt;u)return 0;
+    if(u&lt;=l&&r&lt;=v)return st[id];
+    int m=(l+r)/2;
+    return query(id*2,l,m,u,v)+query(id*2+1,m+1,r,u,v);
+  }
+};</code></pre>
+
+<h2>💻 Fenwick Tree (Python)</h2>
+<pre><code>class Fenwick:
+  def __init__(self,n):
+    self.n=n;self.bit=[0]*(n+1)
+  def update(self,i,v):
+    while i&lt;=self.n:
+      self.bit[i]+=v
+      i+=i&-i
+  def sum(self,i):
+    s=0
+    while i&gt;0:
+      s+=self.bit[i]
+      i-=i&-i
+    return s
+fw=Fenwick(5)
+for i in range(1,6): fw.update(i,i)
+print(fw.sum(5)-fw.sum(2))</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập</h2>
+<ol>
+  <li>Viết hàm query(l, r) và update(i, x) cho Fenwick Tree.</li>
+  <li>Tính tổng các phần tử từ 1 đến n nhanh chóng.</li>
+</ol>
+
+<details><summary><b>💡 Gợi ý</b></summary>
+<pre><code>fw=Fenwick(10)
+fw.update(3,5)
+print(fw.sum(5)-fw.sum(2))</code></pre>
+</details>

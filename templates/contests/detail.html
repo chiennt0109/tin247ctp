@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+
+  <!-- 🔷 THÔNG TIN CONTEST -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <h3 class="fw-bold mb-1">{{ contest.name }}</h3>
+    <p class="text-muted mb-2">
+      🕒 <b>Bắt đầu:</b> {{ contest.start_time|date:"d/m/Y H:i" }} <br>
+      ⏳ <b>Kết thúc:</b> {{ contest.end_time|date:"d/m/Y H:i" }} <br>
+      📘 <b>Số bài:</b> {{ problems|length }}
+    </p>
+
+    {% if contest.description %}
+      <div class="border-top pt-3">{{ contest.description|safe }}</div>
+    {% endif %}
+  </div>
+
+  <!-- 📚 DANH SÁCH BÀI -->
+  {% if problems %}
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-light fw-bold">
+      📚 Danh sách bài trong cuộc thi
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th style="width: 140px;">Mã</th>
+            <th>Tên bài</th>
+            <th class="text-center" style="width:160px;">Thao tác</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for letter, p in problems_with_letters %}
+          <tr>
+
+            <!-- A, B, C, D -->
+            <td class="fw-bold text-primary">{{ letter }}</td>
+            <td class="fw-semibold text-primary">
+
+              {% if contest_state == "ended" %}
+                {{ p.code }}
+
+              {% elif contest_state == "not_started" %}
+                {{ p.code }}
+
+              {% else %}
+                <a href="{% url 'problems:problem_detail' p.id %}?contest_id={{ contest.id }}">
+                  {{ p.code }}
+                </a>
+              {% endif %}
+
+            </td>            
+            <td class="fw-semibold text-primary">
+
+              {% if contest_state == "ended" %}
+                {{ p.title }}
+
+              {% elif contest_state == "not_started" %}
+                {{ p.title }}
+
+              {% else %}
+                <a href="{% url 'problems:problem_detail' p.id %}?contest_id={{ contest.id }}">
+                  {{ p.title }}
+                </a>
+              {% endif %}
+
+            </td>
+           
+            <td class="text-center">
+
+             {% if contest_state == "ended" %}
+                  <a href="{% url 'problems:problem_detail' p.id %}?view=editorial&contest_id={{ contest.id }}"
+                     class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                      📘 Xem lời giải
+                  </a>
+              {% elif contest_state == "not_started" %}
+                  <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>
+                    ⏳ Chưa bắt đầu
+                  </button>
+              {% else %}
+                  <a href="{% url 'problems:problem_detail' p.id %}?contest_id={{ contest.id }}"
+                     class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                      🚀 Làm bài
+                  </a>
+              {% endif %}
+
+
+            </td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+    <p class="text-muted text-center mt-4">❗ Cuộc thi này chưa có bài nào.</p>
+  {% endif %}
+
+</div>
+
+<!-- 🌐 Điều hướng -->
+<div class="d-flex justify-content-between align-items-center mt-4 container">
+  <a href="{% url 'contests:contest_list' %}" class="btn btn-outline-secondary rounded-pill">
+    ← Danh sách contest
+  </a>
+
+  <a href="{% url 'contests:contest_rank' contest.id %}" class="btn btn-outline-success rounded-pill">
+    🏅 Bảng xếp hạng
+  </a>
+</div>
+
+<style>
+.table-hover tbody tr:hover { 
+  background-color:#f8fafc !important; 
+  transition: 0.15s; 
+}
+.btn-sm { font-size:0.82rem; }
+.card-header { font-size: 1rem; }
+</style>
+
+{% endblock %}

@@ -1,0 +1,1224 @@
+<style>
+  :root {
+    --blue-main: #2563eb;
+    --blue-dark: #1d4ed8;
+    --accent-neon: #38bdf8;
+    --slate-50:#f8fafc;
+    --slate-100:#f1f5f9;
+    --slate-200:#e2e8f0;
+    --slate-700:#334155;
+    --slate-900:#0f172a;
+  }
+
+  .arena-lesson {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--slate-900);
+  }
+
+  /* ⭐ FIX: Hiển thị style cho bullet list */
+  .arena-lesson ul {
+    margin: 8px 0 8px 22px;
+    padding-left: 18px;
+    list-style-type: disc;
+  }
+
+  .arena-lesson ul ul {
+    margin-top: 4px;
+    list-style-type: circle;
+  }
+
+  .arena-lesson li {
+    margin-bottom: 4px;
+  }
+  /* ⭐ END FIX */
+
+  .arena-lesson h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--blue-dark);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 0;
+  }
+
+  .arena-lesson h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--blue-main);
+    border-left: 5px solid var(--blue-main);
+    padding-left: 10px;
+    margin-top: 26px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .arena-lesson h3 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--slate-700);
+    margin-top: 18px;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .arena-box {
+    background: var(--slate-50);
+    border-radius: 12px;
+    border: 1px solid var(--slate-200);
+    padding: 14px 16px;
+    margin: 16px 0;
+  }
+
+  .algo-step {
+    background: #e0f2fe;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin: 10px 0;
+  }
+
+  .arena-callout {
+    background:#eef2ff;
+    border-radius:10px;
+    padding:10px 12px;
+    margin:10px 0;
+  }
+
+  .arena-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 14px;
+  }
+
+  .arena-table th,
+  .arena-table td {
+    border: 1px solid #cbd5f5;
+    padding: 6px 8px;
+    vertical-align: top;
+  }
+
+  .arena-table th {
+    background: #e5edff;
+  }
+
+  .code-box {
+    background:#0f172a;
+    color:#e5e7eb;
+    border-radius:10px;
+    padding:12px 14px;
+    margin:12px 0;
+    font-family:Consolas,Menlo,monospace;
+    font-size:13px;
+    overflow-x:auto;
+  }
+
+  .code-label {
+    font-size: 13px;
+    color: #bfdbfe;
+    margin-bottom: 4px;
+  }
+
+  .svg-box {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid var(--slate-200);
+    padding: 10px;
+    margin: 10px 0;
+  }
+</style>
+
+<style>
+  /* ==== Mục 4 (Miller–Rabin) ==== */
+
+  .algo-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 18px 0;
+  }
+
+  .algo-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .algo-step-box {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 8px;
+  }
+
+  .algo-step-box strong {
+    color: #1d4ed8;
+  }
+
+  .algo-sub {
+    background: #f1f5f9;
+    border-left: 4px solid #64748b;
+    padding: 8px 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .algo-example {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin: 14px 0;
+  }
+
+  .algo-math {
+    margin-left: 18px;
+    font-size: 15px;
+    padding: 4px 0;
+  }
+
+  .algo-list {
+    margin-left: 22px;
+    list-style-type: disc;
+  }
+</style>
+
+<div class="arena-lesson">
+
+  <h2>🎓 MỘT SỐ PHƯƠNG PHÁP KIỂM TRA SỐ NGUYÊN TỐ CƠ BẢN</h2>
+
+  <!-- I. SỐ NGUYÊN TỐ VÀ LÝ DO PHẢI TỐI ƯU -->
+  <h2>🧠 I. Số nguyên tố và lý do phải tối ưu</h2>
+
+  <div class="arena-box">
+    <h3>1. Số nguyên tố là gì?</h3>
+
+    <p>Một số lớn hơn 1 và chỉ chia hết cho 1 và chính nó được gọi là số nguyên tố.</p>
+
+    <p>Ví dụ:<br>
+    2, 3, 5, 7, 11, 13, …</p>
+
+    <p>Có thể hiểu đơn giản:</p>
+    <ul>
+      <li>Nếu thử chia số đó cho bất kỳ số nào khác ngoài 1 và chính nó → luôn dư → số nguyên tố.</li>
+      <li>Nếu tìm được số nào chia hết → hợp số, không phải nguyên tố.</li>
+    </ul>
+
+    <!-- Hình minh họa: nguyên tố vs hợp số -->
+    <div class="svg-box" align="center">
+      <svg>  
+        <rect x="120" y="25" width="60" height="50" fill="#fee2e2" stroke="#ef4444"/>
+        <text x="150" y="55" font-size="22" text-anchor="middle">100</text>
+        <text x="150" y="20" font-size="12" text-anchor="middle">hợp số</text>
+        
+        <rect x="15" y="25" width="60" height="50" fill="#dcfce7" stroke="#16a34a"/>
+        <text x="45" y="55" font-size="22" text-anchor="middle">47</text>
+        <text x="45" y="20" font-size="12" text-anchor="middle">nguyên tố</text>
+      </svg>
+    </div>
+
+    <h3>2. Nhu cầu tối ưu – Tại sao không phải bài nào cũng dùng cùng một cách?</h3>
+
+    <p>Trong thực tế, dạng bài kiểm tra số nguyên tố rất đa dạng:</p>
+    <ul>
+      <li>Kiểm tra 1 số nhỏ</li>
+      <li>Kiểm tra hàng triệu số liên tiếp</li>
+      <li>Tìm số nguyên tố trong đoạn rất lớn</li>
+      <li>Kiểm tra một số khổng lồ (100 chữ số trở lên)</li>
+    </ul>
+
+    <p>Ví dụ để thấy độ khó tăng nhanh:</p>
+    <ul>
+      <li>Nếu N = 10⁹ → √N ≈ 30.000</li>
+      <li>Nếu N = 10¹⁸ → √N = 1.000.000.000 (1 tỷ)</li>
+      <li>Nếu N có 300 chữ số → √N có ~150 chữ số → việc chia thử là bất khả thi.</li>
+    </ul>
+
+    <!-- Hình minh họa: N lớn lên, sqrt(N) phình ra -->
+    <div class="svg-box" align=center>
+      <svg width="100%" height="80">
+        <line x1="40" y1="60" x2="260" y2="60" stroke="#94a3b8" stroke-width="2"/>
+        <rect x="50" y="40" width="40" height="20" fill="#bfdbfe" stroke="#3b82f6"/>
+        <text x="70" y="54" font-size="11" text-anchor="middle">10⁹</text>
+
+        <rect x="120" y="30" width="60" height="30" fill="#bfdbfe" stroke="#3b82f6"/>
+        <text x="150" y="49" font-size="11" text-anchor="middle">10¹⁸</text>
+
+        <rect x="210" y="20" width="80" height="40" fill="#bfdbfe" stroke="#3b82f6"/>
+        <text x="250" y="44" font-size="11" text-anchor="middle">300 chữ số</text>
+
+        <text x="70" y="20" font-size="9" text-anchor="middle">√N ~ 3×10⁴</text>
+        <text x="150" y="18" font-size="9" text-anchor="middle">√N = 10⁹</text>
+        <text x="250" y="12" font-size="9" text-anchor="middle">√N ~ 150 chữ số</text>
+      </svg>
+    </div>
+
+    <p>Kết luận:<br>
+    → Phải chọn đúng thuật toán phù hợp với kích thước và mục tiêu của bài toán.<br>
+    → Không có thuật toán “vạn năng”.</p>
+  </div>
+
+  <!-- II. DANH SÁCH CÁC THUẬT TOÁN -->
+  <h2>📋 II. Một số thuật toán kiểm tra số nguyên tố cơ bản</h2>
+
+  <div class="arena-box">
+    <table class="arena-table">
+      <tr>
+        <th>STT</th><th>Thuật toán</th><th>Mục tiêu chính</th>
+      </tr>
+      <tr>
+        <td>1</td><td>Trial Division</td><td>Nền tảng, độ chính xác 100%, dùng cho N nhỏ</td>
+      </tr>
+      <tr>
+        <td>2</td><td>Sàng Eratosthenes</td><td>Tìm toàn bộ số nguyên tố trong phạm vi nhỏ</td>
+      </tr>
+      <tr>
+        <td>3</td><td>Sàng trên đoạn (Segmented Sieve)</td><td>Tối ưu sàng Eratosthenes khi [L,R] lớn</td>
+      </tr>
+      <tr>
+        <td>4</td><td>Miller–Rabin</td><td>Kiểm tra tính nguyên tố của số N rất lớn</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- III. CHI TIẾT TỪNG THUẬT TOÁN -->
+  <h2>🧩 III. Thuật toán chi tiết</h2>
+
+  <!-- 1) TRIAL DIVISION -->
+  <h3>1️⃣ Trial Division (Chia thử)</h3>
+
+  <div class="arena-box">
+    <h3>1.1. Cơ chế hoạt động</h3>
+
+    <p>Muốn kiểm tra N</p>
+    <p>Duyệt i từ 2 → √N</p>
+    <p>Nếu N % i == 0 → hợp số</p>
+    <p>Nếu duyệt hết không chia được → nguyên tố</p>
+
+    <!-- Hình minh họa: chia thử đến sqrt(N) -->
+    <div class="svg-box">
+      <svg width="100%" height="90">
+        <text x="15" y="20" font-size="14">Ví dụ N = 37, √N ≈ 6</text>
+        <rect x="20" y="30" width="40" height="40" fill="#dbeafe" stroke="#3b82f6"/>
+        <text x="40" y="58" text-anchor="middle">2</text>
+        <rect x="80" y="30" width="40" height="40" fill="#dbeafe" stroke="#3b82f6"/>
+        <text x="100" y="58" text-anchor="middle">3</text>
+        <rect x="140" y="30" width="40" height="40" fill="#dbeafe" stroke="#3b82f6"/>
+        <text x="160" y="58" text-anchor="middle">4</text>
+        <rect x="200" y="30" width="40" height="40" fill="#dbeafe" stroke="#3b82f6"/>
+        <text x="220" y="58" text-anchor="middle">5</text>
+        <rect x="260" y="30" width="40" height="40" fill="#dbeafe" stroke="#3b82f6"/>
+        <text x="280" y="58" text-anchor="middle">6</text>
+      </svg>
+    </div>
+
+    <h3>1.2. Ví dụ</h3>
+
+    <p>N = 37<br>
+    √37 ≈ 6<br>
+    Thử chia 2,3,4,5,6 → không số nào chia được → 37 là nguyên tố.</p>
+
+    <h3>1.3. Ưu điểm – nhược điểm</h3>
+
+    <table class="arena-table">
+      <tr>
+        <th>Ưu điểm</th><th>Nhược điểm</th>
+      </tr>
+      <tr>
+        <td>Dễ hiểu, dễ cài đặt</td>
+        <td>Chậm khi N lớn hoặc nhiều test</td>
+      </tr>
+      <tr>
+        <td>Độ chính xác tuyệt đối</td>
+        <td>Độ phức tạp O(√N)</td>
+      </tr>
+    </table>
+
+    <h3>1.4. Áp dụng trong bài toán</h3>
+    <p>✔ Dùng khi:</p>
+    <ul>
+      <li>Kiểm tra vài số (≤10³)</li>
+      <li>Mỗi số ≤10⁹</li>
+    </ul>
+
+    <p>✔ Ví dụ:</p>
+    <ul>
+      <li>“Cho N ≤ 10⁹, kiểm tra N có phải số nguyên tố không.”</li>
+      <li>“Cho mảng 1000 số, mỗi số ≤10⁹, đếm số nguyên tố.”</li>
+    </ul>
+
+    <p>❌ Không dùng khi:</p>
+    <ul>
+      <li>N rất lớn (≥10¹²)</li>
+      <li>Các bài có số lượng đầu vào lớn (≥10⁶ số) → chắc chắn TLE.</li>
+    </ul>
+
+    <h3>1.5. Code</h3>
+
+    <div class="code-box">
+      <div class="code-label">C++</div>
+<pre><code>bool isPrime(long long n) {
+    if (n < 2) return false;
+    for (long long i = 2; i * i <= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}
+</code></pre>
+    </div>
+
+    <div class="code-box">
+      <div class="code-label">Python</div>
+<pre><code>def is_prime(n):
+    if n &lt; 2:
+        return False
+    i = 2
+    while i * i &lt;= n:
+        if n % i == 0:
+            return False
+        i += 1
+    return True
+</code></pre>
+    </div>
+  </div>
+
+  <!-- 2) SÀNG ERATOSTHENES -->
+  <h3>2️⃣ Sàng Eratosthenes (Sieve of Eratosthenes)</h3>
+
+  <div class="arena-box">
+    <h3>2.1. Cơ chế hoạt động</h3>
+
+    <p>Thuật toán sử dụng mảng đánh dấu kích thước 10⁶–10⁷.</p>
+
+    <p><b>Nguyên tắc chính:</b></p>
+    <p>Nếu p là nguyên tố → tất cả bội số của p: 2p, 3p, 4p… đều là hợp số.</p>
+
+    <p><b>Quy trình:</b></p>
+    <ul>
+      <li>Tạo mảng đánh dấu từ 2 đến N</li>
+      <li>Bắt đầu từ p = 2</li>
+      <li>Gạch bội số của p</li>
+      <li>Tìm p tiếp theo chưa bị gạch</li>
+      <li>Lặp đến khi p > √N</li>
+    </ul>
+
+    <!-- Hình minh họa: gạch bội số -->
+    <div class="svg-box">
+      <svg width="100%" height="120">
+        <text x="15" y="20" font-size="13">Minh họa gạch bội số trong sàng</text>
+        <text x="25" y="40" font-size="12">2</text>
+        <text x="55" y="40" font-size="12">3</text>
+        <text x="85" y="40" font-size="12">4</text>
+        <text x="115" y="40" font-size="12">5</text>
+        <text x="145" y="40" font-size="12">6</text>
+        <text x="175" y="40" font-size="12">7</text>
+        <text x="205" y="40" font-size="12">8</text>
+        <text x="235" y="40" font-size="12">9</text>
+
+        <circle cx="25" cy="70" r="14" fill="#bbf7d0" stroke="#22c55e"/>
+        <circle cx="55" cy="70" r="14" fill="#bbf7d0" stroke="#22c55e"/>
+        <circle cx="115" cy="70" r="14" fill="#bbf7d0" stroke="#22c55e"/>
+        <circle cx="175" cy="70" r="14" fill="#bbf7d0" stroke="#22c55e"/>
+
+          
+        <circle cx="85" cy="70" r="14" fill="#fecaca" stroke="#ef4444"/>
+        <line x1="75" y1="60" x2="95" y2="80" stroke="#ef4444" stroke-width="2"/>
+        <line x1="75" y1="80" x2="95" y2="60" stroke="#ef4444" stroke-width="2"/>
+
+        <circle cx="145" cy="70" r="14" fill="#fecaca" stroke="#ef4444"/>
+        <line x1="135" y1="60" x2="155" y2="80" stroke="#ef4444" stroke-width="2"/>
+        <line x1="135" y1="80" x2="155" y2="60" stroke="#ef4444" stroke-width="2"/>
+
+        <circle cx="205" cy="70" r="14" fill="#fecaca" stroke="#ef4444"/>
+        <line x1="195" y1="60" x2="215" y2="80" stroke="#ef4444" stroke-width="2"/>
+        <line x1="195" y1="80" x2="215" y2="60" stroke="#ef4444" stroke-width="2"/>
+        
+        <circle cx="235" cy="70" r="14" fill="#fecaca" stroke="#ef4444"/>        
+        <line x1="225" y1="60" x2="245" y2="80" stroke="#ef4444" stroke-width="2"/>
+        <line x1="225" y1="80" x2="245" y2="60" stroke="#ef4444" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <h3>2.2. Độ phức tạp</h3>
+
+    <p>Thời gian: O(N log N)</p>
+    <p>Bộ nhớ: O(N)</p>
+
+    <h3>2.3. Áp dụng trong bài toán</h3>
+
+    <p>✔ Dùng khi:</p>
+    <ul>
+      <li>N ≤ 10⁷ hoặc 5×10⁷</li>
+      <li>Cần tạo danh sách nguyên tố để sử dụng nhiều lần</li>
+      <li>Bài toán có nhiều truy vấn kiểm tra nguyên tố</li>
+    </ul>
+
+    <p>✔ Ví dụ:</p>
+    <ul>
+      <li>“Liệt kê prime từ 1 đến N (N ≤10⁷).”</li>
+      <li>“Tính tổng số lượng prime trong đoạn [1, N].”</li>
+      <li>“Cho Q truy vấn: kiểm tra prime nhanh.”</li>
+    </ul>
+
+    <p>❌ Không dùng khi:</p>
+    <ul>
+      <li>N ≥ 10¹⁰ hoặc 10¹² → mảng không chứa nổi</li>
+      <li>Chỉ kiểm tra 1 số → sàng quá dư</li>
+    </ul>
+
+    <h3>2.4. Code</h3>
+
+    <div class="code-box">
+      <div class="code-label">C++</div>
+<pre><code>const int N = 10000000;
+bool prime[N+1];
+
+void sieve() {
+    fill(prime, prime+N+1, true);
+    prime[0] = prime[1] = false;
+
+    for (int i = 2; i * i <= N; i++) {
+        if (prime[i]) {
+            for (int j = i*i; j <= N; j += i)
+                prime[j] = false;
+        }
+    }
+}
+</code></pre>
+    </div>
+
+    <div class="code-box">
+      <div class="code-label">Python</div>
+<pre><code>def sieve(N):
+    prime = [True] * (N+1)
+    prime[0] = prime[1] = False
+
+    p = 2
+    while p * p <= N:
+        if prime[p]:
+            for j in range(p*p, N+1, p):
+                prime[j] = False
+        p += 1
+    return prime
+</code></pre>
+    </div>
+  </div>
+
+  <!-- 3) SEGMENTED SIEVE -->
+  <h3>3️⃣ Sàng trên đoạn (Segmented Sieve)</h3>
+
+  <div class="arena-box">
+    <h3>3.1. Vấn đề</h3>
+
+    <p>Không thể dùng sàng Eratosthenes cho R=10¹² vì cần mảng 10¹² phần tử → không khả thi.</p>
+
+    <h3>3.2. Nguyên tắc cốt lõi</h3>
+
+    <p>Một hợp số N luôn có 1 ước nguyên tố ≤√N.</p>
+    <p>→ Vì vậy chỉ cần prime ≤√R để gạch trong đoạn [L, R].</p>
+
+    <h3>3.3. Quy trình</h3>
+    <p>Bước 1 – Sàng nhỏ</p>
+    <p>Dùng sàng Eratosthenes để tìm tất cả prime p ≤ √R.</p>
+
+    <p>Bước 2 – Sàng đoạn</p>
+    <ul>
+      <li>Tạo mảng mark có size R-L+1</li>
+      <li>Với mỗi prime p:
+        <ul>
+          <li>Tìm bội số đầu tiên trong đoạn</li>
+          <li>Gạch dần từng bội số</li>
+        </ul>
+      </li>
+    </ul>
+
+    <!-- Hình minh họa: đoạn [L,R] và các ô bị gạch -->
+    <div class="svg-box">
+      <svg width="100%" height="90">
+        <text x="20" y="20" font-size="13">Minh họa đoạn [L, R]</text>
+        <rect x="20" y="30" width="40" height="40" fill="#fef3c7" stroke="#f59e0b"/>
+        <rect x="70" y="30" width="40" height="40" fill="#fecaca" stroke="#dc2626"/>
+        <line x1="80" y1="40" x2="100" y2="60" stroke="#dc2626" stroke-width="2"/>
+        <line x1="80" y1="60" x2="100" y2="40" stroke="#dc2626" stroke-width="2"/>
+        <rect x="120" y="30" width="40" height="40" fill="#fef3c7" stroke="#f59e0b"/>
+        <rect x="170" y="30" width="40" height="40" fill="#fecaca" stroke="#dc2626"/>
+        <line x1="180" y1="40" x2="200" y2="60" stroke="#dc2626" stroke-width="2"/>
+        <line x1="180" y1="60" x2="200" y2="40" stroke="#dc2626" stroke-width="2"/>
+        <rect x="220" y="30" width="40" height="40" fill="#fef3c7" stroke="#f59e0b"/>
+      </svg>
+    </div>
+
+    <h3>3.4. Độ phức tạp</h3>
+
+    <p>Bộ nhớ: O(√R + (R-L))</p>
+    <p>Cho phép tìm prime trong đoạn lên đến 10¹².</p>
+
+    <h3>3.5. Áp dụng trong bài toán</h3>
+
+    <p>✔ Khi dùng:</p>
+    <p>“Tìm prime trong đoạn [L, R], L, R ≤10¹², R-L ≤10⁶”.</p>
+
+    <p>✔ Thường gặp ở:</p>
+    <ul>
+      <li>Bài nâng cao</li>
+      <li>HSG Tỉnh</li>
+      <li>VNOI, VOI</li>
+    </ul>
+
+    <p>❌ Không dùng khi:</p>
+    <ul>
+      <li>N ≤10⁷ → sàng thường đủ</li>
+      <li>Kiểm tra 1 số → Miller–Rabin</li>
+    </ul>
+
+    <h3>3.6. Code</h3>
+
+    <div class="code-box">
+      <div class="code-label">C++</div>
+<pre><code>vector<long long> segmented_sieve(long long L, long long R) {
+    long long limit = sqrt(R) + 1;
+    vector<bool> mark(R - L + 1, true);
+
+    // Sàng nhỏ
+    vector<bool> isPrime(limit + 1, true);
+    for (long long i = 2; i * i <= limit; i++)
+        if (isPrime[i])
+            for (long long j = i*i; j <= limit; j += i)
+                isPrime[j] = false;
+
+    vector<long long> primes;
+    for (long long i = 2; i <= limit; i++)
+        if (isPrime[i]) primes.push_back(i);
+
+    // Sàng đoạn
+    for (long long p : primes) {
+        long long start = max(p*p, ((L + p - 1) / p) * p);
+        for (long long j = start; j <= R; j += p)
+            mark[j - L] = false;
+    }
+
+    vector<long long> result;
+    for (long long i = 0; i < (long long)mark.size(); i++)
+        if (mark[i] && (i + L) >= 2)
+            result.push_back(i + L);
+
+    return result;
+}
+</code></pre>
+    </div>
+
+    <p>Python</p>
+
+
+    <div class="code-box">
+      <div class="code-label">Python</div>
+<pre><code>def segmented_sieve(L, R):
+    import math
+    limit = int(math.sqrt(R)) + 1
+
+    # Sàng nhỏ
+    prime_small = [True] * (limit+1)
+    for i in range(2, int(math.sqrt(limit))+1):
+        if prime_small[i]:
+            for j in range(i*i, limit+1, i):
+                prime_small[j] = False
+    primes = [i for i in range(2, limit+1) if prime_small[i]]
+
+    # Sàng đoạn
+    mark = [True] * (R-L+1)
+    for p in primes:
+        start = max(p*p, ((L+p-1)//p)*p)
+        for j in range(start, R+1, p):
+            mark[j-L] = False
+
+    return [L+i for i in range(R-L+1) if mark[i] and (L+i)>=2]
+</code></pre>
+    </div>
+  </div>
+
+  <!-- 4) MILLER–RABIN -->
+  <h3>4️⃣ Miller–Rabin (Kiểm tra nguyên tố hiện đại)</h3>
+
+  <div class="arena-box">
+    <h3>4.1. Cơ chế hoạt động </h3>
+
+    <p>Đây là thuật toán xác suất:</p>
+    <ul>
+      <li>Nếu tìm thấy nhân chứng → N chắc chắn hợp số.</li>
+      <li>Nếu tất cả cơ số đều vượt qua → N là số nguyên tố xác suất.</li>
+    </ul>
+
+    <p>Với tập cơ số chuẩn → kết quả chính xác 100% cho N ≤ 2⁶⁴.</p>
+
+    <h3>4.2. Cơ sở toán học</h3>
+
+    <p>Khai triển:</p>
+    <p style="margin-left:12px;">
+      N − 1 = 2<sup>s</sup> · d, với d là số lẻ.
+    </p>
+    
+    <p>Với một cơ số ngẫu nhiên a (1 &lt; a &lt; N − 1), nếu N là số nguyên tố thì
+    <b>một trong hai điều kiện sau</b> phải đúng:</p>
+    
+    <ul>
+      <li>
+        Điều kiện 1:
+        <div style="margin-left:24px; margin-top:4px;">
+          a<sup>d</sup> ≡ 1 (mod N)
+        </div>
+      </li>
+    
+      <li style="margin-top:6px;">
+        Điều kiện 2:
+        <div style="margin-left:24px; margin-top:4px;">
+          a<sup>(2<sup>r</sup> · d)</sup> ≡ N − 1 (mod N)
+        </div>
+        <div style="margin-left:24px; font-size:13px; margin-top:2px;">
+          cho một số r nào đó, với 0 ≤ r &lt; s
+          (N − 1 ≡ −1 (mod N)).
+        </div>
+      </li>
+    </ul>
+    
+    <p>Nếu không có điều kiện nào đúng → N là hợp số.</p>
+   <hr>
+    <!-- 🔎 Ví dụ Miller–Rabin với số hợp số N = 561 -->
+        <h3>Ví dụ 1: N = 561</h3>
+        
+    
+        
+        <h4><b>Bước 1</b>. Khai triển N − 1</h4>
+        <p>
+          Với <code>N = 561</code> ta có:<br>
+          <code>N − 1 = 561 − 1 = 560 = 2<sup>4</sup> · 35</code><br>
+          Tức là ta viết được:
+        </p>
+        <ul>
+          <li><code>s = 4</code></li>
+          <li><code>d = 35</code> (d là số lẻ)</li>
+        </ul>
+        <p>
+          Chuỗi cần kiểm tra sẽ là các giá trị  <code>a<sup>(2<sup>r</sup> · d)</sup></code> với số <code>r</code> thoả mã <code>0 ≤ r &lt; s</code>:<br>
+          <code>a<sup>d</sup>, a<sup>2d</sup>, a<sup>4d</sup>, a<sup>8d</sup> (mod N)</code>.
+        </p>
+        
+        <h4><b>Bước 2</b>. Chọn một cơ số a</h4>
+        <p>
+          Dùng một cơ số trong tập các cơ số kiểm tra:
+          <code>A = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37}</code>.<br>
+          Ở đây ta chọn cơ số đơn giản:
+          <code>a = 2</code>.
+        </p>
+        
+        <h4><b>Bước 3</b>. Tính giá trị ban đầu x = a<sup>d</sup> mod N</h4>
+        <p>
+          Ta cần tính:
+          <code>x = a<sup>d</sup> mod N = 2<sup>35</sup> mod 561</code>.
+        </p>
+        <p>
+          Do số mũ lớn, trong chương trình ta sẽ dùng hàm lũy thừa modulo an toàn
+          (hàm <code>power_mod</code>) để tránh tràn số. Kết quả tính được là:
+        </p>
+        <p>
+          <code>x = 263</code>
+        </p>
+        
+        <p>Kiểm tra Điều kiện 1 của Miller–Rabin:</p>
+        <ul>
+          <li><code>x == 1 (mod 561)</code>? → Không.</li>
+          <li><code>x == N − 1 = 560 (mod 561)</code>? → Không.</li>
+        </ul>
+        <p>
+          Như vậy <code>a<sup>d</sup></code> không rơi vào 1 hoặc N − 1.
+          Thuật toán không kết luận được ở bước này, nên phải chuyển sang
+          bước bình phương liên tiếp (vòng lặp với <code>0 ≤ r &lt; s</code>).
+        </p>
+        
+        <h4><b>Bước 4</b>. Vòng bình phương liên tiếp</h4>
+        <ul>
+        
+        <li><strong>Lần 1:</strong></li>
+        <p>
+          <code>x = x<sup>2</sup> mod 561 = 263<sup>2</sup> mod 561 = 166</code><br>
+          Ta thấy:
+        </p>
+        <ul>
+          <li>166 ≠ 560 (tức N − 1)</li>
+          <li>166 ≠ 1</li>
+        </ul>
+        <p>⇒ Tiếp tục bình phương.</p>
+        
+        <li><strong>Lần 2:</strong></li>
+        <p>
+          <code>x = 166<sup>2</sup> mod 561 = 67</code><br>
+          Ta thấy:
+        </p>
+        <ul>
+          <li>67 ≠ 560</li>
+          <li>67 ≠ 1</li>
+        </ul>
+        <p>⇒ Tiếp tục.</p>
+        
+        <li><strong>Lần 3:</strong></li>
+        <p>
+          <code>x = 67<sup>2</sup> mod 561 = 1</code>
+        </p>
+        </ul>
+        <p>
+          Đây là một tình huống <strong>sai phạm</strong> trong Miller–Rabin:
+        </p>
+        <ul>
+          <li>
+            Nếu trong quá trình bình phương liên tiếp, ta gặp <code>1</code> 
+            <em>trước khi từng gặp</em> <code>N − 1</code>, thì số đang kiểm tra 
+            <strong>chắc chắn là hợp số</strong>.
+          </li>
+        </ul>
+        
+        <p>
+          Nói cách khác: <code>a = 2</code> là một “nhân chứng” (witness) chứng minh rằng
+          <code>561</code> là hợp số.
+        </p>
+        
+        <h4>Kết luận</h4>
+        <p>
+          <code>561</code> là một <strong>hợp số</strong> (composite). Thuật toán Miller–Rabin
+          chỉ cần duy nhất cơ số <code>a = 2</code> đã phát hiện được điều này.
+        </p>
+        
+        <hr>
+        
+        <!-- ✅ Ví dụ Miller–Rabin với số nguyên tố N = 37 -->
+        <h3>Ví dụ 2: N = 37 </h3>
+        
+        <p><strong>Mục tiêu:</strong> Dùng Miller–Rabin để thấy chuỗi bình phương “đúng” của một số nguyên tố.</p>
+        
+        <h4><b>Bước 1</b>. Khai triển N − 1</h4>
+        <p>
+          Với <code>N = 37</code> ta có:<br>
+          <code>N − 1 = 37 − 1 = 36 = 2<sup>2</sup> · 9</code><br>
+          Suy ra:
+        </p>
+        <ul>
+          <li><code>s = 2</code></li>
+          <li><code>d = 9</code></li>
+        </ul>
+        <p>
+          Chuỗi cần kiểm tra là:
+          <code>a<sup>d</sup>, a<sup>2d</sup>, a<sup>4d</sup> (mod N)</code>.
+        </p>
+        
+        <h4><b>Bước 2</b>. Chọn một cơ số a</h4>
+        <p>
+          Chọn cơ số nhỏ, thông dụng:
+          <code>a = 2</code>.
+        </p>
+        
+        <h4><b>Bước 3</b>. Tính giá trị ban đầu x = a<sup>d</sup> mod N</h4>
+        <p>
+          Ta tính:
+          <code>x = 2<sup>9</sup> mod 37 = 512 mod 37 = 31</code>.
+        </p>
+        
+        <p>Kiểm tra Điều kiện 1:</p>
+        <ul>
+          <li><code>x == 1 (mod 37)</code>? → Không.</li>
+          <li><code>x == N − 1 = 36 (mod 37)</code>? → Không.</li>
+        </ul>
+        <p>
+          Không thỏa Điều kiện 1 → ta chuyển sang bước bình phương liên tiếp 
+          (kiểm tra Điều kiện 2).
+        </p>
+        
+        <h4><b>Bước 4</b>. Vòng bình phương liên tiếp</h4>
+        <ul>
+        <li><strong>Lần 1:</strong></li>
+        <p>
+          <code>x = x<sup>2</sup> mod 37 = 31<sup>2</sup> mod 37 = 961 mod 37 = 36</code><br>
+          Ta được:
+          <code>x = 36 = N − 1</code>.
+        </p>
+        <p>
+          Đây chính là Điều kiện 2 của Miller–Rabin: tồn tại một r sao cho
+          <code>a<sup>2<sup>r</sup> · d</sup> ≡ N − 1 (mod N)</code>.
+        </p>
+        
+        <p>
+          Khi gặp <code>x = N − 1</code> trong chuỗi bình phương, thuật toán coi cơ số
+          <code>a = 2</code> là không phát hiện được sai phạm.<br> Kết luận:
+          <code>N</code> có thể là số nguyên tố. Kiểm tra với các cơ số khác cùng điều kiện sẽ cho câu trả lời chính xác 100%.
+        </p>
+        
+        <h4>Chuỗi giá trị đầy đủ để quan sát</h4>
+        <p>Để dễ hình dung, ta có thể nhìn cả chuỗi:</p>
+        <ul>
+          <li>Bước đầu: <code>x = 2<sup>9</sup> mod 37 = 31</code></li>
+          <li>Lần 1: <code>x = 31<sup>2</sup> mod 37 = 36 = N − 1</code></li>
+          <li>Lần 2 (nếu tiếp tục): <code>x = 36<sup>2</sup> mod 37 = 1</code></li>
+        </ul>
+        </ul>
+        <p>
+          Chuỗi này có dạng:
+          <code>31 → 36 → 1</code>.<br>
+          Tức là:
+          <strong>N − 1 xuất hiện trước 1</strong>, đúng với “hành vi” mong đợi của một số nguyên tố.
+        </p>
+        
+        <h4>Kết luận</h4>
+        <p>
+          Với cơ số <code>a = 2</code>, thuật toán Miller–Rabin không tìm thấy sai phạm
+          và kết luận <code>37</code> là một số nguyên tố.
+        </p>
+
+
+<hr>
+   
+    <h3>4.3. Áp dụng trong bài toán</h3>
+
+    <p>✔ Dùng khi:</p>
+    <ul>
+      <li>Kiểm tra 1 số rất lớn (10¹⁶ – 10¹⁸)</li>
+      <li>Kiểm tra số có >60 chữ số</li>
+      <li>Dạng bài yêu cầu tốc độ rất cao</li>
+    </ul>
+
+    <p>✔ Ví dụ:</p>
+    <ul>
+      <li>“Kiểm tra N ≤10¹⁸ có phải nguyên tố không.”</li>
+      <li>“Tìm prime gần nhất ≥N, với N ≤10¹⁸.”</li>
+    </ul>
+
+    <p>❌ Không dùng khi:</p>
+    <ul>
+      <li>Tìm dãy nguyên tố → dùng Sàng / Segmented Sieve</li>
+    </ul>
+    
+    <hr>
+    
+<h3>4.4. Thuật toán chi tiết</h3>
+
+<div class="algo-block">
+
+  <!-- Bước 1 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bước 1: Phân tích N − 1 = 2<sup>s</sup> · d</div>
+    <p>Ta viết:</p>
+    <p class="algo-math">N − 1 = 2<sup>s</sup> · d, với d là số lẻ.</p>
+    <p>Mục đích: để tạo dãy giá trị <i>a<sup>d</sup>, a<sup>2d</sup>, a<sup>4d</sup>, …</i> phục vụ việc kiểm tra.</p>
+  </div>
+
+  <!-- Bước 2 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bước 2: Chọn cơ số a</div>
+    <p>Chọn một số a sao cho:</p>
+    <p class="algo-math">1 &lt; a &lt; N − 1</p>
+    <p>
+      Đối với 64-bit, ta không cần chọn ngẫu nhiên mà dùng bộ cơ sở đặc biệt
+      giúp kết quả chính xác tuyệt đối.
+    </p>
+    <p>Các cơ số dùng cho mọi số nguyên 64-bit:</p>
+    <p style="margin-left:16px;">
+      <code> a ∈ { 2, 325, 9375, 28178, 450775, 9780504, 1795265022 }.</code> <br> Hoặc <code> a ∈ { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37}.</code>
+    </p>
+
+  </div>
+
+  <!-- Bước 3 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bước 3: Tính a<sup>d</sup> mod N</div>
+    <p>Ta cần:</p>
+    <p class="algo-math">x = a<sup>d</sup> mod N</p>
+
+    <div class="algo-sub">
+      <strong>Vì sao cần hàm power_mod?</strong><br>
+      - d có thể rất lớn → không thể tính a<sup>d</sup> trực tiếp.<br>
+      - Nên dùng lũy thừa nhị phân (binary exponentiation) → O(log d).
+    </div>
+
+    <div class="algo-sub">
+      <strong>Vì sao cần hàm multiply_mod?</strong><br>
+      - Khi nhân 64-bit lớn, phép nhân a · b có thể gây tràn số.<br>
+      - multiply_mod tính (a · b) mod N theo dạng “nhân + mod” không tràn.
+    </div>
+  </div>
+
+  <!-- Bước 4 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bước 4: Kiểm tra 2 điều kiện nguyên tố</div>
+
+    <p>Nếu N là số nguyên tố, ít nhất 1 trong 2 điều kiện sau đúng:</p>
+
+    <ul class="algo-list">
+      <li>
+        <b>Điều kiện 1:</b>
+        <p class="algo-math">a<sup>d</sup> ≡ 1 (mod N)</p>
+      </li>
+
+      <li style="margin-top:6px;">
+        <b>Điều kiện 2:</b>
+        <p class="algo-math">
+          a<sup>(2<sup>r</sup> · d)</sup> ≡ N − 1 (mod N)
+        </p>
+        <p class="algo-math">với 0 ≤ r &lt; s.</p>
+      </li>
+    </ul>
+
+    <div class="algo-sub">
+      <strong>Vai trò của hàm miller_rabin_test:</strong><br>
+      - Tính x = a<sup>d</sup> mod N.<br>
+      - Nếu x = 1 hoặc x = N − 1 → "đi qua".<br>
+      - Nếu không, tiếp tục bình phương x và kiểm tra x², x⁴...<br>
+    </div>
+</div>
+<div>
+    <h3>4.5. Code C++ </h3>
+
+
+    <div class="code-box">
+      <div class="code-label">C++</div>
+<pre><code>typedef long long ll;
+
+// Phép nhân modulo an toàn cho 64-bit
+ll multiply_mod(ll a, ll b, ll n) {
+    ll res = 0;
+    a %= n;
+    while (b > 0) {
+        if (b & 1)
+            res = (res + a) % n;
+        a = (a * 2) % n;
+        b >>= 1;
+    }
+    return res;
+}
+
+// Lũy thừa modulo an toàn
+ll power_mod(ll a, ll d, ll n) {
+    ll res = 1;
+    a %= n;
+    while (d > 0) {
+        if (d & 1)
+            res = multiply_mod(res, a, n);
+        a = multiply_mod(a, a, n);
+        d >>= 1;
+    }
+    return res;
+}
+
+// Kiểm tra một cơ số
+bool miller_rabin_test(ll n, ll a, ll d, int s) {
+    ll x = power_mod(a, d, n);
+    if (x == 1 || x == n - 1)
+        return true;
+
+    for (int r = 0; r < s - 1; r++) {
+        x = multiply_mod(x, x, n);
+        if (x == n - 1)
+            return true;
+        if (x == 1)
+            return false;
+    }
+
+    return false;
+}
+
+// Hàm chính
+bool is_prime_miller_rabin(ll n) {
+    if (n <= 1) return false;
+    if (n <= 3) return true;
+    if (n % 2 == 0) return false;
+
+    ll d = n - 1;
+    int s = 0;
+    while (d % 2 == 0)
+        d >>= 1, s++;
+
+    ll bases[] = {2,3,5,7,11,13,17,19,23,29,31,37};
+
+    for (ll a : bases) {
+        if (a >= n) continue;
+        if (!miller_rabin_test(n, a, d, s))
+            return false;
+    }
+
+    return true;
+}
+</code></pre>
+    </div>
+
+    <h3>5. Python </h3>
+
+    <div class="code-box">
+      <div class="code-label">Python</div>
+<pre><code>def is_prime_miller_rabin(n):
+    if n &lt; 2:
+        return False
+
+    # Các base tuyệt đối cho 64-bit
+    test_bases = [2,325,9375,28178,450775,9780504,1795265022]
+
+    # Tách n-1 = 2^s * d
+    d = n - 1
+    s = 0
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    for a in test_bases:
+        if a % n == 0:
+            continue
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+
+        for _ in range(s - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+</code></pre>
+    </div>
+  </div></div></div>
+
+  <div class="arena-box">
+
+  <!-- IV. TÓM TẮT -->
+  <h2>📚 IV. Tóm tắt lựa chọn thuật toán theo dạng bài</h2>
+
+  
+
+    <table class="arena-table">
+      <tr>
+        <th>Dạng bài</th><th>Thuật toán phù hợp</th>
+      </tr>
+      <tr>
+        <td>Kiểm tra 1 số nhỏ (≤10⁹)</td>
+        <td>Trial Division</td>
+      </tr>
+      <tr>
+        <td>Kiểm tra nhiều số nhỏ (≤10³)</td>
+        <td>Trial Division</td>
+      </tr>
+      <tr>
+        <td>Liệt kê prime ≤10⁷</td>
+        <td>Sàng Eratosthenes</td>
+      </tr>
+      <tr>
+        <td>Tìm prime trong [L,R], R≤10¹², R–L≤10⁶</td>
+        <td>Segmented Sieve</td>
+      </tr>
+      <tr>
+        <td>Kiểm tra prime ≤10¹⁸</td>
+        <td>Miller–Rabin</td>
+      </tr>
+      <tr>
+        <td>Kiểm tra số có 100 chữ số</td>
+        <td>Miller–Rabin (nhiều lượt thử)</td>
+      </tr>
+    </table>
+    </div>
+
+
+<h2>📝 V. Bài tập vận dụng</h2>
+
+<div class="arena-box">
+  <p>
+    Dưới đây là một số bài tập giúp bạn áp dụng các kỹ thuật kiểm tra số nguyên tố:  
+    Trial Division, Sàng Eratosthenes, Segmented Sieve và Miller–Rabin.
+  </p>
+
+  <!-- Bài 1 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Tìm K chữ số nguyên tố trong đoạn [A, B]</div>
+    
+    <a href="https://tin247ctp.com/problems/137/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+  
+   <!-- Bài 1.2 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Tổng Các Số Nguyên Tố Trong Đoạn [A, B]</div>
+    
+    <a href="https://tin247ctp.com/problems/140/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+  
+    <!-- Bài 2 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Tổng Nguyên Tố</div>
+   
+    <a href="https://tin247ctp.com/problems/141/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+
+  <!-- Bài 2 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Bảng nguyên tố</div>
+   
+    <a href="https://tin247ctp.com/problems/138/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+  
+     <!-- Bài 2 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: PRIMEP - Hoán Vị Nguyên Tố 2</div>
+   
+    <a href="https://tin247ctp.com/problems/142/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+
+  <!-- Bài 3 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Số đặc biệt</div>
+  
+    <a href="https://tin247ctp.com/problems/131/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+  
+    <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Số Nguyên Tố Tốt Hơn</div>
+  
+    <a href="https://tin247ctp.com/problems/143/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+  
+  
+      <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Số Fibonacci Nguyên Tố Nhỏ Hơn P</div>
+  
+    <a href="https://tin247ctp.com/problems/144/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+
+    <!-- Bài 4 -->
+  <div class="algo-step-box">
+    <div class="algo-title">🔹 Bài tập: Đường đi nguyên tố</div>
+  
+    <a href="https://tin247ctp.com/problems/139/" target="_blank">
+      👉 Click here...
+    </a>
+  </div>
+
+</div>
+
+

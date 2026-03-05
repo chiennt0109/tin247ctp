@@ -1,0 +1,83 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cây bao trùm nhỏ nhất (MST – Minimum Spanning Tree).</li>
+  <li>Phân biệt Kruskal (sắp xếp cạnh) và Prim (mở rộng dần từ 1 đỉnh).</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>
+Một đồ thị liên thông có thể có nhiều cây bao trùm.  
+<b>MST</b> là cây có tổng trọng số nhỏ nhất.<br>
+<b>Kruskal:</b> chọn cạnh nhỏ nhất, dùng Union-Find tránh chu trình.<br>
+<b>Prim:</b> mở rộng dần bằng cách chọn cạnh nhỏ nhất nối từ tập đã có ra ngoài.
+</p>
+
+<hr>
+
+<h2>💻 Kruskal – C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+struct Edge{int u,v,w;};
+struct DSU{
+    vector&lt;int&gt; p;
+    DSU(int n){p.resize(n+1);iota(p.begin(),p.end(),0);}
+    int find(int x){return p[x]==x?x:p[x]=find(p[x]);}
+    bool unite(int a,int b){
+        a=find(a);b=find(b);
+        if(a==b) return false;
+        p[b]=a; return true;
+    }
+};
+int main(){
+    int n,m;cin&gt;&gt;n&gt;&gt;m;
+    vector&lt;Edge&gt; e(m);
+    for(auto &x:e) cin&gt;&gt;x.u&gt;&gt;x.v&gt;&gt;x.w;
+    sort(e.begin(),e.end(),[](auto &a,auto &b){return a.w&lt;b.w;});
+    DSU d(n);
+    int total=0;
+    for(auto &x:e)
+        if(d.unite(x.u,x.v)) total+=x.w;
+    cout&lt;&lt;"MST="&lt;&lt;total;
+}</code></pre>
+
+<h2>💻 Prim – Python</h2>
+<pre><code>import heapq
+n,m=map(int,input().split())
+adj=[[] for _ in range(n+1)]
+for _ in range(m):
+    u,v,w=map(int,input().split())
+    adj[u].append((w,v))
+    adj[v].append((w,u))
+
+vis=[False]*(n+1)
+pq=[(0,1)]
+total=0
+while pq:
+    w,u=heapq.heappop(pq)
+    if vis[u]: continue
+    vis[u]=True
+    total+=w
+    for ww,v in adj[u]:
+        if not vis[v]:
+            heapq.heappush(pq,(ww,v))
+print("MST=",total)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tìm MST bằng cả Kruskal và Prim để kiểm chứng kết quả.</li>
+  <li>In ra các cạnh thuộc cây bao trùm nhỏ nhất.</li>
+  <li>Kiểm tra đồ thị có liên thông hay không trước khi chạy MST.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 2</b></summary>
+  <pre><code>edges_in_mst=[]
+for u,v,w in edges:
+    if unite(u,v):
+        edges_in_mst.append((u,v,w))
+print(edges_in_mst)</code></pre>
+</details>

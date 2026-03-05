@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  /* Timer overlay */
+  #practice-overlay-timer {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 10px;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+  }
+
+  #practice-overlay-timer.finished {
+    background: rgba(180, 0, 0, 0.85);
+  }
+</style>
+
+<div class="container py-3" style="max-width: 1200px;">
+  <div class="row g-4">
+
+    <!-- LEFT PANEL -->
+    <div class="col-lg-4 col-md-12">
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+
+        <h5 class="fw-bold mb-3 text-primary">
+          🧪 PRACTICE MODE
+          
+            <a href="/contests/{{ contest.id }}/practice/rank/"
+               class="btn btn-outline-primary rounded-pill">
+               🏆 Xếp hạng
+            </a>
+          
+        </h5>
+        
+        <div class="mb-2">
+          <div class="small text-muted">Contest:</div>
+          <b>{{ contest.name }}</b>
+        </div>
+
+        <hr>
+        
+
+        {% if error %}
+          <div class="alert alert-warning small">{{ error }}</div>
+        {% endif %}
+
+        {% if not session.is_started %}
+
+          <!-- ❗ CHƯA BẮT ĐẦU -->
+          <div class="alert alert-info small">
+            Bấm <b>Bắt đầu</b> để kích hoạt đồng hồ và mở danh sách bài.
+          </div>
+
+          <a href="?action=start" class="btn btn-primary w-100 rounded-pill fw-semibold py-2">
+            🚀 Bắt đầu làm bài
+          </a>
+
+          {% if session.attempt > 1 %}
+          <p class="text-center small text-muted mt-2">
+            Attempt hiện tại: #{{ session.attempt }}
+          </p>
+          {% endif %}
+
+          <a href="{% url 'contests:contest_list'%}" class="btn btn-link small mt-3 p-0">
+            ⏎ Quay lại
+          </a>
+
+        {% else %}
+
+          <!-- ✔ ĐANG LÀM BÀI -->
+          <div class="mb-3">
+            <div class="small text-muted">Attempt:</div>
+            <b>#{{ session.attempt }}</b>
+          </div>
+
+          <div class="small text-muted mb-1">Thời gian còn lại:</div>
+          <div class="h4 fw-bold" id="practice-timer">--:--</div>
+
+          <hr>
+
+          {% if session.is_locked or remaining <= 0 %}
+            <!-- ❗ HẾT GIỜ -->
+            <div class="alert alert-danger small">
+              Phiên này đã hết giờ.
+            </div>
+
+            <!-- Confirm khi tạo phiên mới -->
+            <a href="?action=cancel"
+               onclick="return confirm('Bạn có chắc muốn tạo phiên PRACTICE mới? Toàn bộ tiến trình hiện tại sẽ bị xoá.');"
+               class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
+              🔁 Tạo phiên mới
+            </a>
+
+          {% else %}
+            <!-- ĐANG LÀM BÀI → nút huỷ có confirm -->
+            <a href="?action=cancel"
+               onclick="return confirm('Bạn chắc chắn muốn huỷ phiên PRACTICE này và tạo lại từ đầu?');"
+               class="btn btn-outline-danger w-100 rounded-pill fw-semibold">
+              ❌ Huỷ Practice & tạo phiên mới
+            </a>
+          {% endif %}
+
+          <a href="{% url 'contests:contest_list'%}" class="btn btn-link small mt-2 p-0">
+            ⏎ Quay lại
+          </a>
+
+        {% endif %}
+
+      </div>
+    </div>
+
+
+    <!-- RIGHT PANEL: PROBLEMS -->
+    <div class="col-lg-8 col-md-12">
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="fw-bold mb-0">Danh sách bài</h6>
+          <span class="badge bg-light text-muted">{{ problems|length }} bài</span>
+        </div>
+
+        <hr class="mt-2 mb-3">
+
+        {% if not session.is_started %}
+          <div class="alert alert-warning small">
+            Bạn phải bấm <b>BẮT ĐẦU</b> mới xem được bài.
+          </div>
+        {% else %}
+          <div class="list-group list-group-flush">
+            {% for letter, prob in problems_with_letters %}
+              <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <div>
+                  <span class="badge rounded-pill bg-primary me-2">{{ letter }}</span>
+
+                  <a href="{% url 'problems:problem_detail' prob.id %}?practice=1&contest_id={{ contest.id }}"
+                     class="text-decoration-none">
+                    {{ prob.code }} – {{ prob.title }}
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% if session.is_started and remaining > 0 %}
+<div id="practice-overlay-timer">--:--</div>
+{% endif %}
+
+<!-- TIMER SCRIPT -->
+{% if session.is_started %}
+<script>
+  (() => {
+    let remain = {{ remaining|default:0 }};
+    const displayTop = document.getElementById('practice-overlay-timer');
+    const displayLeft = document.getElementById('practice-timer');
+
+    function fmt(t) {
+      const m = Math.floor(t / 60);
+      const s = t % 60;
+      return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    function tick() {
+      if (remain <= 0) {
+        if (displayTop) {
+          displayTop.textContent = "HẾT GIỜ";
+          displayTop.classList.add("finished");
+        }
+        if (displayLeft) {
+          displayLeft.textContent = "HẾT GIỜ";
+          displayLeft.classList.add("text-danger");
+        }
+        return;
+      }
+
+      const t = fmt(remain);
+      if (displayTop) displayTop.textContent = t;
+      if (displayLeft) displayLeft.textContent = t;
+
+      remain--;
+      setTimeout(tick, 1000);
+    }
+
+    tick();
+  })();
+</script>
+{% endif %}
+
+{% endblock %}

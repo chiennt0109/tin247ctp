@@ -1,0 +1,617 @@
+<style>
+:root {
+  --blue-main: #2563eb;
+  --blue-dark: #1e3a8a;
+  --text-color: #1e293b;
+  --slate-100:#f1f5f9;
+  --slate-200:#e2e8f0;
+  --slate-600:#475569;
+}
+
+/* ====== PAGE STYLES ====== */
+h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
+h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
+h3 { color: #334155; margin-top: 25px; }
+p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
+ul { margin-left: 1.5rem; }
+code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
+pre {
+  background: #f1f5f9;
+  border-left: 4px solid var(--blue-main);
+  padding: 14px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
+}
+th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
+th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
+
+/* ====== STACK ANIMATION (giới thiệu) ====== */
+.stack-demo {
+  display: flex; flex-direction: column-reverse; align-items: center;
+  height: 320px; width: 240px; background: #fff;
+  border: 2px solid var(--blue-main); border-radius: 10px;
+  margin: 25px auto; padding: 10px; position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+.block {
+  width: 170px; height: 42px; background: var(--blue-main); color: #fff;
+  font-weight: bold; text-align: center; line-height: 42px;
+  margin: 4px 0; border-radius: 6px; opacity: 0; transform: translateY(80px);
+  animation: pushUp 0.9s ease forwards;
+}
+.block:nth-child(2){animation-delay:1s;}
+.block:nth-child(3){animation-delay:2s;}
+.block:nth-child(4){animation-delay:3s;}
+.stack-label {
+  position: absolute; bottom: -40px; font-weight: bold; color: var(--blue-main);
+  text-transform: uppercase;
+}
+@keyframes pushUp {
+  from {opacity:0;transform:translateY(80px);}
+  to {opacity:1;transform:translateY(0);}
+}
+
+/* ====== DETAILS / LOCK ====== */
+details {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 16px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size: 16px; }
+.locked { color: #6b7280; font-style: italic; text-align: center; padding: 10px; }
+
+/* ====== MÔ PHỎNG STACK – HÌNH ẢNH + TỪNG DÒNG LỆNH ====== */
+.sim-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 900px){ .sim-grid{ grid-template-columns: 1fr; } }
+
+.stack-visual {
+  height: 360px; width: 280px; background: #fff; border: 2px dashed var(--blue-main);
+  border-radius: 12px; margin: 10px auto; padding: 12px; position: relative;
+  display:flex; flex-direction: column-reverse; align-items: center; overflow-y: auto;
+}
+.stack-visual .item {
+  width: 190px; height: 44px; border-radius: 8px; color:#fff; background: var(--blue-main);
+  line-height: 44px; text-align: center; margin: 6px 0; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.stack-visual .item.top { outline: 3px solid #22c55e; }
+.badge {
+  position:absolute; top: -10px; right: -10px; background:#111827; color:#fff;
+  font-size:12px; padding:3px 8px; border-radius: 999px;
+}
+.op-panel { background:#fff; border:1px solid var(--slate-200); border-radius: 10px; padding: 12px; }
+.op-panel .row { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
+.op-panel input[type="text"]{
+  padding:8px 10px; border:1px solid var(--slate-200); border-radius:8px; min-width:120px;
+}
+button.btn {
+  border:none; background: var(--blue-main); color:#fff; padding:9px 12px; border-radius:8px; cursor:pointer;
+  font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,.06);
+}
+button.btn.secondary { background:#0ea5e9; }
+button.btn.ghost { background:#e5e7eb; color:#111827; }
+button.btn:disabled { opacity:.5; cursor:not-allowed; }
+
+.codebox {
+  background: var(--slate-100); border-left: 4px solid var(--blue-main);
+  border-radius: 8px; padding: 10px; font-family: Consolas, monospace; font-size: 14px;
+  max-height: 360px; overflow:auto; position: relative;
+}
+.codebox .line { padding: 3px 6px; border-radius: 6px; }
+.codebox .line.hl { background: #dbeafe; }
+#trace {
+  background:#fff; border:1px solid var(--slate-200); border-radius:10px; padding:10px; height:120px; overflow:auto; font-family:Consolas, monospace; font-size:13px;
+}
+
+/* ====== CALLOUT ====== */
+.callout {
+  border-left: 6px solid #10b981; background: #ecfeff; padding: 10px 12px; border-radius:8px; margin: 12px 0;
+}
+</style>
+
+<!-- ====== BẮT ĐẦU NỘI DUNG ====== -->
+<h1>🎯 Bài giảng: Cấu trúc dữ liệu Stack (Ngăn xếp)</h1>
+<p>Stack là một trong những cấu trúc dữ liệu cơ bản nhất, được dùng rộng rãi trong thuật toán và rất gần gũi với đời sống (chồng sách, đĩa, khay cốc...).</p>
+
+<h2>I. Giới thiệu & Ví dụ thực tế</h2>
+<p>Hình dung bạn xếp chồng sách. Muốn lấy sách ở trên cùng bạn phải nhấc quyển vừa đặt gần nhất. Đó là nguyên lý <b>LIFO – Last In, First Out</b> (vào sau, ra trước).</p>
+
+<div class="stack-demo">
+  <div class="block">Sách 3</div>
+  <div class="block">Sách 2</div>
+  <div class="block">Sách 1</div>
+  <div class="stack-label">TOP ↑</div>
+</div>
+<p style="text-align:center;"><i>Nguyên tắc LIFO – “vào sau ra trước”.</i></p>
+
+<h2>II. Lý thuyết cơ bản</h2>
+<ul>
+  <li><b>Push(x):</b> thêm phần tử x vào <b>đỉnh</b>.</li>
+  <li><b>Pop():</b> lấy phần tử ở đỉnh ra khỏi stack.</li>
+  <li><b>Top():</b> xem (không xoá) phần tử ở đỉnh.</li>
+  <li><b>Empty():</b> kiểm tra rỗng.</li>
+  <li><b>Size():</b> số lượng phần tử hiện có.</li>
+</ul>
+
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main() {
+    stack&lt;int&gt; st;
+    st.push(10);
+    st.push(20);
+    cout &lt;&lt; st.top() &lt;&lt; "\n"; // 20
+    st.pop();                     // xoá 20
+    cout &lt;&lt; st.size() &lt;&lt; "\n";   // 1
+}</code></pre>
+
+
+<!-- ========== MÔ PHỎNG ========== -->
+<h2>III. Trình mô phỏng Stack: hình ảnh + mô tả từng dòng lệnh</h2>
+<p>
+Trong mô phỏng dưới đây, giao diện được chia làm <b>3 cột</b>:
+</p>
+<ul>
+  <li>🖱 <b>Cột 1 – Thao tác:</b> Các nút mô phỏng hành động của người lập trình (Push, Pop, Top, Size, Reset).</li>
+  <li>💻 <b>Cột 2 – Dòng lệnh tương ứng:</b> Mỗi thao tác sẽ tô sáng các dòng lệnh C++ mà máy tính thực hiện.</li>
+  <li>📊 <b>Cột 3 – Kết quả minh hoạ:</b> Stack hiển thị theo thời gian thực sau khi lệnh được chạy.</li>
+</ul>
+
+<div class="sim-3col">
+  <div class="col op-panel">
+    <h4>🖱 Thao tác</h4>
+    <input type="text" id="valInput" placeholder="Giá trị cần push (vd: 42)" />
+    <div class="btn-group">
+      <button class="btn" id="btnPush">Push</button>
+      <button class="btn secondary" id="btnTop">Top</button>
+      <button class="btn" id="btnPop">Pop</button>
+      <button class="btn ghost" id="btnSize">Size</button>
+      <button class="btn ghost" id="btnReset">Reset</button>
+    </div>
+    <div class="callout" id="explain">💡 Hướng dẫn sẽ hiển thị tại đây…</div>
+    <div id="trace"></div>
+  </div>
+
+  <div class="col codebox" id="codeBox">
+    <h4>💻 Code đang thực thi</h4>
+    <div class="line" data-k="init">stack&lt;int&gt; st;                  // tạo stack rỗng</div>
+    <div class="line" data-k="push1">int x; cin &gt;&gt; x;                 // đọc giá trị</div>
+    <div class="line" data-k="push2">st.push(x);                       // thêm vào đỉnh</div>
+    <div class="line" data-k="pop1">if(!st.empty())                    // kiểm tra rỗng</div>
+    <div class="line" data-k="pop2">    st.pop();                      // xoá phần tử đỉnh</div>
+    <div class="line" data-k="top1">if(!st.empty())                    // kiểm tra rỗng</div>
+    <div class="line" data-k="top2">    cout &lt;&lt; st.top();            // xem phần tử đỉnh</div>
+    <div class="line" data-k="size">cout &lt;&lt; st.size();              // kích thước stack</div>
+  </div>
+
+  <div class="col vis-box">
+    <h4>📊 Kết quả Stack</h4>
+    <div class="stack-visual" id="stackVisual"></div>
+    <span class="badge" id="sizeBadge">size=0</span>
+  </div>
+</div>
+
+<style>
+.sim-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+@media (max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
+
+.col { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
+.col h4 { margin-top: 0; color: var(--blue-main); }
+
+.btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.stack-visual {
+  height: 330px; width: 240px; margin: 10px auto;
+  display: flex; flex-direction: column-reverse; align-items: center;
+  background: #fff; border: 2px dashed var(--blue-main);
+  border-radius: 12px; padding: 10px; overflow-y: auto;
+}
+.stack-visual .item {
+  width: 180px; height: 42px; background: var(--blue-main);
+  color: #fff; font-weight: bold; text-align: center;
+  line-height: 42px; border-radius: 6px; margin: 4px 0;
+}
+.stack-visual .item.top { outline: 3px solid #22c55e; }
+.badge {
+  background: #111827; color: #fff; padding: 3px 8px;
+  border-radius: 999px; font-size: 12px; display: block; text-align: center;
+  margin-top: 8px;
+}
+.codebox { font-family: Consolas, monospace; font-size: 14px; background: #f8fafc; }
+.line { padding: 3px 6px; border-radius: 6px; }
+.line.hl { background: #dbeafe; }
+</style>
+
+<script>
+(function(){
+  const st=[]; 
+  const vis=document.getElementById('stackVisual');
+  const badge=document.getElementById('sizeBadge');
+  const explain=document.getElementById('explain');
+  const codeBox=document.getElementById('codeBox');
+  const trace=document.getElementById('trace');
+  const valInput=document.getElementById('valInput');
+
+  function render(){
+    vis.innerHTML='';
+    st.forEach((v,i)=>{
+      const el=document.createElement('div');
+      el.className='item'+(i===st.length-1?' top':'');
+      el.textContent=v;
+      vis.appendChild(el);
+    });
+    badge.textContent='size='+st.length;
+  }
+  function log(msg){
+    const p=document.createElement('div');
+    p.textContent='• '+msg;
+    trace.prepend(p);
+  }
+  function hl(keys){
+    codeBox.querySelectorAll('.line').forEach(l=>l.classList.remove('hl'));
+    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
+      const el=codeBox.querySelector(`.line[data-k="${k}"]`);
+      if(el) el.classList.add('hl');
+    });
+  }
+
+  // 🔹 Push
+  document.getElementById('btnPush').onclick=()=>{
+    const val=valInput.value.trim();
+    if(!val){ explain.textContent='⚠️ Hãy nhập giá trị trước khi push.'; return; }
+    hl(['push1','push2']);
+    st.push(val); render();
+    explain.innerHTML=`Đã <b>push(${val})</b> vào đỉnh stack.`;
+    log(`push(${val}) → size=${st.length}`);
+    valInput.value='';
+  };
+
+  // 🔹 Top
+  document.getElementById('btnTop').onclick=()=>{
+    if(st.length===0){ explain.textContent='⚠️ Stack rỗng, không thể xem top.'; hl(); log('top() thất bại'); return; }
+    hl(['top1','top2']);
+    const t=st[st.length-1];
+    explain.innerHTML=`<b>top()</b>: phần tử ở đỉnh hiện tại là <b>${t}</b>.`;
+    log(`top() = ${t}`);
+    render();
+  };
+
+  // 🔹 Pop
+  document.getElementById('btnPop').onclick=()=>{
+    if(st.length===0){ explain.textContent='⚠️ Stack rỗng, không thể pop.'; hl(); log('pop() thất bại'); return; }
+    hl(['pop1','pop2']);
+    const t=st.pop(); render();
+    explain.innerHTML=`<b>pop()</b>: kiểm tra <code>empty()</code> → xoá phần tử đỉnh <b>${t}</b>.`;
+    log(`pop() = ${t} → size=${st.length}`);
+  };
+
+  // 🔹 Size
+  document.getElementById('btnSize').onclick=()=>{
+    hl(['size']);
+    explain.innerHTML=`<b>size()</b>: Stack hiện có <b>${st.length}</b> phần tử.`;
+    log(`size() = ${st.length}`);
+  };
+
+  // 🔹 Reset
+  document.getElementById('btnReset').onclick=()=>{
+    st.length=0; render(); hl(['init']); explain.textContent='Stack đã được làm trống (reset).'; log('reset()');
+  };
+
+  render(); hl(['init']);
+})();
+</script>
+
+<!-- ===================== Cách dung ======================= -->
+
+<h2 id="stack-usage">VI. Khi nào dùng Stack & Cách nhận biết bài toán cần Stack</h2>
+
+<p>
+Stack được gắn tag cho những bài toán mà <b>thứ tự xử lý dữ liệu phụ thuộc vào nguyên tắc “vào sau ra trước”</b> hoặc khi ta cần
+<b>ghi nhớ tạm thời các trạng thái</b> để quay lại sau.  
+Dưới đây là các nhóm bài toán phổ biến sử dụng Stack, kèm lý do và ví dụ.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nhóm bài toán</th>
+      <th>Đặc điểm nhận biết</th>
+      <th>Ví dụ & Ứng dụng</th>
+      <th>Tại sao dùng Stack?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>1. Đảo ngược dữ liệu</b></td>
+      <td>Dữ liệu được đưa vào rồi cần xử lý theo thứ tự ngược lại.</td>
+      <td>Đảo chuỗi, đảo mảng, in ngược số, đảo thứ tự từ trong câu.</td>
+      <td>Stack lưu tạm các phần tử, pop ra ngược thứ tự ban đầu (LIFO).</td>
+    </tr>
+    <tr>
+      <td><b>2. Kiểm tra cấu trúc cặp (ngoặc, thẻ XML,...)</b></td>
+      <td>Có cặp mở – đóng cần khớp và đúng thứ tự.</td>
+      <td>Kiểm tra dấu ngoặc, kiểm tra HTML/XML hợp lệ.</td>
+      <td>Khi gặp mở → push, gặp đóng → pop; nếu lệch cặp hoặc còn sót → sai.</td>
+    </tr>
+    <tr>
+      <td><b>3. Biểu thức toán học</b></td>
+      <td>Gồm toán tử, toán hạng cần tính theo thứ tự ưu tiên.</td>
+      <td>Chuyển biểu thức trung tố ↔ hậu tố, tính hậu tố/postfix, tiền tố/prefix.</td>
+      <td>Stack dùng để lưu toán tử và tạm toán hạng trong khi tính.</td>
+    </tr>
+    <tr>
+      <td><b>4. Duyệt cây & đồ thị (DFS, Backtracking)</b></td>
+      <td>Cần ghi nhớ trạng thái trước khi quay lui hoặc đi nhánh khác.</td>
+      <td>DFS không đệ quy, thuật toán quay lui, giải mê cung.</td>
+      <td>Stack thay thế ngăn gọi đệ quy để nhớ “nút đang đi”.</td>
+    </tr>
+    <tr>
+      <td><b>5. Stack đơn điệu – tìm phần tử kế tiếp lớn hơn / nhỏ hơn</b></td>
+      <td>So sánh phần tử với các phần tử đứng trước để tìm vị trí đặc biệt.</td>
+      <td>Next Greater Element, Daily Temperatures, dãy đơn điệu tăng/giảm.</td>
+      <td>Duyệt mảng, dùng stack lưu chỉ số; khi gặp phần tử lớn hơn thì pop để gán kết quả.</td>
+    </tr>
+    <tr>
+      <td><b>6. Tính diện tích hoặc vùng liên tiếp (Histogram, Rain Water)</b></td>
+      <td>Bài có biểu đồ cột, cần tìm vùng lớn nhất/liên tục.</td>
+      <td>Diện tích hình chữ nhật lớn nhất trong histogram, hứng nước mưa.</td>
+      <td>Dùng stack lưu chỉ số cột tăng dần. Khi gặp cột thấp hơn → pop để tính vùng vừa khép lại.</td>
+    </tr>
+    <tr>
+      <td><b>7. Quản lý lịch sử hành động (Undo/Redo, Browser)</b></td>
+      <td>Hệ thống cho phép quay lại bước trước hoặc tiến lên bước sau.</td>
+      <td>Undo/Redo trong Word, lịch sử duyệt web.</td>
+      <td>Hai stack: một cho “Undo”, một cho “Redo” – pop qua lại giữa hai ngăn.</td>
+    </tr>
+    <tr>
+      <td><b>8. Mô phỏng hệ thống gọi lồng nhau</b></td>
+      <td>Hàm hoặc quy trình được gọi lồng nhau (call stack).</td>
+      <td>Hàm đệ quy, chương trình thông dịch biểu thức lồng.</td>
+      <td>Hệ thống máy tính thực tế dùng call stack để lưu địa chỉ trả về.</td>
+    </tr>
+    <tr>
+      <td><b>9. Đánh giá thời gian / khoảng hoạt động</b></td>
+      <td>Bài liên quan đến thời gian bắt đầu – kết thúc xen kẽ nhau.</td>
+      <td>Tính thời gian CPU chạy hàm, log hệ thống dạng <code>start/end</code>.</td>
+      <td>Mỗi khi gặp “start” → push, “end” → pop để tính khoảng thời gian.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p class="callout">
+💡 <b>Tóm lại:</b> Hễ bài toán cần “ghi nhớ tạm thời để quay lại”, “đảo ngược thứ tự”, hoặc “đóng–mở cặp” theo quy luật → gần như chắc chắn có thể giải bằng Stack.
+</p>
+
+
+<!-- ========== BÀI TẬP ========== -->
+<h2>V. Hệ thống bài tập theo cấp độ (có giải thích chi tiết)</h2>
+
+<h3>📘 Egg</h3>
+
+<details>
+  <summary>1️⃣ Bài 1: Đảo ngược chuỗi ký tự (cơ bản)</summary>
+  <p><b>Đề:</b> Nhập chuỗi S (không chứa khoảng trắng). In chuỗi đảo ngược bằng Stack.</p>
+  <p><b>Ý tưởng:</b> Duyệt từng ký tự, <code>push</code> vào stack → <code>pop</code> ra dần để in ngược.</p>
+  <p><b>Bước làm:</b> (1) Tạo <code>stack&lt;char&gt;</code>. (2) Duyệt S và push. (3) Trong khi chưa rỗng, pop và in. (4) Kết thúc.</p>
+  <p><b>Độ phức tạp:</b> O(n) thời gian, O(n) bộ nhớ (n là độ dài chuỗi).</p>
+  <p><b>Lưu ý:</b> Nếu có khoảng trắng, dùng <code>getline</code> thay vì <code>cin&gt;&gt;</code>.</p>
+  <pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main(){
+    string s; cin &gt;&gt; s;
+    stack&lt;char&gt; st;
+    for(char c : s) st.push(c);
+    while(!st.empty()){ cout &lt;&lt; st.top(); st.pop(); }
+}</code></pre>
+  <p><b>Test mẫu:</b> <code>hello</code> → <code>olleh</code></p>
+</details>
+
+<details>
+  <summary>1️⃣ Bài 2: Tổng các phần tử (luyện thao tác)</summary>
+  <p><b>Đề:</b> Nhập n, sau đó n số nguyên. Tính tổng bằng cách lấy ra từng phần tử qua stack.</p>
+  <p><b>Ý tưởng:</b> Dùng stack để “lưu rồi lấy ngược”, đồng thời cộng dồn.</p>
+  <p><b>Bước làm:</b> Push toàn bộ → while !empty: cộng top rồi pop.</p>
+  <p><b>Độ phức tạp:</b> O(n). <b>Lưu ý:</b> Dùng <code>long long</code> nếu tổng lớn.</p>
+  <pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+int main(){
+    ios::sync_with_stdio(false); cin.tie(nullptr);
+    int n; long long x,sum=0; cin&gt;&gt;n;
+    stack&lt;long long&gt; st;
+    for(int i=0;i&lt;n;i++){cin&gt;&gt;x; st.push(x);}
+    while(!st.empty()){ sum+=st.top(); st.pop(); }
+    cout&lt;&lt;sum;
+}</code></pre>
+</details>
+
+<h3>📗 Chicken</h3>
+
+<details>
+  <summary>2️⃣ Bài 3: Kiểm tra dấu ngoặc hợp lệ</summary>
+  <p><b>Đề:</b> Chuỗi gồm <code>()[]{}&lt;&gt;</code>. Hãy kiểm tra có hợp lệ không (mở – đóng đúng cặp, đúng thứ tự).</p>
+  <p><b>Ý tưởng:</b> Gặp ngoặc mở → push. Gặp ngoặc đóng → pop để so cặp. Nếu sai hoặc rỗng → không hợp lệ.</p>
+  <p><b>Bước làm:</b> Duyệt chuỗi: 
+    <br>• Nếu là mở: push. 
+    <br>• Nếu là đóng: nếu rỗng → sai; else kiểm tra xem có khớp cặp không. 
+    <br>• Cuối cùng stack phải rỗng.
+  </p>
+  <p><b>Độ phức tạp:</b> O(n). <b>Lưu ý:</b> Thêm cặp &lt;&gt; nếu muốn.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+bool match(char o, char c){
+    return (o=='('&&c==')')||(o=='['&&c==']')||(o=='{'&&c=='}')||(o=='&lt;'&&c=='&gt;');
+}
+int main(){
+    ios::sync_with_stdio(false); cin.tie(nullptr);
+    string s; cin&gt;&gt;s;
+    stack&lt;char&gt; st;
+    for(char c : s){
+        if(c=='('||c=='['||c=='{'||c=='&lt;') st.push(c);
+        else {
+            if(st.empty() || !match(st.top(), c)) return cout&lt;&lt;"NO",0;
+            st.pop();
+        }
+    }
+    cout&lt;&lt;(st.empty()?"YES":"NO");
+}</code></pre>
+  <p><b>Test:</b> <code>({[]})</code> → YES; <code>([)]</code> → NO; <code>&lt;[]&gt;()</code> → YES.</p>
+</details>
+
+<details>
+  <summary>2️⃣ Bài 4: Đảo thứ tự từ trong câu</summary>
+  <p><b>Đề:</b> Nhập một câu gồm nhiều từ cách nhau bằng khoảng trắng. In lại các từ theo thứ tự ngược.</p>
+  <p><b>Ý tưởng:</b> Tách từ, push từng từ vào stack rồi pop dần để in ngược.</p>
+  <p><b>Bước làm:</b> <code>stringstream</code> để tách từ → stack&lt;string&gt; → pop để in.</p>
+  <p><b>Độ phức tạp:</b> O(n) theo số từ/ký tự.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    ios::sync_with_stdio(false); cin.tie(nullptr);
+    string s, w; getline(cin, s);
+    stack&lt;string&gt; st;
+    stringstream ss(s);
+    while(ss&gt;&gt;w) st.push(w);
+    bool first=true;
+    while(!st.empty()){
+        if(!first) cout&lt;&lt;' ';
+        cout&lt;&lt;st.top(); st.pop(); first=false;
+    }
+}</code></pre>
+  <p><b>Ví dụ:</b> <code>I love coding</code> → <code>coding love I</code></p>
+</details>
+
+<h3>📙 Chicken farmer</h3>
+
+<details>
+  <summary>3️⃣ Bài 5: Tính biểu thức hậu tố (Postfix Evaluation)</summary>
+  <p><b>Đề:</b> Cho biểu thức hậu tố gồm số nguyên và toán tử <code>+ - * /</code> cách nhau bởi khoảng trắng. Hãy tính giá trị.</p>
+  <p><b>Ý tưởng:</b> Gặp số → push. Gặp toán tử → pop 2 số theo thứ tự (a trước, b sau), tính <code>a op b</code>, rồi push kết quả.</p>
+  <p><b>Bước làm:</b> Duyệt token bằng <code>stringstream</code>. Dùng <code>stack&lt;long long&gt;</code>. Cẩn thận thứ tự khi trừ/chia.</p>
+  <p><b>Độ phức tạp:</b> O(n) theo số token.</p>
+  <p><b>Lưu ý:</b> Kiểm tra lỗi chia cho 0 nếu cần; nếu có âm/đa chữ số, vẫn nhận diện bằng isdigit(token[0]) hoặc kiểm tra toàn chuỗi.</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+bool isNumber(const string &t){
+    if(t.empty()) return false;
+    int i=0; if(t[0]=='-'||t[0]=='+') i=1;
+    for(;i&lt;(int)t.size();++i) if(!isdigit(t[i])) return false;
+    return true;
+}
+int main(){
+    ios::sync_with_stdio(false); cin.tie(nullptr);
+    string s; getline(cin, s);
+    stringstream ss(s); string tok;
+    stack&lt;long long&gt; st;
+    while(ss&gt;&gt;tok){
+        if(isNumber(tok)) st.push(stoll(tok));
+        else{
+            long long b=st.top(); st.pop();
+            long long a=st.top(); st.pop();
+            if(tok=="+") st.push(a+b);
+            else if(tok=="-") st.push(a-b);
+            else if(tok=="*") st.push(a*b);
+            else if(tok=="/") st.push(a/b); // giả sử b != 0, chia số nguyên
+        }
+    }
+    cout&lt;&lt;st.top();
+}</code></pre>
+  <p><b>Ví dụ:</b> <code>5 1 2 + 4 * + 3 -</code> → <b>14</b></p>
+</details>
+
+<details>
+  <summary>3️⃣ Bài 6: Next Greater Element (NGE) – Dãy đơn điệu</summary>
+  <p><b>Đề:</b> Với mỗi phần tử A[i], tìm phần tử bên phải đầu tiên lớn hơn nó; nếu không có in -1.</p>
+  <p><b>Ý tưởng (stack chỉ số tăng dần):</b> Duyệt i từ trái sang phải. Trong khi A[i] &gt; A[st.top()], cập nhật kết quả cho vị trí đó và pop. Sau đó push i.</p>
+  <p><b>Bước làm:</b> Dùng <code>stack&lt;int&gt;</code> lưu chỉ số. Mảng kết quả khởi tạo -1.</p>
+  <p><b>Độ phức tạp:</b> O(n) vì mỗi chỉ số push/pop tối đa 1 lần.</p>
+  <p><b>Lưu ý:</b> Đây là “stack đơn điệu” – mẫu rất quan trọng cho nhiều bài như nhiệt độ hàng ngày, diện tích hình chữ nhật lớn nhất…</p>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    ios::sync_with_stdio(false); cin.tie(nullptr);
+    int n; cin&gt;&gt;n; vector&lt;int&gt; a(n), ans(n, -1);
+    for(int i=0;i&lt;n;i++) cin&gt;&gt;a[i];
+    stack&lt;int&gt; st;
+    for(int i=0;i&lt;n;i++){
+        while(!st.empty() &amp;&amp; a[i] &gt; a[st.top()]){
+            ans[st.top()] = a[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    for(int i=0;i&lt;n;i++) cout&lt;&lt;ans[i]&lt;&lt;(i+1==n?'\n':' ');
+}</code></pre>
+  <p><b>Ví dụ:</b> <code>4 | 4 5 2 10</code> → <code>5 10 10 -1</code></p>
+</details>
+
+<h2>VII. Tổng kết & Gợi ý mở rộng</h2>
+<ul>
+  <li>Nắm chắc thao tác cơ bản → áp dụng vào đệ quy, backtracking, DFS.</li>
+  <li>Học thêm <b>stack đơn điệu</b> để giải các bài dãy số/nhiệt độ/biểu đồ.</li>
+  <li>Thử tự cài đặt stack bằng <code>vector</code> (tự viết <code>push/pop/back</code>).</li>
+</ul>
+
+<p style="text-align:center;color:#555;font-style:italic;">
+📘 Stack – nền tảng luyện tư duy thuật toán. Hãy luyện từ dễ → khó, và quan sát “vào sau – ra trước” trong mọi tình huống.
+</p>
+
+<!-- ========= (có thể dùng nếu bạn muốn khoá lời giải thêm) =========
+<details>
+  <summary>💡 Lời giải mẫu – Python (ẩn/hiện)</summary>
+  <div id="locked" class="locked">
+    <a id="login-link" href="#">🔒 Vui lòng đăng nhập để xem lời giải.</a>
+  </div>
+  <pre id="sol" style="display:none;"><code>
+# ví dụ đảo chuỗi
+s = input().rstrip()
+st = []
+for ch in s:
+    st.append(ch)
+while st:
+    print(st.pop(), end="")
+  </code></pre>
+</details>
+-->
+
+<script>
+(function(){
+  // Gắn link login ?next=URL hiện tại (nếu dùng khoá lời giải)
+  const link = document.getElementById("login-link");
+  if (link) {
+    const nextUrl = encodeURIComponent(location.pathname + location.search + location.hash);
+    link.href = `/accounts/login/?next=${nextUrl}`;
+  }
+})();
+</script>
+
+<script>
+(async function() {
+  // Nếu có API check_login, tự mở khoá lời giải
+  try {
+    const res = await fetch("/roadmap/api/check_login/", { credentials: "include" });
+    if(!res.ok) return;
+    const data = await res.json();
+    const isLoggedIn = data.is_authenticated === true;
+    const lock = document.getElementById("locked");
+    const sol = document.getElementById("sol");
+    if (isLoggedIn && lock && sol) {
+      lock.style.display = "none";
+      sol.style.display = "block";
+    }
+  } catch (err) {
+    console.warn("Không kiểm tra được trạng thái đăng nhập:", err);
+  }
+})();
+</script>

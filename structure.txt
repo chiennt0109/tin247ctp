@@ -1,0 +1,489 @@
+/var/www/tin247ctp
+├── Procfile
+├── README.md
+├── accounts
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── forms.py
+│   ├── urls.py
+│   └── views.py
+├── admin_user.json
+├── arena
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── forms.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── sandbox.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── games
+│   │   ├── Bai1
+│   │   │   ├── __pycache__
+│   │   │   │   ├── robot_step_chick.cpython-312.pyc
+│   │   │   │   ├── robot_step_egg.cpython-312.pyc
+│   │   │   │   └── robot_step_teen.cpython-312.pyc
+│   │   │   ├── robot_step_chick.py
+│   │   │   ├── robot_step_egg.py
+│   │   │   └── robot_step_teen.py
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   ├── robot_step.cpython-312.pyc
+│   │   │   └── snake.cpython-312.pyc
+│   │   ├── robot_step.py
+│   │   └── snake.py
+│   ├── migrations
+│   │   ├── 0001_alter_arenaprogress_unique_together_and_more.py
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_arenagame_min_level_arenagame_robot_mode_and_more.py
+│   │   ├── 0003_remove_arenagame_min_level_and_more.py
+│   │   ├── 000X_add_stateful_robot_fields.py
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       ├── 0001_alter_arenaprogress_unique_together_and_more.cpython-312.pyc
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_arenagame_min_level_arenagame_robot_mode_and_more.cpython-312.pyc
+│   │       ├── 0003_remove_arenagame_min_level_and_more.cpython-312.pyc
+│   │       ├── 000X_add_stateful_robot_fields.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── sandbox.py
+│   ├── templates
+│   │   └── arena
+│   │       ├── game_list.html
+│   │       ├── paywall.html
+│   │       ├── robot_play.html
+│   │       └── snake_play.html
+│   ├── urls.py
+│   └── views.py
+├── backup.sql
+├── contests
+│   ├── __pycache__
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── ai_analysis.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   ├── utils.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── admin.py
+│   ├── ai_analysis.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_contest_description.py
+│   │   ├── 0003_practicesession.py
+│   │   ├── 0004_alter_practicesession_options_and_more.py
+│   │   ├── 0005_contest_practice_open_contest_practice_time.py
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_contest_description.cpython-312.pyc
+│   │       ├── 0003_practicesession.cpython-312.pyc
+│   │       ├── 0004_alter_practicesession_options_and_more.cpython-312.pyc
+│   │       ├── 0005_contest_practice_open_contest_practice_time.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── templatetags
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   └── dict_filters.cpython-312.pyc
+│   │   └── dict_filters.py
+│   ├── urls.py
+│   ├── utils.py
+│   └── views.py
+├── contests.json
+├── export_tests.py
+├── judge
+│   ├── __pycache__
+│   │   ├── grader.cpython-312.pyc
+│   │   └── run_code.cpython-312.pyc
+│   ├── admin.py
+│   ├── grader.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_ignore.py
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── run_code.py
+│   ├── urls.py
+│   └── views.py
+├── log
+├── logs
+│   └── judge_callback.log
+├── manage.py
+├── oj
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── settings.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   ├── views.cpython-312.pyc
+│   │   ├── views_api.cpython-312.pyc
+│   │   └── wsgi.cpython-312.pyc
+│   ├── asgi.py
+│   ├── roadmap_data
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   ├── stage_01.cpython-312.pyc
+│   │   │   ├── stage_02.cpython-312.pyc
+│   │   │   ├── stage_03.cpython-312.pyc
+│   │   │   ├── stage_04.cpython-312.pyc
+│   │   │   ├── stage_05.cpython-312.pyc
+│   │   │   ├── stage_06.cpython-312.pyc
+│   │   │   ├── stage_07.cpython-312.pyc
+│   │   │   ├── stage_08.cpython-312.pyc
+│   │   │   ├── stage_09.cpython-312.pyc
+│   │   │   ├── stage_10.cpython-312.pyc
+│   │   │   ├── stage_11.cpython-312.pyc
+│   │   │   ├── stage_12.cpython-312.pyc
+│   │   │   ├── stage_13.cpython-312.pyc
+│   │   │   └── stage_14.cpython-312.pyc
+│   │   ├── stage_01.py
+│   │   ├── stage_02.py
+│   │   ├── stage_03.py
+│   │   ├── stage_04.py
+│   │   ├── stage_05.py
+│   │   ├── stage_06.py
+│   │   ├── stage_07.py
+│   │   ├── stage_08.py
+│   │   ├── stage_09.py
+│   │   ├── stage_10.py
+│   │   ├── stage_11.py
+│   │   ├── stage_12.py
+│   │   ├── stage_13.py
+│   │   ├── stage_14.py
+│   │   └── topics
+│   │       ├── stage01_topic01.html
+│   │       ├── stage01_topic02.html
+│   │       ├── stage01_topic03.html
+│   │       ├── stage02_topic01.html
+│   │       ├── stage02_topic02.html
+│   │       ├── stage02_topic03.html
+│   │       ├── stage02_topic04.html
+│   │       ├── stage03_topic01.html
+│   │       ├── stage03_topic02.html
+│   │       ├── stage03_topic03.html
+│   │       ├── stage04_topic01.html
+│   │       ├── stage04_topic02.html
+│   │       ├── stage04_topic03.html
+│   │       ├── stage04_topic04.html
+│   │       ├── stage05_topic01.html
+│   │       ├── stage05_topic02.html
+│   │       ├── stage05_topic03.html
+│   │       ├── stage06_topic01.html
+│   │       ├── stage06_topic02.html
+│   │       ├── stage06_topic03.html
+│   │       ├── stage07_topic01.html
+│   │       ├── stage07_topic02.html
+│   │       ├── stage07_topic03.html
+│   │       ├── stage08_topic01.html
+│   │       ├── stage08_topic02.html
+│   │       ├── stage08_topic03.html
+│   │       ├── stage08_topic04.html
+│   │       ├── stage08_topic05.html
+│   │       ├── stage09_topic01.html
+│   │       ├── stage09_topic02.html
+│   │       ├── stage09_topic03.html
+│   │       ├── stage10_topic01.html
+│   │       ├── stage10_topic02.html
+│   │       ├── stage10_topic03.html
+│   │       ├── stage11_topic01.html
+│   │       ├── stage11_topic02.html
+│   │       ├── stage11_topic03.html
+│   │       ├── stage11_topic04.html
+│   │       ├── stage12_topic01.html
+│   │       ├── stage12_topic02.html
+│   │       ├── stage12_topic03.html
+│   │       ├── stage12_topic04.html
+│   │       ├── stage13_topic01.html
+│   │       ├── stage13_topic02.html
+│   │       ├── stage13_topic03.html
+│   │       ├── stage13_topic04.html
+│   │       ├── stage14_topic01.html
+│   │       ├── stage14_topic02.html
+│   │       ├── stage14_topic03.html
+│   │       └── stage14_topic04.html
+│   ├── settings.py
+│   ├── templates
+│   │   └── submit.html
+│   ├── urls.py
+│   ├── views.py
+│   ├── views_api.py
+│   └── wsgi.py
+├── problems
+│   ├── __pycache__
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── ai_helper.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── editorial_access.cpython-312.pyc
+│   │   ├── forms.cpython-312.pyc
+│   │   ├── load_default_tags.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── signals.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   ├── views.cpython-312.pyc
+│   │   ├── views_admin.cpython-312.pyc
+│   │   └── views_profile.cpython-312.pyc
+│   ├── admin.py
+│   ├── ai
+│   │   ├── __pycache__
+│   │   │   └── ai_hint.cpython-312.pyc
+│   │   ├── ai_autotag.py
+│   │   └── ai_hint.py
+│   ├── ai_helper.py
+│   ├── apps.py
+│   ├── editorial_access.py
+│   ├── forms.py
+│   ├── load_default_tags.py
+│   ├── management
+│   │   └── commands
+│   │       ├── __init__.py
+│   │       ├── __pycache__
+│   │       │   ├── __init__.cpython-312.pyc
+│   │       │   ├── clean_tags_slug.cpython-312.pyc
+│   │       │   ├── fix_duplicate_tags.cpython-312.pyc
+│   │       │   └── sync_tags.cpython-312.pyc
+│   │       ├── clean_tags_slug.py
+│   │       ├── fix_duplicate_tags.py
+│   │       └── sync_tags.py
+│   ├── middleware
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   └── submission_throttle.cpython-312.pyc
+│   │   └── submission_throttle.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_auto_20251117_1448.py
+│   │   ├── 0003_tag_and_more.py
+│   │   ├── 0004_problemeditorial_editorialpurchase.py
+│   │   ├── 0005_alter_problemeditorial_access_mode.py
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_auto_20251117_1448.cpython-312.pyc
+│   │       ├── 0003_tag_and_more.cpython-312.pyc
+│   │       ├── 0004_problemeditorial_editorialpurchase.cpython-312.pyc
+│   │       ├── 0005_alter_problemeditorial_access_mode.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── signals.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── views_admin.py
+│   └── views_profile.py
+├── render-build.sh
+├── render.yaml
+├── requirements.txt
+├── runtime.txt
+├── static
+│   ├── css
+│   │   └── admin_markdown.css
+│   ├── images
+│   │   ├── __InIt.py
+│   │   └── qr_bank.jpg
+│   └── js
+│       ├── admin_markdown.js
+│       ├── ai_admin_helper.js
+│       └── ai_editor.js
+├── staticfiles
+├── structure.txt
+├── submissions
+│   ├── __pycache__
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── tasks.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   ├── views.cpython-312.pyc
+│   │   ├── views_api.cpython-312.pyc
+│   │   └── views_callback.cpython-312.pyc
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_alter_submission_verdict.py
+│   │   ├── 0003_submission_contest.py
+│   │   ├── 0004_submission_practice_session.py
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_alter_submission_verdict.cpython-312.pyc
+│   │       ├── 0003_submission_contest.cpython-312.pyc
+│   │       ├── 0004_submission_practice_session.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── my_submissions.html
+│   ├── sse_state.py
+│   ├── tasks.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── views_api
+│   ├── views_api.py
+│   └── views_callback.py
+├── templates
+│   ├── account
+│   │   ├── login.html
+│   │   ├── password_reset.html
+│   │   └── signup.html
+│   ├── admin
+│   │   ├── problems
+│   │   │   ├── change_form_with_upload.html
+│   │   │   ├── problem_change_form.html
+│   │   │   ├── testcase_list_partial.html
+│   │   │   └── view_tests.html
+│   │   └── upload_tests.html
+│   ├── base.html
+│   ├── contests
+│   │   ├── contest_block.html
+│   │   ├── detail.html
+│   │   ├── list.html
+│   │   ├── practice.html
+│   │   ├── practice_rank.html
+│   │   └── rank.html
+│   ├── error_rate_limit.html
+│   ├── home.html
+│   ├── includes
+│   │   ├── _footer.html
+│   │   ├── _hero.html
+│   │   ├── _roadmap.html
+│   │   └── roadmap_stages.html
+│   ├── problems
+│   │   ├── ai_dashboard.html
+│   │   ├── detail.html
+│   │   ├── list.html
+│   │   └── partials
+│   │       └── _problem_table.html
+│   ├── roadmap_detail.html
+│   ├── roadmap_stage.html
+│   ├── socialaccount
+│   │   └── login.html
+│   ├── submissions
+│   │   ├── detail.html
+│   │   ├── my_submissions.html
+│   │   ├── result.html
+│   │   └── submit.html
+│   ├── submit.html
+│   ├── topic_detail.html
+│   ├── users
+│   │   ├── change_password.html
+│   │   └── profile.html
+│   └── z7154674795489_c190e2526b36a51897494f322bd15bc1.jpg
+├── throttle.log
+├── tin247ctp.sock
+├── udo journalctl -u tin247ctp-rqworker -n 50 --no-pager
+├── udo systemctl restart tin247ctp
+└── venv
+    ├── bin
+    │   ├── Activate.ps1
+    │   ├── activate
+    │   ├── activate.csh
+    │   ├── activate.fish
+    │   ├── django-admin
+    │   ├── dotenv
+    │   ├── gunicorn
+    │   ├── normalizer
+    │   ├── pip
+    │   ├── pip3
+    │   ├── pip3.12
+    │   ├── python -> python3
+    │   ├── python3 -> /usr/bin/python3
+    │   ├── python3.12 -> python3
+    │   ├── rq
+    │   ├── rqinfo
+    │   ├── rqworker
+    │   └── sqlformat
+    ├── include
+    │   ├── python3.12
+    │   └── site
+    │       └── python3.12
+    │           └── greenlet
+    ├── lib
+    │   └── python3.12
+    │       └── site-packages
+    │           ├── Django-5.1.dist-info
+    │           ├── PyJWT-2.10.1.dist-info
+    │           ├── __pycache__
+    │           ├── _cffi_backend.cpython-312-x86_64-linux-gnu.so
+    │           ├── allauth
+    │           ├── asgiref
+    │           ├── asgiref-3.10.0.dist-info
+    │           ├── certifi
+    │           ├── certifi-2025.10.5.dist-info
+    │           ├── cffi
+    │           ├── cffi-2.0.0.dist-info
+    │           ├── charset_normalizer
+    │           ├── charset_normalizer-3.4.4.dist-info
+    │           ├── click
+    │           ├── click-8.3.0.dist-info
+    │           ├── crispy_bootstrap5
+    │           ├── crispy_bootstrap5-2025.6.dist-info
+    │           ├── crispy_forms
+    │           ├── croniter
+    │           ├── croniter-6.0.0.dist-info
+    │           ├── cryptography
+    │           ├── cryptography-46.0.3.dist-info
+    │           ├── dateutil
+    │           ├── django
+    │           ├── django_allauth-65.13.0.dist-info
+    │           ├── django_crispy_forms-2.5.dist-info
+    │           ├── django_recaptcha
+    │           ├── django_recaptcha-4.1.0.dist-info
+    │           ├── django_redis
+    │           ├── django_redis-5.4.0.dist-info
+    │           ├── django_rq
+    │           ├── django_rq-3.1.dist-info
+    │           ├── dotenv
+    │           ├── gevent
+    │           ├── gevent-24.2.1.dist-info
+    │           ├── greenlet
+    │           ├── greenlet-3.2.4.dist-info
+    │           ├── gunicorn
+    │           ├── gunicorn-23.0.0.dist-info
+    │           ├── idna
+    │           ├── idna-3.11.dist-info
+    │           ├── jwt
+    │           ├── packaging
+    │           ├── packaging-25.0.dist-info
+    │           ├── pip
+    │           ├── pip-24.0.dist-info
+    │           ├── psycopg2
+    │           ├── psycopg2_binary-2.9.11.dist-info
+    │           ├── psycopg2_binary.libs
+    │           ├── pycparser
+    │           ├── pycparser-2.23.dist-info
+    │           ├── python_dateutil-2.9.0.post0.dist-info
+    │           ├── python_dotenv-1.2.1.dist-info
+    │           ├── pytz
+    │           ├── pytz-2025.2.dist-info
+    │           ├── redis
+    │           ├── redis-7.0.1.dist-info
+    │           ├── requests
+    │           ├── requests-2.32.5.dist-info
+    │           ├── rq
+    │           ├── rq-2.6.0.dist-info
+    │           ├── six-1.17.0.dist-info
+    │           ├── six.py
+    │           ├── sqlparse
+    │           ├── sqlparse-0.5.3.dist-info
+    │           ├── urllib3
+    │           ├── urllib3-2.5.0.dist-info
+    │           ├── whitenoise
+    │           ├── whitenoise-6.11.0.dist-info
+    │           ├── zope
+    │           ├── zope_event-6.1.dist-info
+    │           └── zope_interface-8.1.dist-info
+    ├── lib64 -> lib
+    └── pyvenv.cfg
+
+141 directories, 346 files

@@ -1,0 +1,764 @@
+<style>
+  :root {
+    --blue-main: #2563eb;
+    --blue-dark: #1d4ed8;
+    --blue-soft: #eff6ff;
+    --indigo-soft: #eef2ff;
+    --orange-soft: #fff7ed;
+    --slate-50: #f8fafc;
+    --slate-100: #e2e8f0;
+    --slate-700: #334155;
+    --slate-900: #0f172a;
+    --code-bg: #020617;
+  }
+
+  .arena-lesson {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--slate-900);
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  /* Banner trên cùng */
+  .lesson-hero {
+    background: radial-gradient(circle at top left, #bfdbfe, #eff6ff);
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin: 0 0 20px 0;
+    border: 1px solid #dbeafe;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .lesson-hero-icon {
+    font-size: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #2563eb, #4f46e5);
+    color: #e5f0ff;
+    flex-shrink: 0;
+  }
+
+  .lesson-hero-main h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--blue-dark);
+    margin: 0 0 4px 0;
+  }
+
+  .lesson-hero-main p {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+  }
+
+  .lesson-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .lesson-chip {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.04);
+    color: #0f172a;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+  }
+
+  .arena-lesson h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--blue-main);
+    margin-top: 26px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .arena-lesson h2::before {
+    content: "";
+    width: 6px;
+    height: 22px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #2563eb, #4f46e5);
+  }
+
+  .arena-lesson h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--slate-700);
+    margin-top: 18px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arena-lesson h3::before {
+    content: "▶";
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .lesson-box {
+    background: var(--blue-soft);
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #dbeafe;
+    margin: 14px 0 18px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lesson-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(129, 140, 248, 0.18), transparent 55%);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .lesson-box > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .example-box {
+    background: #ecfeff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #bae6fd;
+    margin: 14px 0;
+  }
+
+  .exercise-box {
+    background: var(--orange-soft);
+    padding: 10px 13px;
+    border-radius: 10px;
+    border: 1px solid #fed7aa;
+    margin: 8px 0;
+  }
+
+  .exercise-box b {
+    color: #c05621;
+  }
+
+  .code-box {
+    background: var(--code-bg);
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: Consolas, Menlo, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid #0b1220;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.55);
+  }
+
+  .code-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93c5fd;
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+
+  .code-box pre {
+    margin: 0;
+    white-space: pre;
+  }
+
+  /* ===== LIST STYLE CHUẨN UL/OL ===== */
+  .arena-lesson ul {
+    padding-left: 1.3rem;
+    margin: 6px 0 6px 0;
+    list-style-type: disc !important;
+    list-style-position: outside;
+  }
+
+  .arena-lesson ul ul {
+    list-style-type: circle !important;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .arena-lesson ol {
+    padding-left: 1.4rem;
+    margin: 6px 0 6px 0;
+    list-style-type: decimal !important;
+    list-style-position: outside;
+  }
+
+  .arena-lesson li {
+    margin-bottom: 3px;
+  }
+
+  .arena-lesson li::marker {
+    color: #2563eb;
+  }
+
+  .inline-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    background: #e0f2fe;
+    color: #0f172a;
+    border: 1px solid #bae6fd;
+    margin-left: 4px;
+  }
+
+  .mini-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mini-card {
+    flex: 1 1 180px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px dashed #cbd5e1;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .summary-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #e0f7fa;
+    border: 1px solid #b2ebf2;
+    margin-top: 6px;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px dashed #cbd5e1;
+    margin: 18px 0;
+  }
+
+  .badge-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1d4ed8;
+    margin-bottom: 4px;
+  }
+
+  .arena-lesson p {
+    margin: 5px 0;
+  }
+
+  .arena-lesson strong {
+    font-weight: 600;
+  }
+</style>
+
+
+<div class="arena-lesson">
+
+  <!-- HERO -->
+  <div class="lesson-hero">
+    <div class="lesson-hero-icon">
+      📘
+    </div>
+    <div class="lesson-hero-main">
+      <h1>🎓. PHÉP TOÁN MODULO & NGHỊCH ĐẢO MODULO</h1>
+      <p>Làm việc với số lớn, tránh tràn số, hiểu và sử dụng nghịch đảo modulo trong các bài toán số học và tổ hợp.</p>
+      <div class="lesson-chip-row">
+        <span class="lesson-chip">Number Theory</span>
+        <span class="lesson-chip">Competitive Programming</span>
+        <span class="lesson-chip">Modulo &amp; Inverse</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MỤC TIÊU -->
+  <h2>Mục tiêu bài học</h2>
+
+  <div class="lesson-box">
+    <ul>
+      <li>Hiểu cách biểu diễn số lớn bằng phần dư modulo.</li>
+      <li>Thực hiện chính xác các phép toán: cộng, trừ, nhân, lũy thừa trong modulo.</li>
+      <li>Biết khi nào nghịch đảo modulo tồn tại và cách tính.</li>
+      <li>Áp dụng modulo trong các dạng bài lập trình như:
+        <ul>
+          <li>Tính lũy thừa lớn</li>
+          <li>Tính phân số modulo</li>
+          <li>Tính tổ hợp (nCk)</li>
+          <li>Giải phương trình dạng ax ≡ b (mod m)</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+
+  <hr class="section-divider">
+
+  <!-- I. KHÁI NIỆM MODULO -->
+  <h2>I. Khái niệm modulo</h2>
+
+  <p>Một số nguyên có thể được viết dưới dạng:</p>
+
+  <div class="example-box">
+    <b>a = k · MOD + d</b>, trong đó:<br>
+    – <b>d</b> là phần dư khi chia a cho MOD<br>
+    – <b>0 ≤ d &lt; MOD</b>
+  </div>
+
+  <p>Khi làm việc với số rất lớn, ta chỉ lưu phần dư <b>d</b>. Đây chính là ý nghĩa của việc tránh tràn số bằng modulo.</p>
+
+  <div class="example-box">
+    <b>Ví dụ:</b> Tính (123456789 × 987654321) % 1e9+7<br>
+    – Không nhân trực tiếp (tràn 64-bit)<br>
+    – Tính lần lượt:
+    <ul>
+      <li>123456789 % MOD</li>
+      <li>987654321 % MOD</li>
+      <li>Nhân &amp; lấy mod tiếp</li>
+    </ul>
+  </div>
+
+
+  <hr class="section-divider">
+
+  <!-- II. TẠI SAO DÙNG MODULO -->
+  <h2>II. TẠI SAO PHẢI DÙNG MODULO?</h2>
+
+  <h3>1. Tránh tràn số</h3>
+  <div class="example-box">
+    <p>Ví dụ: cần tính <code>10<sup>1000</sup></code> trong chương trình. Giá trị này có tới 1001 chữ số, không thể lưu vào bất kỳ kiểu dữ liệu thông thường nào.</p>
+    <p>Nhưng nếu bài toán yêu cầu:</p>
+    <div class="code-box"><pre><code>10<sup>1000</sup> % 1,000,000,007</code></pre></div>
+    <p>thì ta có thể dùng lũy thừa nhanh modulo để tính được, mà không cần lưu giá trị đầy đủ của <code>10<sup>1000</sup></code>.</p>
+  </div>
+
+  <h3>2. Giảm độ lớn, tối ưu tính toán</h3>
+  <p>Trong các bài toán đếm, tổ hợp, số cách, kết quả thường rất lớn. Ta chỉ cần kết quả theo một modulo, chẳng hạn <code>1,000,000,007</code>, nên luôn có thể “co” giá trị về trong khoảng <code>[0, MOD-1]</code>.</p>
+
+  <h3>3. Giữ lại phần dư d thay cho a</h3>
+  <p>Về bản chất, trong thế giới modulo, ta thay mỗi số <code>a</code> bằng phần dư <code>d = a % MOD</code>, vì:</p>
+  <div class="code-box"><pre><code>a ≡ d (mod MOD)</code></pre></div>
+
+  <div class="summary-pill">Ta làm việc với lớp dư, không phải giá trị gốc.</div>
+
+  <hr class="section-divider">
+
+  <!-- III. TÍNH CHẤT CƠ BẢN -->
+  <h2>III. CÁC TÍNH CHẤT CƠ BẢN CỦA MODULO</h2>
+
+  <div class="lesson-box">
+    <h3>1. Cộng</h3>
+    <div class="code-box"><pre><code>(a + b) % MOD = (a % MOD + b % MOD) % MOD</code></pre></div>
+
+    <h3>2. Trừ</h3>
+    <div class="code-box"><pre><code>(a - b) % MOD = (a % MOD - b % MOD + MOD) % MOD</code></pre></div>
+    <p>Thêm <code>+ MOD</code> để tránh số âm.</p>
+
+    <h3>3. Nhân</h3>
+    <div class="code-box"><pre><code>(a * b) % MOD = ((a % MOD) * (b % MOD)) % MOD</code></pre></div>
+
+    <h3>4. Lũy thừa</h3>
+    <p>Muốn tính <code>a^k % MOD</code> với <code>k</code> rất lớn, ta dùng lũy thừa nhanh (binary exponentiation) để đạt độ phức tạp <code>O(log k)</code>.</p>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- IV. LŨY THỪA NHANH -->
+  <h2>IV. Lũy thừa nhanh (Binary Exponentiation)</h2>
+
+  <p>
+    Bài toán: Tính <b>a<sup>n</sup> mod MOD</b> với n rất lớn (n lên đến 10<sup>18</sup> hoặc 10<sup>1000</sup>).
+  </p>
+
+  <div class="lesson-box">
+    <p><b>Ý tưởng:</b></p>
+    <ul>
+      <li>Dựa trên phân tích nhị phân của số mũ n.</li>
+      <li>Một số n được biểu diễn dạng nhị phân ⇒ chỉ cần nhân những lũy thừa a<sup>2<sup>k</sup></sup> tương ứng.</li>
+      <li>Mỗi bước chia đôi số mũ ⇒ thời gian O(log n).</li>
+    </ul>
+  </div>
+
+  <h3>Ví dụ minh họa</h3>
+
+  <div class="example-box">
+    Tính 3<sup>13</sup> mod 1000<br><br>
+    13 = (1101)<sub>2</sub> = 8 + 4 + 1<br><br>
+    ⇒ 3<sup>13</sup> = 3<sup>8</sup> × 3<sup>4</sup> × 3<sup>1</sup><br>
+    ⇒ mỗi lũy thừa được tính bằng bình phương liên tiếp.
+  </div>
+
+  <h3>Cài đặt C++</h3>
+
+  <div class="code-box">
+    <div class="code-label">C++</div>
+<pre><code>long long modpow(long long a, long long e, long long MOD) {
+    long long r = 1;
+    a %= MOD;
+    while (e > 0) {
+        if (e & 1) r = (r * a) % MOD;
+        a = (a * a) % MOD;
+        e >>= 1;
+    }
+    return r;
+}
+</code></pre>
+  </div>
+
+  <h3>Cài đặt Python</h3>
+
+  <div class="code-box">
+    <div class="code-label">Python</div>
+<pre><code>def modpow(a, e, MOD):
+    r = 1
+    a %= MOD
+    while e > 0:
+        if e & 1:
+            r = r * a % MOD
+        a = a * a % MOD
+        e //= 2
+    return r
+</code></pre>
+  </div>
+
+
+  <!-- V. VÌ SAO KHÔNG CÓ PHÉP CHIA -->
+  <h2>V. VÌ SAO MODULO KHÔNG CÓ PHÉP CHIA TRỰC TIẾP?</h2>
+
+  <div class="lesson-box">
+    <p>Trong modulo, biểu thức:</p>
+    <div class="code-box"><pre><code>a / b % MOD</code></pre></div>
+    <p>không có nghĩa rõ ràng.</p>
+
+    <p>Thay vào đó, ta dùng ý tưởng:</p>
+    <div class="code-box"><pre><code>a / b (mod MOD)  ≈  a * inv(b) (mod MOD)</code></pre></div>
+    <p>Trong đó <code>inv(b)</code> là nghịch đảo của <code>b</code> theo modulo <code>MOD</code> (nếu tồn tại).</p>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- VI. NGHỊCH ĐẢO MODULO -->
+  <h2>VI. Nghịch đảo modulo</h2>
+
+  <p>
+    Trong modulo, phép chia <b>không tồn tại</b> theo nghĩa thông thường.<br>
+    Để thực hiện phép chia, ta phải chuyển nó thành phép nhân với <b>nghịch đảo modulo</b>.
+  </p>
+
+  <div class="lesson-box">
+    <b>Định nghĩa:</b><br>
+    Với <b>a</b> và <b>MOD</b>, nghịch đảo modulo của a là số <b>x</b> sao cho:
+    <div class="example-box" style="margin-top:8px;">
+      a × x ≡ 1 (mod MOD)
+    </div>
+    Khi đó:
+    <div class="example-box" style="margin-top:8px;">
+      a / b mod MOD = a × inv(b) mod MOD
+    </div>
+  </div>
+
+  <h3>Khi nào nghịch đảo tồn tại?</h3>
+
+  <ul>
+    <li>Nghịch đảo của <b>a</b> theo <b>MOD</b> tồn tại ⇔ <b>gcd(a, MOD) = 1</b>.</li>
+    <li>Nếu MOD là số nguyên tố (như 10<sup>9</sup>+7), mọi số 1 ≤ a &lt; MOD đều có nghịch đảo.</li>
+  </ul>
+
+  <hr class="section-divider"/>
+
+  <h3>1. Nghịch đảo modulo khi MOD là số nguyên tố (Fermat nhỏ)</h2>
+
+  <p>Dựa trên định lý Fermat nhỏ:</p>
+
+  <div class="example-box">
+    a<sup>MOD−1</sup> ≡ 1 (mod MOD)<br>
+    ⇒ a × a<sup>MOD−2</sup> ≡ 1 (mod MOD)
+  </div>
+
+  <p>Do đó nghịch đảo của a là:</p>
+
+  <div class="lesson-box">
+    <b>inv(a) = a<sup>MOD−2</sup> mod MOD</b>
+  </div>
+
+  <h3>C++</h3>
+
+  <div class="code-box">
+    <div class="code-label">C++</div>
+<pre><code>const long long MOD = 1000000007;
+
+long long modpow(long long a, long long e) {
+    long long r = 1;
+    while (e) {
+        if (e & 1) r = r * a % MOD;
+        a = a * a % MOD;
+        e >>= 1;
+    }
+    return r;
+}
+
+long long modinv(long long a) {
+    return modpow(a, MOD - 2);
+}
+</code></pre>
+  </div>
+
+  <h3>Python</h3>
+
+  <div class="code-box">
+    <div class="code-label">Python</div>
+<pre><code>MOD = 10**9 + 7
+
+def modpow(a, e):
+    r = 1
+    a %= MOD
+    while e:
+        if e & 1:
+            r = r * a % MOD
+        a = a * a % MOD
+        e //= 2
+    return r
+
+def modinv(a):
+    return modpow(a, MOD - 2)
+</code></pre>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <h3>2. Nghịch đảo modulo khi MOD không nguyên tố — Euclid mở rộng</h2>
+
+  <p>Giải phương trình:</p>
+  <div class="example-box">
+    a·x + MOD·y = 1
+  </div>
+
+  <p>
+    Khi đó <b>x chính là nghịch đảo của a theo MOD</b>.  
+    Điều kiện tồn tại: gcd(a, MOD) = 1.
+  </p>
+
+  <h3>C++ — Euclid mở rộng</h3>
+
+  <div class="code-box">
+    <div class="code-label">C++</div>
+<pre><code>long long extgcd(long long a, long long b, long long &x, long long &y) {
+    if (b == 0) {
+        x = 1; y = 0;
+        return a;
+    }
+    long long x1, y1;
+    long long g = extgcd(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - y1 * (a / b);
+    return g;
+}
+
+long long modinv_general(long long a, long long MOD) {
+    long long x, y;
+    long long g = extgcd(a, MOD, x, y);
+    if (g != 1) return -1; // không tồn tại nghịch đảo
+    return (x % MOD + MOD) % MOD;
+}
+</code></pre>
+  </div>
+
+  <h3>Python — Euclid mở rộng</h3>
+
+  <div class="code-box">
+    <div class="code-label">Python</div>
+<pre><code>def extgcd(a, b):
+    if b == 0:
+        return a, 1, 0
+    g, x1, y1 = extgcd(b, a % b)
+    return g, y1, x1 - y1 * (a // b)
+
+def modinv_general(a, MOD):
+    g, x, y = extgcd(a, MOD)
+    if g != 1:
+        return None  # không tồn tại nghịch đảo
+    return x % MOD
+</code></pre>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <h3>3. Ví dụ minh họa</h2>
+
+  <div class="example-box">
+    <b>Ví dụ 1:</b> Tìm nghịch đảo của 5 theo MOD = 1,000,000,007.<br><br>
+    inv(5) = 5<sup>MOD−2</sup> mod MOD = 5<sup>1000000005</sup> mod MOD<br>
+    Kết quả: <b>400000003</b>.
+  </div>
+
+  <div class="example-box">
+    <b>Ví dụ 2:</b> Tìm nghịch đảo của 7 theo MOD = 1000.<br><br>
+    gcd(7, 1000) = 1 ⇒ nghịch đảo tồn tại.<br>
+    Giải: 7x + 1000y = 1<br>
+    Ta được x = 143 ⇒ <b>inv(7) = 143 mod 1000</b>.
+  </div>
+
+  <hr class="section-divider"/>
+
+  <h3>4. Ứng dụng thực tế của nghịch đảo modulo</h2>
+
+  <div class="lesson-box">
+    <ul>
+      <li><b>Tính phân số modulo:</b>  
+        <div class="inline-tag">a / b mod MOD = a × inv(b)</div>
+      </li>
+
+      <li><b>Tính tổ hợp C(n, k) modulo:</b>  
+        C(n,k) = n! × inv(k!) × inv((n−k)!) mod MOD
+      </li>
+
+      <li><b>Giải phương trình tuyến tính:</b>  
+        ax ≡ b (mod m) ⇒ x = b × inv(a)
+      </li>
+
+      <li><b>Nhân chia trong FFT, NTT, phép biến đổi số học.</b></li>
+    </ul>
+  </div>
+  
+    <hr class="section-divider">
+
+  <!-- XI. DẠNG BÀI TẬP -->
+<h2>VII. Bài tập vận dụng</h2>
+
+
+<!-- Bài 1 -->
+<div class="exercise-box">
+  <b>Bài 1. Tính a<sup>b</sup> mod 1e9+7</b>
+  <ul>
+    <li><b>Input:</b> a, b (k có thể tới 10<sup>18</sup>)</li>
+    <li><b>Output:</b> a<sup>b</sup> mod 1e9+7</li>
+  </ul>
+   <p><b>Làm bài:</b><a href="https://tin247ctp.com/problems/145/" target="_blank"> click vào đây</a></p>
+</div>
+
+<!-- Bài 2 -->
+<div class="exercise-box">
+  <b>Bài 2. Hãy đưa ra hai chữ số tận cùng của 7<sup>N</sup></b>
+  <ul>
+    <li><b>Input:</b> Số nguyên N (0 ≤ N ≤ 10<sup>9</sup>)</li>
+    <li><b>Output:</b> Số nguyên duy nhất là hai chữ số tận cùng của 7<sup>N</sup></li>
+  </ul>
+  <p><b>Làm bài:</b><a href="https://tin247ctp.com/problems/146/"> click vào đây</a></p>
+</div>
+
+
+<!-- Bài 3 -->
+<div class="exercise-box">
+  <b>Bài 3. Tìm nghịch đảo của a theo MOD</b>
+  <ul>
+    <li><b>Input:</b> a, MOD</li>
+    <li><b>Output:</b> inv(a) hoặc -1 nếu không tồn tại</li>
+  </ul>
+  <p><b>Gợi ý:</b> 
+    Nếu MOD nguyên tố → dùng a<sup>MOD−2</sup> mod MOD. <br>
+    Nếu MOD không nguyên tố → dùng Euclid mở rộng.
+  </p>
+</div>
+
+<!-- Bài 4 -->
+<div class="exercise-box">
+  <b>Bài 4. Tính phân số modulo</b>
+  <ul>
+    <li><b>Input:</b> a, b, MOD</li>
+    <li><b>Output:</b> (a / b) mod MOD</li>
+  </ul>
+  <p><b>Gợi ý:</b> Tính inv(b), sau đó a × inv(b).</p>
+</div>
+
+<!-- Bài 5 -->
+<div class="exercise-box">
+  <b>Bài 5. Giải phương trình a·x ≡ b (mod m)</b>
+  <ul>
+    <li><b>Input:</b> a, b, m</li>
+    <li><b>Output:</b> x nếu tồn tại, ngược lại -1</li>
+  </ul>
+  <p><b>Gợi ý:</b> x = b × inv(a) (chỉ khi gcd(a, m) = 1).</p>
+</div>
+
+<!-- Bài 6 -->
+<div class="exercise-box">
+  <b>Bài 6. Tính C(n, k) mod 1e9+7</b>
+  <ul>
+    <li><b>Input:</b> n, k ≤ 2×10<sup>6</sup></li>
+    <li><b>Output:</b> C(n, k) mod 1e9+7</li>
+  </ul>
+  <p><b>Gợi ý:</b> Tiền xử lý factorial và inverse factorial.</p>
+</div>
+
+<!-- Bài 7 -->
+<div class="exercise-box">
+  <b>Bài 7. Tổng bảng số</b>
+  <p><b>Làm bài:</b><a href="https://tin247ctp.com/problems/132/"> click vào đây</a></p>
+</div>
+
+<!-- Bài 8 -->
+<div class="exercise-box">
+  <b>Bài 8. Tính 2<sup>N</sup> mod 1e9+7 với N có 10<sup>5</sup> chữ số</b>
+  <ul>
+    <li><b>Input:</b> N dạng chuỗi</li>
+    <li><b>Output:</b> 2<sup>N</sup> mod MOD</li>
+  </ul>
+  <p><b>Gợi ý:</b> Dùng phương pháp "mod mũ từ chuỗi":</p>
+  <div class="mini-card">pow = (pow × 10 + (digit−'0')) % (MOD−1)</div>
+</div>
+
+<!-- Bài 9 -->
+<div class="exercise-box">
+  <b>Bài 9. Phép chia đa thức modulo (ứng dụng nghịch đảo)</b>
+  <ul>
+    <li><b>Input:</b> a, b</li>
+    <li><b>Output:</b> a × inv(b) mod 1e9+7</li>
+  </ul>
+  <p><b>Ứng dụng thường gặp trong FFT/NTT.</b></p>
+</div>
+
+<!-- Bài 10 -->
+<div class="exercise-box">
+  <b>Bài 10. Kiểm tra hai số có đồng dư modulo m</b>
+  <ul>
+    <li><b>Input:</b> a, b, m</li>
+    <li><b>Output:</b> YES hoặc NO</li>
+  </ul>
+  <p><b>Gợi ý:</b> Kiểm tra (a − b) % m == 0.</p>
+</div>
+
+
+
+</div>
+
+
+
+
+</div>

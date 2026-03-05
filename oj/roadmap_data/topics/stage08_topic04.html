@@ -1,0 +1,279 @@
+<style>
+:root {
+  --blue-main: #2563eb;
+  --blue-dark: #1e3a8a;
+  --text-color: #1e293b;
+}
+
+h1 { color: var(--blue-dark); font-size: 28px; }
+h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
+h3 { color: #334155; margin-top: 25px; }
+
+p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
+
+.codebox { font-family: Consolas, monospace; background:#f8fafc; padding:10px; border-radius:8px; font-size:14px; }
+.line { padding:3px 6px; border-radius:6px; }
+.line.hl { background:#dbeafe; }
+
+.sim-3col {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+  margin-top:20px;
+}
+@media(max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
+
+.col { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; }
+.col h4 { margin-top:0; color:var(--blue-main); }
+
+.btn { border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
+.btn.main { background:var(--blue-main); color:#fff; }
+.btn.secondary { background:#0ea5e9; color:#fff; }
+.btn.red { background:#ef4444; color:#fff; }
+
+#ll-vis {
+  display:flex; align-items:center; overflow-x:auto; padding:10px;
+  border:2px dashed var(--blue-main); border-radius:10px;
+}
+
+.node {
+  display:flex; flex-direction:column; align-items:center; margin-right:20px;
+}
+
+.node-box {
+  background:var(--blue-main); color:white; min-width:60px; height:60px;
+  border-radius:8px; display:flex; justify-content:center; align-items:center;
+  font-weight:bold;
+}
+
+.arrow {
+  font-size:20px; color:var(--blue-main); margin-right:20px;
+}
+
+.callout {
+  border-left:6px solid #10b981; background:#ecfeff; padding:10px 12px;
+  border-radius:8px; margin:12px 0;
+}
+</style>
+
+
+<h1>🔗 Bài giảng: Linked List (có mô phỏng trực quan)</h1>
+<p>
+Linked List gồm các node được nối liên tiếp bằng con trỏ <code>next</code>.  
+Ta có thể chèn/xoá node ở đầu hoặc giữa rất nhanh — không cần dời toàn bộ phần tử như mảng.
+</p>
+
+
+<h2>I. Mô phỏng Linked List</h2>
+
+<div class="sim-3col">
+
+  <!-- Cột thao tác -->
+  <div class="col">
+    <h4>🛠 Thao tác</h4>
+
+    <input id="val" placeholder="Giá trị..." />
+
+    <div>
+      <button class="btn main" id="btn-pf">Insert đầu</button>
+      <button class="btn main" id="btn-pb">Insert cuối</button>
+      <button class="btn red" id="btn-del">Delete giá trị</button>
+      <button class="btn secondary" id="btn-print">Print</button>
+    </div>
+
+    <div class="callout" id="msg">💡 Nhập giá trị và thao tác để thấy Linked List thay đổi.</div>
+  </div>
+
+  <!-- Cột code -->
+  <div class="col">
+    <h4>💻 Code đang chạy</h4>
+
+    <div id="ll-code" class="codebox">
+      <div class="line" data-k="init">Node* head = NULL;</div>
+
+      <div class="line" data-k="pf1">Node* p = new Node(x);</div>
+      <div class="line" data-k="pf2">p->next = head;</div>
+      <div class="line" data-k="pf3">head = p;</div>
+
+      <div class="line" data-k="pb1">Node* p = new Node(x);</div>
+      <div class="line" data-k="pb2">if(head == NULL) head = p;</div>
+      <div class="line" data-k="pb3">else tail->next = p;</div>
+
+      <div class="line" data-k="del1">if(head->val == x) head = head->next;</div>
+      <div class="line" data-k="del2">cur->next = cur->next->next;</div>
+
+      <div class="line" data-k="print">cout << head->val;</div>
+    </div>
+  </div>
+
+  <!-- Cột visual -->
+  <div class="col">
+    <h4>📊 Linked List</h4>
+    <div id="ll-vis"></div>
+  </div>
+
+</div>
+
+
+<script>
+(function(){
+
+  let head = [];
+  const vis = document.getElementById("ll-vis");
+  const code = document.getElementById("ll-code");
+  const msg = document.getElementById("msg");
+  const val = document.getElementById("val");
+
+  function highlight(keys){
+    code.querySelectorAll(".line").forEach(l=>l.classList.remove("hl"));
+    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
+      const line = code.querySelector(`.line[data-k="${k}"]`);
+      if(line) line.classList.add("hl");
+    });
+  }
+
+  function render(){
+    vis.innerHTML = "";
+    head.forEach((v,i)=>{
+      // node
+      const node = document.createElement("div");
+      node.className = "node";
+      node.innerHTML = `<div class="node-box">${v}</div>`;
+
+      vis.appendChild(node);
+
+      // arrow
+      if(i < head.length - 1){
+        const ar = document.createElement("div");
+        ar.className = "arrow";
+        ar.innerHTML = "→";
+        vis.appendChild(ar);
+      }
+    });
+  }
+
+  // insert front
+  document.getElementById("btn-pf").onclick = () => {
+    if(!val.value.trim()) return msg.innerHTML = "⚠️ Nhập giá trị!";
+    head.unshift(val.value.trim());
+    highlight(["pf1","pf2","pf3"]);
+    msg.innerHTML = `Insert đầu: <b>${val.value.trim()}</b>`;
+    val.value="";
+    render();
+  };
+
+  // insert back
+  document.getElementById("btn-pb").onclick = () => {
+    if(!val.value.trim()) return msg.innerHTML = "⚠️ Nhập giá trị!";
+    head.push(val.value.trim());
+    highlight(["pb1","pb2","pb3"]);
+    msg.innerHTML = `Insert cuối: <b>${val.value.trim()}</b>`;
+    val.value="";
+    render();
+  };
+
+  // delete value
+  document.getElementById("btn-del").onclick = () => {
+    if(!val.value.trim()) return msg.innerHTML = "⚠️ Nhập giá trị để xoá!";
+    let x = val.value.trim();
+    highlight(["del1","del2"]);
+
+    head = head.filter(v => v != x);
+
+    msg.innerHTML = `Đã xoá mọi node có giá trị <b>${x}</b>`;
+    val.value="";
+    render();
+  };
+
+  // print
+  document.getElementById("btn-print").onclick = () => {
+    highlight("print");
+    msg.innerHTML = `Dãy hiện tại: <b>${head.join(" → ") || "rỗng"}</b>`;
+  };
+
+  render();
+  highlight("init");
+
+})();
+</script>
+
+
+<h2>II. Lý thuyết cơ bản</h2>
+<p>
+Linked List là cấu trúc dữ liệu **linh hoạt**, đặc biệt mạnh trong thao tác chèn/xoá.
+</p>
+
+<ul>
+  <li><b>Insert đầu:</b> O(1)</li>
+  <li><b>Insert cuối:</b> O(1) nếu có tail</li>
+  <li><b>Delete node:</b> O(1) nếu biết node trước đó</li>
+  <li><b>Duyệt:</b> O(n)</li>
+</ul>
+
+<h2>III. Khi nào dùng Linked List</h2>
+
+<div class="callout">
+<b>1) Khi có rất nhiều thao tác chèn/xoá</b>  
+👉 Insert/Delete O(1) → mạnh hơn mảng.
+</div>
+
+<div class="callout">
+<b>2) Khi bài yêu cầu mô phỏng con trỏ</b>  
+👉 Con trỏ trái/phải, xoá tại vị trí → đặc trưng Linked List.
+</div>
+
+<div class="callout">
+<b>3) Khi xử lý bằng slow/fast pointer</b>  
+👉 Tìm giữa, tìm chu kỳ, tìm node thứ k từ cuối.
+</div>
+
+<div class="callout">
+<b>4) Khi bài yêu cầu đảo ngược dãy hoặc đảo một đoạn</b>  
+👉 Đổi con trỏ, không phải đổi chỗ phần tử như array.
+</div>
+
+<div class="callout">
+<b>5) Khi bộ nhớ phân mảnh</b>  
+👉 Linked List không cần vùng nhớ liên tục.
+</div>
+
+
+<h2>IV. Bài tập luyện tập</h2>
+
+<h3>📘 Cơ bản</h3>
+<details>
+  <summary>1️⃣ Chèn đầu/cuối danh sách</summary>
+  <pre><code>Node* push_front(Node* head, int x){
+  Node* p = new Node(x);
+  p->next = head;
+  return p;
+}</code></pre>
+</details>
+
+<h3>📗 Trung bình – Two pointers</h3>
+
+<details>
+  <summary>2️⃣ Tìm phần tử giữa</summary>
+  <pre><code>Node* mid(Node* head){
+  Node *slow=head, *fast=head;
+  while(fast && fast->next){
+    slow=slow->next;
+    fast=fast->next->next;
+  }
+  return slow;
+}</code></pre>
+</details>
+
+<h3>📙 Nâng cao</h3>
+<details>
+  <summary>3️⃣ Reverse toàn bộ Linked List</summary>
+</details>
+
+<h3>🐉 HSG – khó</h3>
+<details>
+  <summary>4️⃣ Floyd Cycle Detection</summary>
+</details>
+
+<p style="text-align:center; font-style:italic; color:#555;">
+🔚 Mô phỏng giúp bạn hiểu rõ Linked List hoạt động thế nào trong thực tế.
+</p>

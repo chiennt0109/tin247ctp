@@ -1,0 +1,166 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu chuỗi là gì (string) và cách máy tính lưu chữ.</li>
+  <li>Nhập chuỗi từ bàn phím (cả có dấu cách và không có dấu cách).</li>
+  <li>Nối chuỗi, đo độ dài chuỗi, truy cập từng ký tự.</li>
+  <li>Làm các tác vụ cơ bản hay gặp: đếm số chữ 'a', đảo ngược chuỗi, so sánh chuỗi.</li>
+</ul>
+
+<hr>
+
+<h2>1. Khai báo chuỗi</h2>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    string s = "Xin chao";
+    cout &lt;&lt; s;
+}</code></pre>
+</td>
+<td>
+<pre><code>s = "Xin chao"
+print(s)</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>2. Nhập chuỗi</h2>
+
+<p><b>Trường hợp 1:</b> Nhập một từ (không có dấu cách)</p>
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>string name;
+cin >> name;
+cout &lt;&lt; "Hello " &lt;&lt; name;</code></pre>
+</td>
+<td>
+<pre><code>name = input()
+print("Hello", name)</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p><b>Trường hợp 2:</b> Nhập cả dòng (có dấu cách, ví dụ: "Nguyen Van A")</p>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>string full_name;
+getline(cin, full_name);
+cout &lt;&lt; "Chao ban " &lt;&lt; full_name;</code></pre>
+<p class="text-muted small">Lưu ý: nếu trước đó bạn đã dùng <code>cin &gt;&gt; ...</code> thì cần thêm <code>cin.ignore();</code> trước getline để bỏ ký tự xuống dòng còn sót lại.</p>
+</td>
+<td>
+<pre><code>full_name = input()
+print("Chao ban", full_name)</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>3. Độ dài chuỗi và truy cập ký tự</h2>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>string s = "abcXYZ";
+cout &lt;&lt; s.size() &lt;&lt; "\\n"; // in ra độ dài
+cout &lt;&lt; s[0];              // 'a'</code></pre>
+</td>
+<td>
+<pre><code>s = "abcXYZ"
+print(len(s))   # độ dài
+print(s[0])     # 'a'</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>4. Ví dụ bài toán hay gặp: Đếm số ký tự 'a'</h2>
+
+<table class="table table-bordered text-sm">
+<thead><tr><th>C++</th><th>Python</th></tr></thead>
+<tbody>
+<tr>
+<td>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    string s;
+    getline(cin, s);
+    int count_a = 0;
+    for (int i = 0; i &lt; (int)s.size(); i++) {
+        if (s[i] == 'a' || s[i] == 'A') count_a++;
+    }
+    cout &lt;&lt; count_a;
+    return 0;
+}</code></pre>
+</td>
+<td>
+<pre><code>s = input()
+count_a = 0
+for ch in s:
+    if ch == 'a' or ch == 'A':
+        count_a += 1
+print(count_a)</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>5. Bài tập tự luyện</h2>
+<ol>
+  <li>Nhập họ và tên, in ra câu: <code>Xin chào, [Tên]!</code> (chỉ lấy tên cuối).</li>
+  <li>Nhập một chuỗi, in ra chuỗi đảo ngược.</li>
+  <li>Cho chuỗi, đếm số lượng chữ số (0-9) xuất hiện trong đó.</li>
+</ol>
+
+<details class="mt-3">
+  <summary class="text-primary" style="cursor:pointer;"><b>🔍 Gợi ý / Lời giải mẫu Python cho bài "đảo ngược chuỗi"</b></summary>
+  <pre><code>s = input()
+rev = s[::-1]   # cắt ngược chuỗi
+print(rev)</code></pre>
+</details>
+
+<details class="mt-3">
+  <summary class="text-success" style="cursor:pointer;"><b>🔍 Gợi ý / Lời giải mẫu C++ cho bài đếm chữ số</b></summary>
+  <pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    string s;
+    getline(cin, s);
+    int cnt = 0;
+    for (char c : s) {
+        if (c &gt;= '0' &amp;&amp; c &lt;= '9') cnt++;
+    }
+    cout &lt;&lt; cnt;
+    return 0;
+}</code></pre>
+</details>
+
+<p class="mt-4 text-center text-info fw-bold">
+➡ Tiếp theo: Hàm - chia chương trình thành các “khối thông minh” có thể tái sử dụng.
+</p>

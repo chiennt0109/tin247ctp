@@ -1,0 +1,537 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-3" style="max-width:1450px;">
+  <div class="row g-4">
+
+    <!-- ============================
+         🧩 CỘT TRÁI: HIỂN THỊ ĐỀ BÀI
+    ============================= -->
+    <div class="col-lg-5 col-md-12">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4" style="font-size:14px;">
+        <h5 class="fw-bold text-primary mb-2">{{ problem.title }}</h5>
+        <div class="text-muted small mb-2">
+          Mã: <b>{{ problem.code }}</b> &nbsp;|&nbsp; ⏱ {{ problem.time_limit|default:"1" }}s
+        </div>
+        <hr>
+
+        <!-- 📘 Markdown -->
+        <textarea id="md-src" hidden>{{ problem.statement }}</textarea>
+        <div id="statement"
+             class="markdown-body"
+             style="max-height:70vh; overflow-y:auto; line-height:1.65; font-size:15px;"></div>
+      </div>
+    </div>
+
+    <!-- ============================
+         💻 CỘT PHẢI: CODE + SUBMIT
+    ============================= -->
+    <div class="col-lg-7 col-md-12">
+      <div class="card border-0 shadow-sm rounded-4 p-3" style="font-size:14px;">
+
+        <!-- 🎯 TITLE + BUTTONS -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-semibold text-dark m-0">🚀 Nộp bài</h5>
+          {% if practice %}
+          <div id="practice-timer"
+               class="badge text-bg-danger rounded-pill px-3 py-2 shadow-sm"
+               style="font-size:14px;">
+            ⏳ Còn lại: <span id="timer-text">--:--</span>
+          </div>
+          {% endif %}
+          <div class="d-flex gap-2">
+            {% if practice %}
+              <!-- QUAY LẠI PRACTICE -->
+              <a href="/contests/{{ contest_id }}/practice/?practice=1"
+                 class="btn btn-outline-secondary rounded-pill px-3 py-1 shadow-sm">
+                ⬅️ Quay lại
+              </a>
+            
+            {% elif contest_id %}
+              <!-- QUAY LẠI CONTEST -->
+              <a href="/contests/{{ contest_id }}/"
+                 class="btn btn-outline-secondary rounded-pill px-3 py-1 shadow-sm">
+                ⬅️ Quay lại
+              </a>
+            
+            {% else %}
+              <!-- QUAY LẠI PROBLEMS -->
+              <a href="/problems/"
+                 class="btn btn-outline-secondary rounded-pill px-3 py-1 shadow-sm">
+                ⬅️ Quay lại
+              </a>
+            {% endif %}
+
+
+
+
+            <button id="submitBtn" type="button"
+                    class="btn btn-primary rounded-pill px-4 py-1 fw-semibold shadow-sm">
+              💾 Nộp bài
+            </button>
+          </div>
+        </div>
+
+        <!-- 📩 FORM (không submit trực tiếp, chỉ dùng CSRF + hidden) -->
+        <form id="submitForm" method="POST">
+          {% csrf_token %}
+          <input type="hidden" id="contest_id" name="contest_id" value="{{ contest_id|default:'' }}">
+          <input type="hidden" id="practice" name="practice" value="{{ practice|yesno:'1,0' }}">
+
+          <!-- Ngôn ngữ -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Ngôn ngữ lập trình</label>
+            <select class="form-select form-select-sm" id="language" name="language" required>
+              <option value="">-- Chọn ngôn ngữ --</option>
+              <option value="python">🐍 Python 3</option>
+              <option value="pypy">⚡ PyPy 3</option>
+              <option value="cpp">💻 C++17</option>
+              <option value="java">☕ Java</option>
+            </select>
+          </div>
+
+          <!-- CODE EDITOR -->
+          <div class="position-relative mb-3">
+            <div id="editor" class="rounded-3 border shadow-sm" style="height:480px;"># Viết code tại đây...</div>
+
+            <!-- QUAN TRỌNG: name="source" (backend đang dùng key này) -->
+            <textarea id="source" name="source" hidden></textarea>
+          </div>
+        </form>
+
+        <!-- KẾT QUẢ -->
+        <div id="result-box" class="border rounded-3 p-3 bg-light mt-3" style="display:none;">
+          <div id="result-text" class="fw-semibold text-center text-muted small mb-3">
+            ⏳ Đang chấm...
+          </div>
+
+          <div style="max-height:260px; overflow:auto;">
+            <table class="table table-sm table-bordered text-center align-middle"
+                   id="result-table" style="font-size:13px; display:none;">
+              <thead class="table-light">
+                <tr><th>Test #</th><th>Kết quả</th></tr>
+              </thead>
+              <tbody id="result-body"></tbody>
+            </table>
+          </div>
+
+          <div id="debug-box" class="mt-3" style="display:none;">
+            <h6 class="fw-bold text-secondary">🧩 Chi tiết lỗi biên dịch / runtime:</h6>
+            <div id="debug-content"
+                 style="max-height:260px; overflow:auto; white-space:pre-wrap; font-size:13px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     CSS & JS
+============================= -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/ace.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/ext-language_tools.js"></script>
+
+<style>
+.markdown-body pre code {
+  background:#f8fafc;
+  padding:6px 10px;
+  border-radius:8px;
+}
+</style>
+
+<!-- ============================
+     🧠 LOGIC
+============================= -->
+<script>
+// ========================================
+// 0) CHẶN SUBMIT MẶC ĐỊNH
+// ========================================
+document.addEventListener("DOMContentLoaded", function () {
+  const f = document.getElementById("submitForm");
+  if (f) {
+    f.addEventListener("submit", function (e) { e.preventDefault(); });
+  }
+});
+
+// ========================================
+// 1) RENDER MARKDOWN ĐỀ BÀI
+// ========================================
+(function(){
+  marked.setOptions({
+    breaks:true,
+    gfm:true,
+    highlight:(code,lang)=>{
+      try { return hljs.highlight(code,{language:lang}).value; }
+      catch { return code; }
+    }
+  });
+
+  const out=document.getElementById('statement');
+  const src=document.getElementById('md-src');
+
+  out.innerHTML = DOMPurify.sanitize(marked.parse(src.value || ""));
+
+  if (window.renderMathInElement){
+    renderMathInElement(out, {
+      delimiters:[
+        {left:"$$", right:"$$", display:true},
+        {left:"$", right:"$", display:false}
+      ]
+    });
+  }
+  out.querySelectorAll("pre code").forEach(el=>hljs.highlightElement(el));
+})();
+
+// ========================================
+// 2) LOCALSTORAGE KEY CHO BÀI NÀY
+// ========================================
+const STORAGE_KEY = "submission_{{ problem.id }}";
+let saved = {};
+try {
+  saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+} catch(e) {
+  saved = {};
+}
+
+// ========================================
+// 3) ACE EDITOR
+// ========================================
+const editor = ace.edit("editor");
+editor.setTheme("ace/theme/github");
+editor.setOptions({
+  enableBasicAutocompletion:true,
+  enableLiveAutocompletion:true,
+  fontSize:"13px",
+  wrap:true,
+  fontFamily:"Fira Code, monospace",
+});
+
+// code mặc định / khôi phục
+editor.setValue(saved.code || "# Viết code tại đây...\n", -1);
+
+// autosave
+editor.session.on("change", function(){
+  saved.code = editor.getValue();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+});
+
+// ========================================
+// 4) NGÔN NGỮ EDITOR + LOCALSTORAGE
+// ========================================
+const langSelect = document.getElementById("language");
+
+function changeMode(){
+  const l = langSelect.value;
+  if(l==="cpp") editor.session.setMode("ace/mode/c_cpp");
+  else if(l==="java") editor.session.setMode("ace/mode/java");
+  else editor.session.setMode("ace/mode/python");
+}
+
+// khôi phục ngôn ngữ
+if (saved.language){
+  langSelect.value = saved.language;
+  changeMode();
+}
+
+langSelect.addEventListener("change", function(){
+  saved.language = this.value;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  changeMode();
+});
+
+// ========================================
+// 5) HÀM TIỆN ÍCH
+// ========================================
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, m => (
+    {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]
+  ));
+}
+
+// parse debug: hỗ trợ cả string & list
+function parseDebug(raw){
+  if (!raw) return {list:null, text:""};
+  if (Array.isArray(raw)) return {list:raw, text:""};
+
+  if (typeof raw === "string"){
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return {list:parsed, text:""};
+      return {list:null, text:raw};
+    } catch(e){
+      return {list:null, text:raw};
+    }
+  }
+  return {list:null, text:String(raw)};
+}
+
+// highlight lỗi trong editor
+function highlightErrorInEditor(stderr){
+  if(!stderr) return;
+
+  let line = null;
+
+  // Python: File "main.py", line 3
+  let py = stderr.match(/line (\d+)/i);
+  if (py) line = parseInt(py[1]);
+
+  // C++: Main.cpp:12:5: error: ...
+  let cpp = stderr.match(/\.cpp:(\d+):/i);
+  if (cpp) line = parseInt(cpp[1]);
+
+  if(line && !isNaN(line)){
+    editor.gotoLine(line, 0, true);
+    editor.session.setAnnotations([{
+      row: line - 1,
+      column: 0,
+      text: "Lỗi tại dòng " + line,
+      type: "error"
+    }]);
+  }
+}
+
+// ========================================
+// 6) SUBMIT
+// ========================================
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  const lang = langSelect.value;
+  const code = editor.getValue();  // không trim
+  const csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  const contestId = document.getElementById("contest_id").value || "";
+
+  if(!lang) return alert("⚠️ Bạn chưa chọn ngôn ngữ!");
+  if(code.replace(/\s/g,"").length === 0)
+    return alert("⚠️ Bạn chưa viết code!");
+
+  const btn   = document.getElementById("submitBtn");
+  const rbox  = document.getElementById("result-box");
+  const rtext = document.getElementById("result-text");
+  const table = document.getElementById("result-table");
+  const body  = document.getElementById("result-body");
+  const dbgBox= document.getElementById("debug-box");
+  const dbgCt = document.getElementById("debug-content");
+
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Đang gửi...";
+  editor.session.clearAnnotations();
+
+  rbox.style.display = "block";
+  rtext.innerHTML = "⏳ Đang nộp...";
+  table.style.display = "none";
+  body.innerHTML = "";
+  dbgBox.style.display = "none";
+  dbgCt.innerHTML = "";
+
+  // hidden textarea (phòng backend dùng)
+  document.getElementById("source").value = code;
+
+  const form = new FormData();
+  form.append("language", lang);
+  form.append("source", code);
+  form.append("contest_id", contestId);
+  form.append("practice", document.getElementById("practice").value);
+
+
+  const url = `/submissions/{{ problem.id }}/submit/`;
+
+  try {
+    const res = await fetch(url, {
+      method:"POST",
+      headers:{ "X-CSRFToken": csrf },
+      body: form
+    });
+
+    const data = await res.json();
+
+    if (!data.ok || !data.submission_id){
+      rtext.innerHTML =
+        `<span class="text-danger">${data.error || "Thiếu ngôn ngữ hoặc mã nguồn."}</span>`;
+      startCooldown(30);
+      return;
+    }
+
+    // lưu lại ngôn ngữ + code mới nhất sau khi submit
+    saved.language = lang;
+    saved.code = code;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+
+    pollResult(data.submission_id);
+   
+
+  } catch(err){
+    console.error(err);
+    rtext.innerHTML = "❌ Không thể kết nối server.";
+    startCooldown(30);
+  }
+});
+
+// ========================================
+// 7) COOLDOWN CHỐNG SPAM
+// ========================================
+function startCooldown(seconds){
+  const btn=document.getElementById("submitBtn");
+  let remain=seconds;
+
+  btn.disabled=true;
+  btn.classList.remove("btn-primary");
+  btn.classList.add("btn-secondary");
+
+  const timer=setInterval(()=>{
+    btn.innerHTML = `🕒 Đợi ${remain}s`;
+    remain--;
+    if(remain<0){
+      clearInterval(timer);
+      btn.disabled=false;
+      btn.classList.add("btn-primary");
+      btn.classList.remove("btn-secondary");
+      btn.innerHTML="💾 Nộp bài";
+    }
+  },1000);
+}
+
+// ========================================
+// 8) POLL KẾT QUẢ
+// ========================================
+async function pollResult(id){
+  const rtext=document.getElementById("result-text");
+  const table=document.getElementById("result-table");
+  const body=document.getElementById("result-body");
+  const dbgBox=document.getElementById("debug-box");
+  const dbgCt=document.getElementById("debug-content");
+
+  rtext.innerHTML = "🧩 Đang chấm...";
+  table.style.display = "table";
+  body.innerHTML = "<tr><td colspan='2'><i>Đang chạy test...</i></td></tr>";
+  dbgBox.style.display = "none";
+  dbgCt.innerHTML = "";
+
+  let data=null;
+  for (let i=0;i<40;i++){
+    await new Promise(r=>setTimeout(r,1000));
+    const res = await fetch(`/submissions/${id}/json/`, {cache:"no-store"});
+    if(!res.ok) continue;
+    data = await res.json();
+    if(data.is_done) break;
+  }
+
+  if(!data){
+    rtext.innerHTML = "⌛ Timeout";
+    return;
+  }
+
+  const verdict = data.verdict;
+  const passed  = Number(data.passed);
+  const total   = Number(data.total);
+
+  const dbg = parseDebug(data.debug);
+
+  // 🔥 CE / RE → hiển thị lỗi chi tiết + highlight editor
+  if (verdict === "Compilation Error" || verdict === "Runtime Error") {
+    table.style.display = "none";
+    body.innerHTML = "";
+
+    dbgBox.style.display = "block";
+
+    let err = "";
+    if (dbg.list && dbg.list.length > 0) {
+      const item = dbg.list[0];
+      err = item.stderr || item.info || JSON.stringify(item, null, 2);
+    } else {
+      err = dbg.text || "";
+    }
+
+    dbgCt.innerHTML = `
+      <pre style="
+        background:#fff;
+        padding:10px;
+        border-radius:6px;
+        border:1px solid #ddd;
+        white-space:pre-wrap;
+        font-family:Consolas, monospace;
+        font-size:13px;
+        max-height:260px;
+        overflow:auto;
+      ">${escapeHtml(err)}</pre>
+    `;
+
+    highlightErrorInEditor(err);
+    rtext.innerHTML = `🎯 Kết quả: <b class="text-danger">${verdict}</b>`;
+    startCooldown(30);
+    return;
+  }
+
+  // 🧪 CHẤM BÌNH THƯỜNG
+  let per = {};
+  if (dbg.list && Array.isArray(dbg.list)) {
+    dbg.list.forEach(i => {
+      if (i && typeof i.case !== "undefined"){
+        per[Number(i.case)] = i.status;
+      }
+    });
+  }
+
+  body.innerHTML = "";
+  for (let t=1; t<=total; t++){
+    let status = per[t] || (t <= passed ? "AC" : "WA");
+
+    let icon="❌", color="text-danger";
+    if(status==="AC"){ icon="✅"; color="text-success"; }
+    if(status==="TLE"){ icon="⏱"; color="text-warning"; }
+    if(status==="RE" || status==="CE"){ icon="💥"; color="text-danger"; }
+
+    body.innerHTML += `
+      <tr>
+        <td>${t}</td>
+        <td class="${color} fw-bold">${icon} ${status}</td>
+      </tr>`;
+  }
+
+  rtext.innerHTML = `🎯 Kết quả: <b class="text-primary">${verdict}</b> (${passed}/${total})`;
+  startCooldown(30);
+}
+// ========================================
+// ⏳ 9) PRACTICE TIMER
+// ========================================
+{% if practice %}
+let timeLeft = {{ remaining|default:0 }};
+if (timeLeft < 0) timeLeft = 0;
+
+function formatTime(t){
+  let m = Math.floor(t / 60);
+  let s = t % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+const timerText = document.getElementById("timer-text");
+timerText.textContent = formatTime(timeLeft);
+
+setInterval(() => {
+  if (timeLeft <= 0){
+    timerText.textContent = "Hết giờ!";
+    return;
+  }
+  timeLeft -= 1;
+  timerText.textContent = formatTime(timeLeft);
+}, 1000);
+{% endif %}
+
+
+</script>
+
+{% endblock %}

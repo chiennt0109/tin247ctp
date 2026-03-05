@@ -1,0 +1,140 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<h1>📦 Upload Test Cases cho <b>{{ problem.title }}</b></h1>
+<p>
+  Hỗ trợ 2 kiểu cấu trúc:<br>
+  🔹 <code>folder/test01.in, test01.out</code><br>
+  🔹 <code>problem/test01/problem.inp, problem.out</code><br>
+  Khi lưu, hệ thống sẽ tự chuyển về 1 chuẩn thống nhất để chấm trong sandbox.
+</p>
+
+<form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'admin:upload_tests' problem.id %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="button btn btn-success">🚀 Upload & Import</button>
+</form>
+
+<div id="progressContainer" style="margin-top: 20px; display: none;">
+  <label>Đang tải lên...</label>
+  <div style="width: 100%; background-color: #eee; border-radius: 4px;">
+    <div id="progressBar" style="width: 0%; height: 22px; background-color: #4caf50; text-align: center; color: white; font-weight: bold;">
+      0%
+    </div>
+  </div>
+</div>
+
+<div id="uploadMessage" style="margin-top:15px; font-weight:bold;"></div>
+
+<hr>
+<h3>🧪 Kiểm tra kết nối Sandbox</h3>
+<button type="button" class="button btn btn-info" onclick="runSandboxCheck()">🔍 Kiểm tra ghi file</button>
+<p id="sandboxStatus" style="margin-top:10px; font-weight:bold;"></p>
+
+<script>
+function runSandboxCheck() {
+  const msg = document.getElementById("sandboxStatus");
+  msg.textContent = "⏳ Đang kiểm tra...";
+  fetch(`/admin/problems/problem/sandbox/check/{{ problem.id }}/`)
+    .then(r => r.json())
+    .then(res => {
+      msg.style.color = res.ok ? "green" : "red";
+      msg.textContent = res.message;
+    })
+    .catch(err => {
+      msg.style.color = "red";
+      msg.textContent = "❌ Lỗi: " + err.message;
+    });
+}
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("uploadForm");
+  const bar = document.getElementById("progressBar");
+  const container = document.getElementById("progressContainer");
+  const msg = document.getElementById("uploadMessage");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const data = new FormData(form);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", form.action, true);
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+    xhr.upload.addEventListener("loadstart", () => {
+      container.style.display = "block";
+      msg.textContent = "";
+      bar.style.width = "0%";
+      bar.textContent = "0%";
+      bar.style.backgroundColor = "#4caf50";
+    });
+
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        bar.style.width = percent + "%";
+        bar.textContent = percent + "%";
+      }
+    });
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.ok) {
+            bar.style.backgroundColor = "#2196F3";
+            bar.textContent = "✅ Hoàn tất!";
+            msg.style.color = "green";
+            msg.textContent = res.message || "Đã import và export sandbox thành công!";
+            setTimeout(() => {
+              window.location.href = `/admin/problems/problem/{{ problem.id }}/tests/`;
+            }, 1200);
+          } else {
+            throw new Error(res.message || "Upload thất bại.");
+          }
+        } catch (err) {
+          msg.style.color = "red";
+          msg.textContent = "❌ Lỗi xử lý: " + err.message;
+          bar.style.backgroundColor = "red";
+        }
+      } else {
+        msg.style.color = "red";
+        msg.textContent = "❌ Lỗi khi upload test. Mã lỗi HTTP " + xhr.status;
+        bar.style.backgroundColor = "red";
+      }
+    };
+
+    xhr.onerror = function () {
+      msg.style.color = "red";
+      msg.textContent = "❌ Không thể kết nối máy chủ.";
+      bar.style.backgroundColor = "red";
+    };
+
+    xhr.send(data);
+  });
+});
+</script>
+
+<a href="/admin/problems/problem/{{ problem.id }}/change/" style="display:block; margin-top:20px;">← Quay lại Problem</a>
+
+<style>
+h1 { font-size: 22px; margin-bottom: 10px; color: #333; }
+p { color: #444; font-size: 14px; }
+.button {
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.button:hover { background-color: #45a049; }
+</style>
+{% endblock %}

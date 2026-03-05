@@ -1,0 +1,127 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Áp dụng quay lui vào một bài thực tế phức tạp hơn tổ hợp/hoán vị.</li>
+  <li>Hiểu cách kiểm tra điều kiện hợp lệ cục bộ trước khi đi sâu hơn.</li>
+  <li>Đây là dạng bài rất hay gặp ở vòng loại HSG vì nó “đời thực nhưng giải thuật”.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Mô tả bài toán</h2>
+<p>Sudoku chuẩn: bảng 9×9, điền số từ 1..9 sao cho:  
+- Không lặp trong hàng  
+- Không lặp trong cột  
+- Không lặp trong mỗi ô vuông 3×3  
+Các ô chưa biết thường được đánh số 0.</p>
+
+<hr>
+
+<h2>💻 Thuật toán quay lui Sudoku</h2>
+<ol>
+  <li>Tìm ô còn 0.</li>
+  <li>Thử đặt 1..9 vào ô đó nếu hợp lệ.</li>
+  <li>Nếu hợp lệ: đệ quy giải phần còn lại.</li>
+  <li>Nếu sau này bí → quay lui, thử giá trị khác.</li>
+</ol>
+
+<hr>
+
+<h3>Python</h3>
+<pre><code>board = [list(map(int, input().split())) for _ in range(9)]
+
+def ok(r, c, val):
+    # check row, col
+    for i in range(9):
+        if board[r][i] == val: return False
+        if board[i][c] == val: return False
+    # check 3x3 box
+    br, bc = (r//3)*3, (c//3)*3
+    for i in range(3):
+        for j in range(3):
+            if board[br+i][bc+j] == val:
+                return False
+    return True
+
+def solve():
+    for r in range(9):
+        for c in range(9):
+            if board[r][c] == 0:
+                for v in range(1,10):
+                    if ok(r,c,v):
+                        board[r][c] = v
+                        if solve():
+                            return True
+                        board[r][c] = 0
+                return False
+    return True
+
+solve()
+for row in board:
+    print(*row)</code></pre>
+
+<h3>C++</h3>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int board[9][9];
+
+bool ok(int r, int c, int val){
+    for(int i=0;i&lt;9;i++){
+        if(board[r][i]==val) return false;
+        if(board[i][c]==val) return false;
+    }
+    int br=(r/3)*3, bc=(c/3)*3;
+    for(int i=0;i&lt;3;i++)
+        for(int j=0;j&lt;3;j++)
+            if(board[br+i][bc+j]==val)
+                return false;
+    return true;
+}
+
+bool solve(){
+    for(int r=0;r&lt;9;r++){
+        for(int c=0;c&lt;9;c++){
+            if(board[r][c]==0){
+                for(int v=1;v&lt;=9;v++){
+                    if(ok(r,c,v)){
+                        board[r][c]=v;
+                        if(solve()) return true;
+                        board[r][c]=0;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+int main(){
+    for(int i=0;i&lt;9;i++)
+        for(int j=0;j&lt;9;j++)
+            cin&gt;&gt;board[i][j];
+    solve();
+    for(int i=0;i&lt;9;i++){
+        for(int j=0;j&lt;9;j++){
+            cout&lt;&lt;board[i][j]&lt;&lt;" ";
+        }
+        cout&lt;&lt;"\n";
+    }
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Đếm xem có bao nhiêu nghiệm Sudoku hợp lệ (không chỉ tìm 1 nghiệm).</li>
+  <li>Viết chương trình in từng bước thử (log lại các lựa chọn).</li>
+  <li>Nâng cấp để phát hiện input vô nghiệm (in ra “No solution”).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý: Đếm số nghiệm</b></summary>
+  <pre><code># Ý tưởng:
+# - thay vì return True khi tìm được nghiệm đầu tiên
+# - bạn tăng biến đếm global và TIẾP TỤC quay lui để tìm nghiệm tiếp
+# => dùng cho đề kiểu "Có bao nhiêu cách điền?"</code></pre>
+</details>

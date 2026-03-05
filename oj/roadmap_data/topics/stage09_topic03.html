@@ -1,0 +1,93 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Đếm số thành phần liên thông trong đồ thị vô hướng.</li>
+  <li>Củng cố cách dùng DFS/BFS để tách các cụm đỉnh.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Ý tưởng</h2>
+<p>
+Khởi tạo tất cả đỉnh là <code>chưa thăm</code>.  
+Mỗi khi gặp 1 đỉnh chưa thăm → chạy DFS/BFS từ nó để đánh dấu toàn bộ cụm.  
+Mỗi lần như vậy tăng biến <code>component</code> thêm 1.
+</p>
+
+<hr>
+
+<h2>💻 Ví dụ Python</h2>
+<pre><code>n,m=map(int,input().split())
+adj=[[] for _ in range(n+1)]
+for _ in range(m):
+    u,v=map(int,input().split())
+    adj[u].append(v)
+    adj[v].append(u)
+
+def dfs(u,vis):
+    vis[u]=True
+    for v in adj[u]:
+        if not vis[v]:
+            dfs(v,vis)
+
+vis=[False]*(n+1)
+comp=0
+for i in range(1,n+1):
+    if not vis[i]:
+        comp+=1
+        dfs(i,vis)
+print("Số thành phần liên thông:",comp)</code></pre>
+
+<h2>💻 C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m;
+vector&lt;vector&lt;int&gt;&gt; adj;
+vector&lt;int&gt; vis;
+void dfs(int u){
+    vis[u]=1;
+    for(int v:adj[u])
+        if(!vis[v]) dfs(v);
+}
+int main(){
+    cin&gt;&gt;n&gt;&gt;m;
+    adj.assign(n+1,{});
+    for(int i=0;i&lt;m;i++){
+        int u,v;cin&gt;&gt;u&gt;&gt;v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    vis.assign(n+1,0);
+    int comp=0;
+    for(int i=1;i&lt;=n;i++)
+        if(!vis[i]){
+            comp++;
+            dfs(i);
+        }
+    cout&lt;&lt;"Số thành phần liên thông: "&lt;&lt;comp;
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>In ra các thành phần liên thông (liệt kê đỉnh trong từng cụm).</li>
+  <li>Cho đồ thị có hướng, xác định số thành phần liên thông mạnh.</li>
+  <li>Vẽ đồ thị từ danh sách cạnh và tô màu từng component khác nhau.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 1</b></summary>
+  <pre><code>def dfs(u,vis,group):
+    vis[u]=True
+    group.append(u)
+    for v in adj[u]:
+        if not vis[v]:
+            dfs(v,vis,group)
+
+vis=[False]*(n+1)
+for i in range(1,n+1):
+    if not vis[i]:
+        group=[]
+        dfs(i,vis,group)
+        print("Nhóm:",group)</code></pre>
+</details>

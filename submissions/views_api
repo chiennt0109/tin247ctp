@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+# path: submissions/views_api.py
+from django.http import JsonResponse, StreamingHttpResponse
+from submissions.models import Submission
+from .sse_state import SSE_STREAMS
+import json, logging, time, queue, traceback, sys
+
+logger = logging.getLogger(__name__)
+
+def submission_json(request, sid: int):
+    """API trả JSON cho polling fallback."""
+    try:
+        s = Submission.objects.get(id=sid)
+        try:
+            raw = s.debug_info or "[]"
+            debug = json.loads(raw) if isinstance(raw, str) else raw
+        except Exception:
+            debug = []
+        verdict = s.verdict or "Pending"
+        passed = s.passed_tests or 0
+        total = s.total_tests or 0
+        done_status = [
+            "Accepted", "Wrong Answer", "Time Limit Exceeded",
+            "Runtime Error", "Compilation Error", "Memory Limit Exceeded"
+        ]
+        return JsonResponse({
+            "id": s.id,
+            "verdict": verdict,
+            "passed": passed,
+            "total": total,
+            "debug": debug,
+            "is_done": verdict in done_status or (total > 0 and verdict != "Pending"),
+        })
+    except Exception as e:
+        print("❌ submission_json lỗi:", traceback.format_exc(), file=sys.stderr)
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def submission_stream(request, sid: int):
+    """SSE realtime stream — DEBUG đầy đủ, log mọi lỗi."""
+    try:
+        print(f"🔵 [SSE] Request nhận cho sid={sid}", file=sys.stderr)
+        sid = str(sid)
+        q = queue.Queue()
+
+        def event_stream():
+            print(f"🟢 [SSE] event_stream khởi chạy cho sid={sid}", file=sys.stderr)
+            last_ping = time.time()
+            try:
+                while True:
+                    # gửi ping giữ kết nối sống
+                    if time.time() - last_ping > 15:
+                        yield b": ping\n\n"
+                        last_ping = time.time()
+
+                    try:
+                        data = q.get(timeout=1)
+                        if data is None:
+                            print(f"🟡 [SSE] sid={sid} nhận None, dừng.", file=sys.stderr)
+                            break
+                        yield data
+                    except queue.Empty:
+                        continue
+            except GeneratorExit:
+                print(f"🔴 [SSE] Client đóng kết nối sid={sid}", file=sys.stderr)
+            except Exception as e:
+                print(f"❌ [SSE] Lỗi trong vòng loop sid={sid}: {traceback.format_exc()}", file=sys.stderr)
+            finally:
+                if sid in SSE_STREAMS and q in SSE_STREAMS[sid]:
+                    SSE_STREAMS[sid].remove(q)
+                    print(f"🧹 [SSE] Dọn queue sid={sid}", file=sys.stderr)
+
+        # Đăng ký queue
+        if sid not in SSE_STREAMS:
+            SSE_STREAMS[sid] = []
+        SSE_STREAMS[sid].append(q)
+        print(f"✅ [SSE] Đăng ký queue cho sid={sid} (hiện có {len(SSE_STREAMS[sid])})", file=sys.stderr)
+
+        response = StreamingHttpResponse(event_stream(), content_type="text/event-stream; charset=utf-8")
+        response["Cache-Control"] = "no-cache"
+        response["X-Accel-Buffering"] = "no"
+        print(f"✅ [SSE] StreamingHttpResponse trả về OK sid={sid}", file=sys.stderr)
+        return response
+
+    except Exception as e:
+        print(f"❌ submission_stream lỗi chính cho sid={sid}: {traceback.format_exc()}", file=sys.stderr)
+        return JsonResponse({"error": str(e)}, status=500)

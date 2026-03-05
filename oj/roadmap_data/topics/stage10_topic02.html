@@ -1,0 +1,72 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Tính đường đi ngắn nhất giữa mọi cặp đỉnh (all-pairs shortest path).</li>
+  <li>Hiểu vai trò của đỉnh trung gian k trong việc tối ưu hóa đường đi.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p>
+Floyd–Warshall là thuật toán quy hoạch động:  
+<code>dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])</code>  
+với mọi đỉnh trung gian k = 1..n.
+</p>
+
+<hr>
+
+<h2>💻 Ví dụ Python</h2>
+<pre><code>INF=10**9
+n,m=map(int,input().split())
+dist=[[INF]*(n+1) for _ in range(n+1)]
+for i in range(1,n+1): dist[i][i]=0
+for _ in range(m):
+    u,v,w=map(int,input().split())
+    dist[u][v]=min(dist[u][v],w)
+for k in range(1,n+1):
+    for i in range(1,n+1):
+        for j in range(1,n+1):
+            dist[i][j]=min(dist[i][j],dist[i][k]+dist[k][j])
+for i in range(1,n+1):
+    print(*[x if x&lt;INF else "INF" for x in dist[i][1:]])</code></pre>
+
+<hr>
+
+<h2>💻 Ví dụ C++</h2>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    int n,m;cin&gt;&gt;n&gt;&gt;m;
+    const int INF=1e9;
+    vector&lt;vector&lt;int&gt;&gt; dist(n+1,vector&lt;int&gt;(n+1,INF));
+    for(int i=1;i&lt;=n;i++) dist[i][i]=0;
+    for(int i=0;i&lt;m;i++){
+        int u,v,w;cin&gt;&gt;u&gt;&gt;v&gt;&gt;w;
+        dist[u][v]=min(dist[u][v],w);
+    }
+    for(int k=1;k&lt;=n;k++)
+        for(int i=1;i&lt;=n;i++)
+            for(int j=1;j&lt;=n;j++)
+                dist[i][j]=min(dist[i][j],dist[i][k]+dist[k][j]);
+    for(int i=1;i&lt;=n;i++){
+        for(int j=1;j&lt;=n;j++)
+            cout&lt;&lt;(dist[i][j]==INF?999:dist[i][j])&lt;&lt;" ";
+        cout&lt;&lt;"\\n";
+    }
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính đường đi ngắn nhất giữa mọi cặp đỉnh.</li>
+  <li>Xác định đỉnh có tổng khoảng cách nhỏ nhất tới các đỉnh khác.</li>
+  <li>Phát hiện chu trình âm (nếu dist[i][i] &lt; 0).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Phát hiện chu trình âm</b></summary>
+  <pre><code>for i in range(1,n+1):
+    if dist[i][i]&lt;0:
+        print("Có chu trình âm")</code></pre>
+</details>

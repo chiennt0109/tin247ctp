@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load dict_filters %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Contest info -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body d-flex justify-content-between flex-wrap">
+      <div>
+        <h3 class="fw-bold text-primary">{{ contest.name }}</h3>
+        <p class="text-muted" style="font-size:14px;">
+          🕒 <b>Bắt đầu:</b> {{ contest.start_time|date:"d/m/Y H:i" }}<br>
+          ⏳ <b>Kết thúc:</b> {{ contest.end_time|date:"d/m/Y H:i" }}
+        </p>
+
+        {% if is_frozen %}
+        <span class="badge bg-warning text-dark px-3 py-2">❄ Scoreboard đang freeze</span>
+        {% endif %}
+      </div>
+
+      <div class="text-end">
+        <span class="badge bg-light text-dark px-3 py-2 shadow-sm">
+          📘 Tổng bài: <b>{{ total_problems }}</b>
+        </span>
+        <span class="badge bg-light text-dark px-3 py-2 shadow-sm ms-2">
+          👥 Thí sinh: <b>{{ rankings|length }}</b>
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ⭐ SCOREBOARD — THU NHỎ TOÀN BỘ KHUNG -->
+  <div class="d-flex justify-content-center mb-4">
+    <div style="width:85%;">  {# Chỉnh 85% → 80% nếu muốn nhỏ hơn #}
+
+      <div class="card border-0 shadow rounded-4">
+        <div class="card-header text-white fw-semibold"
+             style="background: linear-gradient(90deg,#1d4ed8,#4338ca); font-size:16px;">
+          🏅 Bảng xếp hạng
+        </div>
+
+        <div class="table-responsive px-3 py-2">
+          <table class="table align-middle text-center score-table">
+
+            <!-- HEADER -->
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th class="text-start ps-3">Người dùng</th>
+
+                <th class="score-col">Điểm</th>
+                <th class="score-col">Phạt</th>
+
+                {% for letter in problem_letters %}
+                  <th class="prob-head">{{ letter }}</th>
+                {% endfor %}
+
+                <th style="width:120px;">Cập nhật</th>
+              </tr>
+            </thead>
+
+
+            <!-- BODY -->
+            <tbody id="rank-body">
+
+            {% for part in rankings %}
+              <tr class="
+                {% if forloop.counter == 1 %}rank-1
+                {% elif forloop.counter == 2 %}rank-2
+                {% elif forloop.counter == 3 %}rank-3
+                {% endif %}
+              ">
+
+                <!-- Rank -->
+                <td>
+                  {% if forloop.counter == 1 %}🥇
+                  {% elif forloop.counter == 2 %}🥈
+                  {% elif forloop.counter == 3 %}🥉
+                  {% endif %}
+                  {{ forloop.counter }}
+                </td>
+
+                <!-- User -->
+                <td class="text-start ps-3 fw-semibold">{{ part.user.username }}</td>
+
+                <!-- Score + Penalty -->
+                <td class="fw-bold text-success">{{ part.score }}</td>
+                <td class="fw-bold text-danger">{{ part.penalty }}</td>
+
+
+                <!-- PROBLEM CELLS -->
+                {% for prob in contest_problems %}
+                  {% with sub=problem_stats|dict_key:part.user.id|dict_key:prob.id %}
+
+                    {# ❄ Freeze: ẩn non-AC #}
+                    {% if is_frozen and not sub.is_ac and sub.tries > 0 %}
+                      <td class="cell-freeze">?</td>
+
+                    {# 🟢 Full AC #}
+                    {% elif sub.is_ac %}
+                      <td class="cell-ac">
+                        <span class="fw-bold text-success">+{{ sub.score }}</span><br>
+                        <span class="small text-muted">{{ sub.time_from_start }}′</span>
+                      </td>
+
+                    {# 🔴 Partial score #}
+                    {% elif sub.score > 0 %}
+                      <td class="cell-wa">
+                        <span class="fw-bold text-danger">{{ sub.score }}</span><br>
+                        <span class="small text-muted">{{ sub.tries }} tries</span>
+                      </td>
+
+                    {# ⚪ Wrong #}
+                    {% elif sub.tries > 0 %}
+                      <td class="cell-empty"><span class="small text-muted">0</span></td>
+
+                    {# Chưa nộp #}
+                    {% else %}
+                      <td class="cell-empty"></td>
+                    {% endif %}
+
+                  {% endwith %}
+                {% endfor %}
+
+                <!-- Last submit -->
+                <td class="text-muted small">{{ part.last_submit|date:"d/m H:i" }}</td>
+
+              </tr>
+            {% endfor %}
+
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Navigation -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <a href="{% url 'contests:contest_detail' contest.id %}"
+       class="btn btn-outline-secondary rounded-pill px-4">← Quay lại contest</a>
+
+    <div>
+      <a href="{% url 'problems:problem_list' %}" class="btn btn-outline-primary rounded-pill px-4 me-2">
+        🔍 Danh sách bài tập
+      </a>
+      <a href="{% url 'contests:contest_list' %}" class="btn btn-outline-dark rounded-pill px-4">
+        🏆 Tất cả contest
+      </a>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- CSS -->
+<style>
+.score-table th,
+.score-table td { border: 1px solid #e5e5e5 !important; }
+
+.score-table thead th {
+  background: #f4f6ff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.prob-head { width: 60px; }
+
+.rank-1 { background:#fff7c2 !important; }
+.rank-2 { background:#ececec !important; }
+.rank-3 { background:#f5d0d0 !important; }
+
+.cell-ac {
+  background:#c7f7c2 !important;
+  border-left:3px solid #0a960a !important;
+}
+.cell-wa {
+  background:#ffd7d7 !important;
+  border-left:3px solid #d00000 !important;
+}
+.cell-freeze {
+  background:#f5f5f5 !important;
+  border-left:3px solid #888 !important;
+  font-weight:bold;
+}
+.cell-empty {
+  background:#f3f3f3 !important;
+  border-left:3px solid #dcdcdc !important;
+}
+
+.score-table tbody tr:hover {
+  background:#eef4ff !important;
+}
+</style>
+
+<script>
+setInterval(function() {
+    fetch("{% url 'contests:contest_rank_json' contest.id %}")
+}, 5000);
+</script>
+
+{% endblock %}

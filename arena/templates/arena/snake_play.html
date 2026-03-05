@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container py-3" style="max-width: 1200px;">
+  <h3 class="mb-3">🐍 Snake Lite (Arena thử nghiệm)</h3>
+  <p class="text-muted">
+    Viết bot điều khiển rắn di chuyển trên lưới để ăn càng nhiều thức ăn càng tốt.
+    Bot đọc map từ stdin và in ra các lệnh di chuyển: <code>UP</code>, <code>DOWN</code>, <code>LEFT</code>, <code>RIGHT</code>.
+  </p>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }} py-2 mb-2">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row g-3">
+    <!-- CỘT TRÁI: FORM CODE -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">1️⃣ Viết bot của bạn</h5>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-2">
+              <label class="form-label mb-1">Ngôn ngữ</label>
+              {{ form.language }}
+            </div>
+            <div class="mb-2">
+              <label class="form-label mb-1">Mã nguồn bot</label>
+              {{ form.source_code }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+              ▶ Chạy bot (Snake Lite)
+            </button>
+          </form>
+
+          <hr>
+          <p class="small text-muted mb-0">
+            Input cho bot:
+          </p>
+          <pre class="bg-light p-2 small mt-1" style="max-height: 200px; overflow:auto;">
+H W T
+&lt;H dòng lưới&gt;
+
+Ví dụ:
+10 10 40
+S....#....
+.##....F..
+..........
+..F.......
+.....#....
+....F.....
+..........
+....#.....
+..F.......
+......F...
+
+Bot in ra tối đa T dòng, mỗi dòng là: UP / DOWN / LEFT / RIGHT
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- CỘT PHẢI: KẾT QUẢ & REPLAY -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+          <h5 class="card-title mb-3">2️⃣ Kết quả chạy gần nhất</h5>
+
+          {% if run %}
+            <p class="mb-1">
+              <strong>Điểm:</strong> {{ run.score }} &nbsp;&nbsp;
+              <strong>Bước:</strong> {{ run.steps }} &nbsp;&nbsp;
+              <strong>Trạng thái:</strong>
+              <span class="badge bg-secondary">{{ run.status }}</span>
+            </p>
+            {% if run.error_message %}
+              <pre class="mt-2 small bg-light p-2">{{ run.error_message }}</pre>
+            {% endif %}
+          {% else %}
+            <p class="text-muted mb-0">Chưa có lần chạy nào trong phiên này.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">3️⃣ Mô phỏng lưới Snake</h5>
+
+          {% if replay %}
+            <div class="mb-2 small text-muted">
+              Sử dụng nút <strong>Prev/Next</strong> để xem từng bước di chuyển của rắn.
+            </div>
+
+            <div id="snake-grid" class="mb-2"></div>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <button class="btn btn-outline-secondary btn-sm" id="btn-prev">⬅ Prev</button>
+              <button class="btn btn-outline-secondary btn-sm" id="btn-next">Next ➡</button>
+              <span class="small text-muted ms-2" id="frame-info"></span>
+            </div>
+
+            <script>
+              (function() {
+                const frames = {{ replay.frames|safe }};
+                let idx = 0;
+
+                const gridEl = document.getElementById("snake-grid");
+                const infoEl = document.getElementById("frame-info");
+                const btnPrev = document.getElementById("btn-prev");
+                const btnNext = document.getElementById("btn-next");
+
+                function renderFrame(i) {
+                  if (!frames || !frames.length) return;
+                  if (i < 0) i = 0;
+                  if (i >= frames.length) i = frames.length - 1;
+                  idx = i;
+
+                  const frame = frames[idx];
+                  let html = '<table class="table table-bordered table-sm mb-1" style="width:auto;">';
+                  for (let r = 0; r < frame.length; r++) {
+                    html += "<tr>";
+                    for (let c = 0; c < frame[r].length; c++) {
+                      const ch = frame[r][c];
+                      let cls = "bg-white";
+                      if (ch === "R") cls = "bg-success text-white";
+                      else if (ch === "F") cls = "bg-warning";
+                      else if (ch === "#") cls = "bg-dark text-white";
+                      html += `<td class="${cls}" style="width:18px; height:18px; text-align:center; padding:0; font-size:11px;">${ch}</td>`;
+                    }
+                    html += "</tr>";
+                  }
+                  html += "</table>";
+                  gridEl.innerHTML = html;
+                  infoEl.textContent = `Frame ${idx+1} / ${frames.length}`;
+                }
+
+                if (frames && frames.length) {
+                  renderFrame(0);
+                }
+
+                btnPrev && btnPrev.addEventListener("click", function() {
+                  renderFrame(idx - 1);
+                });
+                btnNext && btnNext.addEventListener("click", function() {
+                  renderFrame(idx + 1);
+                });
+              })();
+            </script>
+
+          {% else %}
+            <p class="text-muted mb-0">
+              Chưa có dữ liệu mô phỏng. Hãy viết bot và bấm "Chạy bot" để xem rắn di chuyển.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="card-title mb-3">4️⃣ Lịch sử gần đây</h5>
+          {% if recent_runs %}
+            <ul class="list-group list-group-flush small">
+              {% for r in recent_runs %}
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>
+                    {{ r.created_at|date:"d/m H:i" }} –
+                    Điểm: <strong>{{ r.score }}</strong>,
+                    Bước: {{ r.steps }},
+                    Trạng thái: {{ r.status }}
+                  </span>
+                  <span class="text-muted">{{ r.get_language_display }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0">Chưa có lịch sử chạy nào.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

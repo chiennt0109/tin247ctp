@@ -1,0 +1,115 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cách kiểm tra ràng buộc khi đặt hậu (Q) lên bàn cờ n×n.</li>
+  <li>Biết cắt tỉa nhánh sai thay vì thử tất cả mọi cách mù quáng.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Bài toán N-Queens là gì?</h2>
+<p>
+Ta cần đặt n quân Hậu sao cho:
+</p>
+<ul>
+  <li>Không có 2 hậu nào cùng hàng.</li>
+  <li>Không có 2 hậu nào cùng cột.</li>
+  <li>Không có 2 hậu nào cùng chéo.</li>
+</ul>
+
+<p>Mỗi lời giải là một cách sắp xếp hợp lệ toàn bộ bàn cờ.</p>
+
+<hr>
+
+<h2>💻 Ý tưởng giải bằng quay lui</h2>
+<ol>
+  <li>Đặt hậu từng hàng một (row 0, row 1, ...).</li>
+  <li>Ở mỗi hàng, thử đặt vào từng cột có thể.</li>
+  <li>Nếu hợp lệ thì đi tiếp sang hàng sau, nếu không thì bỏ (backtrack).</li>
+</ol>
+
+<hr>
+
+<h3>C++</h3>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int n;
+vector&lt;int&gt; col, diag1, diag2, pos;
+int solutions = 0;
+
+void backtrack(int row){
+    if(row==n){
+        solutions++;
+        for(int r=0;r&lt;n;r++){
+            for(int c=0;c&lt;n;c++){
+                cout &lt;&lt; (pos[r]==c ? "Q" : ".");
+            }
+            cout &lt;&lt; "\n";
+        }
+        cout &lt;&lt; "\n";
+        return;
+    }
+    for(int c=0;c&lt;n;c++){
+        if(!col[c] && !diag1[row+c] && !diag2[row-c+n-1]){
+            col[c]=diag1[row+c]=diag2[row-c+n-1]=1;
+            pos[row]=c;
+            backtrack(row+1);
+            col[c]=diag1[row+c]=diag2[row-c+n-1]=0;
+        }
+    }
+}
+
+int main(){
+    cin &gt;&gt; n;
+    col.assign(n,0);
+    diag1.assign(2*n,0);
+    diag2.assign(2*n,0);
+    pos.assign(n,-1);
+    backtrack(0);
+    cerr &lt;&lt; "Total solutions: " &lt;&lt; solutions &lt;&lt; "\n";
+}</code></pre>
+
+<h3>Python</h3>
+<pre><code>n = int(input())
+
+col   = [False]*n
+diag1 = [False]*(2*n)
+diag2 = [False]*(2*n)
+pos   = [-1]*n
+solutions = 0
+
+def backtrack(row):
+    global solutions
+    if row == n:
+        solutions += 1
+        for r in range(n):
+            line = "".join("Q" if pos[r]==c else "." for c in range(n))
+            print(line)
+        print()
+        return
+    for c in range(n):
+        if not col[c] and not diag1[row+c] and not diag2[row-c+n-1]:
+            col[c] = diag1[row+c] = diag2[row-c+n-1] = True
+            pos[row] = c
+            backtrack(row+1)
+            col[c] = diag1[row+c] = diag2[row-c+n-1] = False
+
+backtrack(0)
+print("Total solutions:", solutions)</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>In ra tổng số lời giải của N-Queens với n cho trước.</li>
+  <li>Chỉ in ra 1 lời giải hợp lệ đầu tiên (dừng sớm).</li>
+  <li>Biểu diễn lời giải không phải bằng bảng Q/. mà bằng mảng vị trí cột, ví dụ: [1, 3, 0, 2].</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý lời giải dừng sớm</b></summary>
+  <pre><code># Trong backtrack(row):
+#   nếu đã tìm thấy lời giải đầu tiên thì return True để dừng luôn
+#   nếu không thì tiếp tục thử.
+# Đây là tối ưu hóa thời gian khi chỉ cần 1 lời giải.</code></pre>
+</details>

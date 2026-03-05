@@ -1,0 +1,88 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+
+<h2>📄 {{ problem.code }} – {{ problem.title }}</h2>
+<p><b>Tổng số test:</b> {{ testcases|length }}</p>
+<hr>
+
+<table class="table table-bordered table-hover">
+<thead>
+  <tr>
+    <th>#</th>
+    <th>Input</th>
+    <th>Output</th>
+    <th>Xoá</th>
+  </tr>
+</thead>
+<tbody>
+{% for t in testcases %}
+<tr id="row-{{ t.id }}">
+  <td>{{ forloop.counter }}</td>
+
+  <td>
+    <details>
+      <summary>👁 Input (xem)</summary>
+      <pre style="white-space:pre-wrap; font-size:13px; background:#f8f9fa; padding:8px; border-radius:6px;">
+{{ t.input_data }}
+      </pre>
+    </details>
+  </td>
+
+  <td>
+    <details>
+      <summary>📤 Output (xem)</summary>
+      <pre style="white-space:pre-wrap; font-size:13px; background:#f3fcf3; padding:8px; border-radius:6px;">
+{{ t.expected_output }}
+      </pre>
+    </details>
+  </td>
+
+  <td>
+    <button class="btn btn-danger btn-sm" onclick="deleteTest({{ t.id }})">🗑 Xoá</button>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="4">⚠️ Chưa có test case nào</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+<script>
+function getCSRF() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+function deleteTest(testId) {
+  if (!confirm("Bạn có chắc muốn xoá test này?")) return;
+
+  fetch(`/admin/problems/problem/{{ problem.id }}/tests/${testId}/delete/`, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": getCSRF(),
+      "Accept": "application/json"
+    }
+  })
+  .then(async res => {
+      const text = await res.text();
+      try { 
+          return JSON.parse(text);
+      } catch {
+          console.error("Server returned HTML instead of JSON:", text);
+          throw new Error("Server did not return JSON");
+      }
+  })
+  .then(data => {
+      if (data.status === "ok") {
+          document.getElementById(`row-${testId}`).remove();
+      } else {
+          alert("❌ Lỗi: " + (data.message || "Không thể xoá"));
+      }
+  })
+  .catch(err => alert("⚠️ Lỗi mạng: " + err));
+}
+</script>
+
+
+{% endblock %}

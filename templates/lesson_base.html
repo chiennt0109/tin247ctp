@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Bài gi?ng{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'lesson/lesson.css' %}">
+</head>
+<body>
+
+<div class="arena-lesson">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

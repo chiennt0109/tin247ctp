@@ -1,0 +1,70 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cách tìm kiếm phần tử trong mảng (Linear Search, Binary Search).</li>
+  <li>Phân biệt khi nào dùng tuyến tính, khi nào nên dùng nhị phân.</li>
+  <li>Thực hành với ví dụ C++ và Python.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết cơ bản</h2>
+<p><b>Tìm kiếm tuyến tính (Linear Search)</b>: duyệt qua toàn bộ mảng và so sánh từng phần tử.</p>
+<p><b>Tìm kiếm nhị phân (Binary Search)</b>: chỉ dùng được khi mảng đã được sắp xếp, chia đôi để thu hẹp phạm vi tìm kiếm nhanh hơn.</p>
+
+<table class="table table-bordered">
+  <thead class="table-light">
+    <tr><th>Thuật toán</th><th>Độ phức tạp</th><th>Mô tả</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Linear Search</td><td>O(n)</td><td>Duyệt toàn bộ mảng</td></tr>
+    <tr><td>Binary Search</td><td>O(log n)</td><td>Chia đôi dần khoảng tìm kiếm</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>🧠 Thực hành nhanh</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main() {
+    int n, x;
+    cin >> n >> x;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    int pos = -1;
+    for (int i = 0; i < n; i++) if (a[i] == x) pos = i;
+    cout << (pos != -1 ? "Tim thay" : "Khong tim thay");
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>n, x = map(int, input().split())
+a = list(map(int, input().split()))
+print("Tim thay" if x in a else "Khong tim thay")</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Nhập mảng gồm n phần tử, nhập giá trị x, tìm xem x có trong mảng hay không.</li>
+  <li>Nhập mảng tăng dần, tìm vị trí phần tử x bằng <b>tìm kiếm nhị phân</b>.</li>
+  <li>Viết chương trình đếm số lần xuất hiện của x trong mảng.</li>
+</ol>
+
+<details class="mt-3">
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python: Binary Search
+def binary_search(a, x):
+    l, r = 0, len(a) - 1
+    while l <= r:
+        m = (l + r) // 2
+        if a[m] == x:
+            return m
+        elif a[m] < x:
+            l = m + 1
+        else:
+            r = m - 1
+    return -1
+print(binary_search([1,2,3,4,5,6], 4))</code></pre>
+</details>

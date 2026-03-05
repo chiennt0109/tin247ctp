@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 1250px;">
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <h4 class="fw-bold text-primary mb-3">📝 Submission #{{ result.id }}</h4>
+    <p class="mb-1"><b>Problem:</b> {{ problem.title }} (<code>{{ problem.code }}</code>)</p>
+    <p class="mb-1"><b>Language:</b> {{ result.language|title }}</p>
+    <p class="mb-1"><b>Execution Time:</b> {{ result.exec_time|default:"-" }}s</p>
+
+    <p class="mb-1"><b>Status:</b>
+      {% if result.verdict == "Accepted" %}
+        <span class="text-success fw-bold">✅ {{ result.verdict }}</span>
+      {% elif "Wrong" in result.verdict %}
+        <span class="text-danger fw-bold">❌ {{ result.verdict }}</span>
+      {% elif "Time Limit" in result.verdict or "TLE" in result.verdict %}
+        <span class="text-warning fw-bold">⏳ {{ result.verdict }}</span>
+      {% elif "Runtime" in result.verdict %}
+        <span class="text-danger fw-bold">💥 {{ result.verdict }}</span>
+      {% elif "Compilation" in result.verdict %}
+        <span class="text-secondary fw-bold">🧱 {{ result.verdict }}</span>
+      {% elif "Judge" in result.verdict %}
+        <span class="text-muted fw-bold">⚙️ {{ result.verdict }}</span>
+      {% else %}
+        <span class="text-muted fw-bold">❓ {{ result.verdict }}</span>
+      {% endif %}
+    </p>
+
+    <p class="mb-2"><b>Passed Tests:</b> {{ result.passed_tests }}/{{ result.total_tests }}</p>
+    <hr>
+
+    <h5 class="fw-semibold text-dark">💻 Submitted Code</h5>
+    <pre class="bg-dark text-light p-3 rounded" style="font-size:13px; border-radius:10px;">{{ result.source_code }}</pre>
+
+    <hr>
+    <h5 class="fw-semibold text-dark mb-3">🧪 Detailed Test Results</h5>
+
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center table-hover" style="font-size:13px;">
+        <thead class="table-light">
+          <tr>
+            <th style="width:5%">#</th>
+            <th style="width:20%">Input</th>
+            <th style="width:20%">Expected Output</th>
+            <th style="width:20%">Your Output</th>
+            <th style="width:10%">Result</th>
+          </tr>
+        </thead>
+        <tbody id="debug-body">
+          <tr><td colspan="5"><i>Loading detailed info...</i></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    {{ result.debug_info|safe|json_script:"dbg" }}
+    <script>
+    try {
+      const dbg = JSON.parse(document.getElementById("dbg").textContent);
+      const tbody = document.getElementById("debug-body");
+      tbody.innerHTML = "";
+      if (!Array.isArray(dbg) || dbg.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'><i>No detailed debug info available.</i></td></tr>";
+      } else {
+        dbg.forEach((t, i) => {
+          const status = t.status || "";
+          let icon = "⚠️", cls = "text-muted";
+          if (status === "AC") { icon = "✅"; cls = "text-success"; }
+          else if (status === "WA") { icon = "❌"; cls = "text-danger"; }
+          else if (status === "TLE") { icon = "⏳"; cls = "text-warning"; }
+          else if (status === "RE") { icon = "💥"; cls = "text-danger"; }
+
+          tbody.innerHTML += `
+            <tr>
+              <td>${i + 1}</td>
+              <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${t.input || ""}</pre></td>
+              <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${t.expected || ""}</pre></td>
+              <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${t.got || ""}</pre></td>
+              <td class="fw-bold ${cls}">${icon} ${status}</td>
+            </tr>`;
+        });
+      }
+    } catch (e) {
+      document.getElementById("debug-body").innerHTML =
+        "<tr><td colspan='5'><i>Debug info not available or invalid format.</i></td></tr>";
+    }
+    </script>
+
+    <div class="mt-4 d-flex gap-2">
+      <a href="/problems/{{ problem.id }}/" class="btn btn-outline-secondary rounded-pill px-3 py-1 shadow-sm">
+        ⬅️ Back to Problem
+      </a>
+      <a href="/submissions/my/" class="btn btn-primary rounded-pill px-3 py-1 shadow-sm">
+        📂 My Submissions
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+pre {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: "Fira Code", monospace;
+}
+.table-hover tbody tr:hover { background-color: #f1f5f9; }
+.btn-primary {
+  background: linear-gradient(90deg,#2563eb,#1e3a8a);
+  border:none;
+}
+.btn-primary:hover { background: linear-gradient(90deg,#1d4ed8,#1e40af); }
+.card { transition: .2s; }
+.card:hover { box-shadow: 0 8px 22px rgba(0,0,0,0.08); }
+</style>
+{% endblock %}

@@ -1,0 +1,1579 @@
+<style>
+:root {
+  --blue-main: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-soft: #eff6ff;
+  --indigo-soft: #eef2ff;
+  --orange-soft: #fff7ed;
+  --slate-50: #f8fafc;
+  --slate-100: #e2e8f0;
+  --slate-700: #334155;
+  --slate-900: #0f172a;
+  --code-bg: #020617;
+}
+  .arena-lesson {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--slate-900);
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  /* Banner trên cùng */
+  .lesson-hero {
+    background: radial-gradient(circle at top left, #bfdbfe, #eff6ff);
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin: 0 0 20px 0;
+    border: 1px solid #dbeafe;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .lesson-hero-icon {
+    font-size: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #2563eb, #4f46e5);
+    color: #e5f0ff;
+    flex-shrink: 0;
+  }
+
+  .lesson-hero-main h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--blue-dark);
+    margin: 0 0 4px 0;
+  }
+
+  .lesson-hero-main p {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+  }
+
+  .lesson-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .lesson-chip {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.04);
+    color: #0f172a;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+  }
+
+  .arena-lesson h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--blue-main);
+    margin-top: 26px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .arena-lesson h2::before {
+    content: "";
+    width: 6px;
+    height: 22px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #2563eb, #4f46e5);
+  }
+
+  .arena-lesson h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--slate-700);
+    margin-top: 18px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arena-lesson h3::before {
+    content: "▶";
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .lesson-box {
+    background: var(--blue-soft);
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid #dbeafe;
+    margin: 14px 0 18px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lesson-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(129, 140, 248, 0.18), transparent 55%);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .lesson-box > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .example-box {
+    background: #ecfeff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #bae6fd;
+    margin: 14px 0;
+  }
+
+  .exercise-box {
+    background: var(--orange-soft);
+    padding: 10px 13px;
+    border-radius: 10px;
+    border: 1px solid #fed7aa;
+    margin: 8px 0;
+  }
+
+  .exercise-box b {
+    color: #c05621;
+  }
+
+  .code-box {
+    background: var(--code-bg);
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: Consolas, Menlo, monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid #0b1220;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.55);
+  }
+
+  .code-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #93c5fd;
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+
+  .code-box pre {
+    margin: 0;
+    white-space: pre;
+  }
+
+  /* ===== LIST STYLE CHUẨN UL/OL ===== */
+  .arena-lesson ul {
+    padding-left: 1.3rem;
+    margin: 6px 0 6px 0;
+    list-style-type: disc !important;
+    list-style-position: outside;
+  }
+
+  .arena-lesson ul ul {
+    list-style-type: circle !important;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .arena-lesson ol {
+    padding-left: 1.4rem;
+    margin: 6px 0 6px 0;
+    list-style-type: decimal !important;
+    list-style-position: outside;
+  }
+
+  .arena-lesson li {
+    margin-bottom: 3px;
+  }
+
+  .arena-lesson li::marker {
+    color: #2563eb;
+  }
+
+  .inline-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    background: #e0f2fe;
+    color: #0f172a;
+    border: 1px solid #bae6fd;
+    margin-left: 4px;
+  }
+
+  .mini-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mini-card {
+    flex: 1 1 180px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px dashed #cbd5e1;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .summary-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #e0f7fa;
+    border: 1px solid #b2ebf2;
+    margin-top: 6px;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px dashed #cbd5e1;
+    margin: 18px 0;
+  }
+
+  .badge-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1d4ed8;
+    margin-bottom: 4px;
+  }
+
+  .arena-lesson p {
+    margin: 5px 0;
+  }
+
+  .arena-lesson strong {
+    font-weight: 600;
+  }
+  </style>
+
+<div class="arena-lesson">
+
+  <!-- HERO -->
+  <div class="lesson-hero">
+    <div class="lesson-hero-icon">📘</div>
+    <div class="lesson-hero-main">
+      <h1>Ước Số – Bội Số – UCLN – BCNN và Các Bài Toán Ứng Dụng</h1>
+      <p>Nền tảng của số học, thuật toán và rất nhiều bài toán thi học sinh giỏi.</p>
+            <!-- TAGS -->
+  <div class="lesson-chip-row">
+    <span class="lesson-chip">Number Theory</span>
+    <span class="lesson-chip">Divisor</span>
+    <span class="lesson-chip">GCD / LCM</span>
+    <span class="lesson-chip">Prime Factorization</span>
+    <span class="lesson-chip">Thực hành thuật toán</span>
+  </div>
+    </div>
+    
+
+  </div>
+
+
+
+  <!-- ================================================================ -->
+  <h2>I. Mở đầu: Phép chia có dư</h2>
+  <p>Khi làm việc với các bài toán ước số – bội số – UCLN, nền tảng đầu tiên ta cần nắm là phép chia có dư.</p>
+
+  <div class="lesson-box">
+    <p>Mọi số nguyên dương <strong>a</strong> và <strong>b</strong> đều có thể viết:</p>
+    <p style="text-align:center; font-weight:600; font-size:17px;">
+      a = k · b + r, &nbsp; với &nbsp; 0 ≤ r &lt; b
+    </p>
+    <p>Trong đó:</p>
+    <ul>
+      <li><b>k</b> là thương của phép chia a cho b</li>
+      <li><b>r</b> là phần dư</li>
+    </ul>
+    <p>Công thức này chính là nền tảng của thuật toán Euclid, dùng để tính UCLN cực nhanh.</p>
+  </div>
+
+  <!-- ================================================================ -->
+  <h2>II. Ước số</h2>
+
+  <h3>1. Khái niệm</h3>
+  <p>Cho số nguyên dương N. Khi một số d thỏa mãn:</p>
+  <p style="text-align:center; font-weight:600;">N % d = 0</p>
+  <p>Thì d được gọi là <strong>ước số</strong> của N.</p>
+
+  <h3>2. Phân tích thừa số nguyên tố</h3>
+  <p>Mọi số nguyên dương N đều có dạng:</p>
+
+  <p style="text-align:center; font-weight:600; font-size:16px;">
+    N = p<sup>a</sup> × q<sup>b</sup> × r<sup>c</sup> × ...
+  </p>
+
+  <p>Mọi ước của N sẽ có dạng:</p>
+  <p style="text-align:center; font-weight:600;">
+    p<sup>x</sup> q<sup>y</sup> r<sup>z</sup>, &nbsp; với <br>
+    0 ≤ x ≤ a, 0 ≤ y ≤ b, 0 ≤ z ≤ c
+  </p>
+
+  <div class="lesson-box">
+    <p><strong>Số lượng ước của N:</strong></p>
+    <p style="text-align:center; font-weight:700; font-size:17px;">
+      (a + 1) (b + 1) (c + 1) …
+    </p>
+  </div>
+
+  <div class="example-box">
+    <b>Ví dụ:</b><br>
+    100 = 2<sup>2</sup> × 5<sup>2</sup>  
+    <br>Số ước = (2+1)(2+1) = 9.
+  </div>
+
+  <!-- ================================================================ -->
+  <h2>III. Cách đếm số lượng ước của một số N</h2>
+
+  <h3>1. Cách 1 – Ngây thơ nhất: Duyệt 1 → N</h3>
+
+  <p>Ý tưởng tự nhiên nhất: duyệt tất cả i từ 1 đến N và kiểm tra xem i có phải ước không.</p>
+
+  <ul>
+    <li>Dễ hiểu nhất</li>
+    <li>Nhược điểm: nếu N lớn (10<sup>9</sup>) thì vòng lặp chạy 1 tỉ lần → quá chậm</li>
+  </ul>
+
+  <div class="code-box">
+    <div class="code-label">C++</div>
+<pre>
+int main(){
+    long long n, cnt = 0;
+    cin >> n;
+    for(long long i=1;i<=n;i++)
+        if(n % i == 0) cnt++;
+    cout << cnt;
+}
+</pre>
+  </div>
+  
+  <div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+def count_divisors_naive(n):
+    return sum(1 for i in range(1, n+1) if n % i == 0)
+</pre>
+</div>
+
+  <h3>2. Cách 2 – Nhận xét quan trọng: Ước xuất hiện theo cặp</h3>
+
+  <p>Nếu i là ước của N thì N/i cũng là ước của N.</p>
+
+  <div class="example-box">
+    <b>Ví dụ:</b><br>
+    100 = 1×100 = 2×50 = 4×25 = 5×20 = 10×10  
+    <br>Mỗi ước ở trái đi kèm một ước ở phải.
+  </div>
+
+  <p>Vì vậy ta chỉ cần duyệt từ 1 đến √N.</p>
+
+  <p><b>Độ phức tạp giảm từ O(N) → O(√N).</b></p>
+
+  <div class="code-box">
+    <div class="code-label">C++</div>
+<pre>
+for(long long i = 1; i*i <= n; i++){
+    if(n % i == 0){
+        cnt++;
+        if(i != n/i) cnt++;
+    }
+}
+</pre>
+  </div>
+  
+  <div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+import math
+
+def count_divisors(n):
+    cnt = 0
+    for i in range(1, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            cnt += 1
+            if i != n // i:
+                cnt += 1
+    return cnt
+
+print(count_divisors(100))  # 9
+</pre>
+</div>
+
+<h3>3. Cách 3 – Tối ưu nhất: Dùng phân tích thừa số nguyên tố</h3>
+
+<p>
+Đây là phương pháp mạnh nhất khi cần xử lý N rất lớn (N ≤ 10<sup>12</sup>)
+hoặc cần trả lời nhiều truy vấn trong cùng một bài toán. Ý tưởng là phân tích N thành tích các thừa số nguyên tố rồi áp dụng công thức tính số lượng ước.</p>
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <p>75600 = 2<sup>4</sup> × 3<sup>3</sup> × 5<sup>2</sup> × 7<sup>1</sup></p>
+  <p>Số ước = (4+1)(3+1)(2+1)(1+1) = <b>120 ước</b>.</p>
+</div>
+
+<h3>🔍 Tại sao đây là cách tối ưu nhất?</h3>
+
+<ul>
+  <li><b>Cách 1 (Duyệt 1 → N)</b>: O(N) → không thể chạy với N = 10<sup>12</sup>.</li>
+  <li><b>Cách 2 (Duyệt 1 → √N)</b>: O(√N) ≈ 10<sup>6</sup> phép → vẫn tốt cho 1 truy vấn, nhưng nhiều truy vấn sẽ TLE.</li>
+  <li>
+    <b>Cách 3 (Phân tích thừa số)</b>: Vẫn duyệt đến √N, 
+    nhưng số phép chia thực tế thấp hơn rất nhiều vì mỗi lần lấy được thừa số thì chia liên tục.
+  </li>
+</ul>
+
+<div class="lesson-box">
+  <p><b>Đánh giá thực tế:</b></p>
+  <ul>
+    <li>N = 10<sup>12</sup> → √N = 1.000.000</li>
+    <li>Phân tích thừa số chỉ cần khoảng 100–300 phép chia</li>
+    <li>→ Nhanh hơn cách √N từ 5× đến 100×</li>
+  </ul>
+</div>
+
+<hr class="section-divider">
+
+<h3>📌 C++ – Hàm phân tích thừa số nguyên tố</h3>
+
+<div class="code-box">
+  <div class="code-label">C++</div>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+// Đếm số ước bằng phân tích thừa số
+long long count_divisors(long long n) {
+    long long ans = 1;
+    for (long long p = 2; p * p <= n; p++) {
+        if (n % p == 0) {
+            int exp = 0;
+            while (n % p == 0) {
+                n /= p;
+                exp++;
+            }
+            ans *= (exp + 1);
+        }
+    }
+    if (n > 1) ans *= 2; // n còn lại là số nguyên tố
+    return ans;
+}
+
+int main() {
+    long long n;
+    cin >> n;
+
+    cout << count_divisors(n);
+    return 0;
+}
+</pre>
+</div>
+
+<hr class="section-divider">
+
+<h3>📌 Python – Hàm phân tích thừa số + chương trình hoàn chỉnh</h3>
+
+<div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+import math
+
+def count_divisors(n):
+    ans = 1
+    p = 2
+    while p * p <= n:
+        if n % p == 0:
+            exp = 0
+            while n % p == 0:
+                n //= p
+                exp += 1
+            ans *= (exp + 1)
+        p += 1
+    if n > 1:
+        ans *= 2
+    return ans
+
+# main
+n = int(input())
+print(count_divisors(n))
+</pre>
+</div>
+
+<hr class="section-divider">
+
+<h3>📘 Ví dụ minh hoạ độ tối ưu</h3>
+
+<div class="example-box">
+  <p><b>Xét N = 999,983,000,000 (≈ 10<sup>12</sup>)</b></p>
+  <p>
+    ✔ Cách √N phải thử 1.000.000 số.<br>
+    ✔ Cách phân tích thừa số chỉ thực hiện khoảng 200 lần chia.<br>
+  </p>
+  <p>
+    → Nhanh gấp <b>5000 lần</b> trong thực tế!  
+    → Đây là lý do tại sao các bài số học lớn (HSG – ICPC – OI) 
+      đều dùng phân tích thừa số.
+  </p>
+</div>
+
+
+  <!-- ================================================================ -->
+  <h2>IV. Ước số chung lớn nhất (UCLN)</h2>
+
+  <h3>1. Cách ngây thơ nhất: Duyệt từ min(a, b) về 1</h3>
+
+    <p>
+    Đây là cách tự nhiên nhất khi lần đầu học về UCLN.  
+    Ý tưởng: duyệt từ số lớn nhất có thể là ước chung (tức min(a,b)) rồi giảm dần.
+    </p>
+    
+    <ul>
+      <li>Duyệt d từ min(a,b) → 1</li>
+      <li>Nếu d chia hết a và b thì đó là UCLN</li>
+      <li>Dừng ngay khi gặp d đầu tiên</li>
+    </ul>
+    
+    <div class="lesson-box">
+      <p><b>Nhược điểm:</b></p>
+      <p>
+        Độ phức tạp O(min(a,b)).  
+        Nếu a, b khoảng 10<sup>12</sup> thì thuật toán này <b>bất khả thi</b>.
+      </p>
+    </div>
+    
+    <hr class="section-divider">
+    
+    <div class="code-box">
+      <div class="code-label">C++</div>
+    <pre>
+    #include &lt;bits/stdc++.h&gt;
+    using namespace std;
+    
+    int gcd_naive(int a, int b) {
+        int limit = min(a, b);
+        for (int d = limit; d >= 1; d--) {
+            if (a % d == 0 && b % d == 0)
+                return d;
+        }
+        return 1; // nếu không có ước chung lớn hơn
+    }
+    
+    int main() {
+        int a, b;
+        cin >> a >> b;
+        cout << gcd_naive(a, b);
+        return 0;
+    }
+    </pre>
+    </div>
+    
+    <hr class="section-divider">
+    
+    <div class="code-box">
+      <div class="code-label">Python</div>
+    <pre>
+    def gcd_naive(a, b):
+        limit = min(a, b)
+        for d in range(limit, 0, -1):
+            if a % d == 0 and b % d == 0:
+                return d
+        return 1
+    
+    # main
+    a, b = map(int, input().split())
+    print(gcd_naive(a, b))
+    </pre>
+    </div>
+    
+    <div class="example-box">
+      <p><b>Ví dụ:</b></p>
+      <p>a = 12, b = 18</p>
+      <p>Duyệt: 12 → 11 → 10 → ... → 6 → dừng.</p>
+      <p>Kết quả: UCLN = <b>6</b>.</p>
+    </div>
+
+
+  <h3>2. Dùng phân tích thừa số nguyên tố</h3>
+
+<p>
+Dựa trên tính chất: nếu ta phân tích hai số thành thừa số nguyên tố, thì UCLN chính là
+tích của các thừa số chung, với số mũ nhỏ nhất giữa hai bên.
+</p>
+
+<div class="lesson-box">
+  <p><b>Ý tưởng:</b></p>
+  <ul>
+    <li>Phân tích a = p₁<sup>x₁</sup> · p₂<sup>x₂</sup> …</li>
+    <li>Phân tích b = p₁<sup>y₁</sup> · p₂<sup>y₂</sup> …</li>
+    <li>UCLN = p₁<sup>min(x₁, y₁)</sup> · p₂<sup>min(x₂, y₂)</sup> …</li>
+  </ul>
+</div>
+
+<p>
+Cách này hiệu quả khi các số vừa phải (≤ 10<sup>7</sup>), và thường được dùng khi
+ta cần tính thêm các tính chất khác như số ước, BCNN, phân tích số,…  
+Nhưng với số rất lớn thì phân tích thừa số lại tương đối chậm.
+</p>
+
+<div class="lesson-box">
+  <p><b>Độ phức tạp:</b> O(√N) cho mỗi lần phân tích.</p>
+  <p><b>Không tối ưu bằng Euclid</b> (O(logN)) nhưng dễ hiểu và mạnh khi cần cấu trúc phân tích.</p>
+</div>
+
+<hr class="section-divider">
+
+<h3>📌 C++ – Tính UCLN bằng phân tích thừa số</h3>
+
+<div class="code-box">
+  <div class="code-label">C++</div>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+// Hàm phân tích thừa số trả về map {prime -> exponent}
+map&lt;int,int&gt; factorize(long long n) {
+    map&lt;int,int&gt; res;
+    for (long long i = 2; i * i <= n; i++) {
+        while (n % i == 0) {
+            res[i]++;
+            n /= i;
+        }
+    }
+    if (n > 1) res[n]++;
+    return res;
+}
+
+long long gcd_factor(long long a, long long b) {
+    auto fa = factorize(a);
+    auto fb = factorize(b);
+
+    long long g = 1;
+    for (auto &p : fa) {
+        int prime = p.first;
+        if (fb.count(prime)) {
+            int times = min(p.second, fb[prime]);
+            while (times--) g *= prime;
+        }
+    }
+    return g;
+}
+
+int main() {
+    long long a, b;
+    cin >> a >> b;
+    cout << gcd_factor(a, b);
+    return 0;
+}
+</pre>
+</div>
+
+<hr class="section-divider">
+
+<h3>📌 Python – Tính UCLN bằng phân tích thừa số</h3>
+
+<div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+def factorize(n):
+    res = {}
+    i = 2
+    while i * i <= n:
+        while n % i == 0:
+            res[i] = res.get(i, 0) + 1
+            n //= i
+        i += 1
+    if n > 1:
+        res[n] = 1
+    return res
+
+def gcd_factor(a, b):
+    fa = factorize(a)
+    fb = factorize(b)
+
+    g = 1
+    for p in fa:
+        if p in fb:
+            times = min(fa[p], fb[p])
+            g *= p ** times
+    return g
+
+# main
+a, b = map(int, input().split())
+print(gcd_factor(a, b))
+</pre>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <p>a = 180 = 2<sup>2</sup> × 3<sup>2</sup> × 5</p>
+  <p>b = 84  = 2<sup>2</sup> × 3 × 7</p>
+  <p>→ UCLN = 2<sup>2</sup> × 3<sup>1</sup> = <b>12</b></p>
+</div>
+
+<div class="lesson-box">
+  <p><b>Tại sao cách này mạnh?</b></p>
+  <ul>
+    <li>Dễ mở rộng cho nhiều số: 3 số, 4 số, …</li>
+    <li>Dễ kết hợp với bài toán đếm ước, BCNN, tổng ước,…</li>
+    <li>Cho ta thông tin đầy đủ về cấu trúc số</li>
+  </ul>
+  <p><b>Tại sao không tối ưu?</b></p>
+  <ul>
+    <li>Phân tích thừa số O(√N) chậm hơn Euclid O(logN)</li>
+    <li>Không phù hợp với số rất lớn (10<sup>12</sup>, 10<sup>15</sup>)</li>
+  </ul>
+</div>
+
+
+  <h3>3. Cách tối ưu tuyệt đối: Thuật toán Euclid</h3>
+    <div class="lesson-box">
+      <p><b>Công thức nền tảng:</b></p>
+      <p style="text-align:center; font-weight:bold; font-size:16px;">
+        gcd(a, b) = gcd(b, a mod b)
+      </p>
+      <p>Nhờ phép chia có dư, mỗi lần bài toán nhỏ đi rất nhanh.</p>
+    </div>
+    
+    <p>
+Điều này nghĩa là: <b>lấy số lớn chia cho số nhỏ, rồi thay số lớn bằng số nhỏ,
+thay số nhỏ bằng phần dư, tiếp tục cho đến khi dư = 0</b>.  
+Khi đó, số còn lại chính là UCLN.
+</p>
+
+<div class="example-box">
+  <p><b>Ví dụ minh họa:</b></p>
+  <p>Tính gcd(48, 18)</p>
+  <ul>
+    <li>48 mod 18 = 12 → gcd(48,18) = gcd(18,12)</li>
+    <li>18 mod 12 = 6  → gcd(18,12) = gcd(12,6)</li>
+    <li>12 mod 6 = 0   → gcd(12,6) = 6</li>
+  </ul>
+  <p><b>Kết luận: gcd(48,18) = 6</b></p>
+</div>
+
+<div class="lesson-box">
+  <p><b>Độ phức tạp:</b> O(log(min(a,b))).</p>
+  <p>Đây là cách nhanh nhất – dùng trong tất cả thư viện chuẩn của C/C++, Python, Java,…</p>
+</div>
+
+<hr class="section-divider">
+
+<h3>📌 C++ – Thuật toán Euclid</h3>
+
+<div class="code-box">
+  <div class="code-label">C++</div>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int gcd_euclid(int a, int b) {
+    while (b != 0) {
+        int r = a % b; 
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << gcd_euclid(a, b);
+    return 0;
+}
+</pre>
+</div>
+
+<hr class="section-divider">
+
+<h3>📌 Python – Thuật toán Euclid</h3>
+
+<div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+def gcd_euclid(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+# main
+a, b = map(int, input().split())
+print(gcd_euclid(a, b))
+</pre>
+</div>
+
+<hr class="section-divider">
+
+<div class="lesson-box">
+  <p><b>Tại sao Euclid nhanh nhất?</b></p>
+  <ul>
+    <li>Mỗi bước giảm b đáng kể, vì a % b luôn &lt; b</li>
+    <li>Số bước không vượt quá O(logN)</li>
+    <li>Không cần phân tích thừa số (khó làm, chậm)</li>
+    <li>Dùng được với số tới 10<sup>18</sup>, thậm chí số cực lớn trong BigInt</li>
+  </ul>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ kiểm tra tốc độ:</b></p>
+  <p>Tính UCLN của 123456789 và 987654321:</p>
+  <p>
+    <code>gcd(123456789, 987654321) = 9</code>
+  </p>
+  <p>Mất khoảng vài micro-giây → nhanh hơn phân tích thừa số vài triệu lần.</p>
+</div>
+
+<h3>4. Dùng hàm STL trong C++17</h3>
+
+<p>
+Từ chuẩn <b>C++17</b>, thư viện <code>&lt;numeric&gt;</code> đã bổ sung hai hàm rất mạnh:
+</p>
+
+<div class="lesson-box">
+  <ul>
+    <li><b>std::gcd(a, b)</b> – tính UCLN siêu tối ưu</li>
+    <li><b>std::lcm(a, b)</b> – tính BCNN dựa trên gcd</li>
+  </ul>
+  <p>Hai hàm này được viết bằng Assembly tối ưu và được kiểm thử đầy đủ → an toàn hơn tự cài đặt.</p>
+</div>
+
+<h4>📌 C++ – Dùng <code>std::gcd</code></h4>
+<div class="code-box">
+  <div class="code-label">C++17</div>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+#include &lt;numeric&gt;     // chứa std::gcd. Đưa để giới thiệu, không cần viết
+using namespace std;
+
+int main(){
+    long long a, b;
+    cin >> a >> b;
+
+    long long g = gcd(a, b);   // hoặc std::gcd(a, b)
+    cout << g;
+}
+</pre>
+</div>
+
+<h4>📌 Giải thích sự tối ưu</h4>
+
+<div class="lesson-box">
+  <ul>
+    <li>std::gcd được implement bằng Euclid nhưng tối ưu ở mức thấp (low-level optimized)</li>
+    <li>Có xử lý tràn số, dấu âm, các trường hợp đặc biệt tốt hơn</li>
+    <li>Kiểm thử bởi compiler vendor (GCC, Clang, MSVC)</li>
+    <li>Được đánh giá nhanh hơn code tự viết trong phần lớn trường hợp</li>
+  </ul>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <p>Input: <code>84 36</code></p>
+  <p>Kết quả: <b>12</b></p>
+</div>
+
+<hr class="section-divider">
+
+<h4>📌 Python – Thư viện chuẩn tương tự (math.gcd)</h4>
+
+<p>Python cũng có hàm tối ưu sẵn:</p>
+
+<div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+import math
+
+a, b = map(int, input().split())
+print(math.gcd(a, b))
+</pre>
+</div>
+
+<div class="lesson-box">
+  <p><b>Kết luận:</b></p>
+  <ul>
+    <li>Trong C++17 trở lên: <code>std::gcd</code> nên dùng cho mọi bài thi</li>
+    <li>Không cần tự viết thuật toán Euclid (dù vẫn nên hiểu)</li>
+    <li>Python: dùng <code>math.gcd</code> – cũng rất tối ưu</li>
+  </ul>
+</div>
+
+  <!-- ================================================================ -->
+  <h2>V. Bội số chung nhỏ nhất (BCNN)</h2>
+
+<h3>1. Khái niệm</h3>
+
+<p>
+<b>BCNN (Least Common Multiple – LCM)</b> của hai số nguyên dương <b>a</b> và <b>b</b> là số nhỏ nhất chia hết cho cả a và b.
+</p>
+
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <p>a = 6, b = 8 → BCNN = 24</p>
+</div>
+
+<hr class="section-divider">
+
+<h3>2. Cách ngây thơ: Duyệt bội của số lớn</h3>
+
+<p>Ý tưởng đơn giản nhất:</p>
+<ul>
+  <li>Bắt đầu từ max(a,b)</li>
+  <li>Duyệt từng bội: max(a,b), 2·max(a,b), 3·max(a,b), …</li>
+  <li>Kiểm tra xem bội đó có chia hết cho cả hai số hay không</li>
+</ul>
+
+<div class="lesson-box">
+  <p><b>Nhược điểm:</b></p>
+  <ul>
+    <li>Nếu a và b lớn (ví dụ 10<sup>9</sup>), sẽ phải duyệt rất nhiều → chậm</li>
+    <li>Độ phức tạp O(LCM / max(a,b)) → có thể lên đến hàng tỷ phép chia</li>
+  </ul>
+</div>
+
+<h4>📌 C++ – Cách ngây thơ</h4>
+<div class="code-box">
+  <div class="code-label">C++</div>
+<pre>
+long long lcm_naive(long long a, long long b){
+    long long x = max(a, b);
+    while(true){
+        if(x % a == 0 && x % b == 0)
+            return x;
+        x += max(a, b);
+    }
+}
+
+int main(){
+    long long a, b;
+    cin >> a >> b;
+    cout << lcm_naive(a, b);
+}
+</pre>
+</div>
+
+<h4>📌 Python – Cách ngây thơ</h4>
+<div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+def lcm_naive(a, b):
+    x = max(a, b)
+    while True:
+        if x % a == 0 and x % b == 0:
+            return x
+        x += max(a, b)
+
+a, b = map(int, input().split())
+print(lcm_naive(a, b))
+</pre>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <p>a = 12, b = 15</p>
+  <p>Duyệt: 15, 30, 45, 60 → đúng sau 4 bước</p>
+</div>
+
+<hr class="section-divider">
+
+<h3>3. Cách 2 – Dùng công thức: LCM = a·b / GCD</h3>
+
+<p>
+Dựa trên quan hệ giữa UCLN và BCNN:
+</p>
+
+<p style="text-align:center; font-weight:700; font-size:17px;">
+  LCM(a, b) = (a × b) / GCD(a, b)
+</p>
+
+<p>Trong đó GCD được tính bằng <b>Euclid</b> – nhanh O(logN).</p>
+
+<div class="lesson-box">
+  <p><b>Ưu điểm:</b></p>
+  <ul>
+    <li>Cực nhanh – dùng trong mọi bài thi</li>
+    <li>Tính được với số lớn (long long)</li>
+    <li>Dễ cài đặt → chỉ vài dòng</li>
+  </ul>
+</div>
+
+<h4>📌 C++ – Công thức chuẩn</h4>
+<div class="code-box">
+  <div class="code-label">C++</div>
+<pre>
+long long gcd(long long a, long long b){
+    while(b != 0){
+        long long r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+long long lcm(long long a, long long b){
+    return a / gcd(a, b) * b;
+}
+
+int main(){
+    long long a, b;
+    cin >> a >> b;
+    cout << lcm(a, b);
+}
+</pre>
+</div>
+
+<h4>📌 Python – Công thức chuẩn</h4>
+<div class="code-box">
+  <div class="code-label">Python</div>
+<pre>
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+def lcm(a, b):
+    return a // gcd(a, b) * b
+
+a, b = map(int, input().split())
+print(lcm(a, b))
+</pre>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <p>a = 21, b = 6</p>
+  <p>gcd = 3 → lcm = 21 × 6 / 3 = <b>42</b></p>
+</div>
+
+<hr class="section-divider">
+
+<h3>4. Dùng hàm STL trong C++17</h3>
+
+<p>
+Từ C++17, thư viện &lt;numeric&gt; cung cấp <b>std::gcd</b> và <b>std::lcm</b>.
+</p>
+
+<div class="lesson-box">
+  <p><b>Ưu điểm:</b></p>
+  <ul>
+    <li>Độ chính xác tuyệt đối</li>
+    <li>Đã được tối ưu tốt hơn code tự viết</li>
+    <li>Gọn nhất – dùng một dòng</li>
+  </ul>
+</div>
+
+<h4>📌 C++ – std::gcd và std::lcm</h4>
+<div class="code-box">
+  <div class="code-label">C++17</div>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main(){
+    long long a, b;
+    cin >> a >> b;
+    cout << lcm(a, b);  // từ <numeric>
+}
+</pre>
+</div>
+
+<p><b>Lưu ý:</b> cần include &lt;numeric&gt; hoặc &lt;bits/stdc++.h&gt;.</p>
+
+<div class="lesson-box">
+  <p><b>Tổng kết:</b></p>
+  <ul>
+    <li><b>Cách ngây thơ</b>: dễ hiểu, nhưng cực chậm → chỉ dùng minh họa</li>
+    <li><b>Công thức LCM = a·b/GCD</b>: nhanh nhất để tự code</li>
+    <li><b>STL C++17</b>: nhanh – gọn – an toàn</li>
+  </ul>
+</div>
+
+
+  <!-- ================================================================ -->
+<h2>VI. BÀI TOÁN ỨNG DỤNG</h2>
+
+
+
+
+<!-- ===================================================== -->
+<h3>1. Bài toán: Chọn 3 hộp quà – IOI Style</h3>
+<p><code> <a href="https://tin247ctp.com/problems/151/" target="_blank"> Click vào đây để làm bài </a></code> </p>
+
+<details>
+  <summary><code>💡 Đề bài  </code></summary>
+
+<div class="lesson-box">
+  <p>
+    Nhờ thành tích thi lập trình ấn tượng ở vòng loại <b>IOI_VN</b>, Jame đã được chọn vào đội tuyển dự thi
+    <b>IOI 202x</b> và nhận được nhiều phần thưởng.
+  </p>
+  <p>
+    Ban tổ chức có <b>N</b> hộp quà, hộp quà thứ <b>i</b> có ghi số nguyên dương <b>a[i]</b> (các số
+    <b>a[i]</b> đôi một khác nhau, biểu thị giá trị hộp quà đó).
+  </p>
+
+  <p><b>Quy tắc chọn quà:</b></p>
+  <p>
+    Jame được chọn <b>3 hộp quà bất kỳ</b>. Giả sử chọn được bộ ba
+    <b>(a[i], a[j], a[k])</b>.
+  </p>
+  <p>
+    Khi đó, ngoài tổng giá trị của 3 hộp quà, Jame còn nhận thêm một phần thưởng đặc biệt có giá trị
+    <b>X</b> (đồng), trong đó:
+  </p>
+
+  <p style="text-align:center; font-weight:700; font-size:17px;">
+    X = ước chung nguyên tố lớn nhất<br>
+    của <code>gcd(a[i], a[j], a[k])</code>
+  </p>
+
+  <p>
+    Nếu 3 số <b>a[i], a[j], a[k]</b> <b>không có ước chung nguyên tố</b> (tức
+    <code>gcd(a[i], a[j], a[k]) = 1</code>) thì tất nhiên <b>X = 0</b>.
+  </p>
+
+  <p style="margin-top:8px;">Tổng số tiền Jame nhận được với bộ ba đó là:</p>
+
+  <p style="text-align:center; font-weight:bold; font-size:17px;">
+    S = a[i] + a[j] + a[k] + X
+  </p>
+
+  <p><b>Yêu cầu:</b> Hãy tính <b>giá trị lớn nhất</b> của S mà Jame có thể nhận được.</p>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ minh hoạ:</b></p>
+  <pre>
+N = 4
+Các hộp quà: 9, 11, 12, 15
+
+Các cách chọn bộ 3:
+
+(9, 11, 12)
+  gcd(9,11,12) = 1 → không có ước nguyên tố chung → X = 0
+  S = 9 + 11 + 12 + 0 = 32
+
+(9, 11, 15)
+  gcd(9,11,15) = 1 → X = 0
+  S = 9 + 11 + 15 + 0 = 35
+
+(9, 12, 15)
+  gcd(9,12,15) = 3 → ước nguyên tố lớn nhất là 3 → X = 3
+  S = 9 + 12 + 15 + 3 = 39   (lớn nhất)
+
+(11, 12, 15)
+  gcd(11,12,15) = 1 → X = 0
+  S = 11 + 12 + 15 + 0 = 38
+
+Kết luận: Cách chọn (9, 12, 15) cho S = 39 là tối ưu.
+  </pre>
+</div>
+
+<h4>📥 Dữ liệu vào – Kết quả ra</h4>
+
+<div class="lesson-box">
+  <p><b>Dữ liệu vào: </b>tệp văn bản <code>CHOOSGIF.INP</code></p>
+  <ul>
+    <li><b>Dòng 1</b>: Ghi số nguyên dương <code>N</code> (<code>N ≤ 500</code>).</li>
+    <li><b>Dòng 2</b>: Ghi <code>N</code> số nguyên dương <code>a[i]</code> (<code>a[i] ≤ 10<sup>5</sup></code>), đôi một khác nhau.</li>
+  </ul>
+
+  <p><b>Kết quả:</b> Ghi ra tệp văn bản <code>CHOOSGIF.OUT</code> một số nguyên là giá trị lớn nhất của S tìm được.</p>
+
+  <p><b>Ví dụ:</b></p>
+  <pre>
+CHOOSGIF.INP
+4
+9 11 12 15
+
+CHOOSGIF.OUT
+39
+  </pre>
+</div>
+
+
+
+</details>
+
+<details>
+  <summary><code>💡 Hướng dẫn giải &amp; Gợi ý tối ưu  </code></summary>
+
+
+<div class="lesson-box">
+  <p><b>1. Phân tích yêu cầu bài toán</b></p>
+  <p>
+    Thực chất yêu cầu của bài toán chính là: cho N và dãy <code>a[i]</code>, hãy chọn 3 phần tử sao cho:
+  </p>
+  <p style="text-align:center; font-weight:bold; font-size:16px;">
+    S = a[i] + a[j] + a[k] + UCNT_max(a[i], a[j], a[k])
+  </p>
+  <p>
+    Trong đó <b>UCNT_max(u, v, z)</b> là <b>ước chung nguyên tố lớn nhất</b> của 3 số u, v, z, tức là
+    <b>thừa số nguyên tố lớn nhất của gcd(u, v, z)</b>.
+  </p>
+
+  <p><b>2. Tìm UCLN của 3 số bằng giải thuật Euclid</b></p>
+  <p>
+    Gọi u, v, z là 3 giá trị đã chọn. Ta có:
+  </p>
+  <pre>
+p = gcd(u, v, z) = gcd(u, gcd(v, z))
+  </pre>
+  <p>
+    Ta dùng giải thuật Ơ-clit (Euclid) để tính gcd(v, z), rồi lại gcd(u, kết quả đó). Độ phức tạp mỗi lần là O(log(max(u, v, z))).
+  </p>
+
+  <p><b>3. Phân tích p thành thừa số nguyên tố và lấy thừa số lớn nhất</b></p>
+  <ul>
+    <li>Nếu <code>p = 1</code> thì 3 số không có ước chung nguyên tố → <code>X = 0</code>.</li>
+    <li>Nếu <code>p &gt; 1</code>, ta phân tích p thành tích các thừa số nguyên tố, thừa số nguyên tố cuối cùng sẽ là UCNT_max(u, v, z).</li>
+  </ul>
+  <p>
+    Điều này tương ứng với hàm <code>largestPrime(p)</code> đã nêu ở trên (hoặc phiên bản <code>phantich(p)</code> như trong code tham khảo).
+  </p>
+
+  <p><b>4. Duyệt mọi bộ ba (i, j, k)</b></p>
+  <p>
+    Ta thực hiện 3 vòng lặp:
+  </p>
+  <pre>
+Duyệt i từ 1 đến N-2
+  Duyệt j từ i+1 đến N-1
+    Duyệt k từ j+1 đến N
+      {
+          p   = gcd(a[i], gcd(a[j], a[k]))
+          X   = UCNT_max(a[i], a[j], a[k])  // ước chung nguyên tố lớn nhất
+          S   = a[i] + a[j] + a[k] + X
+          Res = max(Res, S)
+      }
+  </pre>
+  <p>
+    Vì <code>N ≤ 500</code>, số bộ ba là khoảng <code>C(500,3)</code> ≈ 20 triệu. Kết hợp với việc mỗi bước chỉ tính gcd và phân tích một số ≤ 10<sup>5</sup>,
+    thuật toán vẫn chấp nhận được.
+  </p>
+
+  <p><b>5. Mã C++ tham khảo</b></p>
+  <p>
+    Dưới đây là chương trình C++ tham khảo, cài đặt đúng ý tưởng: sử dụng UCLN ba số, sau đó phân tích UCLN thành thừa số nguyên tố
+    và lấy thừa số nguyên tố lớn nhất.
+  </p>
+<div class="code-box">
+  <div class="code-label">C++17</div>
+<pre>
+#include &lt;bits/stdc++.h&gt;
+#define nmax 505
+using namespace std;
+
+int n, a[nmax], res = INT_MIN;
+int c[nmax], t = 0;
+
+int ucln(int u, int v)
+{
+    int r = 0;
+    while (v > 0)
+    {
+        r = u % v;
+        u = v;
+        v = r;
+    }
+    return u;
+}
+
+void phantich(int u)
+{
+    for (int i = 2; i * i <= u; i++)
+        while (u % i == 0)
+        {
+            c[++t] = i;
+            u /= i;
+        }
+    if (u != 1)
+        c[++t] = u;
+}
+
+int ucnt_max(int u, int v, int z)
+{
+    int p = ucln(u, ucln(v, z));
+    if (p != 1)
+        phantich(p);
+    else
+        return 0;
+    return c[t];  // thừa số nguyên tố lớn nhất
+}
+
+void xuli()
+{
+    for (int i = 1; i <= n - 2; i++)
+        for (int j = i + 1; j <= n - 1; j++)
+            for (int k = j + 1; k <= n; k++)
+            {
+                int s = 0;
+                s = a[i] + a[j] + a[k] + ucnt_max(a[i], a[j], a[k]);
+                if (res &lt; s)
+                    res = s;
+            }
+}
+
+int main()
+{
+    freopen("CHOOSGIF.inp", "r", stdin);
+    freopen("CHOOSGIF.out", "w", stdout);
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+        cin >> a[i];
+    xuli();
+    cout &lt;&lt; res;
+    return 0;
+}
+</pre>
+</div>
+  <p>
+    Trong thực hành, có thể tối ưu thêm bằng cách:
+  </p>
+  <ul>
+    <li>Đặt lại biến <code>t = 0</code> mỗi lần phân tích để không dùng chung mảng <code>c[]</code> giữa các lần gọi.</li>
+    <li>Hoặc dùng trực tiếp hàm <code>largestPrime(p)</code> như phiên bản Python/C++ trình bày ở phía dưới.</li>
+  </ul>
+
+  <p><b>6. Gợi ý tối ưu nâng cao</b></p>
+  <ul>
+    <li>Có thể lưu trước tất cả các số nguyên tố ≤ 10<sup>5</sup> bằng sàng Eratosthenes để phân tích nhanh hơn.</li>
+    <li>Có thể thêm kiểm tra đơn giản: nếu <code>a[i] + a[j] + a[k]</code> đã nhỏ hơn res hiện tại rất nhiều, có thể bỏ qua một số trường hợp (pruning).</li>
+  </ul>
+</div>
+<h4>📌 Hàm tìm thừa số nguyên tố lớn nhất của một số</h4>
+
+<div class="mini-row">
+  <div class="mini-card">
+    <b>Python</b>
+<pre>
+def largest_prime(n):
+    last = 0
+    d = 2
+    while d * d <= n:
+        while n % d == 0:
+            last = d
+            n //= d
+        d += 1
+    return n if n > 1 else last
+</pre>
+  </div>
+
+  <div class="mini-card">
+    <b>C++</b>
+<pre>
+int largestPrime(int n){
+    int last = 0;
+    for (int d = 2; d * d <= n; d++){
+        while (n % d == 0){
+            last = d;
+            n /= d;
+        }
+    }
+    if (n > 1) last = n;
+    return last;
+}
+</pre>
+  </div>
+</div>
+
+
+</details>
+
+<hr class="section-divider">
+
+<!-- ===================================================== -->
+<h3>3. Bài toán: Tổng các số hoàn hảo</h3>
+
+<div class="lesson-box">
+  <p><b>Đề bài:</b></p>
+  <p>
+    Số hoàn hảo là số có tổng các ước số dương thực sự bằng chính nó.  
+    Các số hoàn hảo ≤ 10⁹ gồm:
+  </p>
+  <ul>
+    <li>6</li>
+    <li>28</li>
+    <li>496</li>
+    <li>8128</li>
+    <li>33550336</li>
+  </ul>
+
+  <p>Cho một số nguyên dương N ≤ 10⁹.</p>
+  <p>Hãy đếm số cách phân tích N thành tổng <b>các số hoàn hảo khác nhau</b>.</p>
+
+  <p>Nếu không có cách nào → in ra <b>-1</b>.</p>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <pre>
+Input: 34
+Cách: 34 = 6 + 28  → 1 cách
+Output: 1
+
+Input: 10
+Không có cách phân tích → Output: -1
+  </pre>
+</div>
+
+<p><b>Phân tích:</b></p>
+<p>Chỉ có 5 số hoàn hảo → chỉ cần duyệt tất cả 32 tập con (bitmask).</p>
+
+<div class="mini-row">
+  <div class="mini-card">
+    <b>Python</b>
+<pre>
+perf = [6, 28, 496, 8128, 33550336]
+S = set()
+
+for mask in range(1, 1 << 5):
+    s = sum(perf[i] for i in range(5)
+             if mask & (1 << i))
+    S.add(s)
+</pre>
+  </div>
+
+  <div class="mini-card">
+    <b>C++</b>
+<pre>
+int perf[5] = {6,28,496,8128,33550336};
+set<long long> S;
+
+for(int mask=1; mask < (1<<5); mask++){
+    long long s = 0;
+    for(int i=0; i<5; i++)
+        if(mask & (1<<i))
+            s += perf[i];
+    S.insert(s);
+}
+</pre>
+  </div>
+</div>
+
+
+
+
+<hr class="section-divider">
+
+<!-- ===================================================== -->
+<h3>4. Bài toán: Chọn quà chia hết cho c và d</h3>
+
+<div class="lesson-box">
+  <p><b>Đề bài:</b></p>
+  <p>
+    Có N món quà, đánh số từ 1 đến N.
+    Một món quà hợp lệ nếu số thứ tự của nó chia hết cho cả <b>c</b> và <b>d</b>.
+  </p>
+
+  <p>
+    Hãy in ra số lượng món quà hợp lệ.  
+    Nếu không có món nào → in ra <b>NONE</b>.
+  </p>
+</div>
+
+<div class="example-box">
+  <p><b>Ví dụ:</b></p>
+  <pre>
+Input: 20 2 5
+Các số chia hết cho 2 và 5: 10, 20 → 2 món
+Output: 2
+
+Input: 25 14 13
+Không có số nào chia hết → Output: NONE
+  </pre>
+</div>
+
+<p><b>Phân tích:</b></p>
+
+<p>Một số chia hết cho cả c và d ⇔ chia hết cho:</p>
+
+<p style="text-align:center; font-weight:bold; font-size:17px;">
+    lcm(c, d)
+</p>
+
+<p>Số lượng món hợp lệ:</p>
+
+<p style="text-align:center; font-weight:bold; font-size:17px;">
+    ⌊ N / lcm(c, d) ⌋
+</p>
+
+<div class="mini-row">
+  <div class="mini-card">
+    <b>Python</b>
+<pre>
+res = N // lcm(c, d)
+print(res if res > 0 else "NONE")
+</pre>
+  </div>
+
+  <div class="mini-card">
+    <b>C++</b>
+<pre>
+long long res = N / lcm(c, d);
+cout << (res ? to_string(res) : "NONE");
+</pre>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ====================================================================== -->
+<h2>VII. TỔNG KẾT BÀI HỌC</h2>
+
+<div class="lesson-box">
+  <ul>
+    <li>Nắm ước – bội – UCLN – BCNN</li>
+    <li>Thực hành 3 cấp độ thuật toán đếm ước</li>
+    <li>Thành thạo Euclid & Euclid mở rộng</li>
+    <li>Áp dụng vào các bài toán HSG: chọn quà, số hoàn hảo, BCNN</li>
+    <li>Biết cách triển khai song song Python & C++</li>
+  </ul>
+</div>
+
+<hr class="section-divider">
+
+<h2>VIII. BÀI TẬP TỰ LUYỆN</h2>
+<ol>
+  <li>Nhập a,b → in gcd(a,b), lcm(a,b) bằng cả C++ & Python.</li>
+  <li>Dùng Euclid mở rộng tìm x,y sao cho ax+by=gcd(a,b).</li>
+  <li>Đếm ước của N ≤ 10¹² bằng phân tích thừa số.</li>
+  <li><code><a href="https://tin247ctp.com/problems/155/" target="_blank">Tính Lũy Thừa Tích và ƯCLN</a></code></li>
+  <li>Tìm số nguyên tố lớn nhất chia hết cho gcd(a,b,c).</li>
+</ol>
+
+
+
+
+
+
+

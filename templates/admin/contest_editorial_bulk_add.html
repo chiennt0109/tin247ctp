@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Áp quyền xem lời giải cho toàn bộ bài trong Contest</h1>
+
+<p>Chọn contest và rule, sau đó hệ thống sẽ áp dụng cho tất cả problem trong contest.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <br>
+    <button type="submit" class="default">Apply rule to all problems</button>
+</form>
+
+{% endblock %}

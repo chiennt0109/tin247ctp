@@ -1,0 +1,270 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block content %}
+<div id="problem-header">
+  <h2 id="problem-title">{{ original.title|default:"🧩 New Problem" }}</h2>
+  <div id="toolbar">
+    <button class="btn-ai" type="button" onclick="aiAutoFill()">🤖 Gợi ý code/tags/độ khó</button>
+    {% if original and original.id %}
+      <a href="{% url 'admin:upload_tests' original.id %}" class="btn-ai">⬆ Upload test</a>
+      <button class="btn-ai" type="button" onclick="runSandboxCheck()">🧪 Kiểm tra sandbox</button>
+    {% else %}
+      <span class="text-muted">💡 Lưu bài trước khi kiểm tra sandbox</span>
+    {% endif %}
+    <span id="aiResult"></span>
+  </div>
+</div>
+
+{{ block.super }}
+{{ media }}   <!-- 🔥 BẮT BUỘC: Load JS SelectFilter -->
+
+<!-- SimpleMDE -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
+<script>
+// =====================
+// SimpleMDE Editor
+// =====================
+document.addEventListener("DOMContentLoaded", function () {
+  const textarea = document.querySelector("#id_statement");
+  if (!textarea) return;
+
+  new SimpleMDE({
+    element: textarea,
+    spellChecker: false,
+    toolbar: [
+      "bold","italic","heading","|",
+      "quote","unordered-list","ordered-list","|",
+      "link","image","code","table","|",
+      "preview","side-by-side","fullscreen"
+    ],
+    status: false,
+  });
+});
+</script>
+
+
+<script>
+// ============================================================
+// ⭐ WAIT UNTIL DJANGO ADMIN SelectFilter CREATED (IMPORTANT)
+// ============================================================
+function waitForSelectFilterReady(callback) {
+    let tries = 0;
+    const timer = setInterval(() => {
+
+        const fromBox = document.getElementById("id_tags_from");
+        const toBox   = document.getElementById("id_tags_to");
+
+        if (fromBox && toBox) {
+            clearInterval(timer);
+            callback(fromBox, toBox);
+        }
+
+        if (tries++ > 40) { // 2 seconds timeout
+            clearInterval(timer);
+            const msg = document.getElementById("aiResult");
+            msg.style.color = "red";
+            msg.textContent = "❌ SelectFilter chưa sẵn sàng. Hãy scroll xuống mục Tags rồi thử lại.";
+        }
+
+    }, 50);
+}
+
+
+
+  const PROBLEM_LOCKED = {{ problem_locked|yesno:"true,false" }};
+
+// ============================================================
+// ⭐ AI AUTO FILL — highlight & select trong Available
+// ============================================================
+function aiAutoFill() {
+    const msg = document.getElementById("aiResult");
+    msg.textContent = "🤖 Đang xử lý...";
+    msg.style.color = "#333";
+
+    fetch("/admin/problems/problem/ai_analyze_problem/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({
+            title: document.querySelector("#id_title").value,
+            statement: document.querySelector("#id_statement").value
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+        console.log("AI result:", res);
+
+        // ===== CODE =====
+        if (res.code) {
+            const c = document.getElementById("id_code");
+        
+            if (PROBLEM_LOCKED) {
+                alert("⚠ Bài toán đang trong kỳ thi – không thể ghi đè code.");
+                return;
+            }
+        
+            if (c) {
+                if (c.value.trim() !== "") {
+                    const ok = confirm("⚠ Mã bài đã tồn tại.\nBạn có chắc muốn ghi đè không?");
+                    if (!ok) return;
+                }
+                c.value = res.code;
+            }
+        }
+
+        // ===== DIFFICULTY =====
+        if (res.difficulty) {
+            const d = document.getElementById("id_difficulty");
+            if (d) d.value = res.difficulty;
+        }
+        // ===== TIME LIMIT =====
+        if (res.time_limit !== undefined && res.time_limit !== null) {
+            const tl = document.getElementById("id_time_limit");
+            if (tl) tl.value = res.time_limit;
+        }
+        
+        // ===== MEMORY LIMIT =====
+        if (res.memory_limit !== undefined && res.memory_limit !== null) {
+            const ml = document.getElementById("id_memory_limit");
+            if (ml) ml.value = res.memory_limit;
+        }
+
+
+        // ===== TAGS: chỉ chọn + highlight trong Available =====
+        // Ưu tiên 2 cửa sổ (filter_horizontal), nếu không có thì dùng 1 cửa sổ
+        const available =
+            document.getElementById("id_tags_from") ||
+            document.getElementById("id_tags");
+
+        if (!available) {
+            msg.style.color = "red";
+            msg.textContent = "❌ Không tìm thấy ô Tags trên form.";
+            return;
+        }
+
+        const wants = (res.tags || []).map(t => t.toLowerCase().trim());
+        console.log("AI wants:", wants);
+
+        // Reset highlight + chọn cũ
+        Array.from(available.options).forEach(opt => {
+            opt.style.background = "";
+            opt.style.color = "";
+            opt.selected = false;
+        });
+
+        // Chọn + tô màu các tag khớp
+        let matched = 0;
+        Array.from(available.options).forEach(opt => {
+            const txt = (opt.textContent || opt.innerText || "").toLowerCase().trim();
+            if (wants.includes(txt)) {
+                opt.selected = true;          // để bạn bấm nút ▶ là nó chạy luôn
+                opt.style.background = "#ffecb5";
+                opt.style.color = "#000";
+                matched++;
+            }
+        });
+
+        if (matched > 0) {
+            msg.style.color = "green";
+            msg.textContent =
+                `✅ AI đã chọn & highlight ${matched} tag — hãy bấm nút ▶ để chuyển sang Chosen rồi Lưu.`;
+        } else {
+            msg.style.color = "orange";
+            msg.textContent = "⚠ AI không tìm thấy tag trùng trong danh sách hiện có.";
+        }
+    })
+    .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "❌ AI lỗi: " + err.message;
+        console.error(err);
+    });
+}
+
+
+
+
+// ============================================================
+// ⭐ SANDBOX CHECK
+// ============================================================
+function runSandboxCheck() {
+  const msg = document.getElementById("aiResult");
+  msg.textContent = "⏳ Đang kiểm tra sandbox...";
+  msg.style.color = "#444";
+
+  const problemId = {{ original.id|default:"null" }};
+  if (!problemId) {
+      msg.textContent = "💡 Lưu bài trước.";
+      msg.style.color = "gray";
+      return;
+  }
+
+  fetch(`/admin/problems/problem/sandbox/check/${problemId}/`)
+    .then(r => r.json())
+    .then(data => {
+        msg.textContent = data.sandbox_ok
+            ? "✅ Sandbox hoạt động tốt!"
+            : "⚠ Sandbox lỗi hoặc thiếu dữ liệu.";
+        msg.style.color = data.sandbox_ok ? "green" : "red";
+    })
+    .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "❌ Sandbox lỗi: " + err.message;
+    });
+}
+</script>
+
+
+<style>
+/* Toolbar + Header */
+#problem-header {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.btn-ai {
+  background: #3c8dbc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.btn-ai:hover { background: #337ab7; }
+
+/* SimpleMDE toolbar ngang */
+.editor-toolbar {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-bottom: none;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+  min-height: 420px !important;
+}
+
+.form-row.field-statement .flex-container {
+  flex-direction: column;
+}
+</style>
+
+
+{% endblock %}

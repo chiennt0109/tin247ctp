@@ -1,0 +1,59 @@
+<h2>🎯 Mục tiêu</h2>
+<ul>
+  <li>Hiểu cách lưu chuỗi bằng Trie.</li>
+  <li>Dùng Union-Find (DSU) để xác định nhóm liên thông.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết</h2>
+<p><b>Trie</b> là cây ký tự: mỗi nút biểu diễn 1 ký tự, dùng để tìm kiếm chuỗi nhanh.<br>
+<b>Union-Find</b> quản lý các tập hợp disjoint – rất hiệu quả trong đồ thị.</p>
+
+<hr>
+
+<h2>💻 Trie (Python)</h2>
+<pre><code>class Trie:
+  def __init__(self): self.child={};self.end=False
+  def insert(self,s):
+    node=self
+    for c in s:
+      if c not in node.child: node.child[c]=Trie()
+      node=node.child[c]
+    node.end=True
+  def search(self,s):
+    node=self
+    for c in s:
+      if c not in node.child: return False
+      node=node.child[c]
+    return node.end
+root=Trie()
+for w in ["cat","car","dog"]: root.insert(w)
+print(root.search("car"))</code></pre>
+
+<h2>💻 Union-Find (C++)</h2>
+<pre><code>struct DSU{
+  vector&lt;int&gt; p;
+  DSU(int n){p.resize(n+1);iota(p.begin(),p.end(),0);}
+  int find(int x){return x==p[x]?x:p[x]=find(p[x]);}
+  void unite(int a,int b){
+    a=find(a);b=find(b);
+    if(a!=b)p[b]=a;
+  }
+};</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập</h2>
+<ol>
+  <li>Viết chương trình đếm số nhóm liên thông bằng DSU.</li>
+  <li>Kiểm tra xem hai từ có cùng tiền tố trong Trie không.</li>
+</ol>
+
+<details><summary><b>💡 Lời giải DSU</b></summary>
+<pre><code>dsu=DSU(5)
+dsu.unite(1,2)
+dsu.unite(3,4)
+groups=len(set(dsu.find(i) for i in range(1,6)))
+print(groups)</code></pre>
+</details>

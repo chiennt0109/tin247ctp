@@ -1,0 +1,120 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu C(n,k), P(n,k), giai thừa n!.</li>
+  <li>Biết cách tính tổ hợp rất lớn mod 1e9+7 bằng tiền xử lý factorial.</li>
+  <li>Nhìn được bài toán “phân tích số” dưới góc nhìn đếm phương án.</li>
+</ul>
+
+<hr>
+
+<h2>📘 C(n, k) là gì?</h2>
+<p><code>C(n,k)</code> là số cách chọn k phần tử từ n phần tử, không quan tâm thứ tự.</p>
+
+<p>Định nghĩa:
+<code>C(n,k) = n! / (k! * (n-k)!)</code></p>
+
+<p>Trong code thi HSG, ta thường tính mod một số nguyên tố lớn (ví dụ 1e9+7) để tránh tràn số.</p>
+
+<hr>
+
+<h2>💻 Tiền xử lý giai thừa (factorial)</h2>
+
+<h4>Python</h4>
+<pre><code>MOD = 10**9+7
+
+def modpow(a,e):
+    r=1
+    while e:
+        if e&1: r=r*a%MOD
+        a=a*a%MOD
+        e//=2
+    return r
+
+def modinv(a):
+    return modpow(a, MOD-2)
+
+N = 100000
+fact = [1]*(N+1)
+invfact = [1]*(N+1)
+
+for i in range(1,N+1):
+    fact[i] = fact[i-1]*i % MOD
+
+invfact[N] = modinv(fact[N])
+for i in range(N-1,-1,-1):
+    invfact[i] = invfact[i+1]*(i+1) % MOD
+
+def C(n,k):
+    if k<0 or k>n: return 0
+    return fact[n]*invfact[k]%MOD*invfact[n-k]%MOD
+
+print(C(10,3))</code></pre>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+const long long MOD=1000000007;
+
+long long modpow(long long a,long long e){
+    long long r=1;
+    while(e){
+        if(e&1) r=r*a%MOD;
+        a=a*a%MOD;
+        e>>=1;
+    }
+    return r;
+}
+long long modinv(long long a){
+    return modpow(a,MOD-2);
+}
+
+int main(){
+    int N=100000;
+    vector&lt;long long&gt; fact(N+1),invfact(N+1);
+    fact[0]=1;
+    for(int i=1;i&lt;=N;i++) fact[i]=fact[i-1]*i%MOD;
+    invfact[N]=modinv(fact[N]);
+    for(int i=N-1;i&gt;=0;i--)
+        invfact[i]=invfact[i+1]*(i+1)%MOD;
+    auto C=[&](int n,int k){
+        if(k&lt;0||k&gt;n) return 0LL;
+        return fact[n]*invfact[k]%MOD*invfact[n-k]%MOD;
+    };
+    cout&lt;&lt;C(10,3);
+}</code></pre>
+
+<hr>
+
+<h2>📗 Phân tích số</h2>
+<p>
+Bài toán điển hình:  
+“Có bao nhiêu cách viết n dưới dạng tổng của các số nguyên dương?”  
+hoặc  
+“Có bao nhiêu cách đổi tiền với các mệnh giá cho trước?”  
+→ Đây chính là quy hoạch động đếm số nghiệm (kiểu coin change).
+</p>
+
+<pre><code># Python: số cách tạo tổng S từ các mệnh giá coins
+def count_ways(S, coins):
+    dp=[0]*(S+1)
+    dp[0]=1
+    for c in coins:
+        for x in range(c,S+1):
+            dp[x]+=dp[x-c]
+    return dp[S]
+
+print(count_ways(5, [1,2,5]))  # 4 cách</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính C(n,k) mod 1e9+7 với n rất lớn (ví dụ n=100000, k=12345).</li>
+  <li>Cho số n, in ra phân tích thừa số nguyên tố của n.</li>
+  <li>Bài đổi tiền: có bao nhiêu cách trả đúng số tiền S?</li>
+</ol>
+
+<details>
+  <summary><b>💡 Gợi ý bài 3</b></summary>
+  <pre><code># quy hoạch động 1 chiều như ví dụ count_ways phía trên</code></pre>
+</details>

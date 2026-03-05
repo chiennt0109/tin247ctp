@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="py-12 px-6 sm:px-12 lg:px-24 bg-gradient-to-br from-white via-sky-50 to-indigo-50 min-h-screen">
+  <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8 leading-relaxed relative overflow-hidden">
+
+   
+
+  
+    <div id="topic-detail" class="prose max-w-none text-gray-700 text-justify mb-8"
+         style="overflow-x:auto;word-wrap:break-word;line-height:1.7;">
+      {{ topic.detail|safe }}
+    </div>
+
+    <div class="text-center mt-10">
+      <a href="/roadmap/stage/{{ stage.id }}/"
+         class="inline-block px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition">
+         ⬅️ Quay lại giai đoạn {{ stage.id }}
+      </a>
+    </div>
+
+    <!-- Nút lên đầu -->
+    <button id="scrollTopBtn"
+      title="Lên đầu"
+      class="rounded-full bg-indigo-600 text-white text-lg shadow-lg"
+      style="position:fixed;bottom:24px;right:24px;display:none;width:42px;height:42px;line-height:1;z-index:50;">
+      ⬆
+    </button>
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const saved = sessionStorage.getItem("currentTopic");
+  if (saved) {
+    try {
+      const t = JSON.parse(saved);
+      if (t && t.title) {
+        document.getElementById("topic-title").textContent = t.title;
+        document.getElementById("topic-summary").textContent = t.summary;
+        if (t.detail) {
+          let html = decodeURIComponent(t.detail || "");
+          html = html.replace(/\\n/g, "<br>");
+          document.getElementById("topic-detail").innerHTML = html;
+        }
+      }
+    } catch (e) { console.warn("⚠️ Lỗi đọc sessionStorage:", e); }
+  }
+
+  // Nút cuộn lên đầu
+  const scrollBtn = document.getElementById("scrollTopBtn");
+  const container = document.querySelector(".max-w-5xl");
+
+  function positionScrollBtn() {
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const rightGap = Math.max(16, window.innerWidth - rect.right + 20);
+    scrollBtn.style.right = rightGap + "px";
+  }
+
+  function toggleScrollBtn() {
+    const show = document.documentElement.scrollTop > 400;
+    scrollBtn.style.display = show ? "block" : "none";
+  }
+
+  window.addEventListener("scroll", () => {
+    toggleScrollBtn();
+    positionScrollBtn();
+  });
+  window.addEventListener("resize", positionScrollBtn);
+  scrollBtn.addEventListener("click", () => {
+    window.scrollBy({ top: -window.innerHeight * 2, behavior: "smooth" });
+  });
+
+  positionScrollBtn();
+});
+</script>
+
+{% endblock %}

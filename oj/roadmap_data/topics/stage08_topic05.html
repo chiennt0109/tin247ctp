@@ -1,0 +1,57 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cơ chế ánh xạ khóa → giá trị trong Hash Table.</li>
+  <li>Biết sử dụng Heap (Priority Queue) để xử lý phần tử có độ ưu tiên cao nhất.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Lý thuyết cơ bản</h2>
+<p>
+<b>Hash Table</b> là cấu trúc ánh xạ khóa (key) thành vị trí lưu trữ nhanh chóng, giúp truy xuất trung bình O(1).<br>
+<b>Priority Queue</b> (hàng đợi ưu tiên) lưu các phần tử theo thứ tự ưu tiên — thường dùng Heap để cài đặt.
+</p>
+
+<hr>
+
+<h2>💻 Ví dụ</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    unordered_map&lt;string,int&gt; mp;
+    mp["apple"]=3; mp["banana"]=5; mp["orange"]=2;
+    priority_queue&lt;int&gt; pq;
+    pq.push(10); pq.push(5); pq.push(8);
+    cout&lt;&lt;"Hash apple="&lt;&lt;mp["apple"]&lt;&lt;"\\n";
+    cout&lt;&lt;"Top of max-heap="&lt;&lt;pq.top();
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>import heapq
+mp={"apple":3,"banana":5,"orange":2}
+pq=[]
+for x in [10,5,8]:
+    heapq.heappush(pq,-x) # max-heap bằng âm số
+print("Hash apple =",mp["apple"])
+print("Top of max-heap =",-pq[0])</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Đếm số lần xuất hiện của từng từ trong chuỗi bằng Hash Map.</li>
+  <li>Tìm k phần tử lớn nhất trong mảng bằng Priority Queue.</li>
+  <li>Tự cài đặt Hash Table đơn giản bằng mảng + hàm băm mod.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Lời giải mẫu 1: Đếm tần suất</b></summary>
+  <pre><code>text=input().split()
+freq={}
+for w in text:
+    freq[w]=freq.get(w,0)+1
+for k,v in freq.items():
+    print(k,v)</code></pre>
+</details>

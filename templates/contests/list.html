@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h3 class="fw-bold mb-4">🏆 Danh sách cuộc thi</h3>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle border rounded-3 shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>Tên cuộc thi</th>
+          <th>Trạng thái</th>
+          <th>Bắt đầu</th>
+          <th>Kết thúc</th>
+          <th>Thời lượng</th>
+          <th class="text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in contests %}
+        <tr>
+          <td class="fw-semibold">
+           {% if c.status == "running" %}
+            <a class="cf-title" href="{% url 'contests:contest_detail' c.id %}">
+                {{ c.name }}
+            </a>
+            {% elif c.status == "upcoming" %}
+             <a class="cf-title">
+                {{ c.name }}
+            </a>
+             {% else %}
+              <a href="{% url 'contests:contest_detail' c.id %}" class="cf-title">
+              {{ c.name }}
+            </a>
+            {% endif %}
+             
+          </td>
+          <td>
+            {% if c.status == "upcoming" %}
+              <span class="badge bg-info text-white">Sắp diễn ra</span>
+            {% elif c.status == "running" %}
+              <span class="badge bg-success text-white">Đang diễn ra</span>
+            {% else %}
+              <span class="badge bg-secondary text-white">Đã kết thúc</span>
+            {% endif %}
+          </td>
+          <td>{{ c.start_time|date:"d/m/Y H:i" }}</td>
+          <td>{{ c.end_time|date:"d/m/Y H:i" }}</td>
+          <td>{{ c.duration }}</td>
+          <td class="text-center">
+            {% if c.status == "running" %}
+              <a href="{% url 'contests:contest_detail' c.id %}"
+                 class="btn btn-success btn-sm rounded-pill">
+                🚀 Bắt đầu ngay
+              </a>
+          
+            {% elif c.status == "upcoming" %}
+              <button class="btn btn-outline-secondary btn-sm rounded-pill" disabled>
+                ⏳ Chưa bắt đầu
+              </button>
+          
+            {% else %}
+              <!-- ⭐ CHỈ KHI CONTEST KẾT THÚC MỚI HIỆN PRACTICE ⭐ -->
+              <div class="d-flex justify-content-center gap-2">
+          
+                <!-- Nút xem kết quả đi thẳng vào rank -->
+                <a href="{% url 'contests:contest_rank' c.id %}"
+                   class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                   🏁 Xem kết quả
+                </a>
+          
+                <!-- Nút practice (chỉ cho finished) -->
+                <a href="{% url 'contests:contest_practice' c.id %}"
+                   class="btn btn-outline-success btn-sm rounded-pill px-3">
+                   🧪 Practice
+                </a>
+          
+              </div>
+            {% endif %}
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">❗ Chưa có contest nào</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.table-hover tbody tr:hover { background-color: #f8fafc !important; }
+.badge { font-size: 0.85rem; }
+.btn-sm { font-size: 0.85rem; }
+</style>
+{% endblock %}
