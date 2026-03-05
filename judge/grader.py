@@ -3,9 +3,12 @@ import os
 import time
 import subprocess
 
-from problems.models import TestCase, CHECKER_NONE, CHECKER_CUSTOM
+from problems.models import TestCase
 from .run_code import run_program
 from .checkers import run_builtin_checker, run_custom_checker
+
+CHECKER_NONE = "none"
+CHECKER_CUSTOM = "custom"
 
 
 def normalize(s):

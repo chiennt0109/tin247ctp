@@ -22,7 +22,6 @@ from .models import (
     TestCase,
     Tag,
     UserProgress,
-    CHECKER_CUSTOM,
 )
 from .views_admin import ai_analyze_problem, ai_suggest_tags   # <-- AI thật
 from .forms import ProblemAdminForm
@@ -31,6 +30,7 @@ from django.utils.safestring import mark_safe
 
 from .models import ProblemEditorial, EditorialPurchase
 
+CHECKER_CUSTOM = "custom"
 
 # ===== SANDBOX EXPORT PATH =====
 SANDBOX_ROOT = "/srv/judge/testcases"
