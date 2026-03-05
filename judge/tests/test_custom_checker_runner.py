@@ -16,6 +16,9 @@ class CustomCheckerRunnerTests(unittest.TestCase):
         checker = self.dir / "checker"
         if checker.exists():
             checker.unlink()
+        checker_cpp = self.dir / "checker.cpp"
+        if checker_cpp.exists():
+            checker_cpp.unlink()
 
     def _write_checker(self, body: str):
         checker = self.dir / "checker"
@@ -57,6 +60,27 @@ class CustomCheckerRunnerTests(unittest.TestCase):
         )
         res = run_custom_checker(self.problem_code, "IN", "OUT", "EXP")
         self.assertEqual(res["return_code"], 0)
+
+    def test_compile_checker_cpp_when_binary_missing(self):
+        cpp = self.dir / "checker.cpp"
+        cpp.write_text(
+            '#include <bits/stdc++.h>\n'
+            'using namespace std;\n'
+            'int main(int argc,char**argv){\n'
+            '  if(argc<4) return 1;\n'
+            '  ifstream out(argv[2]), exp(argv[3]);\n'
+            '  string a,b; getline(out,a); getline(exp,b);\n'
+            '  return a==b?0:1;\n'
+            '}\n',
+            encoding="utf-8"
+        )
+        checker = self.dir / "checker"
+        if checker.exists():
+            checker.unlink()
+
+        res = run_custom_checker(self.problem_code, "IN", "OUT", "OUT")
+        self.assertEqual(res["return_code"], 0)
+        self.assertTrue(checker.exists())
 
 
 if __name__ == "__main__":
