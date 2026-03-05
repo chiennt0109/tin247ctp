@@ -66,6 +66,6 @@ class ProblemAdminForm(forms.ModelForm):
         checker_file = (cleaned.get("checker_file") or "").strip()
         if "checker_type" not in self.fields or "checker_file" not in self.fields:
             return cleaned
-        if checker_type == CHECKER_CUSTOM and not checker_file:
+        if checker_type == "custom" and not checker_file:
             self.add_error("checker_file", "Custom Checker yêu cầu checker.cpp (checker_file).")
         return cleaned
