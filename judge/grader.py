@@ -5,7 +5,7 @@ import subprocess
 
 from problems.models import TestCase
 from .run_code import run_program
-from .checkers import run_builtin_checker, run_custom_checker
+from .special_judge.runner import run_special_judge
 
 CHECKER_NONE = "none"
 CHECKER_CUSTOM = "custom"
@@ -44,6 +44,7 @@ def _load_problem_yml_checker(problem_code: str):
 def _check_output(problem, tc, contestant_output):
     checker_type = getattr(problem, "checker", CHECKER_NONE) or CHECKER_NONE
     checker_config = getattr(problem, "checker_config", "") or ""
+
     if checker_type == CHECKER_NONE:
         yml_checker, yml_config = _load_problem_yml_checker(problem.code)
         if yml_checker:
@@ -53,32 +54,46 @@ def _check_output(problem, tc, contestant_output):
 
     if checker_type == CHECKER_NONE:
         ok = normalize(contestant_output) == normalize(tc.expected_output)
-        return ok, {"mode": "diff", "return_code": 0 if ok else 1, "stdout": "", "stderr": ""}
+        return ok, {
+            "mode": "diff",
+            "checker_exit_code": 0 if ok else 1,
+            "checker_stdout": "",
+            "checker_stderr": "",
+            "checker_time": 0.0,
+            "checker_verdict": "Accepted" if ok else "Wrong Answer",
+        }
 
-    if checker_type == CHECKER_FLOAT_TOLERANCE:
-        checker_type = "numeric_tolerance"
+    result = run_special_judge(
+        problem.code,
+        checker_type,
+        tc.input_data,
+        contestant_output,
+        tc.expected_output,
+        checker_config,
+    )
 
-    if checker_type == CHECKER_CUSTOM:
-        log = run_custom_checker(problem.code, tc.input_data, contestant_output, tc.expected_output, timeout=1.0, config=checker_config)
-    else:
-        log = run_builtin_checker(checker_type, tc.input_data, contestant_output, tc.expected_output, config=checker_config)
-
-    # Special judge verdict is determined ONLY by checker exit code.
-    exit_code = int(log.get("return_code", 1))
+    exit_code = int(result.get("return_code", 3))
     if exit_code == 0:
         checker_verdict = "Accepted"
         ok = True
     elif exit_code == 2:
         checker_verdict = "Presentation Error"
         ok = False
-    else:
+    elif exit_code == 1:
         checker_verdict = "Wrong Answer"
         ok = False
+    else:
+        checker_verdict = "Checker Error"
+        ok = False
 
-    log["checker_exit_code"] = exit_code
-    log["checker_verdict"] = checker_verdict
-    log["mode"] = f"checker:{checker_type}"
-    return ok, log
+    return ok, {
+        "mode": f"checker:{checker_type}",
+        "checker_exit_code": exit_code,
+        "checker_stdout": result.get("stdout", ""),
+        "checker_stderr": result.get("stderr", ""),
+        "checker_time": float(result.get("time", 0.0) or 0.0),
+        "checker_verdict": checker_verdict,
+    }
 
 
 def grade_submission(submission):
@@ -132,10 +147,11 @@ def grade_submission(submission):
             debug_log.append(
                 f"[TEST {idx}] time={elapsed:.3f}s\n"
                 f"IN:\n{tc.input_data}\nOUT:\n{out}\nEXP:\n{tc.expected_output}\n"
-                f"checker_input: mode={checker_log.get('mode')}\n"
-                f"checker_exit_code: {checker_log.get('checker_exit_code', checker_log.get('return_code'))}\n"
-                f"checker_stdout: {checker_log.get('stdout','')}\n"
-                f"checker_stderr: {checker_log.get('stderr','')}\n"
+                f"checker_mode: {checker_log.get('mode')}\n"
+                f"checker_exit_code: {checker_log.get('checker_exit_code')}\n"
+                f"checker_time: {checker_log.get('checker_time', 0.0):.6f}s\n"
+                f"checker_stdout: {checker_log.get('checker_stdout','')}\n"
+                f"checker_stderr: {checker_log.get('checker_stderr','')}\n"
                 f"checker_verdict: {checker_log.get('checker_verdict','')}\n---\n"
             )
 
