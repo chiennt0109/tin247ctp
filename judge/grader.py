@@ -42,15 +42,18 @@ def _load_problem_yml_checker(problem_code: str):
 
 
 def _check_output(problem, tc, contestant_output):
-    checker_type = getattr(problem, "checker", CHECKER_NONE) or CHECKER_NONE
+    checker_type = getattr(problem, "checker", None)
     checker_config = getattr(problem, "checker_config", "") or ""
 
-    if checker_type == CHECKER_NONE:
-        yml_checker, yml_config = _load_problem_yml_checker(problem.code)
-        if yml_checker:
-            checker_type = yml_checker
-        if yml_config:
-            checker_config = yml_config
+    # always check YAML override
+    yml_checker, yml_config = _load_problem_yml_checker(problem.code)
+    if yml_checker:
+        checker_type = yml_checker
+    if yml_config:
+        checker_config = yml_config
+
+    checker_type = (checker_type or CHECKER_NONE).strip().lower()
+    print("DEBUG CHECKER TYPE:", checker_type)
 
     if checker_type == CHECKER_NONE:
         ok = normalize(contestant_output) == normalize(tc.expected_output)
