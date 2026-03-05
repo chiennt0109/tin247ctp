@@ -1,4 +1,4 @@
-<section class="relative overflow-hidden py-20 text-center bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50"
+<section class="hero-banner relative overflow-hidden py-20 text-center bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50"
          style="position: relative; z-index: 1; isolation: isolate;">
   <div class="max-w-5xl mx-auto px-6 relative z-10">
     <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-gray-900 flex items-center justify-center gap-2 leading-tight tracking-tight whitespace-nowrap">
@@ -29,6 +29,32 @@
   <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50 z-0"
        style="pointer-events:none;"></div>
 
+  <!-- đường dữ liệu chuyển động -->
+  <div class="hero-data-layer" aria-hidden="true">
+    <span class="data-line line-1"></span>
+    <span class="data-line line-2"></span>
+    <span class="data-line line-3"></span>
+    <span class="data-line line-4"></span>
+
+    <span class="data-node node-1"></span>
+    <span class="data-node node-2"></span>
+    <span class="data-node node-3"></span>
+    <span class="data-node node-4"></span>
+    <span class="data-node node-5"></span>
+  </div>
+
+  <!-- lớp lấp lánh -->
+  <div class="hero-spark-layer" aria-hidden="true">
+    <span class="spark s1"></span>
+    <span class="spark s2"></span>
+    <span class="spark s3"></span>
+    <span class="spark s4"></span>
+    <span class="spark s5"></span>
+    <span class="spark s6"></span>
+    <span class="spark s7"></span>
+    <span class="spark s8"></span>
+  </div>
+
   <style>
     @keyframes gradientMove {
       0% { background-position: 0% 50%; }
@@ -38,6 +64,95 @@
     .animate-gradient {
       background-size: 200% 200%;
       animation: gradientMove 15s ease infinite;
+    }
+
+    .hero-data-layer,
+    .hero-spark-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .data-line {
+      position: absolute;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,
+          rgba(56, 189, 248, 0) 0%,
+          rgba(56, 189, 248, 0.75) 35%,
+          rgba(99, 102, 241, 0.75) 65%,
+          rgba(99, 102, 241, 0) 100%);
+      opacity: 0.65;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5));
+      animation: dataFlow 8s linear infinite;
+    }
+
+    .line-1 { top: 22%; left: -8%; width: 42%; transform: rotate(7deg); animation-delay: 0s; }
+    .line-2 { top: 38%; left: 26%; width: 48%; transform: rotate(-11deg); animation-delay: -2s; }
+    .line-3 { top: 62%; left: -5%; width: 58%; transform: rotate(-5deg); animation-delay: -4.5s; }
+    .line-4 { top: 74%; left: 50%; width: 50%; transform: rotate(8deg); animation-delay: -1.8s; }
+
+    .data-node {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(186, 230, 253, 0.9) 45%, rgba(99, 102, 241, 0.55) 100%);
+      box-shadow: 0 0 0 6px rgba(125, 211, 252, 0.08), 0 0 14px rgba(99, 102, 241, 0.4);
+      animation: pulseNode 2.8s ease-in-out infinite;
+    }
+
+    .node-1 { top: 24%; left: 18%; animation-delay: 0s; }
+    .node-2 { top: 42%; left: 57%; animation-delay: -1.1s; }
+    .node-3 { top: 66%; left: 31%; animation-delay: -0.7s; }
+    .node-4 { top: 76%; left: 70%; animation-delay: -2.2s; }
+    .node-5 { top: 30%; left: 77%; animation-delay: -1.7s; }
+
+    .spark {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 10px rgba(191, 219, 254, 0.95);
+      animation: twinkle 2.2s ease-in-out infinite;
+    }
+
+    .s1 { top: 14%; left: 10%; animation-delay: -0.4s; }
+    .s2 { top: 18%; left: 47%; animation-delay: -1.2s; }
+    .s3 { top: 27%; left: 84%; animation-delay: -0.8s; }
+    .s4 { top: 46%; left: 12%; animation-delay: -1.7s; }
+    .s5 { top: 54%; left: 63%; animation-delay: -0.5s; }
+    .s6 { top: 69%; left: 86%; animation-delay: -1.4s; }
+    .s7 { top: 81%; left: 28%; animation-delay: -0.9s; }
+    .s8 { top: 86%; left: 52%; animation-delay: -1.9s; }
+
+    @keyframes dataFlow {
+      0% { transform: translateX(-12%) rotate(var(--line-rotate, 0deg)); opacity: 0.25; }
+      25% { opacity: 0.7; }
+      50% { transform: translateX(6%) rotate(var(--line-rotate, 0deg)); opacity: 0.55; }
+      100% { transform: translateX(18%) rotate(var(--line-rotate, 0deg)); opacity: 0.15; }
+    }
+
+    .line-1 { --line-rotate: 7deg; }
+    .line-2 { --line-rotate: -11deg; }
+    .line-3 { --line-rotate: -5deg; }
+    .line-4 { --line-rotate: 8deg; }
+
+    @keyframes pulseNode {
+      0%, 100% { transform: scale(0.95); opacity: 0.6; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { transform: scale(0.7); opacity: 0.3; }
+      50% { transform: scale(1.5); opacity: 0.95; }
+    }
+
+    @media (max-width: 640px) {
+      .data-line { opacity: 0.45; }
+      .hero-spark-layer .spark:nth-child(n+6) { display: none; }
     }
   </style>
 </section>
