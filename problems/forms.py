@@ -5,7 +5,7 @@
 from django import forms
 from django.http import QueryDict
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .models import Problem, Tag
+from .models import Problem, Tag, CheckerType
 
 
 class ProblemAdminForm(forms.ModelForm):
@@ -52,3 +52,14 @@ class ProblemAdminForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         self.fields["tags"].queryset = Tag.objects.all()
+
+
+    def clean(self):
+        cleaned = super().clean()
+        checker_type = cleaned.get("checker")
+        checker_file = (cleaned.get("checker_file") or "").strip()
+        if "checker" not in self.fields or "checker_file" not in self.fields:
+            return cleaned
+        if checker_type == CheckerType.CUSTOM and not checker_file:
+            self.add_error("checker_file", "Custom Checker yêu cầu checker.cpp (checker_file).")
+        return cleaned
