@@ -9,6 +9,7 @@ from .checkers import run_builtin_checker, run_custom_checker
 
 CHECKER_NONE = "none"
 CHECKER_CUSTOM = "custom"
+CHECKER_FLOAT_TOLERANCE = "float_tolerance"
 
 
 def normalize(s):
@@ -41,7 +42,7 @@ def _load_problem_yml_checker(problem_code: str):
 
 
 def _check_output(problem, tc, contestant_output):
-    checker_type = getattr(problem, "checker_type", CHECKER_NONE) or CHECKER_NONE
+    checker_type = getattr(problem, "checker", CHECKER_NONE) or CHECKER_NONE
     checker_config = getattr(problem, "checker_config", "") or ""
     if checker_type == CHECKER_NONE:
         yml_checker, yml_config = _load_problem_yml_checker(problem.code)
@@ -53,6 +54,9 @@ def _check_output(problem, tc, contestant_output):
     if checker_type == CHECKER_NONE:
         ok = normalize(contestant_output) == normalize(tc.expected_output)
         return ok, {"mode": "diff", "return_code": 0 if ok else 1, "stdout": "", "stderr": ""}
+
+    if checker_type == CHECKER_FLOAT_TOLERANCE:
+        checker_type = "numeric_tolerance"
 
     if checker_type == CHECKER_CUSTOM:
         log = run_custom_checker(problem.code, tc.input_data, contestant_output, tc.expected_output, timeout=1.0)

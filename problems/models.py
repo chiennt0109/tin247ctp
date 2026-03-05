@@ -16,33 +16,20 @@ class Tag(models.Model):
 
 
 
-CHECKER_NONE = "none"
-CHECKER_CUSTOM = "custom"
-CHECKER_EULER_PATH = "euler_path"
-CHECKER_GRAPH_PATH = "graph_path"
-CHECKER_PERMUTATION = "permutation"
-CHECKER_PERMUTATION_CONSTRAINTS = "permutation_constraints"
-CHECKER_MATCHING = "matching"
-CHECKER_ASSIGNMENT = "assignment"
-CHECKER_CONSTRUCTIVE = "constructive"
-CHECKER_GRID = "grid"
-CHECKER_SET_COMPARE = "set_compare"
-CHECKER_NUMERIC_TOLERANCE = "numeric_tolerance"
+class CheckerType(models.TextChoices):
+    NONE = "none", "None"
+    CUSTOM = "custom", "Custom Checker"
+    EULER_PATH = "euler_path", "Euler Path"
+    PERMUTATION = "permutation", "Permutation"
+    MATCHING = "matching", "Matching"
+    GRAPH_PATH = "graph_path", "Graph Path"
+    GRID = "grid", "Grid Construction"
+    SET_COMPARE = "set_compare", "Set Compare"
+    FLOAT_TOLERANCE = "float_tolerance", "Numeric Tolerance"
+    PERMUTATION_CONSTRAINTS = "permutation_constraints", "Permutation With Constraints"
+    ASSIGNMENT = "assignment", "Assignment"
+    CONSTRUCTIVE = "constructive", "Constructive"
 
-CHECKER_CHOICES = [
-    (CHECKER_NONE, "None"),
-    (CHECKER_EULER_PATH, "Euler Path"),
-    (CHECKER_GRAPH_PATH, "Graph Path"),
-    (CHECKER_PERMUTATION, "Permutation"),
-    (CHECKER_PERMUTATION_CONSTRAINTS, "Permutation With Constraints"),
-    (CHECKER_MATCHING, "Matching"),
-    (CHECKER_ASSIGNMENT, "Assignment"),
-    (CHECKER_CONSTRUCTIVE, "Constructive"),
-    (CHECKER_GRID, "Grid"),
-    (CHECKER_SET_COMPARE, "Set Compare"),
-    (CHECKER_NUMERIC_TOLERANCE, "Numeric Tolerance"),
-    (CHECKER_CUSTOM, "Custom Checker"),
-]
 
 class Problem(models.Model):
     DIFFICULTY_CHOICES = [
@@ -63,7 +50,7 @@ class Problem(models.Model):
     ac_count = models.IntegerField(default=0)
     submission_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)  # ✅ Giữ duy nhất dòng này
-    checker_type = models.CharField(max_length=40, choices=CHECKER_CHOICES, default=CHECKER_NONE)
+    checker = models.CharField(max_length=50, choices=CheckerType.choices, default=CheckerType.NONE)
     checker_file = models.CharField(max_length=255, blank=True, default="")
     checker_config = models.TextField(blank=True, default="")
     

@@ -22,6 +22,7 @@ from .models import (
     TestCase,
     Tag,
     UserProgress,
+    CheckerType,
 )
 from .views_admin import ai_analyze_problem, ai_suggest_tags   # <-- AI thật
 from .forms import ProblemAdminForm
@@ -164,13 +165,13 @@ class ProblemAdmin(admin.ModelAdmin):
             )
         }),
     )
-    list_display = ("code", "title", "difficulty", "submission_count", "ac_count", "view_tests_link")
+    list_display = ("title", "checker", "code", "difficulty", "submission_count", "ac_count", "view_tests_link")
     search_fields = ("code", "title")
 
     def get_fieldsets(self, request, obj=None):
         base = list(super().get_fieldsets(request, obj))
         checker_fields = []
-        for fname in ("checker_type", "checker_file", "checker_config"):
+        for fname in ("checker", "checker_file", "checker_config"):
             try:
                 Problem._meta.get_field(fname)
                 checker_fields.append(fname)
@@ -260,7 +261,7 @@ class ProblemAdmin(admin.ModelAdmin):
                         fo.write(out_data + "\n")
                     imported += 1
 
-                if getattr(problem, "checker_type", "none") == CHECKER_CUSTOM:
+                if getattr(problem, "checker", CheckerType.NONE) == CheckerType.CUSTOM:
                     if checker_upload:
                         checker_bin = _compile_custom_checker(problem.code, checker_upload.read())
                         if hasattr(problem, "checker_file"):

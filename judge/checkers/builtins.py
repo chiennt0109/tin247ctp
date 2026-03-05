@@ -193,4 +193,5 @@ BUILTIN_CHECKERS: Dict[str, Callable[[str, str, str, str], Tuple[int, str]]] = {
     "grid": checker_grid,
     "set_compare": checker_set_compare,
     "numeric_tolerance": checker_numeric_tolerance,
+    "float_tolerance": checker_numeric_tolerance,
 }
