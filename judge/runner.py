@@ -96,6 +96,12 @@ def _limit_resources(memory_limit_mb: int):
 def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_limit_mb: int) -> dict:
     timeout = max(0.1, float(time_limit))
     cmd = _build_docker_cmd(bundle, memory_limit_mb, timeout) if USE_DOCKER else bundle.run_cmd
+    # Docker startup overhead should not count as contestant runtime, otherwise
+    # short limits can false-positive as TLE for every submission.
+    exec_timeout = timeout
+    if USE_DOCKER:
+        docker_overhead = max(0.0, float(os.getenv("OJ_DOCKER_TIMEOUT_OVERHEAD", "2.0")))
+        exec_timeout = timeout + docker_overhead
 
     # Use explicit stdin/stdout redirection files to avoid blocking stdin issues.
     with tempfile.NamedTemporaryFile(mode="wb", dir=bundle.workdir, delete=False) as fin:
@@ -113,7 +119,7 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
                 stdin=stdin_fp,
                 stdout=stdout_fp,
                 stderr=subprocess.PIPE,
-                timeout=timeout,
+                timeout=exec_timeout,
                 cwd=None if USE_DOCKER else bundle.workdir,
                 preexec_fn=None if USE_DOCKER else (lambda: _limit_resources(memory_limit_mb)),
                 env=os.environ.copy(),
