@@ -8,13 +8,11 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from redis import Redis
-from rq import Queue
 
 from .models import Submission
 from problems.models import Problem
-from judge.grader import grade_submission
+from judge.dispatcher import JudgeDispatcher
 from contests.utils import update_participation
-from .tasks import judge_submission  # 🔑 chỉ dùng job này
 
 from django.utils import timezone
 from contests.models import Contest, PracticeSession
@@ -24,8 +22,6 @@ from contests.models import Contest, PracticeSession
 # ⚙️ Cấu hình Redis / Sandbox
 # ============================
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-USE_SANDBOX = True
-
 LOCK_TTL = 5      # chặn double–click trong 5s
 IDEMP_TTL = 30    # cùng 1 code trong 30s → dùng lại submission cũ
 
@@ -210,20 +206,15 @@ def submission_create(request, problem_id):
             pass
 
     # =====================================================
-    # 🚀 Đẩy job chấm sang worker
+    # 🚀 Đẩy job chấm sang worker queue (không fallback local)
     # =====================================================
-    if USE_SANDBOX:
-        try:
-            if not r:
-                r = Redis.from_url(REDIS_URL)
-            Queue("judge", connection=r).enqueue(judge_submission, sub.id)
-        except Exception as e:
-            sub.verdict = "Judge Error"
-            sub.debug_info = str(e)
-            sub.save()
-            _grade_local(sub)
-    else:
-        _grade_local(sub)
+    try:
+        dispatcher = JudgeDispatcher(redis_url=REDIS_URL)
+        dispatcher.dispatch(sub.id)
+    except Exception as e:
+        sub.verdict = "Judge Error"
+        sub.debug_info = f"Queue dispatch failed: {e}"
+        sub.save(update_fields=["verdict", "debug_info"])
 
     # =====================================================
     # 📌 UPDATE RANKING — CHỈ CONTEST
@@ -243,19 +234,6 @@ def submission_create(request, problem_id):
         }
     )
 
-
-def _grade_local(sub: Submission):
-    """Chấm local khi sandbox chết / lỗi Redis."""
-    verdict, exec_time, passed, total, debug = grade_submission(sub)
-    sub.verdict = verdict
-    sub.exec_time = float(exec_time or 0.0)
-    sub.passed_tests = passed
-    sub.total_tests = total
-    try:
-        sub.debug_info = json.dumps(debug, ensure_ascii=False)
-    except Exception:
-        sub.debug_info = str(debug)
-    sub.save()
 
 
 # ======================================================
