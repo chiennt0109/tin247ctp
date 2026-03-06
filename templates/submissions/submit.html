@@ -306,6 +306,19 @@ function highlightErrorInEditor(stderr){
   }
 }
 
+
+function statusFromVerdict(verdict){
+  const v = (verdict || "").toLowerCase();
+  if (v === "accepted") return "AC";
+  if (v === "time limit exceeded") return "TLE";
+  if (v === "runtime error") return "RE";
+  if (v === "compilation error") return "CE";
+  if (v === "memory limit exceeded") return "MLE";
+  if (v === "presentation error") return "PE";
+  if (v === "judge error" || v === "checker error") return "JE";
+  return "WA";
+}
+
 // ========================================
 // 6) SUBMIT
 // ========================================
@@ -487,13 +500,16 @@ async function pollResult(id){
   }
 
   body.innerHTML = "";
+  const fallbackFail = statusFromVerdict(verdict);
   for (let t=1; t<=total; t++){
-    let status = per[t] || (t <= passed ? "AC" : "WA");
+    let status = per[t] || (t <= passed ? "AC" : fallbackFail);
 
     let icon="❌", color="text-danger";
     if(status==="AC"){ icon="✅"; color="text-success"; }
     if(status==="TLE"){ icon="⏱"; color="text-warning"; }
-    if(status==="RE" || status==="CE"){ icon="💥"; color="text-danger"; }
+    if(status==="RE" || status==="CE" || status==="JE"){ icon="💥"; color="text-danger"; }
+    if(status==="MLE"){ icon="🧠"; color="text-warning"; }
+    if(status==="PE"){ icon="⚠️"; color="text-warning"; }
 
     body.innerHTML += `
       <tr>
