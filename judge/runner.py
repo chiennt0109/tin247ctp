@@ -135,6 +135,11 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
     ])
     return cmd
 
+def _limit_resources(memory_limit_mb: int):
+    memory_bytes = int(memory_limit_mb) * 1024 * 1024
+    resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
+    resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (16 * 1024 * 1024, 16 * 1024 * 1024))
 
 def _limit_resources(memory_limit_mb: int):
     memory_bytes = int(memory_limit_mb) * 1024 * 1024
