@@ -61,7 +61,7 @@ def _to_container_cmd(bundle: ProgramBundle) -> list[str]:
 
 def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: float) -> list[str]:
     cpu_limit_seconds = max(1, math.ceil(float(time_limit)) + 1)
-    return [
+    cmd = [
         "docker",
         "run",
         "--rm",
@@ -73,17 +73,25 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
         "--read-only",
         "--cap-drop=ALL",
         "--security-opt=no-new-privileges",
-        "--ulimit",
-        f"cpu={cpu_limit_seconds}",
-        "--ulimit",
-        "fsize=16384:16384",
+    ]
+
+    if os.getenv("OJ_DOCKER_USE_ULIMIT", "false").lower() in {"1", "true", "yes"}:
+        cmd.extend([
+            "--ulimit",
+            f"cpu={cpu_limit_seconds}",
+            "--ulimit",
+            "fsize=16384:16384",
+        ])
+
+    cmd.extend([
         "-v",
         f"{bundle.workdir}:/workspace",
         "-w",
         "/workspace",
         DOCKER_IMAGE,
         *_to_container_cmd(bundle),
-    ]
+    ])
+    return cmd
 
 
 def _limit_resources(memory_limit_mb: int):
