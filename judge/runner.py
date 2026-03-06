@@ -4,6 +4,7 @@ import os
 import resource
 import subprocess
 import time
+import tempfile
 from dataclasses import dataclass
 
 DOCKER_IMAGE = os.getenv("OJ_DOCKER_IMAGE", "tin247ctp-runner")
@@ -62,6 +63,7 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int) -> list[str]:
         "docker",
         "run",
         "--rm",
+        "-i",
         "--network=none",
         f"--memory={max(64, int(memory_limit_mb))}m",
         "--cpus=1",
@@ -86,42 +88,54 @@ def _limit_resources(memory_limit_mb: int):
 
 
 def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_limit_mb: int) -> dict:
-    t0 = time.perf_counter()
     timeout = max(0.1, float(time_limit))
     cmd = _build_docker_cmd(bundle, memory_limit_mb) if USE_DOCKER else bundle.run_cmd
 
+    # Use explicit stdin/stdout redirection files to avoid blocking stdin issues.
+    with tempfile.NamedTemporaryFile(mode="wb", dir=bundle.workdir, delete=False) as fin:
+        fin.write((input_data or "").encode("utf-8", errors="ignore"))
+        input_file = fin.name
+
+    output_file = os.path.join(bundle.workdir, f"out_{os.path.basename(input_file)}")
+
     try:
-        proc = subprocess.run(
-            cmd,
-            input=input_data or "",
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=timeout,
-            cwd=None if USE_DOCKER else bundle.workdir,
-            preexec_fn=None if USE_DOCKER else (lambda: _limit_resources(memory_limit_mb)),
-            env={"PATH": os.getenv("PATH", "")},
-        )
-        elapsed = time.perf_counter() - t0
+        start = time.time()
+        with open(input_file, "rb") as stdin_fp, open(output_file, "wb") as stdout_fp:
+            proc = subprocess.run(
+                cmd,
+                stdin=stdin_fp,
+                stdout=stdout_fp,
+                stderr=subprocess.PIPE,
+                timeout=timeout,
+                cwd=None if USE_DOCKER else bundle.workdir,
+                preexec_fn=None if USE_DOCKER else (lambda: _limit_resources(memory_limit_mb)),
+                env={"PATH": os.getenv("PATH", "")},
+            )
+        elapsed = time.time() - start
+
+        with open(output_file, "rb") as f:
+            stdout_data = f.read()
+        stderr_data = proc.stderr or b""
+
         memory_kb = max(0, memory_limit_mb * 1024 if proc.returncode == 137 else 0)
         return {
             "return_code": proc.returncode,
-            "stdout": proc.stdout,
-            "stderr": proc.stderr,
+            "stdout": stdout_data.decode("utf-8", errors="replace"),
+            "stderr": stderr_data.decode("utf-8", errors="replace"),
             "time": elapsed,
             "memory_kb": memory_kb,
         }
     except subprocess.TimeoutExpired as exc:
-        elapsed = time.perf_counter() - t0
+        elapsed = time.time() - start
         return {
             "return_code": 124,
-            "stdout": exc.stdout or "",
-            "stderr": exc.stderr or "",
+            "stdout": "",
+            "stderr": ((exc.stderr or b"").decode("utf-8", errors="replace") if isinstance(exc.stderr, (bytes, bytearray)) else (exc.stderr or "")),
             "time": elapsed,
             "memory_kb": 0,
         }
     except Exception as exc:
-        elapsed = time.perf_counter() - t0
+        elapsed = time.time() - start if "start" in locals() else 0.0
         return {
             "return_code": 1,
             "stdout": "",
@@ -129,3 +143,13 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
             "time": elapsed,
             "memory_kb": 0,
         }
+    finally:
+        try:
+            os.remove(input_file)
+        except Exception:
+            pass
+        try:
+            if os.path.exists(output_file):
+                os.remove(output_file)
+        except Exception:
+            pass
