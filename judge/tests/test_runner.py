@@ -12,20 +12,22 @@ class RunnerDockerTests(unittest.TestCase):
 
     def test_docker_flags_present(self):
         b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
-        cmd = _build_docker_cmd(b)
+        cmd = _build_docker_cmd(b, memory_limit_mb=256, time_limit=1.5)
         s = " ".join(cmd)
         self.assertIn("--network=none", s)
-        self.assertIn("--memory=512m", s)
+        self.assertIn("--memory=256m", s)
         self.assertIn("--cpus=1", s)
         self.assertIn("--pids-limit=64", s)
         self.assertIn("--read-only", s)
+        self.assertIn("--ulimit", s)
+        self.assertIn("cpu=3", s)
 
 
     def test_run_case_timeout_infinite_loop(self):
-        bundle, err = compile_submission("python", "while True:\n    pass\n")
+        bundle, err = compile_submission("python", "while True:\n    pass\n", "/tmp/test_runner")
         self.assertIsNotNone(bundle, err)
         with patch("judge.runner.USE_DOCKER", False):
-            res = run_case(bundle, "", time_limit=0.2)
+            res = run_case(bundle, "", time_limit=0.2, memory_limit_mb=128)
         self.assertEqual(res["return_code"], 124)
 
 
