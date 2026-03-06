@@ -38,6 +38,11 @@ class SpecialJudgeTests(unittest.TestCase):
         res = run_special_judge(self.problem_code, "euler_path", "3 2 1 2 2 3", "1 2 3", "")
         self.assertEqual(res["return_code"], 0)
 
+
+    def test_euler_path_zero_based(self):
+        res = run_special_judge(self.problem_code, "euler_path", "3 2 0 1 1 2", "0 1 2", "")
+        self.assertEqual(res["return_code"], 0)
+
     def test_graph_path(self):
         res = run_special_judge(self.problem_code, "graph_path", "4 3 1 2 2 3 3 4", "1 2 3 4", "")
         self.assertEqual(res["return_code"], 0)

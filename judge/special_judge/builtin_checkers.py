@@ -59,6 +59,14 @@ def _parse_graph(input_data):
     return n, m, edges
 
 
+def _detect_vertex_base(path, n: int):
+    if all(1 <= x <= n for x in path):
+        return 1
+    if all(0 <= x < n for x in path):
+        return 0
+    return None
+
+
 def check_euler(input_data, contestant_output, expected_output, config=""):
     parsed = _parse_graph(input_data)
     if not parsed:
@@ -81,7 +89,8 @@ def check_euler(input_data, contestant_output, expected_output, config=""):
         path = path[1:]
     if len(path) != m + 1:
         return _ret(1, err="path length mismatch")
-    if any(x < 1 or x > n for x in path):
+
+    if _detect_vertex_base(path, n) is None:
         return _ret(1, err="vertex out of range")
 
     directed = parse_config(config).get("directed", "0") in {"1", "true", "yes"}
@@ -110,7 +119,7 @@ def check_graph_path(input_data, contestant_output, expected_output, config=""):
         return _ret(2, err="non-integer output")
     if not path:
         return _ret(2, err="empty path")
-    if any(x < 1 or x > n for x in path):
+    if _detect_vertex_base(path, n) is None:
         return _ret(1, err="vertex out of range")
     for i in range(len(path) - 1):
         if (path[i], path[i + 1]) not in edge_set:

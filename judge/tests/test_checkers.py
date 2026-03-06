@@ -34,6 +34,12 @@ class BuiltinCheckerTests(unittest.TestCase):
         res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "-1", "-1")
         self.assertEqual(res["return_code"], 0)
 
+
+    def test_euler_path_zero_based_vertices(self):
+        # n=3,m=2 edges (0,1),(1,2), valid 0-based Euler path
+        res = run_builtin_checker("euler_path", "3 2 0 1 1 2", "0 1 2", "")
+        self.assertEqual(res["return_code"], 0)
+
     def test_euler_path_directed(self):
         # directed edges 1->2,2->3; path 1 2 3 valid only in directed mode
         res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "1 2 3", "", config="directed=1")

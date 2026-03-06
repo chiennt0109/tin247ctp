@@ -22,6 +22,14 @@ def _pe(msg: str):
     return RC_PRESENTATION, msg
 
 
+def _detect_vertex_base(path: list[int], n: int):
+    if all(1 <= x <= n for x in path):
+        return 1
+    if all(0 <= x < n for x in path):
+        return 0
+    return None
+
+
 def checker_euler_path(input_file: str, contestant_output: str, expected_output: str, config: str = ""):
     ints = read_ints(input_file)
     if len(ints) < 2:
@@ -63,7 +71,7 @@ def checker_euler_path(input_file: str, contestant_output: str, expected_output:
     if len(path) != m + 1:
         return _wa("Path length must be m+1")
 
-    if any(x < 1 or x > n for x in path):
+    if _detect_vertex_base(path, n) is None:
         return _wa("Vertex out of range")
 
     directed = "directed=1" in (config or "") or "directed=true" in (config or "").lower()
@@ -98,7 +106,7 @@ def checker_graph_path(input_file: str, contestant_output: str, expected_output:
     path = read_ints(contestant_output)
     if not path:
         return _pe("Empty output")
-    if any(x < 1 or x > n for x in path):
+    if _detect_vertex_base(path, n) is None:
         return _wa("Vertex out of range")
     if not verify_graph_path(path, edges, directed=False):
         return _wa("Invalid edge in path")
