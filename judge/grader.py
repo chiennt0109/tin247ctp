@@ -6,9 +6,10 @@ from typing import Tuple
 
 from problems.models import TestCase
 
+from judge.sandbox import SandboxManager
+
 from .checker_dispatcher import canonicalize_checker_type, run_checker
 from .debug_logger import log_test_event
-from .dispatcher import JudgeDispatcher
 from .result import SubmissionResult, TestResult
 from .runner import compile_submission, run_case
 from .verdict import map_checker_exit_code, map_program_exit_code
@@ -67,7 +68,9 @@ def grade_submission(submission) -> Tuple[str, float, int, int, str]:
     if total_tests == 0:
         return ("No Test Cases", 0.0, 0, 0, "")
 
-    bundle, compile_err = compile_submission(submission.language, submission.source_code)
+    sandbox = SandboxManager()
+    ctx = sandbox.create(submission.id)
+    bundle, compile_err = compile_submission(submission.language, submission.source_code, ctx.root_dir)
     if bundle is None:
         return ("Compilation Error", 0.0, 0, total_tests, compile_err)
 
@@ -76,11 +79,10 @@ def grade_submission(submission) -> Tuple[str, float, int, int, str]:
     aggregate = SubmissionResult(total_tests=total_tests)
     debug_log = []
 
-    dispatcher = JudgeDispatcher()
 
     def _run_in_worker(_ctx):
         for idx, tc in enumerate(tests, start=1):
-            prog = run_case(bundle, tc.input_data, time_limit=float(problem.time_limit or 1.0))
+            prog = run_case(bundle, tc.input_data, time_limit=float(problem.time_limit or 1.0), memory_limit_mb=int(problem.memory_limit or 256))
             program_verdict = map_program_exit_code(int(prog.get("return_code", 1)))
 
             checker_result = {
@@ -149,7 +151,10 @@ def grade_submission(submission) -> Tuple[str, float, int, int, str]:
             if final_verdict != "Accepted":
                 break
 
-    dispatcher.dispatch(submission.id, _run_in_worker)
+    try:
+        _run_in_worker(None)
+    finally:
+        sandbox.destroy(ctx)
     aggregate.finalize()
 
     return (
