@@ -1,19 +1,23 @@
 # path: judge/grader.py
+from __future__ import annotations
+
 import os
-import time
-import subprocess
+from typing import Tuple
 
 from problems.models import TestCase
-from .run_code import run_program
-from .special_judge.runner import run_special_judge
+
+from .checker_dispatcher import run_checker
+from .debug_logger import log_test_event
+from .dispatcher import JudgeDispatcher
+from .result import SubmissionResult, TestResult
+from .runner import compile_submission, run_case
+from .verdict import map_checker_exit_code, map_program_exit_code
 
 CHECKER_NONE = "none"
-CHECKER_CUSTOM = "custom"
-CHECKER_FLOAT_TOLERANCE = "float_tolerance"
 
 
 def normalize(s):
-    return (s or "").strip().replace('\r\n', '\n').rstrip()
+    return (s or "").strip().replace("\r\n", "\n").rstrip()
 
 
 def _load_problem_yml_checker(problem_code: str):
@@ -33,19 +37,15 @@ def _load_problem_yml_checker(problem_code: str):
                     checker = v
                 elif k in ("checker_config", "epsilon"):
                     config = f"eps={v}" if k == "epsilon" else v
-                elif k == "checker_file" and v:
-                    # supported via uploaded binary in sandbox path
-                    pass
     except Exception:
         return None, None
     return checker, config
 
 
-def _check_output(problem, tc, contestant_output):
+def _resolve_checker(problem):
     checker_type = getattr(problem, "checker", None)
     checker_config = getattr(problem, "checker_config", "") or ""
 
-    # always check YAML override
     yml_checker, yml_config = _load_problem_yml_checker(problem.code)
     if yml_checker:
         checker_type = yml_checker
@@ -53,136 +53,105 @@ def _check_output(problem, tc, contestant_output):
         checker_config = yml_config
 
     checker_type = (checker_type or CHECKER_NONE).strip().lower()
-    print("DEBUG CHECKER TYPE:", checker_type)
-
-    if checker_type == CHECKER_NONE:
-        ok = normalize(contestant_output) == normalize(tc.expected_output)
-        return ok, {
-            "mode": "diff",
-            "checker_exit_code": 0 if ok else 1,
-            "checker_stdout": "",
-            "checker_stderr": "",
-            "checker_time": 0.0,
-            "checker_verdict": "Accepted" if ok else "Wrong Answer",
-        }
-
-    result = run_special_judge(
-        problem.code,
-        checker_type,
-        tc.input_data,
-        contestant_output,
-        tc.expected_output,
-        checker_config,
-    )
-
-    exit_code = int(result.get("return_code", 3))
-    if exit_code == 0:
-        checker_verdict = "Accepted"
-        ok = True
-    elif exit_code == 2:
-        checker_verdict = "Presentation Error"
-        ok = False
-    elif exit_code == 1:
-        checker_verdict = "Wrong Answer"
-        ok = False
-    else:
-        checker_verdict = "Checker Error"
-        ok = False
-
-    return ok, {
-        "mode": f"checker:{checker_type}",
-        "checker_exit_code": exit_code,
-        "checker_stdout": result.get("stdout", ""),
-        "checker_stderr": result.get("stderr", ""),
-        "checker_time": float(result.get("time", 0.0) or 0.0),
-        "checker_verdict": checker_verdict,
-    }
+    return checker_type, checker_config
 
 
-def grade_submission(submission):
+def grade_submission(submission) -> Tuple[str, float, int, int, str]:
     problem = submission.problem
-    tests = TestCase.objects.filter(problem=problem)
-    lang = submission.language
-    code = submission.source_code
-
-    total_tests = tests.count()
+    tests = list(TestCase.objects.filter(problem=problem))
+    total_tests = len(tests)
     if total_tests == 0:
-        return ("No Test Cases", 0, 0, 0, "")
+        return ("No Test Cases", 0.0, 0, 0, "")
 
-    passed = 0
-    total_time = 0.0
+    bundle, compile_err = compile_submission(submission.language, submission.source_code)
+    if bundle is None:
+        return ("Compilation Error", 0.0, 0, total_tests, compile_err)
+
+    checker_type, checker_config = _resolve_checker(problem)
+
+    aggregate = SubmissionResult(total_tests=total_tests)
     debug_log = []
 
-    compiled_bin = None
-    if lang == "cpp":
-        out, err = run_program("compile_cpp", code, "")
-        if "Compilation Error" in out:
-            return ("Compilation Error", 0, 0, total_tests, out)
-        compiled_bin = err.strip()
+    dispatcher = JudgeDispatcher()
 
-    verdict = "Accepted"
-    for idx, tc in enumerate(tests, start=1):
-        start = time.time()
-        try:
-            hard_limit = min(max(problem.time_limit or 1.0, 0.5), 5.0) + 0.5
-            if lang == "cpp":
-                out, err = run_program("run_cpp_bin", compiled_bin, tc.input_data, time_limit=hard_limit)
+    def _run_in_worker(_ctx):
+        for idx, tc in enumerate(tests, start=1):
+            prog = run_case(bundle, tc.input_data, time_limit=float(problem.time_limit or 1.0))
+            program_verdict = map_program_exit_code(int(prog.get("return_code", 1)))
+
+            checker_result = {
+                "checker_mode": "skipped",
+                "return_code": 1,
+                "stdout": "",
+                "stderr": "",
+                "time": 0.0,
+            }
+
+            if program_verdict == "OK":
+                checker_result = run_checker(
+                    problem.code,
+                    checker_type,
+                    tc.input_data,
+                    prog.get("stdout", ""),
+                    tc.expected_output,
+                    checker_config,
+                )
+                final_verdict = map_checker_exit_code(int(checker_result.get("return_code", 1)))
             else:
-                out, err = run_program(lang, code, tc.input_data, time_limit=hard_limit)
+                final_verdict = program_verdict
 
-            elapsed = time.time() - start
-            total_time += elapsed
+            tr = TestResult(
+                test_id=idx,
+                input_size=len(tc.input_data or ""),
+                execution_time=float(prog.get("time", 0.0) or 0.0),
+                program_exit_code=int(prog.get("return_code", 1)),
+                checker_type=checker_result.get("checker_mode", checker_type),
+                checker_exit_code=int(checker_result.get("return_code", 1)),
+                checker_stdout=checker_result.get("stdout", ""),
+                checker_stderr=checker_result.get("stderr", ""),
+                verdict=final_verdict,
+            )
+            aggregate.add(tr)
 
-            if "Time Limit" in out:
-                verdict = "Time Limit Exceeded"
-                debug_log.append(f"[TEST {idx}] TIMEOUT\n")
-                break
-            if "Runtime Error" in out:
-                verdict = "Runtime Error"
-                debug_log.append(f"[TEST {idx}] Runtime Error: {err}\n")
-                break
-            if "API Error" in out or "Internal Error" in out:
-                verdict = "Judge Error"
-                debug_log.append(f"[TEST {idx}] Judge Error: {out}\n")
-                break
-
-            ok, checker_log = _check_output(problem, tc, out)
-            debug_log.append(
-                f"[TEST {idx}] time={elapsed:.3f}s\n"
-                f"IN:\n{tc.input_data}\nOUT:\n{out}\nEXP:\n{tc.expected_output}\n"
-                f"checker_mode: {checker_log.get('mode')}\n"
-                f"checker_exit_code: {checker_log.get('checker_exit_code')}\n"
-                f"checker_time: {checker_log.get('checker_time', 0.0):.6f}s\n"
-                f"checker_stdout: {checker_log.get('checker_stdout','')}\n"
-                f"checker_stderr: {checker_log.get('checker_stderr','')}\n"
-                f"checker_verdict: {checker_log.get('checker_verdict','')}\n---\n"
+            log_test_event(
+                {
+                    "submission_id": submission.id,
+                    "problem_code": problem.code,
+                    "test_id": idx,
+                    "input_size": tr.input_size,
+                    "program_exit_code": tr.program_exit_code,
+                    "execution_time": tr.execution_time,
+                    "checker_type": tr.checker_type,
+                    "checker_exit_code": tr.checker_exit_code,
+                    "stdout_preview": (prog.get("stdout", "") or "")[:200],
+                    "stderr_preview": (prog.get("stderr", "") or "")[:200],
+                }
             )
 
-            if ok:
-                passed += 1
-            else:
-                verdict = "Wrong Answer"
+            debug_log.append(
+                f"[TEST {idx}] time={tr.execution_time:.3f}s\n"
+                f"IN:\n{tc.input_data}\n"
+                f"OUT:\n{prog.get('stdout','')}\n"
+                f"EXP:\n{tc.expected_output}\n"
+                f"program_exit_code: {tr.program_exit_code}\n"
+                f"checker_mode: {tr.checker_type}\n"
+                f"checker_exit_code: {tr.checker_exit_code}\n"
+                f"checker_stdout: {tr.checker_stdout}\n"
+                f"checker_stderr: {tr.checker_stderr}\n"
+                f"checker_time: {checker_result.get('time',0.0)}\n"
+                f"verdict: {tr.verdict}\n---\n"
+            )
+
+            if final_verdict != "Accepted":
                 break
 
-        except subprocess.TimeoutExpired:
-            verdict = "Time Limit Exceeded"
-            total_time += hard_limit
-            debug_log.append(f"[TEST {idx}] TIMEOUT (>{hard_limit}s)\n")
-            break
-        except Exception as e:
-            verdict = f"Runtime Error: {e}"
-            debug_log.append(f"[TEST {idx}] {verdict}\n")
-            break
+    dispatcher.dispatch(submission.id, _run_in_worker)
+    aggregate.finalize()
 
-    if passed == total_tests:
-        verdict = "Accepted"
-    elif "Time Limit" in verdict:
-        verdict = "Time Limit Exceeded"
-    elif "Runtime" in verdict:
-        verdict = "Runtime Error"
-    elif "Judge Error" in verdict:
-        verdict = "Judge Error"
-    elif passed < total_tests:
-        verdict = "Wrong Answer"
-
-    return verdict, round(total_time, 3), passed, total_tests, "\n".join(debug_log[:10])
+    return (
+        aggregate.verdict,
+        round(aggregate.max_time, 3),
+        aggregate.passed_tests,
+        aggregate.total_tests,
+        "\n".join(debug_log[:10]),
+    )
