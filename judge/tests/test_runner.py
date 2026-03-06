@@ -68,6 +68,31 @@ class RunnerDockerTests(unittest.TestCase):
         mode = stat.S_IMODE(os.stat(py_path).st_mode)
         self.assertEqual(mode, 0o644)
 
+    def test_compile_cpp_uses_docker_toolchain_when_enabled(self):
+        class _Proc:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        def _fake_run(cmd, **_kwargs):
+            # simulate successful compilation output artifact
+            if "-o" in cmd:
+                out = cmd[cmd.index("-o") + 1]
+                out_path = out if out.startswith("/") else "/tmp/test_runner_cpp/" + out
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+                with open(out_path, "wb") as f:
+                    f.write(b"binary")
+            return _Proc()
+
+        with patch("judge.runner.USE_DOCKER", True), patch("judge.runner.subprocess.run", side_effect=_fake_run) as run_mock:
+            bundle, err = compile_submission("cpp", "int main(){return 0;}\n", "/tmp/test_runner_cpp")
+
+        self.assertIsNotNone(bundle, err)
+        cmd = run_mock.call_args.args[0]
+        joined = " ".join(cmd)
+        self.assertIn("docker run", joined)
+        self.assertIn("g++ main.cpp -O2 -std=c++17 -o main", joined)
+
 
 if __name__ == "__main__":
     unittest.main()

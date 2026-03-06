@@ -37,14 +37,40 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
         with open(src, "w", encoding="utf-8") as f:
             f.write(source_code or "")
         os.chmod(src, 0o644)
-        proc = subprocess.run(
-            ["g++", "main.cpp", "-O2", "-std=c++17", "-o", "main"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            cwd=workdir,
-            timeout=30,
-        )
+        if USE_DOCKER:
+            compile_cmd = [
+                "docker",
+                "run",
+                "--rm",
+                "--network=none",
+                "-v",
+                f"{workdir}:/workspace",
+                "-w",
+                "/workspace",
+                _get_docker_image(ProgramBundle(language="cpp", run_cmd=[], workdir=workdir)),
+                "g++",
+                "main.cpp",
+                "-O2",
+                "-std=c++17",
+                "-o",
+                "main",
+            ]
+            proc = subprocess.run(
+                compile_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=30,
+            )
+        else:
+            proc = subprocess.run(
+                ["g++", "main.cpp", "-O2", "-std=c++17", "-o", "main"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                cwd=workdir,
+                timeout=30,
+            )
         if proc.returncode != 0:
             return None, proc.stderr
         os.chmod(exe, 0o755)
