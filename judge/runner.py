@@ -36,6 +36,7 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
         exe = os.path.join(workdir, "main")
         with open(src, "w", encoding="utf-8") as f:
             f.write(source_code or "")
+        os.chmod(src, 0o644)
         proc = subprocess.run(
             ["g++", "main.cpp", "-O2", "-std=c++17", "-o", "main"],
             stdout=subprocess.PIPE,
@@ -53,6 +54,7 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
         src = os.path.join(workdir, "main.py")
         with open(src, "w", encoding="utf-8") as f:
             f.write(source_code or "")
+        os.chmod(src, 0o644)
         interp = "python3" if language == "python" else "pypy3"
         return ProgramBundle(language=language, run_cmd=[interp, src], workdir=workdir), ""
 

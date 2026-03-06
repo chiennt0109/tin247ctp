@@ -20,7 +20,11 @@ class SandboxManager:
 
     def create(self, submission_id: int) -> SandboxContext:
         os.makedirs(self.base_dir, exist_ok=True)
+        os.chmod(self.base_dir, 0o755)
         root_dir = tempfile.mkdtemp(prefix=f"sub_{submission_id}_", dir=self.base_dir)
+        # Docker containers may run with a different UID/GID than the host process.
+        # Ensure workspace is traversable/readable by non-owner users in container.
+        os.chmod(root_dir, 0o755)
         return SandboxContext(submission_id=submission_id, root_dir=root_dir)
 
     def destroy(self, ctx: SandboxContext) -> None:

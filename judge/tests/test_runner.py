@@ -1,4 +1,6 @@
 import unittest
+import os
+import stat
 
 from unittest.mock import patch
 
@@ -58,6 +60,13 @@ class RunnerDockerTests(unittest.TestCase):
         with patch("judge.runner.USE_DOCKER", False):
             res = run_case(bundle, "", time_limit=0.2, memory_limit_mb=128)
         self.assertEqual(res["return_code"], 124)
+
+    def test_compile_python_sets_readable_permissions(self):
+        bundle, err = compile_submission("python", "print(1)\n", "/tmp/test_runner_perm")
+        self.assertIsNotNone(bundle, err)
+        py_path = os.path.join(bundle.workdir, "main.py")
+        mode = stat.S_IMODE(os.stat(py_path).st_mode)
+        self.assertEqual(mode, 0o644)
 
 
 if __name__ == "__main__":
