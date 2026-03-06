@@ -11,13 +11,33 @@ from judge.special_judge.compiler import ensure_custom_checker
 CHECKER_NONE = "none"
 TMP_ROOT = "/dev/shm/judge_tmp"
 
+CHECKER_ALIASES = {
+    "custom_checker": "custom",
+    "euler": "euler_path",
+    "eulerpath": "euler_path",
+    "graphpath": "graph_path",
+    "setcompare": "set_compare",
+    "numerictolerance": "numeric_tolerance",
+    "float": "float_tolerance",
+    "float_tolerance": "numeric_tolerance",
+}
+
 
 def _normalize_text(s: str) -> str:
     return (s or "").strip().replace("\r\n", "\n").rstrip()
 
 
+def canonicalize_checker_type(checker_type: str | None) -> str:
+    raw = (checker_type or CHECKER_NONE).strip().lower()
+    key = raw.replace("-", "_").replace(" ", "_")
+    key = CHECKER_ALIASES.get(key, key)
+    if key in BUILTIN_CHECKER_NAMES or key in {"custom", CHECKER_NONE}:
+        return key
+    return raw
+
+
 def resolve_checker_mode(problem_code: str, checker_type: str) -> str:
-    c = (checker_type or CHECKER_NONE).strip().lower()
+    c = canonicalize_checker_type(checker_type)
     if c in BUILTIN_CHECKER_NAMES:
         return "builtin"
     tc_dir = f"/srv/judge/testcases/{problem_code}"
@@ -99,6 +119,7 @@ def run_checker(
     submission_id: int | None = None,
     test_id: int | None = None,
 ) -> dict:
+    checker_type = canonicalize_checker_type(checker_type)
     mode = resolve_checker_mode(problem_code, checker_type)
 
     if mode == "builtin":
@@ -119,7 +140,7 @@ def run_checker(
             )
 
         # fallback to builtin checker when custom checker binary is unavailable
-        c = (checker_type or "").strip().lower()
+        c = canonicalize_checker_type(checker_type)
         if c in BUILTIN_CHECKER_NAMES:
             res = run_builtin_checker(c, input_data, contestant_output, expected_output, config)
             res["checker_mode"] = "builtin_fallback"

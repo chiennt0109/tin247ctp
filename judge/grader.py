@@ -6,7 +6,7 @@ from typing import Tuple
 
 from problems.models import TestCase
 
-from .checker_dispatcher import run_checker
+from .checker_dispatcher import canonicalize_checker_type, run_checker
 from .debug_logger import log_test_event
 from .dispatcher import JudgeDispatcher
 from .result import SubmissionResult, TestResult
@@ -19,6 +19,7 @@ CHECKER_NONE = "none"
 def normalize(s):
     return (s or "").strip().replace("\r\n", "\n").rstrip()
 
+CHECKER_NONE = "none"
 
 def _load_problem_yml_checker(problem_code: str):
     path = f"/srv/judge/testcases/{problem_code}/problem.yml"
@@ -47,12 +48,15 @@ def _resolve_checker(problem):
     checker_config = getattr(problem, "checker_config", "") or ""
 
     yml_checker, yml_config = _load_problem_yml_checker(problem.code)
-    if yml_checker:
-        checker_type = yml_checker
-    if yml_config:
+
+    checker_type = canonicalize_checker_type(checker_type)
+    # Respect admin-selected checker. Only fallback to problem.yml when checker is not set.
+    if checker_type in {"", CHECKER_NONE} and yml_checker:
+        checker_type = canonicalize_checker_type(yml_checker)
+
+    if yml_config and not checker_config:
         checker_config = yml_config
 
-    checker_type = (checker_type or CHECKER_NONE).strip().lower()
     return checker_type, checker_config
 
 
