@@ -31,6 +31,7 @@ from django.utils.safestring import mark_safe
 
 from .models import ProblemEditorial, EditorialPurchase
 
+CHECKER_CUSTOM = "custom"
 
 # ===== SANDBOX EXPORT PATH =====
 SANDBOX_ROOT = "/srv/judge/testcases"
