@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 # ================================
 SANDBOX_PATH = "/srv/judge/worker.py"
 sandbox_worker = None
+USE_EXTERNAL_SANDBOX_WORKER = os.getenv("OJ_USE_EXTERNAL_SANDBOX_WORKER", "false").lower() in {"1", "true", "yes"}
 
 if os.path.exists(SANDBOX_PATH):
     try:
@@ -69,10 +70,11 @@ def judge_submission(submission_id: int):
     sub.verdict = "Running"
     sub.save(update_fields=["verdict"])
 
-    # Nếu không có sandbox → chấm local luôn
-    if sandbox_worker is None or not hasattr(sandbox_worker, "run_job"):
+    # Mặc định chấm local để đảm bảo verdict/checker thống nhất với code trong repo.
+    # Chỉ dùng sandbox worker ngoài khi bật tường minh qua OJ_USE_EXTERNAL_SANDBOX_WORKER=true
+    if (not USE_EXTERNAL_SANDBOX_WORKER) or sandbox_worker is None or not hasattr(sandbox_worker, "run_job"):
         logger.warning(
-            "[TASK] ⚠️ sandbox_worker unavailable (None or missing run_job), "
+            "[TASK] ⚠️ using local grader (external sandbox disabled or unavailable), "
             "fallback local cho submission %s",
             sub.id,
         )
