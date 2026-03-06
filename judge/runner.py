@@ -6,6 +6,9 @@ import tempfile
 import time
 from dataclasses import dataclass
 
+DOCKER_IMAGE = os.getenv("OJ_DOCKER_IMAGE", "tin247ctp-runner")
+USE_DOCKER = os.getenv("OJ_USE_DOCKER", "true").lower() not in {"0", "false", "no"}
+
 
 @dataclass
 class ProgramBundle:
@@ -37,17 +40,50 @@ def compile_submission(language: str, source_code: str) -> tuple[ProgramBundle |
     return None, f"Unsupported language: {language}"
 
 
+def _to_container_cmd(bundle: ProgramBundle) -> list[str]:
+    mapped = []
+    for arg in bundle.run_cmd:
+        if isinstance(arg, str) and arg.startswith(bundle.workdir):
+            rel = os.path.relpath(arg, bundle.workdir)
+            mapped.append(f"/workspace/{rel}")
+        else:
+            mapped.append(arg)
+    return mapped
+
+
+def _build_docker_cmd(bundle: ProgramBundle) -> list[str]:
+    return [
+        "docker",
+        "run",
+        "--rm",
+        "--network=none",
+        "--memory=512m",
+        "--cpus=1",
+        "--pids-limit=64",
+        "--read-only",
+        "-v",
+        f"{bundle.workdir}:/workspace",
+        "-w",
+        "/workspace",
+        DOCKER_IMAGE,
+        *_to_container_cmd(bundle),
+    ]
+
+
 def run_case(bundle: ProgramBundle, input_data: str, time_limit: float) -> dict:
     t0 = time.perf_counter()
+    timeout = max(0.1, float(time_limit))
+    cmd = _build_docker_cmd(bundle) if USE_DOCKER else bundle.run_cmd
+
     try:
         proc = subprocess.run(
-            bundle.run_cmd,
+            cmd,
             input=input_data or "",
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            timeout=max(0.1, float(time_limit)),
-            cwd=bundle.workdir,
+            timeout=timeout,
+            cwd=None if USE_DOCKER else bundle.workdir,
         )
         elapsed = time.perf_counter() - t0
         return {
@@ -62,5 +98,13 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float) -> dict:
             "return_code": 124,
             "stdout": exc.stdout or "",
             "stderr": exc.stderr or "",
+            "time": elapsed,
+        }
+    except Exception as exc:
+        elapsed = time.perf_counter() - t0
+        return {
+            "return_code": 1,
+            "stdout": "",
+            "stderr": f"runner error: {exc}",
             "time": elapsed,
         }
