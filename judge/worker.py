@@ -32,6 +32,8 @@ def _map_program_verdict(return_code: int) -> str:
         return "TLE"
     if return_code == 137:
         return "MLE"
+    if return_code == 125:
+        return "JE"
     return "RE"
 
 

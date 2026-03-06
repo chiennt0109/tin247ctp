@@ -4,8 +4,8 @@ import os
 import resource
 import subprocess
 import time
-import tempfile
 import math
+import shlex
 from dataclasses import dataclass
 
 DOCKER_IMAGE = os.getenv("OJ_DOCKER_IMAGE", "tin247ctp-runner")
@@ -53,7 +53,7 @@ def _to_container_cmd(bundle: ProgramBundle) -> list[str]:
     mapped = []
     for arg in bundle.run_cmd:
         if isinstance(arg, str) and arg.startswith(bundle.workdir):
-            mapped.append(f"/workspace/{os.path.relpath(arg, bundle.workdir)}")
+            mapped.append(f"./{os.path.relpath(arg, bundle.workdir)}")
         else:
             mapped.append(arg)
     return mapped
@@ -83,13 +83,17 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
             "fsize=16384:16384",
         ])
 
+    container_cmd = _to_container_cmd(bundle)
+    shell_cmd = shlex.join(container_cmd)
     cmd.extend([
         "-v",
         f"{bundle.workdir}:/workspace",
         "-w",
         "/workspace",
         DOCKER_IMAGE,
-        *_to_container_cmd(bundle),
+        "/bin/sh",
+        "-c",
+        shell_cmd,
     ])
     return cmd
 
@@ -111,12 +115,11 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
         docker_overhead = max(0.0, float(os.getenv("OJ_DOCKER_TIMEOUT_OVERHEAD", "2.0")))
         exec_timeout = timeout + docker_overhead
 
-    # Use explicit stdin/stdout redirection files to avoid blocking stdin issues.
-    with tempfile.NamedTemporaryFile(mode="wb", dir=bundle.workdir, delete=False) as fin:
+    # Use explicit files inside workspace to ensure they are visible in Docker mount.
+    input_file = os.path.join(bundle.workdir, "input.txt")
+    output_file = os.path.join(bundle.workdir, "output.txt")
+    with open(input_file, "wb") as fin:
         fin.write((input_data or "").encode("utf-8", errors="ignore"))
-        input_file = fin.name
-
-    output_file = os.path.join(bundle.workdir, f"out_{os.path.basename(input_file)}")
 
     try:
         before_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -141,8 +144,9 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
 
         usage_delta_kb = max(0, int(after_usage.ru_maxrss) - int(before_usage.ru_maxrss))
         memory_kb = usage_delta_kb if usage_delta_kb > 0 else int(after_usage.ru_maxrss or 0)
+        normalized_rc = 125 if proc.returncode == 127 else proc.returncode
         return {
-            "return_code": proc.returncode,
+            "return_code": normalized_rc,
             "stdout": stdout_data.decode("utf-8", errors="replace"),
             "stderr": stderr_data.decode("utf-8", errors="replace"),
             "time": elapsed,
