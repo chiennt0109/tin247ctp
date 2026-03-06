@@ -1,4 +1,6 @@
 import unittest
+import os
+import stat
 
 from unittest.mock import patch
 
@@ -8,25 +10,101 @@ from judge.runner import ProgramBundle, _build_docker_cmd, _to_container_cmd, co
 class RunnerDockerTests(unittest.TestCase):
     def test_container_path_mapping(self):
         b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
-        self.assertEqual(_to_container_cmd(b), ["/workspace/main"])
+        self.assertEqual(_to_container_cmd(b), ["./main"])
 
     def test_docker_flags_present(self):
         b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
-        cmd = _build_docker_cmd(b)
+        cmd = _build_docker_cmd(b, memory_limit_mb=256, time_limit=1.5)
         s = " ".join(cmd)
         self.assertIn("--network=none", s)
-        self.assertIn("--memory=512m", s)
-        self.assertIn("--cpus=1", s)
+        self.assertIn("--memory=256m", s)
+        self.assertIn("--cpus=0.5", s)
         self.assertIn("--pids-limit=64", s)
         self.assertIn("--read-only", s)
+        self.assertIn("/bin/sh -c", s)
+        self.assertIn("./main", s)
+        self.assertNotIn("--ulimit", s)
 
+    def test_docker_cpu_is_configurable(self):
+        b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
+        with patch("judge.runner.DOCKER_RUN_CPUS", "0.25"):
+            cmd = _build_docker_cmd(b, memory_limit_mb=256, time_limit=1.5)
+
+        self.assertIn("--cpus=0.25", " ".join(cmd))
+
+    def test_docker_ulimit_flags_opt_in(self):
+        b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
+        with patch.dict("os.environ", {"OJ_DOCKER_USE_ULIMIT": "true"}):
+            cmd = _build_docker_cmd(b, memory_limit_mb=256, time_limit=1.5)
+        s = " ".join(cmd)
+        self.assertIn("--ulimit", s)
+        self.assertIn("cpu=3", s)
+
+    def test_docker_timeout_includes_overhead(self):
+        b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
+
+        class _Proc:
+            returncode = 0
+            stderr = b""
+
+        def fake_open(path, mode="r", *args, **kwargs):
+            import io
+            if "rb" in mode:
+                return io.BytesIO(b"")
+            return io.BytesIO()
+
+        with patch("judge.runner.USE_DOCKER", True), \
+             patch("judge.runner._build_docker_cmd", return_value=["docker", "run"]), \
+             patch("judge.runner.subprocess.run", return_value=_Proc()) as run_mock, \
+             patch("builtins.open", side_effect=fake_open):
+            run_case(b, "", time_limit=1.0, memory_limit_mb=128)
+
+        self.assertGreaterEqual(run_mock.call_args.kwargs["timeout"], 3.0)
 
     def test_run_case_timeout_infinite_loop(self):
-        bundle, err = compile_submission("python", "while True:\n    pass\n")
+        bundle, err = compile_submission("python", "while True:\n    pass\n", "/tmp/test_runner")
         self.assertIsNotNone(bundle, err)
         with patch("judge.runner.USE_DOCKER", False):
-            res = run_case(bundle, "", time_limit=0.2)
+            res = run_case(bundle, "", time_limit=0.2, memory_limit_mb=128)
         self.assertEqual(res["return_code"], 124)
+
+    def test_compile_python_sets_readable_permissions(self):
+        bundle, err = compile_submission("python", "print(1)\n", "/tmp/test_runner_perm")
+        self.assertIsNotNone(bundle, err)
+        py_path = os.path.join(bundle.workdir, "main.py")
+        mode = stat.S_IMODE(os.stat(py_path).st_mode)
+        self.assertEqual(mode, 0o644)
+
+    def test_compile_cpp_uses_docker_toolchain_when_enabled(self):
+        class _Proc:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        def _fake_run(cmd, **_kwargs):
+            # simulate successful compilation output artifact
+            if "-o" in cmd:
+                out = cmd[cmd.index("-o") + 1]
+                out_path = out if out.startswith("/") else "/tmp/test_runner_cpp/" + out
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+                with open(out_path, "wb") as f:
+                    f.write(b"binary")
+            return _Proc()
+
+        with patch("judge.runner.USE_DOCKER", True), patch("judge.runner.subprocess.run", side_effect=_fake_run) as run_mock:
+            bundle, err = compile_submission("cpp", "int main(){return 0;}\n", "/tmp/test_runner_cpp")
+
+        self.assertIsNotNone(bundle, err)
+        run_cmd = None
+        for c in run_mock.call_args_list:
+            cmd = c.args[0]
+            if len(cmd) >= 2 and cmd[0] == "docker" and cmd[1] == "run":
+                run_cmd = cmd
+                break
+        self.assertIsNotNone(run_cmd)
+        joined = " ".join(run_cmd)
+        self.assertIn("docker run", joined)
+        self.assertIn("g++ main.cpp -O2 -std=c++17 -o main", joined)
 
 
 if __name__ == "__main__":
