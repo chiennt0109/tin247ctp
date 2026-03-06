@@ -19,6 +19,16 @@ class ProgramBundle:
     workdir: str
 
 
+def _get_docker_image(bundle: ProgramBundle):
+    if bundle.language == "cpp":
+        return "judge-cpp"
+    if bundle.language in ("python", "pypy"):
+        return "judge-py"
+    if bundle.language == "java":
+        return "judge-java"
+    return os.getenv("OJ_DOCKER_IMAGE", "judge-cpp")
+
+
 def compile_submission(language: str, source_code: str, workdir: str) -> tuple[ProgramBundle | None, str]:
     os.makedirs(workdir, exist_ok=True)
     if language == "cpp":
@@ -90,13 +100,18 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
         f"{bundle.workdir}:/workspace",
         "-w",
         "/workspace",
-        DOCKER_IMAGE,
+        _get_docker_image(bundle),
         "/bin/sh",
         "-c",
         shell_cmd,
     ])
     return cmd
 
+def _limit_resources(memory_limit_mb: int):
+    memory_bytes = int(memory_limit_mb) * 1024 * 1024
+    resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
+    resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (16 * 1024 * 1024, 16 * 1024 * 1024))
 
 def _limit_resources(memory_limit_mb: int):
     memory_bytes = int(memory_limit_mb) * 1024 * 1024
