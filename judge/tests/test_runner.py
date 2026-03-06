@@ -95,8 +95,14 @@ class RunnerDockerTests(unittest.TestCase):
             bundle, err = compile_submission("cpp", "int main(){return 0;}\n", "/tmp/test_runner_cpp")
 
         self.assertIsNotNone(bundle, err)
-        cmd = run_mock.call_args.args[0]
-        joined = " ".join(cmd)
+        run_cmd = None
+        for c in run_mock.call_args_list:
+            cmd = c.args[0]
+            if len(cmd) >= 2 and cmd[0] == "docker" and cmd[1] == "run":
+                run_cmd = cmd
+                break
+        self.assertIsNotNone(run_cmd)
+        joined = " ".join(run_cmd)
         self.assertIn("docker run", joined)
         self.assertIn("g++ main.cpp -O2 -std=c++17 -o main", joined)
 

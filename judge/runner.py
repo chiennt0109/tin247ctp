@@ -6,6 +6,7 @@ import subprocess
 import time
 import math
 import shlex
+import uuid
 from dataclasses import dataclass
 
 DOCKER_IMAGE = os.getenv("OJ_DOCKER_IMAGE", "tin247ctp-runner")
@@ -38,6 +39,20 @@ def _docker_user_args() -> list[str]:
     return ["--user", f"{uid}:{gid}"]
 
 
+def _cleanup_container(container_name: str | None) -> None:
+    if not container_name:
+        return
+    try:
+        subprocess.run(
+            ["docker", "rm", "-f", container_name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except Exception:
+        pass
+
+
 def compile_submission(language: str, source_code: str, workdir: str) -> tuple[ProgramBundle | None, str]:
     os.makedirs(workdir, exist_ok=True)
     if language == "cpp":
@@ -47,10 +62,13 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
             f.write(source_code or "")
         os.chmod(src, 0o644)
         if USE_DOCKER:
+            compile_container_name = f"oj-compile-{uuid.uuid4().hex[:12]}"
             compile_cmd = [
                 "docker",
                 "run",
                 "--rm",
+                "--name",
+                compile_container_name,
                 "--network=none",
                 "--cpus",
                 str(DOCKER_COMPILE_CPUS),
@@ -67,13 +85,16 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
                 "-o",
                 "main",
             ]
-            proc = subprocess.run(
-                compile_cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                timeout=30,
-            )
+            try:
+                proc = subprocess.run(
+                    compile_cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=30,
+                )
+            finally:
+                _cleanup_container(compile_container_name)
         else:
             proc = subprocess.run(
                 ["g++", "main.cpp", "-O2", "-std=c++17", "-o", "main"],
@@ -155,10 +176,19 @@ def _limit_resources(memory_limit_mb: int):
     resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
     resource.setrlimit(resource.RLIMIT_FSIZE, (16 * 1024 * 1024, 16 * 1024 * 1024))
 
+def _limit_resources(memory_limit_mb: int):
+    memory_bytes = int(memory_limit_mb) * 1024 * 1024
+    resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
+    resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (16 * 1024 * 1024, 16 * 1024 * 1024))
 
 def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_limit_mb: int) -> dict:
     timeout = max(0.1, float(time_limit))
     cmd = _build_docker_cmd(bundle, memory_limit_mb, timeout) if USE_DOCKER else bundle.run_cmd
+    container_name = None
+    if USE_DOCKER:
+        container_name = f"oj-run-{uuid.uuid4().hex[:12]}"
+        cmd = cmd[:3] + ["--name", container_name] + cmd[3:]
     # Docker startup overhead should not count as contestant runtime, otherwise
     # short limits can false-positive as TLE for every submission.
     exec_timeout = timeout
@@ -222,6 +252,7 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
             "memory_kb": 0,
         }
     finally:
+        _cleanup_container(container_name)
         try:
             os.remove(input_file)
         except Exception:
