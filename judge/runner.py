@@ -29,6 +29,13 @@ def _get_docker_image(bundle: ProgramBundle):
     return os.getenv("OJ_DOCKER_IMAGE", "judge-cpp")
 
 
+def _docker_user_args() -> list[str]:
+    """Run container process as the same host UID/GID to avoid bind-mount write denial."""
+    uid = os.getuid()
+    gid = os.getgid()
+    return ["--user", f"{uid}:{gid}"]
+
+
 def compile_submission(language: str, source_code: str, workdir: str) -> tuple[ProgramBundle | None, str]:
     os.makedirs(workdir, exist_ok=True)
     if language == "cpp":
@@ -43,6 +50,7 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
                 "run",
                 "--rm",
                 "--network=none",
+                *_docker_user_args(),
                 "-v",
                 f"{workdir}:/workspace",
                 "-w",
@@ -105,6 +113,7 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
         "--rm",
         "-i",
         "--network=none",
+        *_docker_user_args(),
         f"--memory={max(64, int(memory_limit_mb))}m",
         "--cpus=1",
         "--pids-limit=64",
@@ -135,11 +144,6 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
     ])
     return cmd
 
-def _limit_resources(memory_limit_mb: int):
-    memory_bytes = int(memory_limit_mb) * 1024 * 1024
-    resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
-    resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
-    resource.setrlimit(resource.RLIMIT_FSIZE, (16 * 1024 * 1024, 16 * 1024 * 1024))
 
 def _limit_resources(memory_limit_mb: int):
     memory_bytes = int(memory_limit_mb) * 1024 * 1024
