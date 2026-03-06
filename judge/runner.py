@@ -10,6 +10,8 @@ from dataclasses import dataclass
 
 DOCKER_IMAGE = os.getenv("OJ_DOCKER_IMAGE", "tin247ctp-runner")
 USE_DOCKER = os.getenv("OJ_USE_DOCKER", "true").lower() not in {"0", "false", "no"}
+DOCKER_RUN_CPUS = os.getenv("OJ_DOCKER_CPUS", "0.5")
+DOCKER_COMPILE_CPUS = os.getenv("OJ_DOCKER_COMPILE_CPUS", DOCKER_RUN_CPUS)
 
 
 @dataclass
@@ -50,6 +52,8 @@ def compile_submission(language: str, source_code: str, workdir: str) -> tuple[P
                 "run",
                 "--rm",
                 "--network=none",
+                "--cpus",
+                str(DOCKER_COMPILE_CPUS),
                 *_docker_user_args(),
                 "-v",
                 f"{workdir}:/workspace",
@@ -115,7 +119,7 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: f
         "--network=none",
         *_docker_user_args(),
         f"--memory={max(64, int(memory_limit_mb))}m",
-        "--cpus=1",
+        f"--cpus={DOCKER_RUN_CPUS}",
         "--pids-limit=64",
         "--read-only",
         "--cap-drop=ALL",

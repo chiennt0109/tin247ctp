@@ -18,12 +18,19 @@ class RunnerDockerTests(unittest.TestCase):
         s = " ".join(cmd)
         self.assertIn("--network=none", s)
         self.assertIn("--memory=256m", s)
-        self.assertIn("--cpus=1", s)
+        self.assertIn("--cpus=0.5", s)
         self.assertIn("--pids-limit=64", s)
         self.assertIn("--read-only", s)
         self.assertIn("/bin/sh -c", s)
         self.assertIn("./main", s)
         self.assertNotIn("--ulimit", s)
+
+    def test_docker_cpu_is_configurable(self):
+        b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
+        with patch("judge.runner.DOCKER_RUN_CPUS", "0.25"):
+            cmd = _build_docker_cmd(b, memory_limit_mb=256, time_limit=1.5)
+
+        self.assertIn("--cpus=0.25", " ".join(cmd))
 
     def test_docker_ulimit_flags_opt_in(self):
         b = ProgramBundle(language="cpp", run_cmd=["/tmp/sub/main"], workdir="/tmp/sub")
