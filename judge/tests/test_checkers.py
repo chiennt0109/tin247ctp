@@ -1,0 +1,50 @@
+import unittest
+
+from judge.checkers import run_builtin_checker
+
+
+class BuiltinCheckerTests(unittest.TestCase):
+    def test_permutation_accept(self):
+        res = run_builtin_checker("permutation", "5", "1 3 2 5 4", "")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_set_compare_accept_order_insensitive(self):
+        res = run_builtin_checker("set_compare", "", "3 1 2", "1 2 3")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_numeric_tolerance(self):
+        res = run_builtin_checker("numeric_tolerance", "", "3.141592", "3.141593", config="eps=0.00001")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_reject_wrong_length(self):
+        # n=3,m=2 edges (1,2),(2,3), path length must be 3
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "1 2", "")
+        self.assertEqual(res["return_code"], 1)
+
+    def test_euler_path_accept_with_length_prefix(self):
+        # format: k + path, where k = m+1
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "3 1 2 3", "")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_accept_yes_prefix(self):
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "YES 1 2 3", "")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_impossible_case(self):
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "-1", "-1")
+        self.assertEqual(res["return_code"], 0)
+
+
+    def test_euler_path_zero_based_vertices(self):
+        # n=3,m=2 edges (0,1),(1,2), valid 0-based Euler path
+        res = run_builtin_checker("euler_path", "3 2 0 1 1 2", "0 1 2", "")
+        self.assertEqual(res["return_code"], 0)
+
+    def test_euler_path_directed(self):
+        # directed edges 1->2,2->3; path 1 2 3 valid only in directed mode
+        res = run_builtin_checker("euler_path", "3 2 1 2 2 3", "1 2 3", "", config="directed=1")
+        self.assertEqual(res["return_code"], 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
