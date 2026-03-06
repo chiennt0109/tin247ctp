@@ -5,6 +5,7 @@ import resource
 import subprocess
 import time
 import tempfile
+import math
 from dataclasses import dataclass
 
 DOCKER_IMAGE = os.getenv("OJ_DOCKER_IMAGE", "tin247ctp-runner")
@@ -58,7 +59,8 @@ def _to_container_cmd(bundle: ProgramBundle) -> list[str]:
     return mapped
 
 
-def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int) -> list[str]:
+def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int, time_limit: float) -> list[str]:
+    cpu_limit_seconds = max(1, math.ceil(float(time_limit)) + 1)
     return [
         "docker",
         "run",
@@ -71,6 +73,10 @@ def _build_docker_cmd(bundle: ProgramBundle, memory_limit_mb: int) -> list[str]:
         "--read-only",
         "--cap-drop=ALL",
         "--security-opt=no-new-privileges",
+        "--ulimit",
+        f"cpu={cpu_limit_seconds}",
+        "--ulimit",
+        "fsize=16384:16384",
         "-v",
         f"{bundle.workdir}:/workspace",
         "-w",
@@ -89,7 +95,7 @@ def _limit_resources(memory_limit_mb: int):
 
 def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_limit_mb: int) -> dict:
     timeout = max(0.1, float(time_limit))
-    cmd = _build_docker_cmd(bundle, memory_limit_mb) if USE_DOCKER else bundle.run_cmd
+    cmd = _build_docker_cmd(bundle, memory_limit_mb, timeout) if USE_DOCKER else bundle.run_cmd
 
     # Use explicit stdin/stdout redirection files to avoid blocking stdin issues.
     with tempfile.NamedTemporaryFile(mode="wb", dir=bundle.workdir, delete=False) as fin:
@@ -99,6 +105,7 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
     output_file = os.path.join(bundle.workdir, f"out_{os.path.basename(input_file)}")
 
     try:
+        before_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
         start = time.time()
         with open(input_file, "rb") as stdin_fp, open(output_file, "wb") as stdout_fp:
             proc = subprocess.run(
@@ -109,15 +116,17 @@ def run_case(bundle: ProgramBundle, input_data: str, time_limit: float, memory_l
                 timeout=timeout,
                 cwd=None if USE_DOCKER else bundle.workdir,
                 preexec_fn=None if USE_DOCKER else (lambda: _limit_resources(memory_limit_mb)),
-                env={"PATH": os.getenv("PATH", "")},
+                env=os.environ.copy(),
             )
         elapsed = time.time() - start
+        after_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
 
         with open(output_file, "rb") as f:
             stdout_data = f.read()
         stderr_data = proc.stderr or b""
 
-        memory_kb = max(0, memory_limit_mb * 1024 if proc.returncode == 137 else 0)
+        usage_delta_kb = max(0, int(after_usage.ru_maxrss) - int(before_usage.ru_maxrss))
+        memory_kb = usage_delta_kb if usage_delta_kb > 0 else int(after_usage.ru_maxrss or 0)
         return {
             "return_code": proc.returncode,
             "stdout": stdout_data.decode("utf-8", errors="replace"),
