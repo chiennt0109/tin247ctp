@@ -19,6 +19,7 @@ CHECKER_NONE = "none"
 def normalize(s):
     return (s or "").strip().replace("\r\n", "\n").rstrip()
 
+CHECKER_NONE = "none"
 
 def _load_problem_yml_checker(problem_code: str):
     path = f"/srv/judge/testcases/{problem_code}/problem.yml"
