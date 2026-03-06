@@ -56,33 +56,41 @@
     {{ result.debug_info|safe|json_script:"dbg" }}
     <script>
     try {
-      const dbg = JSON.parse(document.getElementById("dbg").textContent);
+      const debug = JSON.parse(document.getElementById("dbg").textContent || "{}");
+      const tests = Array.isArray(debug?.tests) ? debug.tests : [];
       const tbody = document.getElementById("debug-body");
       tbody.innerHTML = "";
-      if (!Array.isArray(dbg) || dbg.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'><i>No detailed debug info available.</i></td></tr>";
+
+      if (tests.length === 0) {
+        const runtimeText = debug?.tests?.[0]?.stderr || debug?.summary?.stderr || "No detailed debug info available.";
+        tbody.innerHTML = `
+          <tr>
+            <td colspan='5'><i>${runtimeText}</i></td>
+          </tr>`;
       } else {
-        dbg.forEach((t, i) => {
-          const status = t.status || "";
+        tests.forEach((t, i) => {
+          const status = t.verdict || "";
           let icon = "⚠️", cls = "text-muted";
           if (status === "AC") { icon = "✅"; cls = "text-success"; }
           else if (status === "WA") { icon = "❌"; cls = "text-danger"; }
           else if (status === "TLE") { icon = "⏳"; cls = "text-warning"; }
           else if (status === "RE") { icon = "💥"; cls = "text-danger"; }
+          else if (status === "JE") { icon = "⚙️"; cls = "text-muted"; }
 
+          const err = t.stderr || "";
           tbody.innerHTML += `
             <tr>
               <td>${i + 1}</td>
               <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${t.input || ""}</pre></td>
               <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${t.expected || ""}</pre></td>
-              <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${t.got || ""}</pre></td>
+              <td><pre class="text-start mb-0" style="white-space:pre-wrap;">${(t.stdout || "") + (err ? "\n" + err : "")}</pre></td>
               <td class="fw-bold ${cls}">${icon} ${status}</td>
             </tr>`;
         });
       }
     } catch (e) {
       document.getElementById("debug-body").innerHTML =
-        "<tr><td colspan='5'><i>Debug info not available or invalid format.</i></td></tr>";
+        "<tr><td colspan='5'><i>Debug info parse failed.</i></td></tr>";
     }
     </script>
 
