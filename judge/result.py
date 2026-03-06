@@ -5,14 +5,13 @@ from typing import List
 @dataclass
 class TestResult:
     test_id: int
-    input_size: int
     execution_time: float
+    memory_kb: int
     program_exit_code: int
-    checker_type: str
     checker_exit_code: int
-    checker_stdout: str = ""
-    checker_stderr: str = ""
-    verdict: str = ""
+    verdict: str
+    stdout: str = ""
+    stderr: str = ""
 
 
 @dataclass
@@ -20,33 +19,47 @@ class SubmissionResult:
     total_tests: int
     passed_tests: int = 0
     max_time: float = 0.0
-    verdict: str = "Pending"
+    max_memory_kb: int = 0
+    verdict: str = "JE"
     tests: List[TestResult] = field(default_factory=list)
 
-    def add(self, t: TestResult):
-        self.tests.append(t)
-        if t.verdict == "Accepted":
+    def add(self, test_result: TestResult) -> None:
+        self.tests.append(test_result)
+        if test_result.verdict == "AC":
             self.passed_tests += 1
-        self.max_time = max(self.max_time, t.execution_time)
+        self.max_time = max(self.max_time, test_result.execution_time)
+        self.max_memory_kb = max(self.max_memory_kb, test_result.memory_kb)
 
-    def finalize(self):
+    def finalize(self) -> None:
+        if self.total_tests == 0:
+            self.verdict = "JE"
+            return
         if self.passed_tests == self.total_tests:
-            self.verdict = "Accepted"
+            self.verdict = "AC"
             return
         for t in self.tests:
-            if t.verdict.startswith("Runtime Error"):
-                self.verdict = "Runtime Error"
+            if t.verdict != "AC":
+                self.verdict = t.verdict
                 return
-            if t.verdict == "Time Limit Exceeded":
-                self.verdict = "Time Limit Exceeded"
-                return
-            if t.verdict == "Memory Limit Exceeded":
-                self.verdict = "Memory Limit Exceeded"
-                return
-            if t.verdict in ("Wrong Answer", "Presentation Error"):
-                self.verdict = "Wrong Answer"
-                return
-            if t.verdict == "Checker Error":
-                self.verdict = "Judge Error"
-                return
-        self.verdict = "Wrong Answer"
+        self.verdict = "WA"
+
+    def to_payload(self) -> dict:
+        return {
+            "verdict": self.verdict,
+            "time": round(self.max_time, 3),
+            "memory": int(self.max_memory_kb),
+            "passed": int(self.passed_tests),
+            "total": int(self.total_tests),
+        }
+
+
+VERDICT_TO_DB = {
+    "AC": "Accepted",
+    "WA": "Wrong Answer",
+    "TLE": "Time Limit Exceeded",
+    "MLE": "Runtime Error",
+    "RE": "Runtime Error",
+    "CE": "Compilation Error",
+    "PE": "Wrong Answer",
+    "JE": "Judge Error",
+}
