@@ -264,21 +264,30 @@ function escapeHtml(s){
   ));
 }
 
-// parse debug: hỗ trợ cả string & list
+// parse debug: hỗ trợ cả string/list/object (summary+tests)
 function parseDebug(raw){
   if (!raw) return {list:null, text:""};
   if (Array.isArray(raw)) return {list:raw, text:""};
 
+  if (typeof raw === "object"){
+    const tests = Array.isArray(raw.tests) ? raw.tests : null;
+    return {list:tests, text:"", obj:raw};
+  }
+
   if (typeof raw === "string"){
     try {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return {list:parsed, text:""};
+      if (Array.isArray(parsed)) return {list:parsed, text:"", obj:null};
+      if (parsed && typeof parsed === "object"){
+        const tests = Array.isArray(parsed.tests) ? parsed.tests : null;
+        return {list:tests, text:"", obj:parsed};
+      }
       return {list:null, text:raw};
     } catch(e){
       return {list:null, text:raw};
     }
   }
-  return {list:null, text:String(raw)};
+  return {list:null, text:String(raw), obj:null};
 }
 
 // highlight lỗi trong editor
@@ -464,7 +473,10 @@ async function pollResult(id){
     let err = "";
     if (dbg.list && dbg.list.length > 0) {
       const item = dbg.list[0];
-      err = item.stderr || item.info || JSON.stringify(item, null, 2);
+      err = item.stderr || item.stdout || item.info || JSON.stringify(item, null, 2);
+    } else if (dbg.obj && dbg.obj.tests && dbg.obj.tests[0]) {
+      const item = dbg.obj.tests[0];
+      err = item.stderr || item.stdout || JSON.stringify(item, null, 2);
     } else {
       err = dbg.text || "";
     }
@@ -495,6 +507,8 @@ async function pollResult(id){
     dbg.list.forEach(i => {
       if (i && typeof i.case !== "undefined"){
         per[Number(i.case)] = i.status;
+      } else if (i && typeof i.test !== "undefined"){
+        per[Number(i.test)] = i.verdict || i.status;
       }
     });
   }
