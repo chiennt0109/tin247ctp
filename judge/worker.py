@@ -15,6 +15,16 @@ from judge.sandbox import SandboxManager
 logger = logging.getLogger(__name__)
 
 
+def json_safe(obj):
+    if isinstance(obj, bytes):
+        return obj.decode("utf-8", errors="ignore")
+    elif isinstance(obj, dict):
+        return {k: json_safe(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [json_safe(v) for v in obj]
+    return obj
+
+
 def _map_program_verdict(return_code: int) -> str:
     if return_code == 0:
         return "AC"
@@ -137,7 +147,12 @@ def judge_submission_job(submission_id: int) -> dict:
         submission.exec_time = payload["time"]
         submission.passed_tests = payload["passed"]
         submission.total_tests = payload["total"]
-        submission.debug_info = json.dumps({"summary": payload, "tests": debug_rows}, ensure_ascii=False)
+        safe_payload = json_safe(payload)
+        safe_rows = json_safe(debug_rows)
+        submission.debug_info = json.dumps(
+            {"summary": safe_payload, "tests": safe_rows},
+            ensure_ascii=False
+        )
         submission.save(update_fields=["verdict", "exec_time", "passed_tests", "total_tests", "debug_info"])
 
         logger.info("[TASK] result submission=%s payload=%s", submission_id, payload)
