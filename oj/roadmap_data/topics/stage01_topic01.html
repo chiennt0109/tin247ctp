@@ -183,6 +183,54 @@
   .practice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
   .practice-item { border: 1px solid #dbeafe; border-radius: 10px; background: #f8fafc; padding: 10px; }
 
+  .step-box {
+    margin-top: 8px;
+    border: 2px solid #93c5fd;
+    border-radius: 10px;
+    background: #eff6ff;
+    width: 120px;
+    text-align: center;
+    padding: 8px;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .step-box .label { font-size: 13px; color: #1e3a8a; }
+  .step-box .value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #1e40af;
+  }
+
+  .step-explain {
+    margin-top: 8px;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    background: #f8fbff;
+    padding: 10px;
+    min-height: 44px;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .fade-in {
+    animation: fadeIn .45s ease;
+  }
+
+  .highlight-change {
+    animation: highlightChange .7s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes highlightChange {
+    0% { transform: scale(1); background: #dbeafe; }
+    45% { transform: scale(1.08); background: #bbf7d0; }
+    100% { transform: scale(1); background: transparent; }
+  }
+
   @media (max-width: 980px) {
     .practice-grid { grid-template-columns: 1fr; }
     .header h1 { font-size: 24px; }
@@ -375,9 +423,21 @@ int main(){
 
     <div class="row" style="margin-top:10px;">
       <div class="col">
-        <p><b>Demo biến:</b> a = 5; a = a + 1;</p>
-        <button class="btn" onclick="animateVar()">Chạy animation 5 → 6</button>
-        <div id="varAnim" class="alert">Giá trị a hiện tại: 5</div>
+        <p><b>Demo biến theo từng bước:</b> a = 5; a = a + 1;</p>
+        <div id="stepTitle" class="small-muted">Bấm <b>Next Step</b> để bắt đầu mô phỏng.</div>
+        <div class="step-box" id="varBox">
+          <div class="label">a =</div>
+          <div class="value" id="varValue">?</div>
+        </div>
+        <div id="stepExplain" class="step-explain">Chưa bắt đầu.</div>
+        <div class="row" style="margin-top:8px;">
+          <div class="col" style="min-width:160px;">
+            <button class="btn" onclick="nextVarStep()">Next Step</button>
+          </div>
+          <div class="col" style="min-width:160px;">
+            <button class="btn" style="background:#475569;" onclick="resetVarDemo()">Reset</button>
+          </div>
+        </div>
       </div>
     </div>
   </div></section>
@@ -408,11 +468,62 @@ a*b</pre></div>
     document.getElementById('sumResult').innerText = 'Kết quả: ' + a + ' + ' + b + ' = ' + (a + b);
   }
 
-  function animateVar() {
-    var box = document.getElementById('varAnim');
-    box.innerText = 'Giá trị a hiện tại: 5';
-    setTimeout(function () { box.innerText = 'a = a + 1'; }, 500);
-    setTimeout(function () { box.innerText = 'Giá trị a hiện tại: 6 ✅'; }, 1100);
+  var varDemoStep = 0;
+
+  function clearStepAnimations() {
+    document.getElementById('varBox').classList.remove('fade-in', 'highlight-change');
+    document.getElementById('stepExplain').classList.remove('fade-in');
+  }
+
+  function resetVarDemo() {
+    varDemoStep = 0;
+    document.getElementById('stepTitle').innerHTML = 'Bấm <b>Next Step</b> để bắt đầu mô phỏng.';
+    document.getElementById('varValue').innerText = '?';
+    document.getElementById('stepExplain').innerText = 'Chưa bắt đầu.';
+    clearStepAnimations();
+  }
+
+  function nextVarStep() {
+    varDemoStep += 1;
+
+    var varBox = document.getElementById('varBox');
+    var varValue = document.getElementById('varValue');
+    var stepExplain = document.getElementById('stepExplain');
+    var stepTitle = document.getElementById('stepTitle');
+
+    clearStepAnimations();
+
+    if (varDemoStep === 1) {
+      stepTitle.innerText = 'Step 1: Khởi tạo biến';
+      varValue.innerText = '5';
+      stepExplain.innerText = 'a = 5 (hộp biến đang chứa giá trị 5).';
+      varBox.classList.add('fade-in');
+      stepExplain.classList.add('fade-in');
+      return;
+    }
+
+    if (varDemoStep === 2) {
+      stepTitle.innerText = 'Step 2: Tính biểu thức';
+      stepExplain.innerText = 'a + 1 = 5 + 1 = 6';
+      stepExplain.classList.add('fade-in');
+      return;
+    }
+
+    if (varDemoStep === 3) {
+      stepTitle.innerText = 'Step 3: Gán lại cho biến';
+      varValue.innerText = '6';
+      stepExplain.innerText = 'Cập nhật hộp biến: a = 6 ✅';
+      varBox.classList.add('highlight-change');
+      stepExplain.classList.add('fade-in');
+      return;
+    }
+
+    varDemoStep = 1;
+    stepTitle.innerText = 'Step 1: Khởi tạo biến';
+    varValue.innerText = '5';
+    stepExplain.innerText = 'a = 5 (bắt đầu lại vòng mô phỏng).';
+    varBox.classList.add('fade-in');
+    stepExplain.classList.add('fade-in');
   }
 
   function simulateOverflow() {
