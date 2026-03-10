@@ -1,63 +1,345 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu <b>biến</b> là gì và cách khai báo biến.</li>
-  <li>Biết <b>nhập dữ liệu từ bàn phím</b> và <b>in kết quả ra màn hình</b>.</li>
-  <li>Thực hành viết chương trình đầu tiên: <code>Tính tổng hai số</code>.</li>
-</ul>
-</br>
-<h2>📘 1️⃣ Cấu trúc cơ bản của chương trình C++</h2>
-<p>Với C++, em hãy tưởng tượng mỗi khi em muốn xây một ngôi nhà (viết một chương trình), em luôn luôn phải xây một cái móng và bộ khung sườn y hệt nhau.
-Đây chính là "bộ khung" thần thánh đó. Em phải ghi nhớ nó nhé, gần như 99% các bài tập của em đều bắt đầu bằng cái khung này:</p>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+  :root {
+    --lesson-primary: #4e73df;
+    --lesson-accent: #22c55e;
+    --lesson-bg: #f6f9ff;
+  }
+
+  .lesson-wrap {
+    background: linear-gradient(180deg, #f9fbff 0%, #eef4ff 100%);
+    border-radius: 18px;
+    padding: 24px;
+    color: #1f2937;
+  }
+
+  .lesson-header {
+    background: linear-gradient(135deg, var(--lesson-primary), #6f42c1);
+    color: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 24px rgba(78, 115, 223, 0.22);
+  }
+
+  .card-lesson {
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .card-lesson .card-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 700;
+  }
+
+  .progress-wrap {
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 12px;
+    margin: 14px 0 20px;
+  }
+
+  .real-box {
+    border-left: 4px solid #f59e0b;
+    background: #fff7ed;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .program-tree {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    white-space: pre;
+  }
+
+  .compare-box {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #dbeafe;
+  }
+
+  .compare-box .head {
+    background: #eff6ff;
+    font-weight: 600;
+  }
+
+  .quiz-option {
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+  .quiz-option.correct {
+    background: #dcfce7 !important;
+    border-color: #22c55e !important;
+  }
+
+  .quiz-option.wrong {
+    background: #fee2e2 !important;
+    border-color: #ef4444 !important;
+  }
+
+  .slide-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.6s ease;
+  }
+
+  .slide-in.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .lesson-wrap {
+      padding: 14px;
+    }
+
+    .lesson-header {
+      padding: 18px;
+    }
+  }
+</style>
+
+<div class="lesson-wrap container-fluid">
+  <header class="lesson-header animate__animated animate__fadeInDown mb-3">
+    <h1 class="h3 mb-2"><i class="fa-solid fa-graduation-cap me-2"></i>Bài giảng C++ cơ bản tương tác</h1>
+    <p class="mb-0">Dành cho học sinh mới học lập trình: dễ hiểu, gần gũi, học đến đâu thực hành đến đó.</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="d-flex justify-content-between small mb-1">
+      <strong><i class="fa-solid fa-bars-progress me-1"></i>Lesson progress</strong>
+      <span id="lessonProgressText">0%</span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Lesson progress">
+      <div id="lessonProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-bullseye text-danger me-2"></i>🎯 Mục tiêu bài học</div>
+    <div class="card-body">
+      <ul class="mb-0">
+        <li>Hiểu <b>biến</b> là gì và cách khai báo biến.</li>
+        <li>Biết <b>nhập dữ liệu từ bàn phím</b> và <b>in kết quả ra màn hình</b>.</li>
+        <li>Thực hành viết chương trình đầu tiên: <code>Tính tổng hai số</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-house-chimney text-primary me-2"></i>📘 1️⃣ Cấu trúc cơ bản của chương trình C++</div>
+    <div class="card-body">
+      <p>Với C++, em hãy tưởng tượng mỗi khi em muốn xây một ngôi nhà (viết một chương trình), em luôn luôn phải xây một cái móng và bộ khung sườn y hệt nhau. Đây chính là "bộ khung" thần thánh đó. Em phải ghi nhớ nó nhé, gần như 99% các bài tập của em đều bắt đầu bằng cái khung này:</p>
+      <pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
     // Code sẽ viết ở đây
     return 0;
 }</code></pre>
-<p>(Thầy thêm <code>return 0;</code> vào nhé, đây là một phần quan trọng để báo cho máy tính biết chương trình đã chạy xong và chạy đúng.)</br>
-Giải thích siêu nhanh (em chưa cần hiểu sâu, chỉ cần biết mặt):
-<ul>
-<li><code>#include &lt;bits/stdc++.h&gt;</code>: Giống như em gọi "Tổng đài", em bảo máy tính là: "Tôi cần tất cả các công cụ mà ông có!" (đây gọi là thư viện).</li>
+      <p class="mb-1"><code>return 0;</code> là cách báo cho máy tính biết chương trình đã chạy xong và chạy đúng.</p>
+      <ul class="mb-3">
+        <li><code>#include &lt;bits/stdc++.h&gt;</code>: gọi tất cả công cụ cần thiết (thư viện).</li>
+        <li><code>using namespace std;</code>: giúp viết lệnh ngắn gọn hơn.</li>
+        <li><code>int main() { ... }</code>: cửa chính để chương trình bắt đầu chạy.</li>
+      </ul>
+      <div class="program-tree animate__animated animate__fadeInUp">
+Program
+ └ main()
+     ├ nhập dữ liệu
+     ├ xử lý
+     └ in kết quả
+      </div>
+    </div>
+  </section>
 
-<li><code>using namespace std;</code>: Để lát nữa mình gõ lệnh cho nó ngắn gọn (thay vì gõ std::cout thì chỉ cần gõ cout).</li>
-
-<li><code>int main() { ... }</code>: Đây là "cửa chính" của ngôi nhà. Máy tính luôn chạy vào cái cửa main này đầu tiên để xem em ra lệnh gì.</li></p>
-</ul>
-<h2>🐍 2️⃣ Cấu trúc chương trình Python</h2>
-<pre><code># Python không cần include hay main()
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-brands fa-python text-success me-2"></i>🐍 2️⃣ Cấu trúc chương trình Python</div>
+    <div class="card-body">
+      <pre><code class="language-python"># Python không cần include hay main()
 print("Xin chao!")</code></pre>
+    </div>
+  </section>
 
-<h2>🧮 3️⃣ Biến là gì?</h2>
-<p><b>Biến</b> giống như chiếc hộp để lưu trữ giá trị.</p>
-<table class="table table-bordered text-sm">
-<thead><tr><th>Ngôn ngữ</th><th>Cú pháp</th><th>Ví dụ</th></tr></thead>
-<tbody>
-<tr><td>C++</td><td><code>int a = 5;</code></td><td>Khai báo biến a kiểu số nguyên</td></tr>
-<tr><td>Python</td><td><code>a = 5</code></td><td>Không cần ghi kiểu dữ liệu</td></tr>
-</tbody></table>
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-box-open text-warning me-2"></i>🧮 3️⃣ Biến là gì?</div>
+    <div class="card-body">
+      <p><b>Biến</b> giống như chiếc hộp để lưu trữ giá trị.</p>
+      <div class="real-box mb-3">
+        <b>Ví dụ thực tế 📦 Hộp A</b><br>
+        → chứa 5 viên kẹo<br>
+        → trong code viết là <code>int a = 5;</code>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-sm mb-0">
+          <thead class="table-light"><tr><th>Ngôn ngữ</th><th>Cú pháp</th><th>Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td>C++ ⚙️</td><td><code>int a = 5;</code></td><td>Khai báo biến a kiểu số nguyên</td></tr>
+            <tr><td>Python 🐍</td><td><code>a = 5</code></td><td>Không cần ghi kiểu dữ liệu</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-<h2>⌨️ 4️⃣ Nhập và xuất dữ liệu</h2>
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr><td><pre><code>int a, b;
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-keyboard text-info me-2"></i>⌨️ 4️⃣ Nhập và xuất dữ liệu</div>
+    <div class="card-body">
+      <div class="table-responsive compare-box">
+        <table class="table table-bordered mb-0">
+          <thead class="head"><tr><th>⚙️ C++</th><th>🐍 Python</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><pre><code class="language-cpp">int a, b;
 cin >> a >> b;
 cout << a + b;</code></pre></td>
-<td><pre><code>a, b = map(int, input().split())
-print(a + b)</code></pre></td></tr>
-</tbody></table>
+              <td><pre><code class="language-python">a, b = map(int, input().split())
+print(a + b)</code></pre></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-<h2>🧑‍🏫 5️⃣ Thử ngay</h2>
-<ol>
-  <li>Chọn ngôn ngữ C++ hoặc Python.</li>
-  <li>Dán code ví dụ vào.</li>
-  <li>Nhập hai số “5 7”.</li>
-  <li>Xem kết quả xuất ra.</li>
-</ol>
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-flask-vial text-success me-2"></i>🧑‍🏫 5️⃣ Thử ngay (Interactive Demo)</div>
+    <div class="card-body">
+      <p>Làm thử ngay bài toán cộng 2 số như khi chạy chương trình đầu tiên.</p>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <label for="demoA" class="form-label">Nhập số A</label>
+          <input id="demoA" type="number" class="form-control" placeholder="Ví dụ: 5">
+        </div>
+        <div class="col-md-4">
+          <label for="demoB" class="form-label">Nhập số B</label>
+          <input id="demoB" type="number" class="form-control" placeholder="Ví dụ: 7">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-primary w-100" onclick="calcSum()"><i class="fa-solid fa-calculator me-1"></i>Tính tổng</button>
+        </div>
+      </div>
+      <div class="alert alert-primary mt-3 mb-0" id="sumResult">Kết quả sẽ hiển thị ở đây.</div>
+    </div>
+  </section>
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Nhập 2 số nguyên, in ra tổng, hiệu, tích, thương.</li>
-  <li>Nhập n, tính tổng các số từ 1 đến n.</li>
-</ol>
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-bolt text-warning me-2"></i>⚡ Hỏi nhanh</div>
+    <div class="card-body">
+      <p class="mb-2"><b>Biến dùng để làm gì?</b></p>
+      <div class="list-group" id="quizGroup">
+        <button class="list-group-item list-group-item-action quiz-option" data-correct="true">A. Lưu dữ liệu</button>
+        <button class="list-group-item list-group-item-action quiz-option" data-correct="false">B. Vẽ hình</button>
+        <button class="list-group-item list-group-item-action quiz-option" data-correct="false">C. Chạy game</button>
+      </div>
+      <div id="quizFeedback" class="mt-2 small"></div>
+    </div>
+  </section>
+
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-code-compare text-secondary me-2"></i>So sánh nhanh C++ và Python</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered mb-0">
+          <thead class="table-light">
+            <tr><th>⚙️ C++</th><th>🐍 Python</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>int a = 5;</code></td><td><code>a = 5</code></td></tr>
+            <tr><td><code>cin >> a;</code></td><td><code>a = int(input())</code></td></tr>
+            <tr><td><code>cout << a;</code></td><td><code>print(a)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card card-lesson slide-in">
+    <div class="card-header"><i class="fa-solid fa-puzzle-piece text-danger me-2"></i>🧩 Thử thách lập trình</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="p-3 border rounded-3 h-100 bg-light">
+            <h6 class="mb-2">🧠 Bài 1</h6>
+            <p class="mb-0">Nhập 2 số nguyên, in ra tổng, hiệu, tích, thương.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 border rounded-3 h-100 bg-light">
+            <h6 class="mb-2">🎯 Bài 2</h6>
+            <p class="mb-0">Nhập <code>n</code>, tính tổng các số từ 1 đến <code>n</code>.</p>
+          </div>
+        </div>
+      </div>
+      <p class="mt-3 mb-0"><i class="fa-solid fa-rocket text-primary me-1"></i>🚀 Gợi ý: hãy viết nháp từng bước “Nhập dữ liệu → Xử lý → In kết quả”.</p>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  hljs.highlightAll();
+
+  function calcSum() {
+    const a = Number(document.getElementById('demoA').value || 0);
+    const b = Number(document.getElementById('demoB').value || 0);
+    document.getElementById('sumResult').innerText = `Kết quả: ${a} + ${b} = ${a + b}`;
+  }
+
+  document.querySelectorAll('.quiz-option').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const isCorrect = btn.dataset.correct === 'true';
+      document.querySelectorAll('.quiz-option').forEach((item) => {
+        item.classList.remove('correct', 'wrong');
+      });
+      btn.classList.add(isCorrect ? 'correct' : 'wrong');
+      document.getElementById('quizFeedback').innerHTML = isCorrect
+        ? '<span class="text-success fw-semibold">✅ Chính xác! Biến dùng để lưu dữ liệu.</span>'
+        : '<span class="text-danger fw-semibold">❌ Chưa đúng. Hãy thử lại nhé!</span>';
+    });
+  });
+
+  const lessonSections = [...document.querySelectorAll('.card-lesson')];
+  const progressBar = document.getElementById('lessonProgressBar');
+  const progressText = document.getElementById('lessonProgressText');
+
+  function updateProgress() {
+    const visibleCount = lessonSections.filter((section) => {
+      const rect = section.getBoundingClientRect();
+      return rect.top < window.innerHeight * 0.75;
+    }).length;
+
+    const percent = Math.min(100, Math.round((visibleCount / lessonSections.length) * 100));
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}%`;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show', 'animate__animated', 'animate__fadeInUp');
+      }
+    });
+    updateProgress();
+  }, { threshold: 0.15 });
+
+  lessonSections.forEach((section) => observer.observe(section));
+  window.addEventListener('scroll', updateProgress);
+  window.addEventListener('load', updateProgress);
+</script>
