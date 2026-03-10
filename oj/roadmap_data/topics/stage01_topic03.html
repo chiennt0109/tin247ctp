@@ -1,56 +1,380 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu khái niệm <b>vòng lặp</b> – lặp lại công việc nhiều lần.</li>
-  <li>Phân biệt giữa <code>for</code> và <code>while</code>.</li>
-  <li>Thực hành tính tổng, đếm, in dãy số.</li>
-</ul>
+<style>
+  * { box-sizing: border-box; }
+  .lesson-page {
+    font-family: Inter, Roboto, Arial, sans-serif;
+    color: #1f2937;
+    background: linear-gradient(180deg, #f8fbff, #eef5ff 70%);
+    border-radius: 16px;
+    padding: 20px;
+    line-height: 1.65;
+  }
+  .header {
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    padding: 18px;
+    box-shadow: 0 10px 24px rgba(37,99,235,.3);
+    margin-bottom: 16px;
+  }
+  .header h1 { margin: 0 0 6px; font-size: 28px; }
 
-<h2>📘 1️⃣ Vòng lặp for trong C++</h2>
-<pre><code>for (int i = 1; i <= n; i++) {
-    // khối lệnh lặp
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: .5s ease;
+  }
+  .card.show { opacity: 1; transform: translateY(0); }
+  .card-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; background: #f8fafc; }
+  .card-body { padding: 14px; }
+
+  .code {
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    overflow: auto;
+    font-size: 14px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+  }
+
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
+  .table th { background: #eff6ff; }
+
+  .flow {
+    border: 1px dashed #93c5fd;
+    border-radius: 10px;
+    background: #eff6ff;
+    padding: 10px;
+    white-space: pre;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .demo-box {
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+    padding: 12px;
+  }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .col { flex: 1 1 220px; min-width: 220px; }
+
+  .input, .btn {
+    width: 100%;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px;
+  }
+  .input { border: 1px solid #cbd5e1; }
+  .btn { border: 0; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
+  .btn:hover { background: #1d4ed8; }
+
+  .alert {
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    padding: 10px;
+  }
+
+  .iteration-box {
+    margin-top: 8px;
+    border: 2px solid #60a5fa;
+    border-radius: 10px;
+    background: #eff6ff;
+    display: inline-block;
+    padding: 8px 14px;
+    min-width: 120px;
+    text-align: center;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .iteration-box .label { font-size: 13px; color: #1e3a8a; }
+  .iteration-box .value { font-size: 30px; font-weight: 700; color: #1d4ed8; }
+
+  .highlight { animation: pulse .55s ease; }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .quiz-option {
+    width: 100%;
+    text-align: left;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
+  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
+
+  @media (max-width: 768px) {
+    .lesson-page { padding: 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+
+<div class="lesson-page">
+  <div class="header">
+    <h1>🔁 Bài học: Vòng lặp (Loops)</h1>
+    <p>Bài học tương tác giúp hiểu cách máy tính lặp từng bước bằng <code>for</code> và <code>while</code>.</p>
+  </div>
+
+  <section class="card"><div class="card-head">🎯 1. Mục tiêu bài học</div><div class="card-body">
+    <ul>
+      <li>Hiểu vòng lặp là gì.</li>
+      <li>Biết dùng <code>for</code> và <code>while</code>.</li>
+      <li>Hiểu cách chương trình lặp lại từng bước.</li>
+      <li>Viết chương trình tính tổng, đếm, in dãy.</li>
+      <li>Hiểu cách vòng lặp chạy bên trong máy tính.</li>
+    </ul>
+  </div></section>
+
+  <section class="card"><div class="card-head">2. Vì sao cần vòng lặp?</div><div class="card-body">
+    <p>Giả sử cần in <code>1 2 3 4 5</code>:</p>
+    <pre class="code"><code>cout << 1;
+cout << 2;
+cout << 3;
+cout << 4;
+cout << 5;</code></pre>
+    <p>Nếu cần in từ 1 → 1000 thì không thể viết 1000 dòng như vậy. ➜ Ta cần vòng lặp.</p>
+  </div></section>
+
+  <section class="card"><div class="card-head">3. Ý tưởng của vòng lặp</div><div class="card-body">
+    <div class="flow">Lặp lại công việc nhiều lần
+
+Bước 1 → in 1
+Bước 2 → in 2
+Bước 3 → in 3
+...</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">4. Vòng lặp for</div><div class="card-body">
+    <pre class="code"><code>for (khởi tạo; điều kiện; cập nhật) {
+    // code
 }</code></pre>
+    <pre class="code"><code>for (int i = 1; i <= 5; i++) {
+    cout << i << " ";
+}</code></pre>
+    <div class="alert">Kết quả: <b>1 2 3 4 5</b></div>
+  </div></section>
 
-<h2>🐍 2️⃣ Trong Python</h2>
-<pre><code>for i in range(1, n + 1):
-    # khối lệnh lặp</code></pre>
+  <section class="card"><div class="card-head">5. Giải thích từng phần của for</div><div class="card-body">
+    <pre class="code"><code>for (int i = 1; i <= 5; i++)</code></pre>
+    <table class="table">
+      <thead><tr><th>Phần</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td>i = 1</td><td>bắt đầu</td></tr>
+        <tr><td>i <= 5</td><td>điều kiện lặp</td></tr>
+        <tr><td>i++</td><td>tăng i</td></tr>
+      </tbody>
+    </table>
+  </div></section>
 
-<h2>🧩 Ví dụ: Tính tổng từ 1 đến n</h2>
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody><tr><td>
-<pre><code>int n, sum = 0;
+  <section class="card"><div class="card-head">6. Step execution ví dụ in 1 → 4</div><div class="card-body">
+    <div class="flow">n = 4
+
+Step 1: i = 1 → output: 1
+Step 2: i = 2 → output: 1 2
+Step 3: i = 3 → output: 1 2 3
+Step 4: i = 4 → output: 1 2 3 4</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">7. Ví dụ: tính tổng 1 → n</div><div class="card-body">
+    <pre class="code"><code>int n, sum = 0;
 cin >> n;
+
 for (int i = 1; i <= n; i++)
     sum += i;
-cout << sum;</code></pre></td>
-<td>
-<pre><code>n = int(input())
-total = 0
-for i in range(1, n + 1):
-    total += i
-print(total)</code></pre></td></tr></tbody></table>
 
-<h2>🔁 3️⃣ Vòng lặp while</h2>
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody><tr><td>
-<pre><code>int i = 1;
-while (i <= n) {
-    cout << i << " ";
+cout << sum;</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">8. Demo trực quan tính tổng</div><div class="card-body">
+    <div class="flow">n = 4
+sum = 0
+
+i=1 → sum=1
+i=2 → sum=3
+i=3 → sum=6
+i=4 → sum=10</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">9. Vòng lặp while</div><div class="card-body">
+    <pre class="code"><code>while (điều kiện) {
+    // code
+}</code></pre>
+    <pre class="code"><code>int i = 1;
+
+while (i <= 5) {
+    cout << i;
     i++;
-}</code></pre></td>
-<td>
-<pre><code>i = 1
-while i <= n:
-    print(i, end=" ")
-    i += 1</code></pre></td></tr></tbody></table>
+}</code></pre>
+  </div></section>
 
-<h2>💡 Bài tập luyện tập</h2>
-<ol>
-  <li>Nhập n, in ra dãy 1 → n.</li>
-  <li>Tính tổng các số chẵn từ 1 → n.</li>
-  <li>Tính giai thừa n! (5! = 1×2×3×4×5).</li>
-</ol>
+  <section class="card"><div class="card-head">10. So sánh for và while</div><div class="card-body">
+    <table class="table">
+      <thead><tr><th>for</th><th>while</th></tr></thead>
+      <tbody>
+        <tr><td>biết số lần lặp</td><td>chưa biết số lần</td></tr>
+        <tr><td>dùng nhiều nhất</td><td>dùng khi điều kiện dừng rõ</td></tr>
+      </tbody>
+    </table>
+  </div></section>
 
-<h2>🧠 Thử thách mở rộng</h2>
-<p>Hãy dùng <code>while</code> thay cho <code>for</code> để làm lại các bài trên.</p>
+  <section class="card"><div class="card-head">11. Demo while</div><div class="card-body">
+    <div class="flow">i = 1
+Check: i <= 5 ?
+TRUE → chạy</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">12. Interactive loop simulator (Step-by-step)</div><div class="card-body">
+    <div class="demo-box">
+      <div class="row">
+        <div class="col"><label for="loopN">Nhập n</label><input id="loopN" class="input" type="number" value="5" min="1"></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" onclick="startLoopDemo()">Start</button></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" style="background:#475569;" onclick="nextLoopStep()">Next Step</button></div>
+      </div>
+      <div class="iteration-box" id="iterBox">
+        <div class="label">i =</div>
+        <div class="value" id="iterValue">?</div>
+      </div>
+      <div id="loopStepText" class="alert">Nhấn Start rồi dùng Next Step để xem từng vòng lặp.</div>
+      <div id="loopOutput" class="alert">Output: </div>
+    </div>
+  </div></section>
+
+  <section class="card"><div class="card-head">13. Interactive summation demo (1 → n)</div><div class="card-body">
+    <div class="demo-box">
+      <div class="row">
+        <div class="col"><label for="sumN">Nhập n</label><input id="sumN" class="input" type="number" value="4" min="1"></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" onclick="startSumDemo()">Start Sum Demo</button></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" style="background:#475569;" onclick="nextSumStep()">Next Step</button></div>
+      </div>
+      <div id="sumStepText" class="alert">Nhấn Start Sum Demo để bắt đầu.</div>
+      <div id="sumResultText" class="alert">sum = 0</div>
+    </div>
+  </div></section>
+
+  <section class="card"><div class="card-head">14. Quiz</div><div class="card-body">
+    <p><b>Câu 1: Loop nào dùng khi biết số lần lặp?</b></p>
+    <button class="quiz-option" data-q="q1" data-correct="false">A. while</button>
+    <button class="quiz-option" data-q="q1" data-correct="true">B. for</button>
+    <div id="q1Result" class="alert">Chọn một đáp án.</div>
+
+    <p><b>Câu 2: Trong <code>for(int i=1;i<=5;i++)</code>, i++ nghĩa là gì?</b></p>
+    <button class="quiz-option" data-q="q2" data-correct="false">A. i giảm</button>
+    <button class="quiz-option" data-q="q2" data-correct="true">B. i tăng 1</button>
+    <button class="quiz-option" data-q="q2" data-correct="false">C. i reset</button>
+    <div id="q2Result" class="alert">Chọn một đáp án.</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">15. Bài tập luyện tập</div><div class="card-body">
+    <ol>
+      <li>Nhập n, in ra dãy 1 2 3 ... n.</li>
+      <li>Tính tổng 1 + 2 + ... + n.</li>
+      <li>Tính giai thừa n!.</li>
+    </ol>
+  </div></section>
+
+  <section class="card"><div class="card-head">🚀 Thử thách</div><div class="card-body">
+    <p>Dùng <code>while</code> thay cho <code>for</code> để làm lại các bài trên.</p>
+  </div></section>
+</div>
+
+<script>
+  var loopState = { n: 0, i: 0, output: [] };
+  function startLoopDemo() {
+    loopState.n = Math.max(1, Number(document.getElementById('loopN').value || 1));
+    loopState.i = 1;
+    loopState.output = [];
+    document.getElementById('iterValue').innerText = '?';
+    document.getElementById('loopOutput').innerText = 'Output: ';
+    document.getElementById('loopStepText').innerText = 'Đã khởi động: for (i = 1; i <= ' + loopState.n + '; i++)';
+  }
+
+  function nextLoopStep() {
+    var iterBox = document.getElementById('iterBox');
+    if (loopState.n < 1 || loopState.i < 1) {
+      document.getElementById('loopStepText').innerText = 'Hãy nhấn Start trước.';
+      return;
+    }
+
+    if (loopState.i <= loopState.n) {
+      document.getElementById('iterValue').innerText = String(loopState.i);
+      loopState.output.push(loopState.i);
+      document.getElementById('loopStepText').innerText = 'Step ' + loopState.i + ' → i = ' + loopState.i + ' → in ' + loopState.i;
+      document.getElementById('loopOutput').innerText = 'Output: ' + loopState.output.join(' ');
+      iterBox.classList.remove('highlight');
+      void iterBox.offsetWidth;
+      iterBox.classList.add('highlight');
+      loopState.i += 1;
+    } else {
+      document.getElementById('loopStepText').innerText = 'Hoàn thành vòng lặp. Điều kiện i <= n đã sai.';
+    }
+  }
+
+  var sumState = { n: 0, i: 1, sum: 0 };
+  function startSumDemo() {
+    sumState.n = Math.max(1, Number(document.getElementById('sumN').value || 1));
+    sumState.i = 1;
+    sumState.sum = 0;
+    document.getElementById('sumStepText').innerText = 'Bắt đầu: sum = 0, i = 1, n = ' + sumState.n;
+    document.getElementById('sumResultText').innerText = 'sum = 0';
+  }
+
+  function nextSumStep() {
+    var box = document.getElementById('sumResultText');
+    if (sumState.n < 1) {
+      document.getElementById('sumStepText').innerText = 'Hãy nhấn Start Sum Demo trước.';
+      return;
+    }
+
+    if (sumState.i <= sumState.n) {
+      sumState.sum += sumState.i;
+      document.getElementById('sumStepText').innerText = 'Step ' + sumState.i + ': cộng ' + sumState.i + ' → sum = ' + sumState.sum;
+      document.getElementById('sumResultText').innerText = 'sum = ' + sumState.sum;
+      box.classList.remove('highlight');
+      void box.offsetWidth;
+      box.classList.add('highlight');
+      sumState.i += 1;
+    } else {
+      document.getElementById('sumStepText').innerText = 'Kết thúc: tổng từ 1 đến n = ' + sumState.sum;
+    }
+  }
+
+  document.querySelectorAll('.quiz-option').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var q = btn.getAttribute('data-q');
+      var ok = btn.getAttribute('data-correct') === 'true';
+
+      document.querySelectorAll('.quiz-option[data-q="' + q + '"]').forEach(function (x) {
+        x.classList.remove('correct', 'wrong');
+      });
+
+      btn.classList.add(ok ? 'correct' : 'wrong');
+      var resultEl = document.getElementById(q + 'Result');
+      resultEl.innerHTML = ok
+        ? '<span style="color:#15803d;font-weight:700;">✅ Chính xác.</span>'
+        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng, thử lại nhé.</span>';
+    });
+  });
+
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) entry.target.classList.add('show');
+    });
+  }, { threshold: 0.15 });
+  cards.forEach(function (card) { observer.observe(card); });
+</script>
