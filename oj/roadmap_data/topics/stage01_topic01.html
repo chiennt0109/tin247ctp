@@ -1,319 +1,371 @@
 <style>
   * { box-sizing: border-box; }
-
   .lesson-page {
     font-family: Inter, Roboto, Arial, sans-serif;
     color: #1f2937;
     background: linear-gradient(180deg, #f8fbff, #edf4ff);
     border-radius: 16px;
     padding: 20px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
-
   .lesson-header {
     border-radius: 14px;
-    background: linear-gradient(135deg, #3b82f6, #7c3aed);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
     color: #fff;
     padding: 18px;
-    box-shadow: 0 10px 20px rgba(59, 130, 246, .25);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
     margin-bottom: 16px;
   }
-
-  .lesson-header h1 {
-    margin: 0 0 6px;
-    font-size: 28px;
-  }
-
+  .lesson-header h1 { margin: 0 0 8px; font-size: 28px; }
   .lesson-progress {
-    position: sticky;
-    top: 8px;
-    z-index: 5;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
-    padding: 10px;
-    margin-bottom: 16px;
+    position: sticky; top: 8px; z-index: 8;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.1);
+    padding: 10px; margin-bottom: 16px;
   }
-
-  .lesson-progress-head {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  .progress-track {
-    width: 100%;
-    height: 10px;
-    background: #e5e7eb;
-    border-radius: 999px;
-    overflow: hidden;
-  }
-
-  .progress-bar {
-    height: 100%;
-    width: 0;
-    background: linear-gradient(90deg, #2563eb, #22c55e);
-    transition: width .3s ease;
-  }
+  .lesson-progress-head { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; }
+  .progress-track { height: 10px; width:100%; background:#e5e7eb; border-radius:999px; overflow:hidden; }
+  .progress-bar { height:100%; width:0%; background:linear-gradient(90deg,#2563eb,#22c55e); transition:width .3s ease; }
 
   .lesson-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
-    margin-bottom: 16px;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity .6s ease, transform .6s ease;
+    background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.08);
+    margin-bottom:16px; overflow:hidden;
+    opacity:0; transform:translateY(18px); transition:.55s ease;
   }
-
-  .lesson-card.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .lesson-card-header {
-    font-weight: 700;
-    background: #f8fafc;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 10px 14px;
-  }
-
-  .lesson-card-body { padding: 14px; }
-
-  .muted { color: #6b7280; }
+  .lesson-card.show { opacity:1; transform:translateY(0); }
+  .lesson-card-header { padding:10px 14px; font-weight:700; background:#f8fafc; border-bottom:1px solid #e5e7eb; }
+  .lesson-card-body { padding:14px; }
 
   .code-block {
-    background: #111827;
-    color: #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
-    overflow: auto;
+    background:#111827; color:#e5e7eb; border-radius:10px;
+    padding:12px; overflow:auto; font-size:14px;
     font-family: Consolas, Monaco, 'Courier New', monospace;
-    font-size: 14px;
+    position: relative;
   }
+  .copy-btn {
+    position:absolute; top:8px; right:8px; border:none; border-radius:6px;
+    background:#374151; color:#fff; padding:4px 8px; cursor:pointer; font-size:12px;
+  }
+  .copy-btn:hover { background:#4b5563; }
 
-  .program-tree {
-    background: #0f172a;
-    color: #e2e8f0;
-    border-radius: 10px;
-    padding: 12px;
-    white-space: pre;
-    font-family: Consolas, Monaco, 'Courier New', monospace;
+  .simple-table { width:100%; border-collapse: collapse; margin-top:8px; }
+  .simple-table th, .simple-table td { border:1px solid #d1d5db; padding:8px; vertical-align:top; text-align:left; }
+  .simple-table th { background:#eff6ff; }
+
+  .tag { display:inline-block; padding:2px 8px; border-radius:999px; color:#fff; font-size:12px; font-weight:700; }
+  .tag-int { background:#2563eb; }
+  .tag-double { background:#16a34a; }
+  .tag-char { background:#ea580c; }
+  .tag-string { background:#7c3aed; }
+
+  .box-demo {
+    display:inline-block; margin-top:8px; font-family:Consolas, Monaco, 'Courier New', monospace;
+    background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px; padding:10px;
+    white-space:pre;
   }
 
   .real-box {
-    border-left: 4px solid #f59e0b;
-    background: #fff7ed;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 10px;
+    border-left:4px solid #f59e0b; background:#fff7ed; border-radius:8px; padding:10px; margin:8px 0 10px;
   }
 
-  .simple-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 8px;
-  }
+  .scope-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .scope-item { border:1px solid #dbeafe; background:#f8fafc; border-radius:10px; padding:10px; }
 
-  .simple-table th,
-  .simple-table td {
-    border: 1px solid #d1d5db;
-    padding: 8px;
-    text-align: left;
-    vertical-align: top;
-  }
-
-  .simple-table th { background: #eff6ff; }
-
-  .row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .col {
-    flex: 1 1 260px;
-    min-width: 220px;
-  }
-
-  .input,
-  .btn {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-size: 14px;
-  }
-
-  .btn {
-    border: none;
-    color: #fff;
-    background: #2563eb;
-    cursor: pointer;
-    font-weight: 600;
-  }
-
-  .btn:hover { background: #1d4ed8; }
-
-  .alert {
-    margin-top: 10px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 8px;
-    padding: 10px;
-  }
-
-  .quiz-list { display: grid; gap: 8px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  .col { flex:1 1 240px; min-width:220px; }
+  .input, .btn { width:100%; padding:10px; border-radius:8px; font-size:14px; }
+  .input { border:1px solid #cbd5e1; }
+  .btn { border:none; background:#2563eb; color:#fff; cursor:pointer; font-weight:600; }
+  .btn:hover { background:#1d4ed8; }
+  .alert { margin-top:10px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; padding:10px; }
 
   .quiz-option {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 10px;
-    background: #fff;
-    cursor: pointer;
+    width:100%; text-align:left; border:1px solid #d1d5db; border-radius:8px;
+    background:#fff; padding:10px; margin-bottom:8px; cursor:pointer;
+  }
+  .quiz-option.correct { background:#dcfce7; border-color:#22c55e; }
+  .quiz-option.wrong { background:#fee2e2; border-color:#ef4444; }
+
+  .practice-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+  .practice-item { border:1px solid #dbeafe; border-radius:10px; background:#f8fafc; padding:10px; }
+
+  .note {
+    background:#ecfeff; border-left:4px solid #0891b2; border-radius:8px; padding:10px;
+    font-family:Consolas, Monaco, 'Courier New', monospace;
   }
 
-  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
-  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
-
-  .challenge-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+  @media (max-width: 900px) {
+    .scope-grid { grid-template-columns:1fr; }
+    .practice-grid { grid-template-columns:1fr; }
+    .lesson-header h1 { font-size:24px; }
   }
-
-  .challenge-item {
-    border: 1px solid #dbeafe;
-    border-radius: 10px;
-    background: #f8fafc;
-    padding: 10px;
-  }
-
   @media (max-width: 768px) {
-    .lesson-page { padding: 12px; }
-    .lesson-header h1 { font-size: 22px; }
-    .challenge-grid { grid-template-columns: 1fr; }
+    .lesson-page { padding:12px; }
+    .lesson-header h1 { font-size:22px; }
   }
 </style>
 
 <div class="lesson-page">
   <div class="lesson-header">
-    <h1>🎓 Bài giảng C++ cơ bản tương tác</h1>
-    <div>Dành cho học sinh mới học lập trình: dễ hiểu, sinh động, học đến đâu thực hành đến đó.</div>
+    <h1>📘 Bài học: Biến, kiểu dữ liệu và nhập xuất trong C++</h1>
+    <div>Bài giảng tương tác cho học sinh mới học lập trình (THCS/THPT): dễ hiểu, nhiều ví dụ thực tế, thực hành ngay.</div>
   </div>
 
   <div class="lesson-progress">
     <div class="lesson-progress-head">
-      <strong>📊 Lesson progress</strong>
+      <b>📊 Lesson progress</b>
       <span id="progressText">0%</span>
     </div>
-    <div class="progress-track">
-      <div id="progressBar" class="progress-bar"></div>
-    </div>
+    <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
   </div>
 
   <section class="lesson-card">
     <div class="lesson-card-header">🎯 Mục tiêu bài học</div>
     <div class="lesson-card-body">
       <ul>
-        <li>Hiểu <b>biến</b> là gì và cách khai báo biến.</li>
-        <li>Biết <b>nhập dữ liệu từ bàn phím</b> và <b>in kết quả ra màn hình</b>.</li>
-        <li>Thực hành viết chương trình đầu tiên: <code>Tính tổng hai số</code>.</li>
+        <li>Hiểu <b>biến là gì</b> và cách sử dụng biến.</li>
+        <li>Biết <b>các kiểu dữ liệu cơ bản</b>.</li>
+        <li>Hiểu <b>phạm vi của biến</b>.</li>
+        <li>Thực hiện <b>các phép toán trong C++</b>.</li>
+        <li>Biết <b>nhập dữ liệu từ bàn phím</b>.</li>
+        <li>Biết <b>in kết quả ra màn hình</b>.</li>
       </ul>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">📘 1️⃣ Cấu trúc cơ bản của chương trình C++</div>
+    <div class="lesson-card-header">1️⃣ Biến là gì?</div>
     <div class="lesson-card-body">
-      <p>Với C++, em hãy tưởng tượng mỗi khi em muốn xây một ngôi nhà (viết một chương trình), em luôn luôn phải xây một cái móng và bộ khung sườn y hệt nhau. Đây chính là "bộ khung" thần thánh đó. Em phải ghi nhớ nó nhé, gần như 99% các bài tập của em đều bắt đầu bằng cái khung này:</p>
-      <pre class="code-block"><code>#include &lt;bits/stdc++.h&gt;
+      <p>Trong lập trình, <b>biến (variable)</b> giống như <b>một chiếc hộp dùng để lưu trữ dữ liệu</b>.</p>
+      <table class="simple-table">
+        <thead><tr><th>Hộp</th><th>Bên trong</th></tr></thead>
+        <tbody>
+          <tr><td>Hộp đựng kẹo</td><td>số viên kẹo</td></tr>
+          <tr><td>Ví tiền</td><td>số tiền</td></tr>
+          <tr><td>Bình nước</td><td>lượng nước</td></tr>
+        </tbody>
+      </table>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-var-1">Copy</button><code id="code-var-1">int a = 5;</code></pre>
+      <p>Ý nghĩa:</p>
+      <div class="note">Tạo một chiếc hộp tên là a
+Trong hộp chứa giá trị 5</div>
+      <div class="box-demo">a
+┌───────┐
+│   5   │
+└───────┘</div>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">2️⃣ Khai báo biến</div>
+    <div class="lesson-card-body">
+      <p>Trong C++, khi tạo biến cần chỉ rõ <b>kiểu dữ liệu</b>.</p>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-declare">Copy</button><code id="code-declare">int age = 16;
+double score = 9.5;
+char grade = 'A';
+string name = "Nam";</code></pre>
+      <div class="real-box"><b>Ví dụ thực tế</b><br>Tên học sinh: Nam<br>Tuổi: 16<br>Điểm trung bình: 9.5<br>Xếp loại: A</div>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-student">Copy</button><code id="code-student">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
-    // Code sẽ viết ở đây
-    return 0;
+    string name = "Nam";
+    int age = 16;
+    double score = 9.5;
+
+    cout &lt;&lt; name &lt;&lt; endl;
+    cout &lt;&lt; age &lt;&lt; endl;
+    cout &lt;&lt; score &lt;&lt; endl;
 }</code></pre>
-      <p><code>return 0;</code> là cách báo cho máy tính biết chương trình đã chạy xong và chạy đúng.</p>
-      <ul>
-        <li><code>#include &lt;bits/stdc++.h&gt;</code>: gọi tất cả công cụ cần thiết (thư viện).</li>
-        <li><code>using namespace std;</code>: giúp viết lệnh ngắn gọn hơn.</li>
-        <li><code>int main() { ... }</code>: cửa chính để chương trình bắt đầu chạy.</li>
-      </ul>
-      <div class="program-tree">Program
- └ main()
-     ├ nhập dữ liệu
-     ├ xử lý
-     └ in kết quả</div>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">🐍 2️⃣ Cấu trúc chương trình Python</div>
+    <div class="lesson-card-header">3️⃣ Các kiểu dữ liệu cơ bản</div>
     <div class="lesson-card-body">
-      <pre class="code-block"><code># Python không cần include hay main()
-print("Xin chao!")</code></pre>
+      <table class="simple-table">
+        <thead><tr><th>Kiểu dữ liệu</th><th>Ý nghĩa</th><th>Ví dụ</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-int">int</span></td><td>số nguyên</td><td>1, 20, 100</td></tr>
+          <tr><td>long long</td><td>số nguyên rất lớn</td><td>100000000000</td></tr>
+          <tr><td><span class="tag tag-double">double</span></td><td>số thực</td><td>3.14</td></tr>
+          <tr><td><span class="tag tag-char">char</span></td><td>ký tự</td><td>'A'</td></tr>
+          <tr><td><span class="tag tag-string">string</span></td><td>chuỗi ký tự</td><td>"hello"</td></tr>
+          <tr><td>bool</td><td>đúng/sai</td><td>true</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">🧮 3️⃣ Biến là gì?</div>
+    <div class="lesson-card-header">4️⃣ Độ lớn của các kiểu dữ liệu</div>
     <div class="lesson-card-body">
-      <p><b>Biến</b> giống như chiếc hộp để lưu trữ giá trị.</p>
-      <div class="real-box">
-        <b>Ví dụ thực tế 📦 Hộp A</b><br>
-        → chứa 5 viên kẹo<br>
-        → trong code viết là <code>int a = 5;</code>
+      <table class="simple-table">
+        <thead><tr><th>Kiểu</th><th>Bộ nhớ</th><th>Giá trị</th></tr></thead>
+        <tbody>
+          <tr><td>bool</td><td>1 byte</td><td>true / false</td></tr>
+          <tr><td>char</td><td>1 byte</td><td>ký tự</td></tr>
+          <tr><td>int</td><td>4 byte</td><td>khoảng ±2 tỷ</td></tr>
+          <tr><td>long long</td><td>8 byte</td><td>rất lớn</td></tr>
+          <tr><td>double</td><td>8 byte</td><td>số thực</td></tr>
+        </tbody>
+      </table>
+      <div class="real-box">int → lưu số học sinh trong lớp<br>long long → lưu số dân của một quốc gia<br>double → lưu chiều cao hoặc điểm số</div>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">5️⃣ Phạm vi của biến (Scope)</div>
+    <div class="lesson-card-body">
+      <p><b>Phạm vi của biến</b> là nơi mà biến đó <b>có thể được sử dụng trong chương trình</b>.</p>
+      <div class="scope-grid">
+        <div class="scope-item">
+          <h4 style="margin:0 0 8px; font-size:16px;">5.1 Biến toàn cục (Global variable)</h4>
+          <p>Khai báo <b>ngoài hàm main()</b>.</p>
+          <pre class="code-block"><button class="copy-btn" data-copy="#code-global">Copy</button><code id="code-global">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int x = 10;
+
+int main() {
+    cout &lt;&lt; x;
+}</code></pre>
+          <p>Biến <code>x</code> có thể sử dụng ở <b>mọi nơi trong chương trình</b>.</p>
+        </div>
+        <div class="scope-item">
+          <h4 style="margin:0 0 8px; font-size:16px;">5.2 Biến cục bộ (Local variable)</h4>
+          <p>Khai báo <b>bên trong hàm</b>.</p>
+          <pre class="code-block"><button class="copy-btn" data-copy="#code-local">Copy</button><code id="code-local">int main() {
+    int a = 5;
+    cout &lt;&lt; a;
+}</code></pre>
+          <p>Biến <code>a</code> chỉ tồn tại <b>trong hàm main</b>.</p>
+        </div>
       </div>
-      <table class="simple-table">
-        <thead>
-          <tr><th>Ngôn ngữ</th><th>Cú pháp</th><th>Ví dụ</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>C++ ⚙️</td><td><code>int a = 5;</code></td><td>Khai báo biến a kiểu số nguyên</td></tr>
-          <tr><td>Python 🐍</td><td><code>a = 5</code></td><td>Không cần ghi kiểu dữ liệu</td></tr>
-        </tbody>
-      </table>
+      <div class="real-box">🏫 Loa phát thanh của trường → ai cũng nghe → giống <b>biến toàn cục</b>.<br>👨‍🏫 Giáo viên nói nhỏ trong lớp → chỉ lớp nghe → giống <b>biến cục bộ</b>.</div>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">⌨️ 4️⃣ Nhập và xuất dữ liệu</div>
+    <div class="lesson-card-header">6️⃣ Các phép toán trong C++</div>
     <div class="lesson-card-body">
       <table class="simple-table">
-        <thead>
-          <tr><th>⚙️ C++</th><th>🐍 Python</th></tr>
-        </thead>
+        <thead><tr><th>Phép toán</th><th>Ký hiệu</th></tr></thead>
         <tbody>
-          <tr>
-            <td><pre class="code-block"><code>int a, b;
-cin >> a >> b;
-cout << a + b;</code></pre></td>
-            <td><pre class="code-block"><code>a, b = map(int, input().split())
-print(a + b)</code></pre></td>
-          </tr>
+          <tr><td>cộng</td><td>+</td></tr>
+          <tr><td>trừ</td><td>-</td></tr>
+          <tr><td>nhân</td><td>*</td></tr>
+          <tr><td>chia</td><td>/</td></tr>
+          <tr><td>chia dư</td><td>%</td></tr>
         </tbody>
       </table>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-ops">Copy</button><code id="code-ops">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int a = 10;
+    int b = 3;
+
+    cout &lt;&lt; a + b &lt;&lt; endl;
+    cout &lt;&lt; a - b &lt;&lt; endl;
+    cout &lt;&lt; a * b &lt;&lt; endl;
+    cout &lt;&lt; a / b &lt;&lt; endl;
+    cout &lt;&lt; a % b &lt;&lt; endl;
+}</code></pre>
+      <div class="note">Kết quả:
+13
+7
+30
+3
+1</div>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">🧑‍🏫 5️⃣ Thử ngay (Interactive Demo)</div>
+    <div class="lesson-card-header">7️⃣ Phép toán tăng giảm</div>
     <div class="lesson-card-body">
-      <p>Làm thử ngay bài toán cộng 2 số như khi chạy chương trình đầu tiên.</p>
+      <div class="note">a = a + 1  →  a++</div>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-inc">Copy</button><code id="code-inc">int a = 5;
+a++;
+cout &lt;&lt; a;</code></pre>
+      <div class="note">Kết quả:
+6</div>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">8️⃣ Phép toán gán</div>
+    <div class="lesson-card-body">
+      <div class="note">a = a + 5  →  a += 5</div>
+      <table class="simple-table">
+        <thead><tr><th>Viết đầy đủ</th><th>Viết ngắn</th></tr></thead>
+        <tbody>
+          <tr><td>a = a + 5</td><td>a += 5</td></tr>
+          <tr><td>a = a - 3</td><td>a -= 3</td></tr>
+          <tr><td>a = a * 2</td><td>a *= 2</td></tr>
+        </tbody>
+      </table>
+      <div class="real-box">Tiết kiệm tiền mỗi ngày: Ban đầu 100000, mỗi ngày thêm 10000.</div>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-assign">Copy</button><code id="code-assign">int money = 100000;
+money += 10000;
+cout &lt;&lt; money;</code></pre>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">9️⃣ Nhập dữ liệu từ bàn phím</div>
+    <div class="lesson-card-body">
+      <p>Trong C++ ta dùng <b>cin</b>.</p>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-cin">Copy</button><code id="code-cin">int a;
+cin &gt;&gt; a;
+
+int a, b;
+cin &gt;&gt; a &gt;&gt; b;</code></pre>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">🔟 Xuất dữ liệu ra màn hình</div>
+    <div class="lesson-card-body">
+      <p>Dùng <b>cout</b>.</p>
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-cout">Copy</button><code id="code-cout">cout &lt;&lt; a;
+cout &lt;&lt; a &lt;&lt; endl;</code></pre>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">1️⃣1️⃣ Ví dụ chương trình hoàn chỉnh</div>
+    <div class="lesson-card-body">
+      <pre class="code-block"><button class="copy-btn" data-copy="#code-full">Copy</button><code id="code-full">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int a, b;
+    cin &gt;&gt; a &gt;&gt; b;
+    cout &lt;&lt; a + b;
+}</code></pre>
+      <div class="note">Input
+5 7
+
+Output
+12</div>
+    </div>
+  </section>
+
+  <section class="lesson-card">
+    <div class="lesson-card-header">🧪 Thử ngay (Interactive demo)</div>
+    <div class="lesson-card-body">
       <div class="row">
         <div class="col">
-          <label for="demoA">Nhập số A</label>
+          <label for="demoA">Input A</label>
           <input id="demoA" class="input" type="number" placeholder="Ví dụ: 5">
         </div>
         <div class="col">
-          <label for="demoB">Nhập số B</label>
+          <label for="demoB">Input B</label>
           <input id="demoB" class="input" type="number" placeholder="Ví dụ: 7">
         </div>
         <div class="col">
-          <label class="muted">&nbsp;</label>
+          <label>&nbsp;</label>
           <button class="btn" onclick="calcSum()">Tính tổng</button>
         </div>
       </div>
@@ -325,45 +377,46 @@ print(a + b)</code></pre></td>
     <div class="lesson-card-header">⚡ Hỏi nhanh</div>
     <div class="lesson-card-body">
       <p><b>Biến dùng để làm gì?</b></p>
-      <div class="quiz-list">
-        <button class="quiz-option" data-correct="true">A. Lưu dữ liệu</button>
-        <button class="quiz-option" data-correct="false">B. Vẽ hình</button>
-        <button class="quiz-option" data-correct="false">C. Chạy game</button>
-      </div>
+      <button class="quiz-option" data-correct="true">A. Lưu dữ liệu</button>
+      <button class="quiz-option" data-correct="false">B. Vẽ hình</button>
+      <button class="quiz-option" data-correct="false">C. Chơi game</button>
       <div id="quizFeedback" style="margin-top:8px;"></div>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">🔁 So sánh nhanh C++ và Python</div>
+    <div class="lesson-card-header">🧩 Bài tập luyện tập</div>
     <div class="lesson-card-body">
-      <table class="simple-table">
-        <thead>
-          <tr><th>⚙️ C++</th><th>🐍 Python</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>int a = 5;</code></td><td><code>a = 5</code></td></tr>
-          <tr><td><code>cin >> a;</code></td><td><code>a = int(input())</code></td></tr>
-          <tr><td><code>cout << a;</code></td><td><code>print(a)</code></td></tr>
-        </tbody>
-      </table>
+      <div class="practice-grid">
+        <div class="practice-item">
+          <b>🧩 Bài 1</b>
+          <p>Nhập hai số <code>a</code> và <code>b</code>. In ra:</p>
+          <div class="note">a + b
+a - b
+a * b</div>
+        </div>
+        <div class="practice-item">
+          <b>🎯 Bài 2</b>
+          <p>Một lớp học có 30 học sinh, mỗi học sinh đóng 20000. Hãy tính tổng tiền thu được.</p>
+        </div>
+        <div class="practice-item">
+          <b>🚀 Bài 3</b>
+          <p>Nhập số <code>n</code>. Tính:</p>
+          <div class="note">n + 1
+n - 1
+n * 2</div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="lesson-card">
-    <div class="lesson-card-header">🧩 Thử thách lập trình</div>
+    <div class="lesson-card-header">📌 Ghi nhớ</div>
     <div class="lesson-card-body">
-      <div class="challenge-grid">
-        <div class="challenge-item">
-          <b>🧠 Bài 1</b>
-          <p>Nhập 2 số nguyên, in ra tổng, hiệu, tích, thương.</p>
-        </div>
-        <div class="challenge-item">
-          <b>🎯 Bài 2</b>
-          <p>Nhập <code>n</code>, tính tổng các số từ 1 đến <code>n</code>.</p>
-        </div>
-      </div>
-      <p>🚀 Gợi ý: hãy viết nháp từng bước “Nhập dữ liệu → Xử lý → In kết quả”.</p>
+      <div class="note">Biến = chiếc hộp lưu dữ liệu
+Kiểu dữ liệu = loại dữ liệu trong hộp
+cin = nhập dữ liệu
+cout = in dữ liệu</div>
     </div>
   </section>
 </div>
@@ -378,12 +431,24 @@ print(a + b)</code></pre></td>
   var quizButtons = document.querySelectorAll('.quiz-option');
   quizButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var isCorrect = btn.getAttribute('data-correct') === 'true';
-      quizButtons.forEach(function (item) { item.classList.remove('correct', 'wrong'); });
-      btn.classList.add(isCorrect ? 'correct' : 'wrong');
-      document.getElementById('quizFeedback').innerHTML = isCorrect
-        ? '<span style="color:#15803d;font-weight:700;">✅ Chính xác! Biến dùng để lưu dữ liệu.</span>'
-        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Hãy thử lại nhé!</span>';
+      var ok = btn.getAttribute('data-correct') === 'true';
+      quizButtons.forEach(function (x) { x.classList.remove('correct', 'wrong'); });
+      btn.classList.add(ok ? 'correct' : 'wrong');
+      document.getElementById('quizFeedback').innerHTML = ok
+        ? '<span style="color:#15803d;font-weight:700;">✅ Đúng rồi! Biến dùng để lưu dữ liệu.</span>'
+        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Em chọn lại nhé!</span>';
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = btn.getAttribute('data-copy');
+      var text = document.querySelector(target).innerText;
+      navigator.clipboard.writeText(text).then(function () {
+        var old = btn.innerText;
+        btn.innerText = 'Copied';
+        setTimeout(function () { btn.innerText = old; }, 900);
+      });
     });
   });
 
@@ -393,10 +458,9 @@ print(a + b)</code></pre></td>
 
   function updateProgress() {
     var visible = cards.filter(function (card) {
-      var rect = card.getBoundingClientRect();
-      return rect.top < window.innerHeight * 0.75;
+      var r = card.getBoundingClientRect();
+      return r.top < window.innerHeight * 0.78;
     }).length;
-
     var percent = Math.min(100, Math.round((visible / cards.length) * 100));
     progressBar.style.width = percent + '%';
     progressText.textContent = percent + '%';
@@ -404,17 +468,15 @@ print(a + b)</code></pre></td>
 
   var observer = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('show');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('show');
     });
     updateProgress();
   }, { threshold: 0.15 });
 
-  cards.forEach(function (card) { observer.observe(card); });
+  cards.forEach(function (c) { observer.observe(c); });
   window.addEventListener('scroll', updateProgress);
   window.addEventListener('load', function () {
-    cards[0].classList.add('show');
+    if (cards[0]) cards[0].classList.add('show');
     updateProgress();
   });
 </script>
