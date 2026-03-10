@@ -1,139 +1,223 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 <style>
-  :root {
-    --lesson-primary: #4e73df;
-    --lesson-accent: #22c55e;
-    --lesson-bg: #f6f9ff;
-  }
+  * { box-sizing: border-box; }
 
-  .lesson-wrap {
-    background: linear-gradient(180deg, #f9fbff 0%, #eef4ff 100%);
-    border-radius: 18px;
-    padding: 24px;
+  .lesson-page {
+    font-family: Inter, Roboto, Arial, sans-serif;
     color: #1f2937;
+    background: linear-gradient(180deg, #f8fbff, #edf4ff);
+    border-radius: 16px;
+    padding: 20px;
+    line-height: 1.6;
   }
 
   .lesson-header {
-    background: linear-gradient(135deg, var(--lesson-primary), #6f42c1);
+    border-radius: 14px;
+    background: linear-gradient(135deg, #3b82f6, #7c3aed);
     color: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 10px 24px rgba(78, 115, 223, 0.22);
+    padding: 18px;
+    box-shadow: 0 10px 20px rgba(59, 130, 246, .25);
+    margin-bottom: 16px;
   }
 
-  .card-lesson {
-    border: 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    margin-bottom: 20px;
+  .lesson-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+  }
+
+  .lesson-progress {
+    position: sticky;
+    top: 8px;
+    z-index: 5;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+    padding: 10px;
+    margin-bottom: 16px;
+  }
+
+  .lesson-progress-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 999px;
     overflow: hidden;
   }
 
-  .card-lesson .card-header {
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    font-weight: 700;
+  .progress-bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #2563eb, #22c55e);
+    transition: width .3s ease;
   }
 
-  .progress-wrap {
-    position: sticky;
-    top: 8px;
-    z-index: 10;
+  .lesson-card {
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    padding: 12px;
-    margin: 14px 0 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .6s ease, transform .6s ease;
   }
 
-  .real-box {
-    border-left: 4px solid #f59e0b;
-    background: #fff7ed;
-    border-radius: 8px;
+  .lesson-card.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .lesson-card-header {
+    font-weight: 700;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px 14px;
+  }
+
+  .lesson-card-body { padding: 14px; }
+
+  .muted { color: #6b7280; }
+
+  .code-block {
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 10px;
     padding: 12px;
+    overflow: auto;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 14px;
   }
 
   .program-tree {
     background: #0f172a;
     color: #e2e8f0;
     border-radius: 10px;
-    padding: 14px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    padding: 12px;
     white-space: pre;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
   }
 
-  .compare-box {
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid #dbeafe;
+  .real-box {
+    border-left: 4px solid #f59e0b;
+    background: #fff7ed;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
   }
 
-  .compare-box .head {
-    background: #eff6ff;
+  .simple-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+
+  .simple-table th,
+  .simple-table td {
+    border: 1px solid #d1d5db;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .simple-table th { background: #eff6ff; }
+
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .col {
+    flex: 1 1 260px;
+    min-width: 220px;
+  }
+
+  .input,
+  .btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+  }
+
+  .btn {
+    border: none;
+    color: #fff;
+    background: #2563eb;
+    cursor: pointer;
     font-weight: 600;
   }
 
-  .quiz-option {
-    cursor: pointer;
+  .btn:hover { background: #1d4ed8; }
+
+  .alert {
+    margin-top: 10px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
     border-radius: 8px;
+    padding: 10px;
   }
 
-  .quiz-option.correct {
-    background: #dcfce7 !important;
-    border-color: #22c55e !important;
+  .quiz-list { display: grid; gap: 8px; }
+
+  .quiz-option {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+    cursor: pointer;
   }
 
-  .quiz-option.wrong {
-    background: #fee2e2 !important;
-    border-color: #ef4444 !important;
+  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
+  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
+
+  .challenge-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
-  .slide-in {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: all 0.6s ease;
-  }
-
-  .slide-in.show {
-    opacity: 1;
-    transform: translateY(0);
+  .challenge-item {
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fafc;
+    padding: 10px;
   }
 
   @media (max-width: 768px) {
-    .lesson-wrap {
-      padding: 14px;
-    }
-
-    .lesson-header {
-      padding: 18px;
-    }
+    .lesson-page { padding: 12px; }
+    .lesson-header h1 { font-size: 22px; }
+    .challenge-grid { grid-template-columns: 1fr; }
   }
 </style>
 
-<div class="lesson-wrap container-fluid">
-  <header class="lesson-header animate__animated animate__fadeInDown mb-3">
-    <h1 class="h3 mb-2"><i class="fa-solid fa-graduation-cap me-2"></i>Bài giảng C++ cơ bản tương tác</h1>
-    <p class="mb-0">Dành cho học sinh mới học lập trình: dễ hiểu, gần gũi, học đến đâu thực hành đến đó.</p>
-  </header>
+<div class="lesson-page">
+  <div class="lesson-header">
+    <h1>🎓 Bài giảng C++ cơ bản tương tác</h1>
+    <div>Dành cho học sinh mới học lập trình: dễ hiểu, sinh động, học đến đâu thực hành đến đó.</div>
+  </div>
 
-  <div class="progress-wrap">
-    <div class="d-flex justify-content-between small mb-1">
-      <strong><i class="fa-solid fa-bars-progress me-1"></i>Lesson progress</strong>
-      <span id="lessonProgressText">0%</span>
+  <div class="lesson-progress">
+    <div class="lesson-progress-head">
+      <strong>📊 Lesson progress</strong>
+      <span id="progressText">0%</span>
     </div>
-    <div class="progress" role="progressbar" aria-label="Lesson progress">
-      <div id="lessonProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+    <div class="progress-track">
+      <div id="progressBar" class="progress-bar"></div>
     </div>
   </div>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-bullseye text-danger me-2"></i>🎯 Mục tiêu bài học</div>
-    <div class="card-body">
-      <ul class="mb-0">
+  <section class="lesson-card">
+    <div class="lesson-card-header">🎯 Mục tiêu bài học</div>
+    <div class="lesson-card-body">
+      <ul>
         <li>Hiểu <b>biến</b> là gì và cách khai báo biến.</li>
         <li>Biết <b>nhập dữ liệu từ bàn phím</b> và <b>in kết quả ra màn hình</b>.</li>
         <li>Thực hành viết chương trình đầu tiên: <code>Tính tổng hai số</code>.</li>
@@ -141,205 +225,196 @@
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-house-chimney text-primary me-2"></i>📘 1️⃣ Cấu trúc cơ bản của chương trình C++</div>
-    <div class="card-body">
+  <section class="lesson-card">
+    <div class="lesson-card-header">📘 1️⃣ Cấu trúc cơ bản của chương trình C++</div>
+    <div class="lesson-card-body">
       <p>Với C++, em hãy tưởng tượng mỗi khi em muốn xây một ngôi nhà (viết một chương trình), em luôn luôn phải xây một cái móng và bộ khung sườn y hệt nhau. Đây chính là "bộ khung" thần thánh đó. Em phải ghi nhớ nó nhé, gần như 99% các bài tập của em đều bắt đầu bằng cái khung này:</p>
-      <pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+      <pre class="code-block"><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
     // Code sẽ viết ở đây
     return 0;
 }</code></pre>
-      <p class="mb-1"><code>return 0;</code> là cách báo cho máy tính biết chương trình đã chạy xong và chạy đúng.</p>
-      <ul class="mb-3">
+      <p><code>return 0;</code> là cách báo cho máy tính biết chương trình đã chạy xong và chạy đúng.</p>
+      <ul>
         <li><code>#include &lt;bits/stdc++.h&gt;</code>: gọi tất cả công cụ cần thiết (thư viện).</li>
         <li><code>using namespace std;</code>: giúp viết lệnh ngắn gọn hơn.</li>
         <li><code>int main() { ... }</code>: cửa chính để chương trình bắt đầu chạy.</li>
       </ul>
-      <div class="program-tree animate__animated animate__fadeInUp">
-Program
+      <div class="program-tree">Program
  └ main()
      ├ nhập dữ liệu
      ├ xử lý
-     └ in kết quả
-      </div>
+     └ in kết quả</div>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-brands fa-python text-success me-2"></i>🐍 2️⃣ Cấu trúc chương trình Python</div>
-    <div class="card-body">
-      <pre><code class="language-python"># Python không cần include hay main()
+  <section class="lesson-card">
+    <div class="lesson-card-header">🐍 2️⃣ Cấu trúc chương trình Python</div>
+    <div class="lesson-card-body">
+      <pre class="code-block"><code># Python không cần include hay main()
 print("Xin chao!")</code></pre>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-box-open text-warning me-2"></i>🧮 3️⃣ Biến là gì?</div>
-    <div class="card-body">
+  <section class="lesson-card">
+    <div class="lesson-card-header">🧮 3️⃣ Biến là gì?</div>
+    <div class="lesson-card-body">
       <p><b>Biến</b> giống như chiếc hộp để lưu trữ giá trị.</p>
-      <div class="real-box mb-3">
+      <div class="real-box">
         <b>Ví dụ thực tế 📦 Hộp A</b><br>
         → chứa 5 viên kẹo<br>
         → trong code viết là <code>int a = 5;</code>
       </div>
-      <div class="table-responsive">
-        <table class="table table-bordered align-middle text-sm mb-0">
-          <thead class="table-light"><tr><th>Ngôn ngữ</th><th>Cú pháp</th><th>Ví dụ</th></tr></thead>
-          <tbody>
-            <tr><td>C++ ⚙️</td><td><code>int a = 5;</code></td><td>Khai báo biến a kiểu số nguyên</td></tr>
-            <tr><td>Python 🐍</td><td><code>a = 5</code></td><td>Không cần ghi kiểu dữ liệu</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="simple-table">
+        <thead>
+          <tr><th>Ngôn ngữ</th><th>Cú pháp</th><th>Ví dụ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>C++ ⚙️</td><td><code>int a = 5;</code></td><td>Khai báo biến a kiểu số nguyên</td></tr>
+          <tr><td>Python 🐍</td><td><code>a = 5</code></td><td>Không cần ghi kiểu dữ liệu</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-keyboard text-info me-2"></i>⌨️ 4️⃣ Nhập và xuất dữ liệu</div>
-    <div class="card-body">
-      <div class="table-responsive compare-box">
-        <table class="table table-bordered mb-0">
-          <thead class="head"><tr><th>⚙️ C++</th><th>🐍 Python</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><pre><code class="language-cpp">int a, b;
+  <section class="lesson-card">
+    <div class="lesson-card-header">⌨️ 4️⃣ Nhập và xuất dữ liệu</div>
+    <div class="lesson-card-body">
+      <table class="simple-table">
+        <thead>
+          <tr><th>⚙️ C++</th><th>🐍 Python</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><pre class="code-block"><code>int a, b;
 cin >> a >> b;
 cout << a + b;</code></pre></td>
-              <td><pre><code class="language-python">a, b = map(int, input().split())
+            <td><pre class="code-block"><code>a, b = map(int, input().split())
 print(a + b)</code></pre></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-flask-vial text-success me-2"></i>🧑‍🏫 5️⃣ Thử ngay (Interactive Demo)</div>
-    <div class="card-body">
+  <section class="lesson-card">
+    <div class="lesson-card-header">🧑‍🏫 5️⃣ Thử ngay (Interactive Demo)</div>
+    <div class="lesson-card-body">
       <p>Làm thử ngay bài toán cộng 2 số như khi chạy chương trình đầu tiên.</p>
-      <div class="row g-2">
-        <div class="col-md-4">
-          <label for="demoA" class="form-label">Nhập số A</label>
-          <input id="demoA" type="number" class="form-control" placeholder="Ví dụ: 5">
+      <div class="row">
+        <div class="col">
+          <label for="demoA">Nhập số A</label>
+          <input id="demoA" class="input" type="number" placeholder="Ví dụ: 5">
         </div>
-        <div class="col-md-4">
-          <label for="demoB" class="form-label">Nhập số B</label>
-          <input id="demoB" type="number" class="form-control" placeholder="Ví dụ: 7">
+        <div class="col">
+          <label for="demoB">Nhập số B</label>
+          <input id="demoB" class="input" type="number" placeholder="Ví dụ: 7">
         </div>
-        <div class="col-md-4 d-flex align-items-end">
-          <button class="btn btn-primary w-100" onclick="calcSum()"><i class="fa-solid fa-calculator me-1"></i>Tính tổng</button>
+        <div class="col">
+          <label class="muted">&nbsp;</label>
+          <button class="btn" onclick="calcSum()">Tính tổng</button>
         </div>
       </div>
-      <div class="alert alert-primary mt-3 mb-0" id="sumResult">Kết quả sẽ hiển thị ở đây.</div>
+      <div id="sumResult" class="alert">Kết quả sẽ hiển thị ở đây.</div>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-bolt text-warning me-2"></i>⚡ Hỏi nhanh</div>
-    <div class="card-body">
-      <p class="mb-2"><b>Biến dùng để làm gì?</b></p>
-      <div class="list-group" id="quizGroup">
-        <button class="list-group-item list-group-item-action quiz-option" data-correct="true">A. Lưu dữ liệu</button>
-        <button class="list-group-item list-group-item-action quiz-option" data-correct="false">B. Vẽ hình</button>
-        <button class="list-group-item list-group-item-action quiz-option" data-correct="false">C. Chạy game</button>
+  <section class="lesson-card">
+    <div class="lesson-card-header">⚡ Hỏi nhanh</div>
+    <div class="lesson-card-body">
+      <p><b>Biến dùng để làm gì?</b></p>
+      <div class="quiz-list">
+        <button class="quiz-option" data-correct="true">A. Lưu dữ liệu</button>
+        <button class="quiz-option" data-correct="false">B. Vẽ hình</button>
+        <button class="quiz-option" data-correct="false">C. Chạy game</button>
       </div>
-      <div id="quizFeedback" class="mt-2 small"></div>
+      <div id="quizFeedback" style="margin-top:8px;"></div>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-code-compare text-secondary me-2"></i>So sánh nhanh C++ và Python</div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-striped table-bordered mb-0">
-          <thead class="table-light">
-            <tr><th>⚙️ C++</th><th>🐍 Python</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>int a = 5;</code></td><td><code>a = 5</code></td></tr>
-            <tr><td><code>cin >> a;</code></td><td><code>a = int(input())</code></td></tr>
-            <tr><td><code>cout << a;</code></td><td><code>print(a)</code></td></tr>
-          </tbody>
-        </table>
-      </div>
+  <section class="lesson-card">
+    <div class="lesson-card-header">🔁 So sánh nhanh C++ và Python</div>
+    <div class="lesson-card-body">
+      <table class="simple-table">
+        <thead>
+          <tr><th>⚙️ C++</th><th>🐍 Python</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>int a = 5;</code></td><td><code>a = 5</code></td></tr>
+          <tr><td><code>cin >> a;</code></td><td><code>a = int(input())</code></td></tr>
+          <tr><td><code>cout << a;</code></td><td><code>print(a)</code></td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <section class="card card-lesson slide-in">
-    <div class="card-header"><i class="fa-solid fa-puzzle-piece text-danger me-2"></i>🧩 Thử thách lập trình</div>
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div class="p-3 border rounded-3 h-100 bg-light">
-            <h6 class="mb-2">🧠 Bài 1</h6>
-            <p class="mb-0">Nhập 2 số nguyên, in ra tổng, hiệu, tích, thương.</p>
-          </div>
+  <section class="lesson-card">
+    <div class="lesson-card-header">🧩 Thử thách lập trình</div>
+    <div class="lesson-card-body">
+      <div class="challenge-grid">
+        <div class="challenge-item">
+          <b>🧠 Bài 1</b>
+          <p>Nhập 2 số nguyên, in ra tổng, hiệu, tích, thương.</p>
         </div>
-        <div class="col-md-6">
-          <div class="p-3 border rounded-3 h-100 bg-light">
-            <h6 class="mb-2">🎯 Bài 2</h6>
-            <p class="mb-0">Nhập <code>n</code>, tính tổng các số từ 1 đến <code>n</code>.</p>
-          </div>
+        <div class="challenge-item">
+          <b>🎯 Bài 2</b>
+          <p>Nhập <code>n</code>, tính tổng các số từ 1 đến <code>n</code>.</p>
         </div>
       </div>
-      <p class="mt-3 mb-0"><i class="fa-solid fa-rocket text-primary me-1"></i>🚀 Gợi ý: hãy viết nháp từng bước “Nhập dữ liệu → Xử lý → In kết quả”.</p>
+      <p>🚀 Gợi ý: hãy viết nháp từng bước “Nhập dữ liệu → Xử lý → In kết quả”.</p>
     </div>
   </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
-  hljs.highlightAll();
-
   function calcSum() {
-    const a = Number(document.getElementById('demoA').value || 0);
-    const b = Number(document.getElementById('demoB').value || 0);
-    document.getElementById('sumResult').innerText = `Kết quả: ${a} + ${b} = ${a + b}`;
+    var a = Number(document.getElementById('demoA').value || 0);
+    var b = Number(document.getElementById('demoB').value || 0);
+    document.getElementById('sumResult').innerText = 'Kết quả: ' + a + ' + ' + b + ' = ' + (a + b);
   }
 
-  document.querySelectorAll('.quiz-option').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const isCorrect = btn.dataset.correct === 'true';
-      document.querySelectorAll('.quiz-option').forEach((item) => {
-        item.classList.remove('correct', 'wrong');
-      });
+  var quizButtons = document.querySelectorAll('.quiz-option');
+  quizButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var isCorrect = btn.getAttribute('data-correct') === 'true';
+      quizButtons.forEach(function (item) { item.classList.remove('correct', 'wrong'); });
       btn.classList.add(isCorrect ? 'correct' : 'wrong');
       document.getElementById('quizFeedback').innerHTML = isCorrect
-        ? '<span class="text-success fw-semibold">✅ Chính xác! Biến dùng để lưu dữ liệu.</span>'
-        : '<span class="text-danger fw-semibold">❌ Chưa đúng. Hãy thử lại nhé!</span>';
+        ? '<span style="color:#15803d;font-weight:700;">✅ Chính xác! Biến dùng để lưu dữ liệu.</span>'
+        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Hãy thử lại nhé!</span>';
     });
   });
 
-  const lessonSections = [...document.querySelectorAll('.card-lesson')];
-  const progressBar = document.getElementById('lessonProgressBar');
-  const progressText = document.getElementById('lessonProgressText');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.lesson-card'));
+  var progressBar = document.getElementById('progressBar');
+  var progressText = document.getElementById('progressText');
 
   function updateProgress() {
-    const visibleCount = lessonSections.filter((section) => {
-      const rect = section.getBoundingClientRect();
+    var visible = cards.filter(function (card) {
+      var rect = card.getBoundingClientRect();
       return rect.top < window.innerHeight * 0.75;
     }).length;
 
-    const percent = Math.min(100, Math.round((visibleCount / lessonSections.length) * 100));
-    progressBar.style.width = `${percent}%`;
-    progressText.textContent = `${percent}%`;
+    var percent = Math.min(100, Math.round((visible / cards.length) * 100));
+    progressBar.style.width = percent + '%';
+    progressText.textContent = percent + '%';
   }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
       if (entry.isIntersecting) {
-        entry.target.classList.add('show', 'animate__animated', 'animate__fadeInUp');
+        entry.target.classList.add('show');
       }
     });
     updateProgress();
   }, { threshold: 0.15 });
 
-  lessonSections.forEach((section) => observer.observe(section));
+  cards.forEach(function (card) { observer.observe(card); });
   window.addEventListener('scroll', updateProgress);
-  window.addEventListener('load', updateProgress);
+  window.addEventListener('load', function () {
+    cards[0].classList.add('show');
+    updateProgress();
+  });
 </script>
