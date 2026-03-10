@@ -1,52 +1,326 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu được cấu trúc rẽ nhánh: <code>if</code>, <code>else</code>.</li>
-  <li>Biết cách so sánh, kiểm tra điều kiện trong chương trình.</li>
-</ul>
+<style>
+  * { box-sizing: border-box; }
+  .lesson-page {
+    font-family: Inter, Roboto, Arial, sans-serif;
+    color: #1f2937;
+    background: linear-gradient(180deg, #f8fbff, #eef5ff 70%);
+    border-radius: 16px;
+    padding: 20px;
+    line-height: 1.65;
+  }
+  .header {
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+    padding: 18px;
+    box-shadow: 0 10px 24px rgba(37,99,235,.3);
+    margin-bottom: 16px;
+  }
+  .header h1 { margin: 0 0 6px; font-size: 28px; }
 
-<h2>📘 1️⃣ Cấu trúc điều kiện trong C++</h2>
-<pre><code>if (điều_kiện) {
-    // Nếu đúng, thực hiện
-} else {
-    // Nếu sai, thực hiện khác
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: .5s ease;
+  }
+  .card.show { opacity: 1; transform: translateY(0); }
+  .card-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; background: #f8fafc; }
+  .card-body { padding: 14px; }
+
+  .code {
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    overflow: auto;
+    font-size: 14px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+  }
+
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
+  .table th { background: #eff6ff; }
+
+  .flow {
+    border: 1px dashed #93c5fd;
+    border-radius: 10px;
+    background: #eff6ff;
+    padding: 10px;
+    white-space: pre;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .demo-box {
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+    padding: 12px;
+  }
+  .input, .btn {
+    width: 100%;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px;
+  }
+  .input { border: 1px solid #cbd5e1; }
+  .btn { border: 0; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
+  .btn:hover { background: #1d4ed8; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .col { flex: 1 1 220px; min-width: 220px; }
+
+  .alert {
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    padding: 10px;
+  }
+  .highlight { animation: pulse .55s ease; }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  .quiz-option {
+    width: 100%;
+    text-align: left;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
+  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
+
+  @media (max-width: 768px) {
+    .lesson-page { padding: 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+
+<div class="lesson-page">
+  <div class="header">
+    <h1>🔀 Bài học: Cấu trúc rẽ nhánh (if / else)</h1>
+    <p>Học cách ra quyết định trong C++ bằng điều kiện, ví dụ thực tế và demo tương tác.</p>
+  </div>
+
+  <section class="card"><div class="card-head">🎯 1. Mục tiêu bài học</div><div class="card-body">
+    <ul>
+      <li>Hiểu điều kiện trong lập trình.</li>
+      <li>Biết dùng <code>if / else</code>.</li>
+      <li>Hiểu toán tử so sánh.</li>
+      <li>Biết viết chương trình ra quyết định.</li>
+      <li>Giải bài toán kiểm tra dữ liệu.</li>
+    </ul>
+  </div></section>
+
+  <section class="card"><div class="card-head">🌦️ 2. Vì sao cần cấu trúc điều kiện?</div><div class="card-body">
+    <p>Trong cuộc sống, ta luôn đưa ra quyết định dựa trên điều kiện:</p>
+    <div class="flow">Nếu trời mưa → mang ô
+Nếu điểm ≥ 5 → đậu
+Nếu tuổi < 18 → chưa đủ tuổi</div>
+    <p>Trong lập trình cũng vậy: kiểm tra điều kiện để quyết định chương trình làm gì.</p>
+  </div></section>
+
+  <section class="card"><div class="card-head">🧱 3. Cấu trúc if trong C++</div><div class="card-body">
+    <pre class="code"><code>if (điều kiện) {
+    // lệnh khi điều kiện đúng
 }</code></pre>
+    <pre class="code"><code>int age;
+cin >> age;
 
-<h2>🐍 2️⃣ Trong Python</h2>
-<pre><code>if điều_kiện:
-    # khi đúng
-else:
-    # khi sai</code></pre>
+if (age >= 18) {
+    cout << "Du tuoi";
+}</code></pre>
+  </div></section>
 
-<h2>🧩 Ví dụ: Kiểm tra số chẵn hay lẻ</h2>
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody><tr><td>
-<pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int main() {
-    int n; cin >> n;
-    if (n % 2 == 0)
-        cout << "Even";
-    else
-        cout << "Odd";
-}</code></pre></td>
-<td>
-<pre><code>n = int(input())
-if n % 2 == 0:
-    print("Even")
-else:
-    print("Odd")</code></pre></td></tr></tbody></table>
+  <section class="card"><div class="card-head">↔️ 4. Cấu trúc if - else</div><div class="card-body">
+    <pre class="code"><code>if (điều kiện) {
+    // khi đúng
+}
+else {
+    // khi sai
+}</code></pre>
+    <pre class="code"><code>int score;
+cin >> score;
 
-<h2>🎯 Ứng dụng mở rộng</h2>
-<ul>
-  <li>Kiểm tra tuổi hợp lệ.</li>
-  <li>Điểm ≥ 5 thì Đậu, ngược lại Rớt.</li>
-  <li>So sánh hai số, in ra số lớn hơn.</li>
-</ul>
+if (score >= 5)
+    cout << "Dau";
+else
+    cout << "Rot";</code></pre>
+  </div></section>
 
-<h2>💡 Bài tập</h2>
-<ol>
-  <li>Nhập một số nguyên, cho biết là dương, âm hay bằng 0.</li>
-  <li>Nhập điểm, in ra kết quả: “Đậu” hoặc “Rớt”.</li>
-  <li>Nhập 3 số, in ra số lớn nhất.</li>
-</ol>
+  <section class="card"><div class="card-head">🧮 5. Toán tử so sánh</div><div class="card-body">
+    <table class="table">
+      <thead><tr><th>Toán tử</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td>==</td><td>bằng</td></tr>
+        <tr><td>!=</td><td>khác</td></tr>
+        <tr><td>&gt;</td><td>lớn hơn</td></tr>
+        <tr><td>&lt;</td><td>nhỏ hơn</td></tr>
+        <tr><td>&gt;=</td><td>lớn hơn hoặc bằng</td></tr>
+        <tr><td>&lt;=</td><td>nhỏ hơn hoặc bằng</td></tr>
+      </tbody>
+    </table>
+    <pre class="code"><code>if (a > b)</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">🧩 6. Ví dụ: kiểm tra số chẵn</div><div class="card-body">
+    <pre class="code"><code>int n;
+cin >> n;
+
+if (n % 2 == 0)
+    cout << "So chan";
+else
+    cout << "So le";</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">🪜 7. Demo step-by-step điều kiện</div><div class="card-body">
+    <div class="flow">Input: 8
+
+Step 1: n = 8
+Step 2: n % 2 = 0
+Step 3: 0 == 0 → TRUE
+Step 4: in "So chan"</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">🏫 8. Ví dụ thực tế</div><div class="card-body">
+    <p><b>Kiểm tra tuổi</b></p>
+    <pre class="code"><code>int age;
+cin >> age;
+
+if (age >= 18)
+    cout << "Du tuoi";
+else
+    cout << "Chua du tuoi";</code></pre>
+
+    <p><b>So sánh hai số</b></p>
+    <pre class="code"><code>int a,b;
+cin >> a >> b;
+
+if (a > b)
+    cout << a;
+else
+    cout << b;</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">🔁 9. else-if chain</div><div class="card-body">
+    <pre class="code"><code>int x;
+cin >> x;
+
+if (x > 0)
+    cout << "Duong";
+else if (x < 0)
+    cout << "Am";
+else
+    cout << "Bang 0";</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">🌳 10. Minh họa logic điều kiện (Decision tree)</div><div class="card-body">
+    <div class="flow">         Điều kiện
+            ↓
+        n % 2 == 0 ?
+          /      \
+       TRUE     FALSE
+        ↓         ↓
+    So chan     So le</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">🎮 Demo 1 — Decision Tree</div><div class="card-body">
+    <div class="demo-box">
+      <div class="row">
+        <div class="col"><label for="scoreInput">score =</label><input id="scoreInput" class="input" type="number" value="7"></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" onclick="checkScoreDecision()">Check condition</button></div>
+      </div>
+      <div id="scoreDecisionResult" class="alert">Bấm nút để kiểm tra: score &gt;= 5 ?</div>
+    </div>
+  </div></section>
+
+  <section class="card"><div class="card-head">🎮 Demo 2 — Even/Odd Visualizer</div><div class="card-body">
+    <div class="demo-box">
+      <div class="row">
+        <div class="col"><label for="evenOddInput">Nhập n</label><input id="evenOddInput" class="input" type="number" value="8"></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" onclick="runEvenOddDemo()">Kiểm tra chẵn/lẻ</button></div>
+      </div>
+      <div id="evenOddResult" class="alert">Nhấn nút để xem từng bước: n % 2, so sánh, kết quả.</div>
+    </div>
+  </div></section>
+
+  <section class="card"><div class="card-head">11. Ứng dụng của if</div><div class="card-body">
+    <ul>
+      <li>kiểm tra dữ liệu nhập</li>
+      <li>quyết định logic game</li>
+      <li>phân loại học sinh</li>
+      <li>kiểm tra điều kiện thuật toán</li>
+    </ul>
+  </div></section>
+
+  <section class="card"><div class="card-head">🧪 Bài tập luyện tập</div><div class="card-body">
+    <ol>
+      <li>Nhập số nguyên n, in: So duong / So am / So 0.</li>
+      <li>Nhập điểm, in: ≥5 → Dau, &lt;5 → Rot.</li>
+      <li>Nhập 3 số, in ra số lớn nhất.</li>
+    </ol>
+  </div></section>
+
+  <section class="card"><div class="card-head">❓ Quiz nhanh</div><div class="card-body">
+    <p><b>"==" trong C++ nghĩa là gì?</b></p>
+    <button class="quiz-option" data-correct="true">A. So sánh bằng nhau</button>
+    <button class="quiz-option" data-correct="false">B. Gán giá trị</button>
+    <button class="quiz-option" data-correct="false">C. Cộng hai số</button>
+    <div id="quizFeedback" style="color:#64748b;">Chọn 1 đáp án.</div>
+  </div></section>
+</div>
+
+<script>
+  function checkScoreDecision() {
+    var score = Number(document.getElementById('scoreInput').value || 0);
+    var box = document.getElementById('scoreDecisionResult');
+    if (score >= 5) {
+      box.innerHTML = 'score = ' + score + '<br>' + score + ' >= 5 → <b>TRUE</b> → Kết quả: <b>Dau</b>';
+    } else {
+      box.innerHTML = 'score = ' + score + '<br>' + score + ' >= 5 → <b>FALSE</b> → Kết quả: <b>Rot</b>';
+    }
+    box.classList.remove('highlight');
+    void box.offsetWidth;
+    box.classList.add('highlight');
+  }
+
+  function runEvenOddDemo() {
+    var n = Number(document.getElementById('evenOddInput').value || 0);
+    var mod = n % 2;
+    var isEven = mod === 0;
+    var box = document.getElementById('evenOddResult');
+    box.innerHTML = 'n = ' + n + '<br>' + n + ' % 2 = ' + mod + '<br>' + mod + ' == 0 → ' + (isEven ? '<b>TRUE</b>' : '<b>FALSE</b>') + '<br>Kết quả: <b>' + (isEven ? 'So chan' : 'So le') + '</b>';
+    box.classList.remove('highlight');
+    void box.offsetWidth;
+    box.classList.add('highlight');
+  }
+
+  document.querySelectorAll('.quiz-option').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var ok = btn.getAttribute('data-correct') === 'true';
+      document.querySelectorAll('.quiz-option').forEach(function (x) { x.classList.remove('correct', 'wrong'); });
+      btn.classList.add(ok ? 'correct' : 'wrong');
+      document.getElementById('quizFeedback').innerHTML = ok
+        ? '<span style="color:#15803d;font-weight:700;">✅ Đúng! == là toán tử so sánh bằng nhau.</span>'
+        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Hãy nhớ: == dùng để so sánh.</span>';
+    });
+  });
+
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) entry.target.classList.add('show');
+    });
+  }, { threshold: 0.15 });
+  cards.forEach(function (card) { observer.observe(card); });
+</script>

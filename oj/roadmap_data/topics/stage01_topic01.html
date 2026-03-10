@@ -1,63 +1,782 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu <b>biến</b> là gì và cách khai báo biến.</li>
-  <li>Biết <b>nhập dữ liệu từ bàn phím</b> và <b>in kết quả ra màn hình</b>.</li>
-  <li>Thực hành viết chương trình đầu tiên: <code>Tính tổng hai số</code>.</li>
-</ul>
-</br>
-<h2>📘 1️⃣ Cấu trúc cơ bản của chương trình C++</h2>
-<p>Với C++, em hãy tưởng tượng mỗi khi em muốn xây một ngôi nhà (viết một chương trình), em luôn luôn phải xây một cái móng và bộ khung sườn y hệt nhau.
-Đây chính là "bộ khung" thần thánh đó. Em phải ghi nhớ nó nhé, gần như 99% các bài tập của em đều bắt đầu bằng cái khung này:</p>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --bg: #f4f8ff;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #64748b;
+    --primary: #2563eb;
+    --accent: #7c3aed;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+  }
+
+  .lesson-page {
+    font-family: Inter, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: linear-gradient(180deg, #f8fbff, #eef5ff 70%);
+    border-radius: 16px;
+    padding: 20px;
+    line-height: 1.65;
+  }
+
+  .header {
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    padding: 18px;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
+    margin-bottom: 16px;
+  }
+
+  .header h1 { margin: 0 0 6px; font-size: 29px; }
+  .header p { margin: 0; opacity: 0.95; }
+
+  .progress-wrap {
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.08);
+    padding: 10px;
+    margin-bottom: 16px;
+  }
+
+  .progress-head { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+  .progress-track { width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+  .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width .3s ease; }
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    margin-bottom: 16px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: .55s ease;
+  }
+
+  .card.show { opacity: 1; transform: translateY(0); }
+
+  .card-head {
+    padding: 10px 14px;
+    font-weight: 700;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+  }
+
+  .card-body { padding: 14px; }
+  .small-muted { color: var(--muted); font-size: 14px; }
+
+  .table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .table th, .table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
+  .table th { background: #eff6ff; }
+
+  .code {
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    overflow: auto;
+    font-size: 14px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    position: relative;
+    margin-top: 8px;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    border: 0;
+    border-radius: 6px;
+    background: #374151;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .copy-btn:hover { background: #4b5563; }
+
+  .flow {
+    border: 1px dashed #93c5fd;
+    background: #eff6ff;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: Consolas, Monaco, monospace;
+    white-space: pre;
+  }
+
+  .box-demo {
+    display: inline-block;
+    margin-top: 8px;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    background: #f8fafc;
+    padding: 10px;
+    white-space: pre;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; color: #fff; font-size: 12px; font-weight: 700; }
+  .chip-int { background: #2563eb; }
+  .chip-long { background: #0f766e; }
+  .chip-ll { background: #7c3aed; }
+  .chip-double { background: #16a34a; }
+  .chip-char { background: #ea580c; }
+  .chip-string { background: #9333ea; }
+
+  .real-box {
+    border-left: 4px solid var(--warning);
+    border-radius: 8px;
+    background: #fff7ed;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .col { flex: 1 1 230px; min-width: 220px; }
+  .input, .btn {
+    width: 100%;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .input { border: 1px solid #cbd5e1; }
+  .btn { border: 0; background: var(--primary); color: #fff; font-weight: 600; cursor: pointer; }
+  .btn:hover { background: #1d4ed8; }
+  .alert {
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    padding: 10px;
+  }
+
+  .quiz-option {
+    width: 100%;
+    text-align: left;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
+  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
+
+  .warning-box {
+    border-left: 4px solid #ef4444;
+    background: #fef2f2;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .practice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .practice-item { border: 1px solid #dbeafe; border-radius: 10px; background: #f8fafc; padding: 10px; }
+
+  .step-box {
+    margin-top: 8px;
+    border: 2px solid #93c5fd;
+    border-radius: 10px;
+    background: #eff6ff;
+    width: 120px;
+    text-align: center;
+    padding: 8px;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .step-box .label { font-size: 13px; color: #1e3a8a; }
+  .step-box .value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #1e40af;
+  }
+
+  .step-explain {
+    margin-top: 8px;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    background: #f8fbff;
+    padding: 10px;
+    min-height: 44px;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .fade-in {
+    animation: fadeIn .45s ease;
+  }
+
+  .highlight-change {
+    animation: highlightChange .7s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes highlightChange {
+    0% { transform: scale(1); background: #dbeafe; }
+    45% { transform: scale(1.08); background: #bbf7d0; }
+    100% { transform: scale(1); background: transparent; }
+  }
+
+
+
+  .lesson-card { }
+
+  .demo-container {
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+    padding: 12px;
+    margin-top: 10px;
+  }
+
+  .variable-box {
+    display: inline-block;
+    border: 2px solid #60a5fa;
+    border-radius: 10px;
+    background: #eff6ff;
+    padding: 8px 12px;
+    min-width: 120px;
+    text-align: center;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .variable-box .var-name { font-size: 13px; color: #1e3a8a; }
+  .variable-box .var-value { font-size: 30px; font-weight: 700; color: #1d4ed8; }
+
+  .step-explanation {
+    margin-top: 8px;
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px;
+    min-height: 48px;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .fade-in { animation: fadeIn .45s ease; }
+  .pulse { animation: pulse .55s ease; }
+  .highlight { animation: highlight .7s ease; }
+
+  .overflow-danger {
+    border-color: #ef4444 !important;
+    background: #fee2e2 !important;
+    color: #991b1b !important;
+  }
+
+
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes highlight {
+    0% { box-shadow: 0 0 0 rgba(34,197,94,0); }
+    50% { box-shadow: 0 0 0 8px rgba(34,197,94,0.25); }
+    100% { box-shadow: 0 0 0 rgba(34,197,94,0); }
+  }
+
+  @media (max-width: 980px) {
+    .practice-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 24px; }
+  }
+
+  @media (max-width: 768px) {
+    .lesson-page { padding: 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+
+<div class="lesson-page">
+  <div class="header">
+    <h1>📘 Khan Style: Biến – Kiểu dữ liệu – Nhập xuất trong C++</h1>
+    <p>Bài học tương tác cho học sinh mới học lập trình: trực quan, ví dụ gần gũi, có demo và quiz.</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-head">
+      <strong>📊 Tiến trình bài học</strong>
+      <span id="progressText">0%</span>
+    </div>
+    <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+  </div>
+
+  <section class="card"><div class="card-head">🎯 1. Mục tiêu bài học</div><div class="card-body">
+    <ul>
+      <li>Hiểu <b>cấu trúc chương trình C++</b>.</li>
+      <li>Hiểu <b>biến là gì</b> và cách dùng biến.</li>
+      <li>Biết <b>các kiểu dữ liệu</b> và giới hạn kiểu số.</li>
+      <li>Hiểu hiện tượng <b>tràn số (overflow)</b>.</li>
+      <li>Biết <b>nhập dữ liệu</b> bằng <code>cin</code> và <b>xuất dữ liệu</b> bằng <code>cout</code>.</li>
+      <li>Viết được chương trình C++ đầu tiên.</li>
+    </ul>
+  </div></section>
+
+  <section class="card"><div class="card-head">🧱 2. Bắt đầu một chương trình C++ (Program template)</div><div class="card-body">
+    <pre class="code"><button class="copy-btn" data-copy="#code-template">Copy</button><code id="code-template">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
-int main() {
-    // Code sẽ viết ở đây
+int main(){
+    // code ở đây
     return 0;
 }</code></pre>
-<p>(Thầy thêm <code>return 0;</code> vào nhé, đây là một phần quan trọng để báo cho máy tính biết chương trình đã chạy xong và chạy đúng.)</br>
-Giải thích siêu nhanh (em chưa cần hiểu sâu, chỉ cần biết mặt):
-<ul>
-<li><code>#include &lt;bits/stdc++.h&gt;</code>: Giống như em gọi "Tổng đài", em bảo máy tính là: "Tôi cần tất cả các công cụ mà ông có!" (đây gọi là thư viện).</li>
+    <table class="table">
+      <thead><tr><th>Phần</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td>include</td><td>mở thư viện</td></tr>
+        <tr><td>namespace</td><td>viết lệnh ngắn gọn</td></tr>
+        <tr><td>main()</td><td>nơi chương trình bắt đầu</td></tr>
+        <tr><td>return 0</td><td>kết thúc chương trình</td></tr>
+      </tbody>
+    </table>
+  </div></section>
 
-<li><code>using namespace std;</code>: Để lát nữa mình gõ lệnh cho nó ngắn gọn (thay vì gõ std::cout thì chỉ cần gõ cout).</li>
+  <section class="card"><div class="card-head">🔄 3. Mô hình hoạt động chương trình (Program workflow)</div><div class="card-body">
+    <div class="flow">Input → Process → Output
+5 7   →   cộng   →   12</div>
+  </div></section>
 
-<li><code>int main() { ... }</code>: Đây là "cửa chính" của ngôi nhà. Máy tính luôn chạy vào cái cửa main này đầu tiên để xem em ra lệnh gì.</li></p>
-</ul>
-<h2>🐍 2️⃣ Cấu trúc chương trình Python</h2>
-<pre><code># Python không cần include hay main()
-print("Xin chao!")</code></pre>
+  <section class="card"><div class="card-head">⌨️ 4. Nhập và xuất dữ liệu (Input / Output)</div><div class="card-body">
+    <p><b>Nhập dữ liệu</b> bằng <code>cin</code>:</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-input">Copy</button><code id="code-input">int age;
+cin >> age;</code></pre>
+    <p><b>Xuất dữ liệu</b> bằng <code>cout</code>:</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-output">Copy</button><code id="code-output">cout << age;
+cout << age << endl;</code></pre>
+  </div></section>
 
-<h2>🧮 3️⃣ Biến là gì?</h2>
-<p><b>Biến</b> giống như chiếc hộp để lưu trữ giá trị.</p>
-<table class="table table-bordered text-sm">
-<thead><tr><th>Ngôn ngữ</th><th>Cú pháp</th><th>Ví dụ</th></tr></thead>
-<tbody>
-<tr><td>C++</td><td><code>int a = 5;</code></td><td>Khai báo biến a kiểu số nguyên</td></tr>
-<tr><td>Python</td><td><code>a = 5</code></td><td>Không cần ghi kiểu dữ liệu</td></tr>
-</tbody></table>
+  <section class="card"><div class="card-head">📦 5. Biến là gì?</div><div class="card-body">
+    <p>Biến giống như <b>một chiếc hộp để chứa dữ liệu</b>.</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-var">Copy</button><code id="code-var">int a = 5;</code></pre>
+    <div class="box-demo">a
+┌───────┐
+│   5   │
+└───────┘</div>
+    <div class="real-box">Ví dụ đời sống: ví tiền chứa số tiền, bình nước chứa lượng nước — biến cũng tương tự như vậy.</div>
+  </div></section>
 
-<h2>⌨️ 4️⃣ Nhập và xuất dữ liệu</h2>
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr><td><pre><code>int a, b;
+  <section class="card"><div class="card-head">🏷️ 6. Kiểu dữ liệu</div><div class="card-body">
+    <table class="table">
+      <thead><tr><th>Kiểu</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip chip-int">int</span></td><td>số nguyên</td></tr>
+        <tr><td><span class="chip chip-long">long</span></td><td>số nguyên lớn</td></tr>
+        <tr><td><span class="chip chip-ll">long long</span></td><td>số nguyên rất lớn</td></tr>
+        <tr><td><span class="chip chip-double">double</span></td><td>số thực</td></tr>
+        <tr><td><span class="chip chip-char">char</span></td><td>ký tự</td></tr>
+        <tr><td><span class="chip chip-string">string</span></td><td>chuỗi</td></tr>
+      </tbody>
+    </table>
+  </div></section>
+
+  <section class="card"><div class="card-head">📏 7. Giới hạn của số nguyên</div><div class="card-body">
+    <table class="table">
+      <thead><tr><th>Kiểu</th><th>Giới hạn gần đúng</th></tr></thead>
+      <tbody>
+        <tr><td>int</td><td>khoảng ±10⁹</td></tr>
+        <tr><td>long</td><td>khoảng ±10¹²</td></tr>
+        <tr><td>long long</td><td>khoảng ±10¹⁸</td></tr>
+      </tbody>
+    </table>
+    <div class="real-box">
+      <b>Ví dụ thực tế</b><br>
+      2000 học sinh → <code>int</code><br>
+      1000000000 dân số → <code>int</code><br>
+      1000000000000 khoảng cách lớn → <code>long</code><br>
+      1000000000000000000 số cực lớn → <code>long long</code>
+    </div>
+  </div></section>
+
+  <section class="card"><div class="card-head">⚠️ 8. Tràn số (Overflow)</div><div class="card-body">
+    <p>Tràn số xảy ra khi giá trị vượt quá giới hạn của kiểu dữ liệu.</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-over">Copy</button><code id="code-over">int a = 2000000000;
+int b = 2000000000;
+cout << a + b;</code></pre>
+    <div class="warning-box">
+      <b>Vì sao sai?</b><br>
+      2000000000 + 2000000000 = 4000000000, nhưng <code>int</code> chỉ khoảng 2.1 tỷ.<br>
+      Mốc tối đa của int ≈ <code>2147483647</code>. Nếu <code>2147483647 + 1</code> sẽ overflow.
+    </div>
+    <p><b>Cách khắc phục:</b> dùng kiểu lớn hơn.</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-fix">Copy</button><code id="code-fix">long long a = 2000000000;
+long long b = 2000000000;
+cout << a + b;</code></pre>
+
+    <div class="row" style="margin-top:10px;">
+      <div class="col">
+        <label for="overflowInput">Overflow visualizer (nhập gần 2147483647)</label>
+        <input id="overflowInput" class="input" type="number" value="2147483647">
+      </div>
+      <div class="col">
+        <label>&nbsp;</label>
+        <button class="btn" onclick="simulateOverflow()">+1 và kiểm tra overflow</button>
+      </div>
+    </div>
+    <div id="overflowResult" class="alert">Nhấn nút để xem mô phỏng overflow.</div>
+  </div></section>
+
+  <section class="card"><div class="card-head">🌍 9. Phạm vi của biến (Scope)</div><div class="card-body">
+    <p><b>Biến toàn cục</b> khai báo ngoài hàm:</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-global">Copy</button><code id="code-global">int x = 10;</code></pre>
+    <p><b>Biến cục bộ</b> khai báo trong hàm:</p>
+    <pre class="code"><button class="copy-btn" data-copy="#code-local">Copy</button><code id="code-local">int main(){
+    int a = 5;
+}</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">➕ 10. Các phép toán</div><div class="card-body">
+    <table class="table">
+      <thead><tr><th>Phép toán</th><th>Ký hiệu</th></tr></thead>
+      <tbody>
+        <tr><td>cộng</td><td>+</td></tr>
+        <tr><td>trừ</td><td>-</td></tr>
+        <tr><td>nhân</td><td>*</td></tr>
+        <tr><td>chia</td><td>/</td></tr>
+        <tr><td>chia dư</td><td>%</td></tr>
+      </tbody>
+    </table>
+    <p><b>Tăng giảm:</b> <code>a++</code>, <code>a--</code>.</p>
+  </div></section>
+
+  <section class="card"><div class="card-head">🧪 11. Ví dụ chương trình đầu tiên</div><div class="card-body">
+    <pre class="code"><button class="copy-btn" data-copy="#code-example">Copy</button><code id="code-example">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main(){
+    long long a,b;
+    cin >> a >> b;
+    cout << a + b;
+}</code></pre>
+  </div></section>
+
+  <section class="card"><div class="card-head">🎮 12. Interactive demo</div><div class="card-body">
+    <div class="row">
+      <div class="col">
+        <label for="demoA">Input A</label>
+        <input id="demoA" class="input" type="number" placeholder="Ví dụ: 5">
+      </div>
+      <div class="col">
+        <label for="demoB">Input B</label>
+        <input id="demoB" class="input" type="number" placeholder="Ví dụ: 7">
+      </div>
+      <div class="col">
+        <label>&nbsp;</label>
+        <button class="btn" onclick="calcSum()">Tính tổng</button>
+      </div>
+    </div>
+    <div id="sumResult" class="alert">Kết quả sẽ hiển thị ở đây.</div>
+
+    <div class="row" style="margin-top:10px;">
+      <div class="col">
+        <p><b>Demo biến theo từng bước:</b> a = 5; a = a + 1;</p>
+        <div id="stepTitle" class="small-muted">Bấm <b>Next Step</b> để bắt đầu mô phỏng.</div>
+        <div class="step-box" id="varBox">
+          <div class="label">a =</div>
+          <div class="value" id="varValue">?</div>
+        </div>
+        <div id="stepExplain" class="step-explain">Chưa bắt đầu.</div>
+        <div class="row" style="margin-top:8px;">
+          <div class="col" style="min-width:160px;">
+            <button class="btn" onclick="nextVarStep()">Next Step</button>
+          </div>
+          <div class="col" style="min-width:160px;">
+            <button class="btn" style="background:#475569;" onclick="resetVarDemo()">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+
+
+  <section class="card lesson-card"><div class="card-head">🎮 Demo 1: Biến hoạt động như một chiếc hộp</div><div class="card-body">
+    <p class="small-muted">Mô phỏng từng bước, học sinh bấm nút để đi tiếp (không tự chạy).</p>
+    <div class="demo-container">
+      <div id="variable-box" class="variable-box">
+        <div class="var-name">a</div>
+        <div class="var-value" id="demo1VarValue">?</div>
+      </div>
+      <div id="stepText" class="step-explanation">Bấm Next Step để bắt đầu.</div>
+      <div class="row" style="margin-top:8px;">
+        <div class="col" style="min-width:180px;"><button id="nextStepButton" class="btn" onclick="demo1NextStep()">Next Step</button></div>
+        <div class="col" style="min-width:180px;"><button class="btn" style="background:#475569;" onclick="demo1Reset()">Reset</button></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="card lesson-card"><div class="card-head">⚠️ Demo 2: Tràn số (Integer Overflow)</div><div class="card-body">
+    <p><code>int max = 2147483647</code></p>
+    <div class="demo-container">
+      <div id="overflowBoxDemo" class="variable-box" style="min-width:190px;">
+        <div class="var-name">int value</div>
+        <div class="var-value" id="overflowValue">2147483647</div>
+      </div>
+      <div id="overflowStepText" class="step-explanation">Giá trị đang ở mức tối đa của kiểu int.</div>
+      <div class="row" style="margin-top:8px;">
+        <div class="col" style="min-width:150px;"><button class="btn" onclick="demo2AddOne()">+1</button></div>
+        <div class="col" style="min-width:150px;"><button class="btn" style="background:#475569;" onclick="demo2Reset()">Reset</button></div>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="card lesson-card"><div class="card-head">💻 Demo 3: Chạy chương trình C++ trực tiếp</div><div class="card-body">
+    <pre class="code"><code>int a,b;
 cin >> a >> b;
-cout << a + b;</code></pre></td>
-<td><pre><code>a, b = map(int, input().split())
-print(a + b)</code></pre></td></tr>
-</tbody></table>
+cout << a + b;</code></pre>
+    <div class="demo-container">
+      <div class="row">
+        <div class="col"><label for="simA">Input A</label><input id="simA" class="input" type="number" placeholder="Ví dụ: 5"></div>
+        <div class="col"><label for="simB">Input B</label><input id="simB" class="input" type="number" placeholder="Ví dụ: 7"></div>
+        <div class="col"><label>&nbsp;</label><button class="btn" onclick="runCinCoutDemo()">Run Program</button></div>
+      </div>
+      <div id="simOutput" class="alert">Output: ...</div>
+      <div id="simExplain" class="small-muted">Nhập 2 số rồi bấm Run Program.</div>
+    </div>
+  </div></section>
 
-<h2>🧑‍🏫 5️⃣ Thử ngay</h2>
-<ol>
-  <li>Chọn ngôn ngữ C++ hoặc Python.</li>
-  <li>Dán code ví dụ vào.</li>
-  <li>Nhập hai số “5 7”.</li>
-  <li>Xem kết quả xuất ra.</li>
-</ol>
+  <section class="card"><div class="card-head">🧩 13. Bài tập luyện tập</div><div class="card-body">
+    <div class="practice-grid">
+      <div class="practice-item"><b>🧩 Bài 1</b><p>Nhập a, b. In:</p><pre>a+b
+a-b
+a*b</pre></div>
+      <div class="practice-item"><b>🎯 Bài 2</b><p>30 học sinh, mỗi người đóng 20000. Tính tổng tiền.</p></div>
+      <div class="practice-item"><b>🚀 Bài 3</b><p>Nhập n ≤ 10^18, in n+1.</p></div>
+    </div>
+  </div></section>
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Nhập 2 số nguyên, in ra tổng, hiệu, tích, thương.</li>
-  <li>Nhập n, tính tổng các số từ 1 đến n.</li>
-</ol>
+  <section class="card"><div class="card-head">❓ 14. Quiz nhanh</div><div class="card-body">
+    <p><b>Kiểu nào lưu được số 10^18?</b></p>
+    <button class="quiz-option" data-correct="false">A. int</button>
+    <button class="quiz-option" data-correct="false">B. long</button>
+    <button class="quiz-option" data-correct="true">C. long long</button>
+    <div id="quizFeedback" class="small-muted">Chọn một đáp án để xem phản hồi.</div>
+  </div></section>
+</div>
+
+<script>
+  function calcSum() {
+    var a = Number(document.getElementById('demoA').value || 0);
+    var b = Number(document.getElementById('demoB').value || 0);
+    document.getElementById('sumResult').innerText = 'Kết quả: ' + a + ' + ' + b + ' = ' + (a + b);
+  }
+
+  var varDemoStep = 0;
+
+  function clearStepAnimations() {
+    document.getElementById('varBox').classList.remove('fade-in', 'highlight-change');
+    document.getElementById('stepExplain').classList.remove('fade-in');
+  }
+
+  function resetVarDemo() {
+    varDemoStep = 0;
+    document.getElementById('stepTitle').innerHTML = 'Bấm <b>Next Step</b> để bắt đầu mô phỏng.';
+    document.getElementById('varValue').innerText = '?';
+    document.getElementById('stepExplain').innerText = 'Chưa bắt đầu.';
+    clearStepAnimations();
+  }
+
+  function nextVarStep() {
+    varDemoStep += 1;
+
+    var varBox = document.getElementById('varBox');
+    var varValue = document.getElementById('varValue');
+    var stepExplain = document.getElementById('stepExplain');
+    var stepTitle = document.getElementById('stepTitle');
+
+    clearStepAnimations();
+
+    if (varDemoStep === 1) {
+      stepTitle.innerText = 'Step 1: Khởi tạo biến';
+      varValue.innerText = '5';
+      stepExplain.innerText = 'a = 5 (hộp biến đang chứa giá trị 5).';
+      varBox.classList.add('fade-in');
+      stepExplain.classList.add('fade-in');
+      return;
+    }
+
+    if (varDemoStep === 2) {
+      stepTitle.innerText = 'Step 2: Tính biểu thức';
+      stepExplain.innerText = 'a + 1 = 5 + 1 = 6';
+      stepExplain.classList.add('fade-in');
+      return;
+    }
+
+    if (varDemoStep === 3) {
+      stepTitle.innerText = 'Step 3: Gán lại cho biến';
+      varValue.innerText = '6';
+      stepExplain.innerText = 'Cập nhật hộp biến: a = 6 ✅';
+      varBox.classList.add('highlight-change');
+      stepExplain.classList.add('fade-in');
+      return;
+    }
+
+    varDemoStep = 1;
+    stepTitle.innerText = 'Step 1: Khởi tạo biến';
+    varValue.innerText = '5';
+    stepExplain.innerText = 'a = 5 (bắt đầu lại vòng mô phỏng).';
+    varBox.classList.add('fade-in');
+    stepExplain.classList.add('fade-in');
+  }
+
+  function simulateOverflow() {
+    var maxInt = 2147483647;
+    var val = Number(document.getElementById('overflowInput').value || 0);
+    var next = val + 1;
+    var el = document.getElementById('overflowResult');
+    if (next > maxInt) {
+      el.innerHTML = '⚠️ ' + val + ' + 1 = ' + next + ' vượt quá 2147483647 → <b>Overflow với int</b>. Hãy dùng <code>long long</code>.';
+      el.style.borderColor = '#fecaca';
+      el.style.background = '#fef2f2';
+    } else {
+      el.innerHTML = '✅ ' + val + ' + 1 = ' + next + ' vẫn nằm trong giới hạn int.';
+      el.style.borderColor = '#bbf7d0';
+      el.style.background = '#f0fdf4';
+    }
+  }
+
+
+
+  var demo1Step = 0;
+  function demo1Reset() {
+    demo1Step = 0;
+    document.getElementById('demo1VarValue').innerText = '?';
+    document.getElementById('stepText').innerText = 'Bấm Next Step để bắt đầu.';
+    document.getElementById('variable-box').classList.remove('pulse', 'highlight', 'fade-in');
+  }
+
+  function demo1NextStep() {
+    demo1Step += 1;
+    var box = document.getElementById('variable-box');
+    var val = document.getElementById('demo1VarValue');
+    var txt = document.getElementById('stepText');
+    box.classList.remove('pulse', 'highlight', 'fade-in');
+
+    if (demo1Step === 1) {
+      val.innerText = '5';
+      txt.innerText = 'Step 1: a = 5';
+      box.classList.add('fade-in');
+      return;
+    }
+    if (demo1Step === 2) {
+      txt.innerText = 'Step 2: a + 1 = 5 + 1';
+      txt.classList.remove('fade-in');
+      void txt.offsetWidth;
+      txt.classList.add('fade-in');
+      return;
+    }
+    if (demo1Step === 3) {
+      val.innerText = '6';
+      txt.innerText = 'Step 3: cập nhật hộp biến → a = 6';
+      box.classList.add('highlight');
+      return;
+    }
+
+    demo1Step = 1;
+    val.innerText = '5';
+    txt.innerText = 'Step 1: a = 5';
+    box.classList.add('pulse');
+  }
+
+  var demo2Value = 2147483647;
+  function toInt32(n) { return n | 0; }
+
+  function demo2Reset() {
+    demo2Value = 2147483647;
+    var box = document.getElementById('overflowBoxDemo');
+    box.classList.remove('overflow-danger', 'highlight');
+    document.getElementById('overflowValue').innerText = String(demo2Value);
+    document.getElementById('overflowStepText').innerText = 'Giá trị đang ở mức tối đa của kiểu int.';
+  }
+
+  function demo2AddOne() {
+    var old = demo2Value;
+    demo2Value = toInt32(demo2Value + 1);
+    var box = document.getElementById('overflowBoxDemo');
+    var text = document.getElementById('overflowStepText');
+    document.getElementById('overflowValue').innerText = String(demo2Value);
+    box.classList.remove('highlight');
+    void box.offsetWidth;
+    box.classList.add('highlight');
+
+    if (old === 2147483647) {
+      box.classList.add('overflow-danger');
+      text.innerHTML = '2147483647 → overflow → -2147483648<br><b>⚠️ Giá trị vượt quá giới hạn của kiểu int</b>';
+    } else {
+      text.innerText = 'Giá trị hiện tại sau khi +1 (mô phỏng số nguyên 32-bit).';
+    }
+  }
+
+  function runCinCoutDemo() {
+    var a = Number(document.getElementById('simA').value || 0);
+    var b = Number(document.getElementById('simB').value || 0);
+    var sum = a + b;
+    document.getElementById('simOutput').innerText = 'Output: ' + sum;
+    document.getElementById('simExplain').innerText = 'Chương trình đã đọc 2 số từ bàn phím và in tổng ra màn hình.';
+  }
+
+  document.querySelectorAll('.quiz-option').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var ok = btn.getAttribute('data-correct') === 'true';
+      document.querySelectorAll('.quiz-option').forEach(function (i) { i.classList.remove('correct', 'wrong'); });
+      btn.classList.add(ok ? 'correct' : 'wrong');
+      document.getElementById('quizFeedback').innerHTML = ok
+        ? '<span style="color:#15803d;font-weight:700;">✅ Đúng! 10^18 nên dùng long long.</span>'
+        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Hãy chọn lại.</span>';
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var selector = btn.getAttribute('data-copy');
+      var text = document.querySelector(selector).innerText;
+      navigator.clipboard.writeText(text).then(function () {
+        var old = btn.innerText;
+        btn.innerText = 'Copied';
+        setTimeout(function () { btn.innerText = old; }, 900);
+      });
+    });
+  });
+
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var progressBar = document.getElementById('progressBar');
+  var progressText = document.getElementById('progressText');
+
+  function updateProgress() {
+    var visible = cards.filter(function (c) {
+      var r = c.getBoundingClientRect();
+      return r.top < window.innerHeight * 0.78;
+    }).length;
+    var percent = Math.min(100, Math.round((visible / cards.length) * 100));
+    progressBar.style.width = percent + '%';
+    progressText.textContent = percent + '%';
+  }
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) e.target.classList.add('show');
+    });
+    updateProgress();
+  }, { threshold: 0.15 });
+
+  cards.forEach(function (c) { observer.observe(c); });
+  window.addEventListener('scroll', updateProgress);
+  window.addEventListener('load', function () {
+    if (cards[0]) cards[0].classList.add('show');
+    updateProgress();
+  });
+</script>
