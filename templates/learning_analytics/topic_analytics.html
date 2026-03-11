@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Topic analytics</h2>
+<table><tr><th>Tag</th><th>Total</th><th>Avg time</th></tr>
+{% for t in topic_heatmap %}<tr><td>{{ t.problem__tags__name|default:'(none)' }}</td><td>{{ t.total }}</td><td>{{ t.avg_time|floatformat:2 }}</td></tr>{% endfor %}
+</table>
+{% endblock %}

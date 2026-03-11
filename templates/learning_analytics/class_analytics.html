@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Class analytics</h2>
+<h3>Top students</h3>
+<ul>{% for s in analytics.top_students %}<li>{{ s.username }} ({{ s.total_submissions }})</li>{% endfor %}</ul>
+<canvas id="difficultyChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labels = [{% for d in analytics.difficulty_stats %}"{{ d.problem__difficulty }}",{% endfor %}];
+const values = [{% for d in analytics.difficulty_stats %}{{ d.cnt }},{% endfor %}];
+new Chart(document.getElementById('difficultyChart'), {type:'bar', data:{labels:labels,datasets:[{label:'Submissions',data:values}]}});
+</script>
+{% endblock %}
