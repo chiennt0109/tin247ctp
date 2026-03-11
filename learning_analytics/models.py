@@ -135,3 +135,33 @@ class UserLearningPath(models.Model):
     class Meta:
         unique_together = (("user", "skill"),)
         ordering = ["order"]
+
+
+class LearningTrack(models.Model):
+    slug = models.SlugField(max_length=80, unique=True)
+    track_name = models.CharField(max_length=120, unique=True)
+    category = models.CharField(max_length=80)
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["track_name"]
+
+    def __str__(self):
+        return self.track_name
+
+
+class LearningTrackStep(models.Model):
+    track = models.ForeignKey(LearningTrack, on_delete=models.CASCADE, related_name="steps")
+    order = models.PositiveIntegerField()
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="track_steps")
+    problem = models.ForeignKey(
+        "problems.Problem", on_delete=models.SET_NULL, null=True, blank=True, related_name="learning_track_steps"
+    )
+    difficulty = models.CharField(max_length=20, blank=True, default="")
+
+    class Meta:
+        unique_together = (("track", "order"),)
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.track.track_name} - Step {self.order}: {self.skill.name}"

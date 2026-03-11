@@ -7,6 +7,8 @@ from submissions.models import Submission
 
 from .analytics_engine import AnalyticsEngine
 from .profile_service import LearningProfileService
+from .coverage_analyzer import SkillCoverageAnalyzer
+from .roadmap_builder import RoadmapBuilder
 
 
 @staff_member_required
@@ -89,3 +91,22 @@ def topic_dashboard(request):
         .order_by("-total")[:30]
     )
     return render(request, "learning_analytics/topic_analytics.html", {"topic_heatmap": topic_heatmap})
+
+
+@staff_member_required
+def skill_coverage_page(request):
+    data = SkillCoverageAnalyzer().analyze()
+    return render(request, "learning_analytics/skill_coverage.html", {"coverage": data})
+
+
+@staff_member_required
+def training_tracks_page(request):
+    builder = RoadmapBuilder()
+    if request.GET.get("rebuild") == "1":
+        builder.build_all()
+    tracks = []
+    for slug in ["graph", "dynamic-programming", "math", "data-structures", "string-algorithms"]:
+        track = builder.get_track(slug)
+        if track:
+            tracks.append(track)
+    return render(request, "learning_analytics/training_tracks.html", {"tracks": tracks})

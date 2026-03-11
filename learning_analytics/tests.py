@@ -96,3 +96,42 @@ class ApiAdminEndpointTests(SimpleTestCase):
         response = admin_user_learning_profile(request, 1)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"overview", response.content)
+
+
+class NewFeatureSmokeTests(SimpleTestCase):
+    def test_keyword_skill_map_contains_expected_items(self):
+        from learning_analytics.skill_detector import KEYWORD_SKILL_MAP
+
+        self.assertEqual(KEYWORD_SKILL_MAP["bfs"], "BFS")
+        self.assertEqual(KEYWORD_SKILL_MAP["dijkstra"], "Dijkstra")
+
+    @patch("learning_analytics.api.SkillCoverageAnalyzer")
+    def test_skill_coverage_api(self, analyzer_mock):
+        from learning_analytics.api import skill_coverage
+
+        analyzer_mock.return_value.analyze.return_value = {"missing_skills": ["BFS"]}
+        request = RequestFactory().get("/api/skill_coverage")
+        request.user = SimpleNamespace(is_staff=True, is_active=True, is_authenticated=True)
+        response = skill_coverage(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"missing_skills", response.content)
+
+    @patch("learning_analytics.api.RoadmapBuilder")
+    def test_roadmap_track_api(self, builder_mock):
+        from learning_analytics.api import roadmap_track
+
+        builder_mock.return_value.get_track.return_value = {"track": "Graph Track", "steps": []}
+        request = RequestFactory().get("/api/roadmap/graph")
+        response = roadmap_track(request, "graph")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Graph Track", response.content)
+
+    @patch("learning_analytics.api.LearningLeaderboardService")
+    def test_learning_leaderboard_api(self, lb_mock):
+        from learning_analytics.api import learning_leaderboard
+
+        lb_mock.return_value.compute.return_value = {"hardworking": [], "breakthrough": [], "needs_improvement": []}
+        request = RequestFactory().get("/api/learning_leaderboard")
+        response = learning_leaderboard(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"hardworking", response.content)

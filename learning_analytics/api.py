@@ -15,6 +15,11 @@ from .serializers import (
 from .skill_engine import SkillEngine
 from .models import UserSkill
 from .profile_service import LearningProfileService
+from .skill_detector import detect_and_assign
+from .coverage_analyzer import SkillCoverageAnalyzer
+from .roadmap_builder import RoadmapBuilder
+from .leaderboard_service import LearningLeaderboardService
+from problems.models import Problem
 
 
 @require_GET
@@ -107,3 +112,37 @@ def student_weak_skills(request, id):
 def admin_user_learning_profile(request, id):
     profile = LearningProfileService().build_profile(id)
     return JsonResponse(profile)
+
+
+@staff_member_required
+@require_GET
+def skill_detection(request):
+    created = 0
+    detected_items = []
+    for problem in Problem.objects.prefetch_related("tags").all():
+        detected, cnt = detect_and_assign(problem)
+        created += cnt
+        if detected:
+            detected_items.append({"problem": problem.code, "skills": [s.name for s in detected]})
+    return JsonResponse({"created_links": created, "detected": detected_items[:200]})
+
+
+@staff_member_required
+@require_GET
+def skill_coverage(request):
+    data = SkillCoverageAnalyzer().analyze()
+    return JsonResponse(data)
+
+
+@require_GET
+def roadmap_track(request, track):
+    data = RoadmapBuilder().get_track(track)
+    if not data:
+        return JsonResponse({"error": "track not found"}, status=404)
+    return JsonResponse(data)
+
+
+@require_GET
+def learning_leaderboard(request):
+    data = LearningLeaderboardService().compute(top_n=3)
+    return JsonResponse(data)

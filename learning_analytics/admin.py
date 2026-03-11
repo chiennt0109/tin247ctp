@@ -9,6 +9,8 @@ from .models import (
     Skill,
     SkillPrerequisite,
     UserLearningPath,
+    LearningTrack,
+    LearningTrackStep,
     UserProblemStats,
     UserSkill,
     UserSkillStats,
@@ -30,6 +32,8 @@ admin.site.register(UserSkillStats)
 admin.site.register(UserTopicStats)
 admin.site.register(UserProblemStats)
 admin.site.register(UserLearningPath)
+admin.site.register(LearningTrack)
+admin.site.register(LearningTrackStep)
 
 
 User = get_user_model()

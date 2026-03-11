@@ -1,0 +1,19 @@
+<section class="py-12 bg-white">
+  <div class="max-w-6xl mx-auto px-6">
+    <h2 class="text-3xl font-bold mb-6">🏆 Learning Leaderboard</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="p-4 rounded-xl border">
+        <h3 class="font-bold mb-2">🐝 Con Ong Chăm Chỉ</h3>
+        <ol class="list-decimal ml-5">{% for u in learning_leaderboard.hardworking %}<li>{{ u.username }} ({{ u.score }})</li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </div>
+      <div class="p-4 rounded-xl border">
+        <h3 class="font-bold mb-2">🚀 Đột Phá</h3>
+        <ol class="list-decimal ml-5">{% for u in learning_leaderboard.breakthrough %}<li>{{ u.username }} ({{ u.score }})</li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </div>
+      <div class="p-4 rounded-xl border">
+        <h3 class="font-bold mb-2">⚠ Cần Cố Gắng</h3>
+        <ol class="list-decimal ml-5">{% for u in learning_leaderboard.needs_improvement %}<li>{{ u.username }} ({{ u.score }})</li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </div>
+    </div>
+  </div>
+</section>

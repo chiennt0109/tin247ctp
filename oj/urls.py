@@ -60,6 +60,10 @@ urlpatterns = [
     path("api/student/<int:id>/training_plan", learning_analytics_api.student_training_plan, name="student_training_plan"),
     path("api/student/<int:id>/weak_skills", learning_analytics_api.student_weak_skills, name="student_weak_skills"),
     path("api/admin/user/<int:id>/learning_profile", learning_analytics_api.admin_user_learning_profile, name="admin_user_learning_profile"),
+    path("api/skill_detection", learning_analytics_api.skill_detection, name="skill_detection"),
+    path("api/skill_coverage", learning_analytics_api.skill_coverage, name="skill_coverage"),
+    path("api/roadmap/<slug:track>", learning_analytics_api.roadmap_track, name="roadmap_track"),
+    path("api/learning_leaderboard", learning_analytics_api.learning_leaderboard, name="learning_leaderboard"),
 
     # ==========================
     # 🧩 Quản trị & AI Tools
