@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import DateTimeField, F, Max, Value
+from django.db.models.functions import Coalesce, Greatest
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -40,6 +42,8 @@ User = get_user_model()
 
 
 class UserAnalyticsAdmin(UserAdmin):
+    ACTIVITY_FALLBACK = Value("1970-01-01T00:00:00Z", output_field=DateTimeField())
+
     def learning_profile_link(self, obj):
         url = reverse("learning_analytics:user_learning_profile", kwargs={"user_id": obj.id})
         return format_html('<a class="button" href="{}">Learning Profile</a>', url)
@@ -71,8 +75,20 @@ class UserAnalyticsAdmin(UserAdmin):
     analytics_tools.short_description = "Learning Analytics"
 
     list_display = UserAdmin.list_display + ("learning_profile_link",)
-    ordering = ("-last_login", "username")
     readonly_fields = UserAdmin.readonly_fields + ("learning_profile_button", "analytics_tools")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).annotate(
+            latest_submission_at=Max("submission__created_at"),
+            latest_problem_submission_at=Max("problem_stats__last_submission_at"),
+        )
+        return qs.annotate(
+            recent_activity_at=Greatest(
+                Coalesce("last_login", self.ACTIVITY_FALLBACK),
+                Coalesce("latest_submission_at", self.ACTIVITY_FALLBACK),
+                Coalesce("latest_problem_submission_at", self.ACTIVITY_FALLBACK),
+            )
+        ).order_by(F("recent_activity_at").desc(nulls_last=True), "username")
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)

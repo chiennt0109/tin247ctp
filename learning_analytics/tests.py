@@ -3,7 +3,11 @@ from unittest.mock import MagicMock, patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory, SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.utils import timezone
+
+from problems.models import Problem
+from submissions.models import Submission
 
 from learning_analytics.admin import UserAnalyticsAdmin
 from learning_analytics.profile_service import LearningProfileService
@@ -67,6 +71,45 @@ class AdminIntegrationTests(SimpleTestCase):
         html = self.model_admin.learning_profile_button(obj)
         self.assertIn("View Learning Profile", html)
         self.assertIn("/learning-analytics/admin/user/7/", html)
+
+
+class AdminRecentActivityOrderingTests(TestCase):
+    def setUp(self):
+        self.site = AdminSite()
+        self.model_admin = UserAnalyticsAdmin(get_user_model(), self.site)
+        self.user_model = get_user_model()
+
+    def test_get_queryset_prioritizes_recent_submission_activity(self):
+        old_login_user = self.user_model.objects.create_user(
+            username="old_login_user", password="x", last_login=timezone.now() - timezone.timedelta(days=5)
+        )
+        active_submitter = self.user_model.objects.create_user(username="active_submitter", password="x")
+
+        Submission.objects.create(
+            user=active_submitter,
+            problem=Problem.objects.create(code="P-ADMIN-1", title="P", statement="S"),
+            language="python",
+            source_code="print(1)",
+            verdict="Accepted",
+        )
+
+        request = RequestFactory().get("/admin/auth/user/")
+        request.user = old_login_user
+        users = list(self.model_admin.get_queryset(request)[:2])
+        self.assertEqual(users[0].username, "active_submitter")
+
+    def test_get_queryset_falls_back_to_last_login_when_no_submissions(self):
+        stale_user = self.user_model.objects.create_user(
+            username="stale_user", password="x", last_login=timezone.now() - timezone.timedelta(days=7)
+        )
+        fresh_user = self.user_model.objects.create_user(
+            username="fresh_user", password="x", last_login=timezone.now() - timezone.timedelta(hours=3)
+        )
+
+        request = RequestFactory().get("/admin/auth/user/")
+        request.user = fresh_user
+        users = list(self.model_admin.get_queryset(request)[:2])
+        self.assertEqual([u.username for u in users], ["fresh_user", "stale_user"])
 
 
 class ApiAdminEndpointTests(SimpleTestCase):
