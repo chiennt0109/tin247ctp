@@ -98,6 +98,10 @@ class AdminRecentActivityOrderingTests(TestCase):
         users = list(self.model_admin.get_queryset(request)[:2])
         self.assertEqual(users[0].username, "active_submitter")
 
+    def test_get_ordering_does_not_override_queryset_activity_sort(self):
+        request = RequestFactory().get("/admin/auth/user/")
+        self.assertEqual(self.model_admin.get_ordering(request), ())
+
     def test_get_queryset_falls_back_to_last_login_when_no_submissions(self):
         stale_user = self.user_model.objects.create_user(
             username="stale_user", password="x", last_login=timezone.now() - timezone.timedelta(days=7)

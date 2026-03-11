@@ -82,6 +82,11 @@ class UserAnalyticsAdmin(UserAdmin):
     def recent_activity(self, obj):
         return getattr(obj, "recent_activity_at", None)
 
+    def get_ordering(self, request):
+        # Keep ordering from get_queryset() so UserAdmin default username ordering
+        # does not override recent activity ordering.
+        return ()
+
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).annotate(
