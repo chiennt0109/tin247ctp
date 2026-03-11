@@ -78,12 +78,10 @@ class UserAnalyticsAdmin(UserAdmin):
     readonly_fields = UserAdmin.readonly_fields + ("learning_profile_button", "analytics_tools")
 
 
-    @admin.display(description="Recent activity", ordering="recent_activity_at")
+    @admin.display(description="Recent activity")
     def recent_activity(self, obj):
         return getattr(obj, "recent_activity_at", None)
 
-    def get_ordering(self, request):
-        return ("-recent_activity_at", "username")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).annotate(
