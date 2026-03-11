@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Contest analytics</h2>
+<p>Contest count: {{ contest_data.contest_count }}</p>
+<p>Avg rank: {{ contest_data.avg_rank }}</p>
+<p>Rating: {{ contest_data.rating }}</p>
+<p>Solve rate: {{ contest_data.problem_solve_rate }}</p>
+<p>Flags: {{ contest_data.flags|join:", " }}</p>
+{% endblock %}

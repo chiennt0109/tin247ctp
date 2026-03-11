@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-3">
+  <h3>Learning Profile: {{ student.username }}</h3>
+  <p>Joined: {{ profile.overview.join_date }} | Talent: <strong>{{ profile.overview.talent.level }}</strong></p>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-3"><div class="card p-2">Solved Problems: {{ profile.overview.problems_solved }}</div></div>
+    <div class="col-md-3"><div class="card p-2">Submissions: {{ profile.overview.total_submissions }}</div></div>
+    <div class="col-md-3"><div class="card p-2">Acceptance: {{ profile.overview.acceptance_rate|floatformat:2 }}</div></div>
+    <div class="col-md-3"><div class="card p-2">Rating: {{ profile.overview.current_rating }}</div></div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6"><canvas id="skillRadar"></canvas></div>
+    <div class="col-md-6"><canvas id="ratingTimeline"></canvas></div>
+  </div>
+
+  <h5 class="mt-4">Weak Skills</h5>
+  <ul>{% for w in profile.weak_skills %}<li>{{ w.skill }} ({{ w.weakness }})</li>{% endfor %}</ul>
+
+  <h5>Learning Gap Detection</h5>
+  <ul>{% for g in profile.learning_gaps %}<li>{{ g.skill }} missing prerequisite {{ g.missing_prerequisite }} ({{ g.prerequisite_score }})</li>{% empty %}<li>No major gap found.</li>{% endfor %}</ul>
+
+  <h5>Recommended Learning Path</h5>
+  <ol>{% for s in profile.recommended_roadmap %}<li>{{ s }}</li>{% endfor %}</ol>
+
+  <h5>Recommended Problems</h5>
+  <ul>{% for p in profile.recommended_problems %}<li>{{ p.code }} - {{ p.title }} ({{ p.skill }})</li>{% endfor %}</ul>
+
+  <h5>AI Coach Suggestions</h5>
+  <p><strong>{{ profile.training_plan.daily.title }}</strong></p>
+  <ul>{% for t in profile.training_plan.daily.tasks %}<li>{{ t.skill }}: {{ t.problems|join:", " }}</li>{% endfor %}<li>{{ profile.training_plan.daily.contest_practice }} contest practice</li></ul>
+  <p><strong>{{ profile.training_plan.weekly.title }}</strong></p>
+  <ul>{% for d in profile.training_plan.weekly.days %}<li>Day {{ d.day }}: {{ d.focus }}</li>{% endfor %}</ul>
+
+  <h5>Submission Behavior</h5>
+  <p>AC {{ profile.submission_behavior.ac_rate }}, WA {{ profile.submission_behavior.wa_rate }}, TLE {{ profile.submission_behavior.tle_rate }}, RE {{ profile.submission_behavior.re_rate }}</p>
+
+  <h5>Skill Progress Table</h5>
+  <div class="table-responsive">
+  <table class="table table-sm table-bordered">
+    <tr><th>Skill</th><th>Category</th><th>Level</th><th>Score</th><th>Solved</th><th>Attempted</th><th>Mastery</th></tr>
+    {% for s in profile.skill_progress %}
+      <tr><td>{{ s.skill }}</td><td>{{ s.category }}</td><td>{{ s.level }}</td><td>{{ s.score }}</td><td>{{ s.problems_solved }}</td><td>{{ s.problems_attempted }}</td><td>{{ s.mastery_status }}</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+
+  <h5>Learning Progress Timeline (monthly)</h5>
+  <canvas id="progressTimeline"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ profile.skill_radar|json_script:"skill-radar-data" }}
+{{ profile.contest_stats.rating_history|json_script:"rating-history-data" }}
+{{ profile.progress_timeline|json_script:"timeline-data" }}
+<script>
+const radar = JSON.parse(document.getElementById("skill-radar-data").textContent);
+new Chart(document.getElementById('skillRadar'), {
+  type: 'radar',
+  data: {labels: Object.keys(radar), datasets:[{label:'Skill Radar', data:Object.values(radar)}]}
+});
+
+const ratingHistory = JSON.parse(document.getElementById("rating-history-data").textContent);
+new Chart(document.getElementById('ratingTimeline'), {
+  type:'line',
+  data:{labels:ratingHistory.map(x=>x.date), datasets:[{label:'Rating', data:ratingHistory.map(x=>x.rating)}]}
+});
+
+const timeline = JSON.parse(document.getElementById("timeline-data").textContent);
+new Chart(document.getElementById('progressTimeline'), {
+  type:'line',
+  data:{
+    labels:timeline.map(x=>x.month),
+    datasets:[
+      {label:'Submissions', data:timeline.map(x=>x.submissions)},
+      {label:'Accepted', data:timeline.map(x=>x.accepted)},
+      {label:'Skills Learned', data:timeline.map(x=>x.skills_learned)}
+    ]
+  }
+});
+</script>
+{% endblock %}

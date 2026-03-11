@@ -1,0 +1,68 @@
+from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from django.urls import reverse
+from django.utils.html import format_html
+
+from .models import (
+    ProblemSkill,
+    Skill,
+    SkillPrerequisite,
+    UserLearningPath,
+    UserProblemStats,
+    UserSkill,
+    UserSkillStats,
+    UserTopicStats,
+)
+
+
+@admin.register(Skill)
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ("name", "category", "level", "parent")
+    list_filter = ("category", "level")
+    search_fields = ("name", "description")
+
+
+admin.site.register(SkillPrerequisite)
+admin.site.register(ProblemSkill)
+admin.site.register(UserSkill)
+admin.site.register(UserSkillStats)
+admin.site.register(UserTopicStats)
+admin.site.register(UserProblemStats)
+admin.site.register(UserLearningPath)
+
+
+User = get_user_model()
+
+
+class UserAnalyticsAdmin(UserAdmin):
+    def learning_profile_link(self, obj):
+        url = reverse("learning_analytics:user_learning_profile", kwargs={"user_id": obj.id})
+        return format_html('<a class="button" href="{}">Learning Profile</a>', url)
+
+    learning_profile_link.short_description = "Learning Profile"
+
+    def learning_profile_button(self, obj):
+        if not obj or not obj.pk:
+            return "Save user first"
+        url = reverse("learning_analytics:user_learning_profile", kwargs={"user_id": obj.id})
+        return format_html(
+            '<a class="button" style="padding:6px 12px;background:#2c7be5;color:white;border-radius:4px;text-decoration:none;" href="{}">View Learning Profile</a>',
+            url,
+        )
+
+    learning_profile_button.short_description = "Learning Profile"
+
+    list_display = UserAdmin.list_display + ("learning_profile_link",)
+    readonly_fields = UserAdmin.readonly_fields + ("learning_profile_button",)
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        return fieldsets + (("Learning Analytics", {"fields": ("learning_profile_button",)}),)
+
+
+try:
+    admin.site.unregister(User)
+except admin.sites.NotRegistered:
+    pass
+admin.site.register(User, UserAnalyticsAdmin)
