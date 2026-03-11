@@ -71,6 +71,7 @@ class UserAnalyticsAdmin(UserAdmin):
     analytics_tools.short_description = "Learning Analytics"
 
     list_display = UserAdmin.list_display + ("learning_profile_link",)
+    ordering = ("-last_login", "username")
     readonly_fields = UserAdmin.readonly_fields + ("learning_profile_button", "analytics_tools")
 
     def get_fieldsets(self, request, obj=None):
