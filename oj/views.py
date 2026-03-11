@@ -45,7 +45,7 @@ STAGES = [
 # 🏠 HOME
 # ==============================
 def home(request):
-    leaderboard = LearningLeaderboardService().compute(top_n=3)
+    leaderboard = LearningLeaderboardService().compute(top_n=10)
     return render(request, "home.html", {"stages": STAGES, "learning_leaderboard": leaderboard})
 
 

@@ -24,7 +24,7 @@ class LearningLeaderboardService:
             ids.append(u.id)
         return User.objects.filter(id__in=ids)
 
-    def compute(self, top_n=3):
+    def compute(self, top_n=10):
         now = timezone.now()
         d30 = now - timedelta(days=30)
         users = self._eligible_users()
@@ -32,9 +32,6 @@ class LearningLeaderboardService:
         hardworking = []
         breakthrough = []
         needs_improvement = []
-        top_skill_learners = []
-        fastest_improvement = []
-        students_needing_help = []
 
         for u in users:
             subs30 = Submission.objects.filter(user=u, created_at__gte=d30)
@@ -61,27 +58,15 @@ class LearningLeaderboardService:
             hardworking.append({"username": u.username, "score": round(activity_score, 2)})
             breakthrough.append({"username": u.username, "score": round(progress_score, 2)})
 
-            top_skill_learners.append({"username": u.username, "score": new_skills})
-            fastest_improvement.append({"username": u.username, "score": round(rating_growth + hard_solved_30, 2)})
-
             if acceptance_rate < 0.2 and failed >= 10 and submissions_30 > 0:
                 needs_improvement.append({"username": u.username, "score": round((1 - acceptance_rate) * failed, 2)})
-                students_needing_help.append({"username": u.username, "score": round((1 - acceptance_rate) * 100, 2)})
 
         hardworking.sort(key=lambda x: x["score"], reverse=True)
         breakthrough.sort(key=lambda x: x["score"], reverse=True)
         needs_improvement.sort(key=lambda x: x["score"], reverse=True)
-        top_skill_learners.sort(key=lambda x: x["score"], reverse=True)
-        fastest_improvement.sort(key=lambda x: x["score"], reverse=True)
-        students_needing_help.sort(key=lambda x: x["score"], reverse=True)
 
         return {
             "hardworking": hardworking[:top_n],
             "breakthrough": breakthrough[:top_n],
             "needs_improvement": needs_improvement[:top_n],
-            "learning_progress": {
-                "top_skill_learners": top_skill_learners[:top_n],
-                "fastest_improvement": fastest_improvement[:top_n],
-                "students_needing_help": students_needing_help[:top_n],
-            },
         }
