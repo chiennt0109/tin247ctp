@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
+from .ai_coach import AICoach
 from .analytics_engine import AnalyticsEngine
 from .prediction_engine import PredictionEngine
 from .recommendation_engine import RecommendationEngine
@@ -42,8 +43,10 @@ def student_analytics(request, id):
 
 @require_GET
 def student_skills(request, id):
-    data = [serialize_user_skill(s) for s in UserSkill.objects.filter(user_id=id).select_related("skill")]
-    return JsonResponse({"skills": data})
+    user = User.objects.get(pk=id)
+    radar = AnalyticsEngine().radar_chart(user)
+    details = [serialize_user_skill(s) for s in UserSkill.objects.filter(user_id=id).select_related("skill")]
+    return JsonResponse({"radar": radar, "details": details})
 
 
 @require_GET
@@ -77,3 +80,21 @@ def student_contest_analysis(request, id):
     user = User.objects.get(pk=id)
     data = AnalyticsEngine().contest_analysis(user)
     return JsonResponse(data)
+
+
+@require_GET
+def student_training_plan(request, id):
+    user = User.objects.get(pk=id)
+    coach = AICoach()
+    return JsonResponse({
+        "daily": coach.daily_training_plan(user),
+        "weekly": coach.weekly_training_plan(user),
+    })
+
+
+@require_GET
+def student_weak_skills(request, id):
+    user = User.objects.get(pk=id)
+    coach = AICoach()
+    weak = coach.weak_skills(user)
+    return JsonResponse({"weak_skills": [{"skill": x["skill"].name, "weakness": x["weakness_score"]} for x in weak]})

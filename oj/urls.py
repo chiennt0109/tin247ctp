@@ -57,6 +57,8 @@ urlpatterns = [
     path("api/student/<int:id>/recommendations", learning_analytics_api.student_recommendations, name="student_recommendations"),
     path("api/student/<int:id>/learning-path", learning_analytics_api.student_learning_path, name="student_learning_path"),
     path("api/student/<int:id>/contest-analysis", learning_analytics_api.student_contest_analysis, name="student_contest_analysis"),
+    path("api/student/<int:id>/training_plan", learning_analytics_api.student_training_plan, name="student_training_plan"),
+    path("api/student/<int:id>/weak_skills", learning_analytics_api.student_weak_skills, name="student_weak_skills"),
 
     # ==========================
     # 🧩 Quản trị & AI Tools

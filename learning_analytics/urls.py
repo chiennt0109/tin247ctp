@@ -16,4 +16,6 @@ urlpatterns = [
     path("api/student/<int:id>/recommendations", api.student_recommendations, name="student_recommendations"),
     path("api/student/<int:id>/learning-path", api.student_learning_path, name="student_learning_path"),
     path("api/student/<int:id>/contest-analysis", api.student_contest_analysis, name="student_contest_analysis"),
+    path("api/student/<int:id>/training_plan", api.student_training_plan, name="student_training_plan"),
+    path("api/student/<int:id>/weak_skills", api.student_weak_skills, name="student_weak_skills"),
 ]

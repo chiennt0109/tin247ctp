@@ -4,15 +4,28 @@ from django.utils import timezone
 
 
 class Skill(models.Model):
+    LEVEL_BEGINNER = "Beginner"
+    LEVEL_INTERMEDIATE = "Intermediate"
+    LEVEL_ADVANCED = "Advanced"
+    LEVEL_OLYMPIAD = "Olympiad"
+    LEVEL_CHOICES = [
+        (LEVEL_BEGINNER, "Beginner"),
+        (LEVEL_INTERMEDIATE, "Intermediate"),
+        (LEVEL_ADVANCED, "Advanced"),
+        (LEVEL_OLYMPIAD, "Olympiad"),
+    ]
+
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True)
+    category = models.CharField(max_length=80, default="Basic Programming")
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default=LEVEL_BEGINNER)
     parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, blank=True, related_name="children"
     )
     description = models.TextField(blank=True)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["category", "name"]
 
     def __str__(self):
         return self.name
@@ -66,6 +79,18 @@ class UserSkill(models.Model):
     class Meta:
         unique_together = (("user", "skill"),)
         indexes = [models.Index(fields=["user", "level"]), models.Index(fields=["user", "-weakness_score"])]
+
+
+class UserSkillStats(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="skill_stats")
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="user_skill_stats")
+    attempted_problems = models.PositiveIntegerField(default=0)
+    solved_problems = models.PositiveIntegerField(default=0)
+    skill_score = models.FloatField(default=0.0)
+    updated_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = (("user", "skill"),)
 
 
 class UserTopicStats(models.Model):

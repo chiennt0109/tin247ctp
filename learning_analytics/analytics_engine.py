@@ -3,20 +3,24 @@ from django.db.models import Avg, Count, F, Q
 from contests.models import Participation
 from submissions.models import Submission
 
-from .models import Skill, UserSkill, UserTopicStats
+from .models import Skill, UserSkill, UserSkillStats, UserTopicStats
 
 
 class AnalyticsEngine:
     def compute_weak_skills(self, user, limit=5):
         topics = UserTopicStats.objects.filter(user=user).select_related("skill")
+        stats_map = {
+            item.skill_id: item
+            for item in UserSkillStats.objects.filter(user=user).only("skill_id", "skill_score")
+        }
         ranked = []
         for topic in topics:
             unsolved_ratio = 1 - (topic.solved / topic.attempted) if topic.attempted else 1
+            low_skill_score = 1 - stats_map.get(topic.skill_id).skill_score if topic.skill_id in stats_map else 1
             weakness_score = (
                 0.4 * (1 - topic.acceptance_rate)
                 + 0.3 * unsolved_ratio
-                + 0.2 * (1 - topic.progress)
-                + 0.1 * topic.tle_rate
+                + 0.3 * low_skill_score
             )
             UserSkill.objects.filter(user=user, skill=topic.skill).update(weakness_score=weakness_score)
             ranked.append({"skill": topic.skill, "weakness_score": round(weakness_score, 4)})

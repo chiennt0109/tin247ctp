@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from submissions.models import Submission
 
-from .models import ProblemSkill, UserSkill, UserTopicStats
+from .models import ProblemSkill, UserSkill, UserSkillStats, UserTopicStats
 
 DIFFICULTY_WEIGHTS = {"Easy": 0.3, "Medium": 0.6, "Hard": 1.0}
 
@@ -37,18 +37,26 @@ class SkillEngine:
 
             solve_rate = solved / attempted if attempted else 0.0
             attempt_rate = attempted / total_skill_problems
-
             solved_links = [link for link in problem_links if link.problem_id in solved_ids]
-            if solved_links:
-                difficulty_weight = sum(
-                    DIFFICULTY_WEIGHTS.get(link.problem.difficulty, 0.3) for link in solved_links
-                ) / len(solved_links)
-            else:
-                difficulty_weight = 0.0
+            difficulty_weight = (
+                sum(DIFFICULTY_WEIGHTS.get(link.problem.difficulty, 0.3) for link in solved_links) / len(solved_links)
+                if solved_links
+                else 0.0
+            )
+            weighted_score = (0.6 * solve_rate) + (0.2 * attempt_rate) + (0.2 * difficulty_weight)
+            simple_score = solve_rate
+            level = self.classify_level(weighted_score)
 
-            skill_score = (0.6 * solve_rate) + (0.2 * attempt_rate) + (0.2 * difficulty_weight)
-            level = self.classify_level(skill_score)
-
+            UserSkillStats.objects.update_or_create(
+                user=user,
+                skill_id=skill_id,
+                defaults={
+                    "attempted_problems": attempted,
+                    "solved_problems": solved,
+                    "skill_score": round(simple_score, 4),
+                    "updated_at": now,
+                },
+            )
             UserTopicStats.objects.update_or_create(
                 user=user,
                 skill_id=skill_id,
@@ -64,7 +72,7 @@ class SkillEngine:
                 user=user,
                 skill_id=skill_id,
                 defaults={
-                    "skill_score": round(skill_score, 4),
+                    "skill_score": round(weighted_score, 4),
                     "level": level,
                     "last_updated": now,
                 },
