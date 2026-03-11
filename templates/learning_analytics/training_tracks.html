@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Training Tracks</h2>
+<p><a class="btn btn-sm btn-primary" href="?rebuild=1">Rebuild Tracks</a></p>
+{% for t in tracks %}
+  <h4>{{ t.track }}</h4>
+  <ol>
+  {% for step in t.steps %}
+    <li>{{ step.skill }} {% if step.problem %}→ {{ step.problem }}{% endif %} {% if step.difficulty %}({{ step.difficulty }}){% endif %}</li>
+  {% endfor %}
+  </ol>
+{% empty %}
+  <p>No tracks yet. Click rebuild.</p>
+{% endfor %}
+{% endblock %}
