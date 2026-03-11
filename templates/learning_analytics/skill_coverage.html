@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Skill Coverage</h2>
+<p>Missing: {{ coverage.missing_skills|length }} | Weak: {{ coverage.weak_skills|length }}</p>
+<table class="table table-bordered table-sm">
+  <tr><th>Skill</th><th>Problems</th><th>Beginner</th><th>Intermediate</th><th>Advanced</th><th>Status</th></tr>
+  {% for r in coverage.rows %}
+  <tr>
+    <td>{{ r.skill }}</td><td>{{ r.problems }}</td><td>{{ r.beginner }}</td><td>{{ r.intermediate }}</td><td>{{ r.advanced }}</td><td>{{ r.status }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
