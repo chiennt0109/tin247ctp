@@ -7,6 +7,7 @@ app_name = "learning_analytics"
 urlpatterns = [
     path("admin/", views.admin_learning_dashboard, name="admin_dashboard"),
     path("admin/students/", views.student_dashboard, name="student_dashboard"),
+    path("admin/user/<int:user_id>/", views.user_learning_profile, name="user_learning_profile"),
     path("admin/class/", views.class_dashboard, name="class_dashboard"),
     path("admin/topics/", views.topic_dashboard, name="topic_dashboard"),
     path("admin/contests/", views.contest_dashboard, name="contest_dashboard"),
@@ -18,4 +19,5 @@ urlpatterns = [
     path("api/student/<int:id>/contest-analysis", api.student_contest_analysis, name="student_contest_analysis"),
     path("api/student/<int:id>/training_plan", api.student_training_plan, name="student_training_plan"),
     path("api/student/<int:id>/weak_skills", api.student_weak_skills, name="student_weak_skills"),
+    path("api/admin/user/<int:id>/learning_profile", api.admin_user_learning_profile, name="admin_user_learning_profile"),
 ]

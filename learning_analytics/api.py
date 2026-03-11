@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from django.contrib.admin.views.decorators import staff_member_required
 
 from .ai_coach import AICoach
 from .analytics_engine import AnalyticsEngine
@@ -13,6 +14,7 @@ from .serializers import (
 )
 from .skill_engine import SkillEngine
 from .models import UserSkill
+from .profile_service import LearningProfileService
 
 
 @require_GET
@@ -98,3 +100,10 @@ def student_weak_skills(request, id):
     coach = AICoach()
     weak = coach.weak_skills(user)
     return JsonResponse({"weak_skills": [{"skill": x["skill"].name, "weakness": x["weakness_score"]} for x in weak]})
+
+
+@staff_member_required
+@require_GET
+def admin_user_learning_profile(request, id):
+    profile = LearningProfileService().build_profile(id)
+    return JsonResponse(profile)

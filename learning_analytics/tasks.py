@@ -5,6 +5,7 @@ from .ai_coach import AICoach
 from .analytics_engine import AnalyticsEngine
 from .prediction_engine import PredictionEngine
 from .recommendation_engine import RecommendationEngine
+from .profile_service import LearningProfileService
 from .skill_engine import SkillEngine
 
 
@@ -40,9 +41,17 @@ def update_student_training_plan(user_id=None):
         )
 
 
+def update_user_learning_profile_cache(user_id=None):
+    users = User.objects.filter(id=user_id) if user_id else User.objects.filter(is_staff=False)
+    service = LearningProfileService()
+    for user in users:
+        service.build_profile(user.id, force=True)
+
+
 def enqueue_update_student_analytics():
     import django_rq
 
     scheduler = django_rq.get_scheduler("default")
     scheduler.schedule(scheduled_time=None, func=update_student_analytics, interval=6 * 3600, repeat=None)
     scheduler.schedule(scheduled_time=None, func=update_student_training_plan, interval=6 * 3600, repeat=None)
+    scheduler.schedule(scheduled_time=None, func=update_user_learning_profile_cache, interval=6 * 3600, repeat=None)

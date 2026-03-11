@@ -59,10 +59,12 @@ urlpatterns = [
     path("api/student/<int:id>/contest-analysis", learning_analytics_api.student_contest_analysis, name="student_contest_analysis"),
     path("api/student/<int:id>/training_plan", learning_analytics_api.student_training_plan, name="student_training_plan"),
     path("api/student/<int:id>/weak_skills", learning_analytics_api.student_weak_skills, name="student_weak_skills"),
+    path("api/admin/user/<int:id>/learning_profile", learning_analytics_api.admin_user_learning_profile, name="admin_user_learning_profile"),
 
     # ==========================
     # 🧩 Quản trị & AI Tools
     # ==========================
+    path("admin/auth/user/<int:user_id>/change/", learning_analytics_views.redirect_admin_user_to_learning_profile, name="admin_user_learning_redirect"),
     path("admin/", admin.site.urls),
     path("admin/problems/ai_analyze_problem/", views_admin.ai_analyze_problem, name="ai_analyze_problem"),
     path("admin/learning-analytics/", learning_analytics_views.admin_learning_dashboard, name="admin_learning_analytics"),
