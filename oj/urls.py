@@ -95,5 +95,6 @@ urlpatterns = [
     
     path("arena/", include("arena.urls", namespace="arena")),
     path("learning-analytics/", include(("learning_analytics.urls", "learning_analytics"), namespace="learning_analytics")),
+    path("analytics/", include(("learning_analytics.urls", "learning_analytics"), namespace="learning_analytics_public")),
 
 ]

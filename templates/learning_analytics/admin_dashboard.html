@@ -6,7 +6,12 @@
   <li><a href="{% url 'learning_analytics:class_dashboard' %}">Class analytics</a></li>
   <li><a href="{% url 'learning_analytics:topic_dashboard' %}">Topic analytics</a></li>
   <li><a href="{% url 'learning_analytics:contest_dashboard' %}">Contest analytics</a></li>
-  <li><a href="{% url 'learning_analytics:skill_coverage_page' %}">Skill Coverage</a></li>
-  <li><a href="{% url 'learning_analytics:training_tracks_page' %}">Training Tracks</a></li>
+  <li><a href="/analytics/skill-coverage/">Skill Coverage</a></li>
+  <li><a href="/analytics/training-tracks/">Training Tracks</a></li>
 </ul>
+
+<div class="analytics-links" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+  <a class="button" href="/analytics/skill-coverage/" style="padding:8px 12px;border:1px solid #ccc;border-radius:6px;">Skill Coverage</a>
+  <a class="button" href="/analytics/training-tracks/" style="padding:8px 12px;border:1px solid #ccc;border-radius:6px;">Training Tracks</a>
+</div>
 {% endblock %}
