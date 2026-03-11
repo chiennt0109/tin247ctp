@@ -1,0 +1,1354 @@
+[
+  {
+    "name": "Input Output",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Input Output in Basic Programming",
+    "prerequisites": []
+  },
+  {
+    "name": "Variables and Types",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Variables and Types in Basic Programming",
+    "prerequisites": [
+      "Input Output"
+    ]
+  },
+  {
+    "name": "Conditionals",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Conditionals in Basic Programming",
+    "prerequisites": [
+      "Variables and Types"
+    ]
+  },
+  {
+    "name": "Loops",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Loops in Basic Programming",
+    "prerequisites": [
+      "Conditionals"
+    ]
+  },
+  {
+    "name": "Functions",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Functions in Basic Programming",
+    "prerequisites": [
+      "Loops"
+    ]
+  },
+  {
+    "name": "Arrays",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Arrays in Basic Programming",
+    "prerequisites": [
+      "Functions"
+    ]
+  },
+  {
+    "name": "Strings Basics",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Strings Basics in Basic Programming",
+    "prerequisites": [
+      "Arrays"
+    ]
+  },
+  {
+    "name": "Sorting Basics",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Sorting Basics in Basic Programming",
+    "prerequisites": [
+      "Strings Basics"
+    ]
+  },
+  {
+    "name": "Big-O",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Big-O in Basic Programming",
+    "prerequisites": [
+      "Sorting Basics"
+    ]
+  },
+  {
+    "name": "Simulation",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Simulation in Basic Programming",
+    "prerequisites": [
+      "Big-O"
+    ]
+  },
+  {
+    "name": "Greedy Implementation",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Greedy Implementation in Basic Programming",
+    "prerequisites": [
+      "Simulation"
+    ]
+  },
+  {
+    "name": "Binary Search",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Binary Search in Basic Programming",
+    "prerequisites": [
+      "Greedy Implementation"
+    ]
+  },
+  {
+    "name": "Two Pointers",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Two Pointers in Basic Programming",
+    "prerequisites": [
+      "Binary Search"
+    ]
+  },
+  {
+    "name": "Sliding Window",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Sliding Window in Basic Programming",
+    "prerequisites": [
+      "Two Pointers"
+    ]
+  },
+  {
+    "name": "Prefix Sum",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Prefix Sum in Basic Programming",
+    "prerequisites": [
+      "Sliding Window"
+    ]
+  },
+  {
+    "name": "Difference Array",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Difference Array in Basic Programming",
+    "prerequisites": [
+      "Prefix Sum"
+    ]
+  },
+  {
+    "name": "Coordinate Compression",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Coordinate Compression in Basic Programming",
+    "prerequisites": [
+      "Difference Array"
+    ]
+  },
+  {
+    "name": "Bit Manipulation",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Bit Manipulation in Basic Programming",
+    "prerequisites": [
+      "Coordinate Compression"
+    ]
+  },
+  {
+    "name": "Recursion",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Recursion in Basic Programming",
+    "prerequisites": [
+      "Bit Manipulation"
+    ]
+  },
+  {
+    "name": "Backtracking",
+    "category": "Basic Programming",
+    "level": "Beginner",
+    "description": "Backtracking in Basic Programming",
+    "prerequisites": [
+      "Recursion"
+    ]
+  },
+  {
+    "name": "Stack",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Stack in Data Structures",
+    "prerequisites": []
+  },
+  {
+    "name": "Queue",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Queue in Data Structures",
+    "prerequisites": [
+      "Stack"
+    ]
+  },
+  {
+    "name": "Deque",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Deque in Data Structures",
+    "prerequisites": [
+      "Queue"
+    ]
+  },
+  {
+    "name": "Priority Queue",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Priority Queue in Data Structures",
+    "prerequisites": [
+      "Deque"
+    ]
+  },
+  {
+    "name": "Linked List",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Linked List in Data Structures",
+    "prerequisites": [
+      "Priority Queue"
+    ]
+  },
+  {
+    "name": "Hash Map",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Hash Map in Data Structures",
+    "prerequisites": [
+      "Linked List"
+    ]
+  },
+  {
+    "name": "Ordered Set",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Ordered Set in Data Structures",
+    "prerequisites": [
+      "Hash Map"
+    ]
+  },
+  {
+    "name": "Multiset",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Multiset in Data Structures",
+    "prerequisites": [
+      "Ordered Set"
+    ]
+  },
+  {
+    "name": "Disjoint Set Union",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Disjoint Set Union in Data Structures",
+    "prerequisites": [
+      "Multiset"
+    ]
+  },
+  {
+    "name": "Fenwick Tree",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Fenwick Tree in Data Structures",
+    "prerequisites": [
+      "Disjoint Set Union"
+    ]
+  },
+  {
+    "name": "Segment Tree",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Segment Tree in Data Structures",
+    "prerequisites": [
+      "Fenwick Tree"
+    ]
+  },
+  {
+    "name": "Lazy Segment Tree",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Lazy Segment Tree in Data Structures",
+    "prerequisites": [
+      "Segment Tree"
+    ]
+  },
+  {
+    "name": "Sparse Table",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Sparse Table in Data Structures",
+    "prerequisites": [
+      "Lazy Segment Tree"
+    ]
+  },
+  {
+    "name": "Treap",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Treap in Data Structures",
+    "prerequisites": [
+      "Sparse Table"
+    ]
+  },
+  {
+    "name": "Persistent Segment Tree",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Persistent Segment Tree in Data Structures",
+    "prerequisites": [
+      "Treap"
+    ]
+  },
+  {
+    "name": "Binary Indexed Tree 2D",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Binary Indexed Tree 2D in Data Structures",
+    "prerequisites": [
+      "Persistent Segment Tree"
+    ]
+  },
+  {
+    "name": "Sqrt Decomposition",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Sqrt Decomposition in Data Structures",
+    "prerequisites": [
+      "Binary Indexed Tree 2D"
+    ]
+  },
+  {
+    "name": "Monotonic Stack",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Monotonic Stack in Data Structures",
+    "prerequisites": [
+      "Sqrt Decomposition"
+    ]
+  },
+  {
+    "name": "Monotonic Queue",
+    "category": "Data Structures",
+    "level": "Intermediate",
+    "description": "Monotonic Queue in Data Structures",
+    "prerequisites": [
+      "Monotonic Stack"
+    ]
+  },
+  {
+    "name": "Graph Representation",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Graph Representation in Graph Algorithms",
+    "prerequisites": []
+  },
+  {
+    "name": "BFS",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "BFS in Graph Algorithms",
+    "prerequisites": [
+      "Graph Representation"
+    ]
+  },
+  {
+    "name": "DFS",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "DFS in Graph Algorithms",
+    "prerequisites": [
+      "BFS"
+    ]
+  },
+  {
+    "name": "Topological Sort",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Topological Sort in Graph Algorithms",
+    "prerequisites": [
+      "DFS"
+    ]
+  },
+  {
+    "name": "Shortest Path DAG",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Shortest Path DAG in Graph Algorithms",
+    "prerequisites": [
+      "Topological Sort"
+    ]
+  },
+  {
+    "name": "Dijkstra",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Dijkstra in Graph Algorithms",
+    "prerequisites": [
+      "BFS"
+    ]
+  },
+  {
+    "name": "0-1 BFS",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "0-1 BFS in Graph Algorithms",
+    "prerequisites": [
+      "Dijkstra"
+    ]
+  },
+  {
+    "name": "Bellman Ford",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Bellman Ford in Graph Algorithms",
+    "prerequisites": [
+      "BFS"
+    ]
+  },
+  {
+    "name": "Floyd Warshall",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Floyd Warshall in Graph Algorithms",
+    "prerequisites": [
+      "BFS"
+    ]
+  },
+  {
+    "name": "Minimum Spanning Tree",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Minimum Spanning Tree in Graph Algorithms",
+    "prerequisites": [
+      "Floyd Warshall"
+    ]
+  },
+  {
+    "name": "Kruskal",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Kruskal in Graph Algorithms",
+    "prerequisites": [
+      "Minimum Spanning Tree"
+    ]
+  },
+  {
+    "name": "Prim",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Prim in Graph Algorithms",
+    "prerequisites": [
+      "Kruskal"
+    ]
+  },
+  {
+    "name": "Strongly Connected Components",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Strongly Connected Components in Graph Algorithms",
+    "prerequisites": [
+      "Prim"
+    ]
+  },
+  {
+    "name": "Bridges",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Bridges in Graph Algorithms",
+    "prerequisites": [
+      "Strongly Connected Components"
+    ]
+  },
+  {
+    "name": "Articulation Points",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Articulation Points in Graph Algorithms",
+    "prerequisites": [
+      "Bridges"
+    ]
+  },
+  {
+    "name": "Biconnected Components",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Biconnected Components in Graph Algorithms",
+    "prerequisites": [
+      "Articulation Points"
+    ]
+  },
+  {
+    "name": "Euler Path",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Euler Path in Graph Algorithms",
+    "prerequisites": [
+      "Biconnected Components"
+    ]
+  },
+  {
+    "name": "LCA",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "LCA in Graph Algorithms",
+    "prerequisites": [
+      "Euler Path"
+    ]
+  },
+  {
+    "name": "Binary Lifting",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Binary Lifting in Graph Algorithms",
+    "prerequisites": [
+      "LCA"
+    ]
+  },
+  {
+    "name": "Heavy Light Decomposition",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Heavy Light Decomposition in Graph Algorithms",
+    "prerequisites": [
+      "Binary Lifting"
+    ]
+  },
+  {
+    "name": "Centroid Decomposition",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Centroid Decomposition in Graph Algorithms",
+    "prerequisites": [
+      "Heavy Light Decomposition"
+    ]
+  },
+  {
+    "name": "Tree Diameter",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Tree Diameter in Graph Algorithms",
+    "prerequisites": [
+      "Centroid Decomposition"
+    ]
+  },
+  {
+    "name": "Tree Rerooting DP",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Tree Rerooting DP in Graph Algorithms",
+    "prerequisites": [
+      "Tree Diameter"
+    ]
+  },
+  {
+    "name": "Functional Graph",
+    "category": "Graph Algorithms",
+    "level": "Intermediate",
+    "description": "Functional Graph in Graph Algorithms",
+    "prerequisites": [
+      "Tree Rerooting DP"
+    ]
+  },
+  {
+    "name": "DP Basics",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "DP Basics in Dynamic Programming",
+    "prerequisites": []
+  },
+  {
+    "name": "Knapsack",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Knapsack in Dynamic Programming",
+    "prerequisites": [
+      "DP Basics"
+    ]
+  },
+  {
+    "name": "Coin Change",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Coin Change in Dynamic Programming",
+    "prerequisites": [
+      "DP Basics"
+    ]
+  },
+  {
+    "name": "Longest Common Subsequence",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Longest Common Subsequence in Dynamic Programming",
+    "prerequisites": [
+      "Coin Change"
+    ]
+  },
+  {
+    "name": "LIS",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "LIS in Dynamic Programming",
+    "prerequisites": [
+      "DP Basics"
+    ]
+  },
+  {
+    "name": "Bitmask DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Bitmask DP in Dynamic Programming",
+    "prerequisites": [
+      "LIS"
+    ]
+  },
+  {
+    "name": "Digit DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Digit DP in Dynamic Programming",
+    "prerequisites": [
+      "Bitmask DP"
+    ]
+  },
+  {
+    "name": "Interval DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Interval DP in Dynamic Programming",
+    "prerequisites": [
+      "Digit DP"
+    ]
+  },
+  {
+    "name": "Tree DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Tree DP in Dynamic Programming",
+    "prerequisites": [
+      "Interval DP"
+    ]
+  },
+  {
+    "name": "Grid DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Grid DP in Dynamic Programming",
+    "prerequisites": [
+      "Tree DP"
+    ]
+  },
+  {
+    "name": "DP with Prefix Sums",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "DP with Prefix Sums in Dynamic Programming",
+    "prerequisites": [
+      "Grid DP"
+    ]
+  },
+  {
+    "name": "Divide and Conquer DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Divide and Conquer DP in Dynamic Programming",
+    "prerequisites": [
+      "DP with Prefix Sums"
+    ]
+  },
+  {
+    "name": "Knuth Optimization",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Knuth Optimization in Dynamic Programming",
+    "prerequisites": [
+      "Divide and Conquer DP"
+    ]
+  },
+  {
+    "name": "CHT Optimization",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "CHT Optimization in Dynamic Programming",
+    "prerequisites": [
+      "Knuth Optimization"
+    ]
+  },
+  {
+    "name": "SOS DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "SOS DP in Dynamic Programming",
+    "prerequisites": [
+      "CHT Optimization"
+    ]
+  },
+  {
+    "name": "Profile DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Profile DP in Dynamic Programming",
+    "prerequisites": [
+      "SOS DP"
+    ]
+  },
+  {
+    "name": "Expected Value DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Expected Value DP in Dynamic Programming",
+    "prerequisites": [
+      "Profile DP"
+    ]
+  },
+  {
+    "name": "Game DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Game DP in Dynamic Programming",
+    "prerequisites": [
+      "Expected Value DP"
+    ]
+  },
+  {
+    "name": "Subset Sum DP",
+    "category": "Dynamic Programming",
+    "level": "Intermediate",
+    "description": "Subset Sum DP in Dynamic Programming",
+    "prerequisites": [
+      "Game DP"
+    ]
+  },
+  {
+    "name": "GCD",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "GCD in Mathematics",
+    "prerequisites": []
+  },
+  {
+    "name": "LCM",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "LCM in Mathematics",
+    "prerequisites": [
+      "GCD"
+    ]
+  },
+  {
+    "name": "Prime Factorization",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Prime Factorization in Mathematics",
+    "prerequisites": [
+      "LCM"
+    ]
+  },
+  {
+    "name": "Modular Arithmetic",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Modular Arithmetic in Mathematics",
+    "prerequisites": [
+      "Prime Factorization"
+    ]
+  },
+  {
+    "name": "Fast Exponentiation",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Fast Exponentiation in Mathematics",
+    "prerequisites": [
+      "Modular Arithmetic"
+    ]
+  },
+  {
+    "name": "Sieve of Eratosthenes",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Sieve of Eratosthenes in Mathematics",
+    "prerequisites": [
+      "Fast Exponentiation"
+    ]
+  },
+  {
+    "name": "Linear Sieve",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Linear Sieve in Mathematics",
+    "prerequisites": [
+      "Sieve of Eratosthenes"
+    ]
+  },
+  {
+    "name": "Combinatorics",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Combinatorics in Mathematics",
+    "prerequisites": [
+      "Linear Sieve"
+    ]
+  },
+  {
+    "name": "Binomial Coefficients",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Binomial Coefficients in Mathematics",
+    "prerequisites": [
+      "Combinatorics"
+    ]
+  },
+  {
+    "name": "Modular Inverse",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Modular Inverse in Mathematics",
+    "prerequisites": [
+      "Binomial Coefficients"
+    ]
+  },
+  {
+    "name": "Extended Euclid",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Extended Euclid in Mathematics",
+    "prerequisites": [
+      "Modular Inverse"
+    ]
+  },
+  {
+    "name": "Chinese Remainder Theorem",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Chinese Remainder Theorem in Mathematics",
+    "prerequisites": [
+      "Extended Euclid"
+    ]
+  },
+  {
+    "name": "Euler Totient",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Euler Totient in Mathematics",
+    "prerequisites": [
+      "Chinese Remainder Theorem"
+    ]
+  },
+  {
+    "name": "Mobius Function",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Mobius Function in Mathematics",
+    "prerequisites": [
+      "Euler Totient"
+    ]
+  },
+  {
+    "name": "Inclusion Exclusion",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Inclusion Exclusion in Mathematics",
+    "prerequisites": [
+      "Mobius Function"
+    ]
+  },
+  {
+    "name": "Matrix Exponentiation",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Matrix Exponentiation in Mathematics",
+    "prerequisites": [
+      "Inclusion Exclusion"
+    ]
+  },
+  {
+    "name": "Polynomial Interpolation",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Polynomial Interpolation in Mathematics",
+    "prerequisites": [
+      "Matrix Exponentiation"
+    ]
+  },
+  {
+    "name": "Probability Basics",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Probability Basics in Mathematics",
+    "prerequisites": [
+      "Polynomial Interpolation"
+    ]
+  },
+  {
+    "name": "Burnside Lemma",
+    "category": "Mathematics",
+    "level": "Advanced",
+    "description": "Burnside Lemma in Mathematics",
+    "prerequisites": [
+      "Probability Basics"
+    ]
+  },
+  {
+    "name": "String Matching Basics",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "String Matching Basics in Strings",
+    "prerequisites": []
+  },
+  {
+    "name": "KMP",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "KMP in Strings",
+    "prerequisites": [
+      "String Matching Basics"
+    ]
+  },
+  {
+    "name": "Z Algorithm",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Z Algorithm in Strings",
+    "prerequisites": [
+      "KMP"
+    ]
+  },
+  {
+    "name": "Prefix Function",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Prefix Function in Strings",
+    "prerequisites": [
+      "Z Algorithm"
+    ]
+  },
+  {
+    "name": "Rolling Hash",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Rolling Hash in Strings",
+    "prerequisites": [
+      "Prefix Function"
+    ]
+  },
+  {
+    "name": "Double Hashing",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Double Hashing in Strings",
+    "prerequisites": [
+      "Rolling Hash"
+    ]
+  },
+  {
+    "name": "Trie",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Trie in Strings",
+    "prerequisites": [
+      "Double Hashing"
+    ]
+  },
+  {
+    "name": "Aho Corasick",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Aho Corasick in Strings",
+    "prerequisites": [
+      "Trie"
+    ]
+  },
+  {
+    "name": "Suffix Array",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Suffix Array in Strings",
+    "prerequisites": [
+      "Aho Corasick"
+    ]
+  },
+  {
+    "name": "LCP Array",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "LCP Array in Strings",
+    "prerequisites": [
+      "Suffix Array"
+    ]
+  },
+  {
+    "name": "Suffix Automaton",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Suffix Automaton in Strings",
+    "prerequisites": [
+      "LCP Array"
+    ]
+  },
+  {
+    "name": "Palindromic Tree",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Palindromic Tree in Strings",
+    "prerequisites": [
+      "Suffix Automaton"
+    ]
+  },
+  {
+    "name": "Manacher",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Manacher in Strings",
+    "prerequisites": [
+      "Palindromic Tree"
+    ]
+  },
+  {
+    "name": "String DP",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "String DP in Strings",
+    "prerequisites": [
+      "Manacher"
+    ]
+  },
+  {
+    "name": "Lexicographic Order",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Lexicographic Order in Strings",
+    "prerequisites": [
+      "String DP"
+    ]
+  },
+  {
+    "name": "Minimal Rotation",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Minimal Rotation in Strings",
+    "prerequisites": [
+      "Lexicographic Order"
+    ]
+  },
+  {
+    "name": "Wildcard Matching",
+    "category": "Strings",
+    "level": "Advanced",
+    "description": "Wildcard Matching in Strings",
+    "prerequisites": [
+      "Minimal Rotation"
+    ]
+  },
+  {
+    "name": "Point Geometry",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Point Geometry in Geometry",
+    "prerequisites": []
+  },
+  {
+    "name": "Vector Operations",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Vector Operations in Geometry",
+    "prerequisites": [
+      "Point Geometry"
+    ]
+  },
+  {
+    "name": "Orientation Test",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Orientation Test in Geometry",
+    "prerequisites": [
+      "Vector Operations"
+    ]
+  },
+  {
+    "name": "Line Intersection",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Line Intersection in Geometry",
+    "prerequisites": [
+      "Orientation Test"
+    ]
+  },
+  {
+    "name": "Distance Geometry",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Distance Geometry in Geometry",
+    "prerequisites": [
+      "Line Intersection"
+    ]
+  },
+  {
+    "name": "Polygon Area",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Polygon Area in Geometry",
+    "prerequisites": [
+      "Distance Geometry"
+    ]
+  },
+  {
+    "name": "Convex Hull",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Convex Hull in Geometry",
+    "prerequisites": [
+      "Polygon Area"
+    ]
+  },
+  {
+    "name": "Half Plane Intersection",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Half Plane Intersection in Geometry",
+    "prerequisites": [
+      "Convex Hull"
+    ]
+  },
+  {
+    "name": "Rotating Calipers",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Rotating Calipers in Geometry",
+    "prerequisites": [
+      "Half Plane Intersection"
+    ]
+  },
+  {
+    "name": "Closest Pair",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Closest Pair in Geometry",
+    "prerequisites": [
+      "Rotating Calipers"
+    ]
+  },
+  {
+    "name": "Circle Geometry",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Circle Geometry in Geometry",
+    "prerequisites": [
+      "Closest Pair"
+    ]
+  },
+  {
+    "name": "Sweep Line Geometry",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Sweep Line Geometry in Geometry",
+    "prerequisites": [
+      "Circle Geometry"
+    ]
+  },
+  {
+    "name": "Minkowski Sum",
+    "category": "Geometry",
+    "level": "Advanced",
+    "description": "Minkowski Sum in Geometry",
+    "prerequisites": [
+      "Sweep Line Geometry"
+    ]
+  },
+  {
+    "name": "Network Flow",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Network Flow in Advanced Algorithms",
+    "prerequisites": []
+  },
+  {
+    "name": "Dinic",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Dinic in Advanced Algorithms",
+    "prerequisites": [
+      "Network Flow"
+    ]
+  },
+  {
+    "name": "Edmonds Karp",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Edmonds Karp in Advanced Algorithms",
+    "prerequisites": [
+      "Dinic"
+    ]
+  },
+  {
+    "name": "Min Cost Max Flow",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Min Cost Max Flow in Advanced Algorithms",
+    "prerequisites": [
+      "Edmonds Karp"
+    ]
+  },
+  {
+    "name": "Bipartite Matching",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Bipartite Matching in Advanced Algorithms",
+    "prerequisites": [
+      "Min Cost Max Flow"
+    ]
+  },
+  {
+    "name": "Hungarian Algorithm",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Hungarian Algorithm in Advanced Algorithms",
+    "prerequisites": [
+      "Bipartite Matching"
+    ]
+  },
+  {
+    "name": "Maximum Matching General",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Maximum Matching General in Advanced Algorithms",
+    "prerequisites": [
+      "Hungarian Algorithm"
+    ]
+  },
+  {
+    "name": "Hopcroft Karp",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Hopcroft Karp in Advanced Algorithms",
+    "prerequisites": [
+      "Maximum Matching General"
+    ]
+  },
+  {
+    "name": "Mo's Algorithm",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Mo's Algorithm in Advanced Algorithms",
+    "prerequisites": [
+      "Hopcroft Karp"
+    ]
+  },
+  {
+    "name": "Mo's on Trees",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Mo's on Trees in Advanced Algorithms",
+    "prerequisites": [
+      "Mo's Algorithm"
+    ]
+  },
+  {
+    "name": "FFT",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "FFT in Advanced Algorithms",
+    "prerequisites": [
+      "Mo's on Trees"
+    ]
+  },
+  {
+    "name": "NTT",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "NTT in Advanced Algorithms",
+    "prerequisites": [
+      "FFT"
+    ]
+  },
+  {
+    "name": "Berlekamp Massey",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Berlekamp Massey in Advanced Algorithms",
+    "prerequisites": [
+      "NTT"
+    ]
+  },
+  {
+    "name": "Gaussian Elimination",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Gaussian Elimination in Advanced Algorithms",
+    "prerequisites": [
+      "Berlekamp Massey"
+    ]
+  },
+  {
+    "name": "XOR Basis",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "XOR Basis in Advanced Algorithms",
+    "prerequisites": [
+      "Gaussian Elimination"
+    ]
+  },
+  {
+    "name": "Randomized Algorithms",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Randomized Algorithms in Advanced Algorithms",
+    "prerequisites": [
+      "XOR Basis"
+    ]
+  },
+  {
+    "name": "Simulated Annealing",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Simulated Annealing in Advanced Algorithms",
+    "prerequisites": [
+      "Randomized Algorithms"
+    ]
+  },
+  {
+    "name": "Meet in the Middle",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Meet in the Middle in Advanced Algorithms",
+    "prerequisites": [
+      "Simulated Annealing"
+    ]
+  },
+  {
+    "name": "Parallel Binary Search",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Parallel Binary Search in Advanced Algorithms",
+    "prerequisites": [
+      "Meet in the Middle"
+    ]
+  },
+  {
+    "name": "Persistent DS",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Persistent DS in Advanced Algorithms",
+    "prerequisites": [
+      "Parallel Binary Search"
+    ]
+  },
+  {
+    "name": "Link Cut Tree",
+    "category": "Advanced Algorithms",
+    "level": "Olympiad",
+    "description": "Link Cut Tree in Advanced Algorithms",
+    "prerequisites": [
+      "Persistent DS"
+    ]
+  }
+]

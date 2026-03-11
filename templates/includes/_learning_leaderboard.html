@@ -1,0 +1,25 @@
+<aside class="hidden xl:block fixed right-4 top-24 w-72 z-30" aria-label="Learning Leaderboard Sidebar">
+  <div class="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-sky-100 bg-white/95 shadow-xl backdrop-blur-sm">
+    <div class="p-4 border-b border-sky-100 sticky top-0 bg-white">
+      <h2 class="text-lg font-bold">🏆 Learning Leaderboard</h2>
+      <p class="text-xs text-gray-500">Bảng xếp hạng học tập theo thời gian gần đây</p>
+    </div>
+
+    <div class="p-4 space-y-4 text-sm">
+      <section>
+        <h3 class="font-semibold mb-2">🐝 Con Ong Chăm Chỉ</h3>
+        <ol class="list-decimal ml-5 space-y-1">{% for u in learning_leaderboard.hardworking %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </section>
+
+      <section>
+        <h3 class="font-semibold mb-2">🚀 Đột Phá</h3>
+        <ol class="list-decimal ml-5 space-y-1">{% for u in learning_leaderboard.breakthrough %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </section>
+
+      <section>
+        <h3 class="font-semibold mb-2">⚠ Cần Cố Gắng</h3>
+        <ol class="list-decimal ml-5 space-y-1">{% for u in learning_leaderboard.needs_improvement %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </section>
+    </div>
+  </div>
+</aside>

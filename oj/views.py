@@ -14,6 +14,7 @@ from judge.run_code import run_program  # dùng cho demo run & backup
 from .roadmap_data import STAGES
 
 import html
+from learning_analytics.leaderboard_service import LearningLeaderboardService
 
 
 
@@ -44,7 +45,8 @@ STAGES = [
 # 🏠 HOME
 # ==============================
 def home(request):
-    return render(request, "home.html", {"stages": STAGES})
+    leaderboard = LearningLeaderboardService().compute(top_n=3)
+    return render(request, "home.html", {"stages": STAGES, "learning_leaderboard": leaderboard})
 
 
 # ==============================
