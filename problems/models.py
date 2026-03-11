@@ -44,6 +44,8 @@ class Problem(models.Model):
     time_limit = models.IntegerField(default=2)       # seconds
     memory_limit = models.IntegerField(default=256)   # MB
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='Easy')
+    difficulty_rating = models.IntegerField(default=1200)
+    difficulty_level = models.CharField(max_length=20, default="Easy")
     tags = models.ManyToManyField(Tag, blank=True)
     has_editorial = models.BooleanField(default=False)
     ai_supported = models.BooleanField(default=False)
