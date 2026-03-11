@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "submissions",
     "contests",
     "arena.apps.ArenaConfig",
+    "learning_analytics",
 ]
 
 SITE_ID = 2
