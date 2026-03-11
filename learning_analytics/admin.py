@@ -74,19 +74,29 @@ class UserAnalyticsAdmin(UserAdmin):
 
     analytics_tools.short_description = "Learning Analytics"
 
-    list_display = UserAdmin.list_display + ("learning_profile_link",)
+    list_display = UserAdmin.list_display + ("recent_activity", "learning_profile_link",)
     readonly_fields = UserAdmin.readonly_fields + ("learning_profile_button", "analytics_tools")
+
+
+    @admin.display(description="Recent activity", ordering="recent_activity_at")
+    def recent_activity(self, obj):
+        return getattr(obj, "recent_activity_at", None)
+
+    def get_ordering(self, request):
+        return ("-recent_activity_at", "username")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).annotate(
             latest_submission_at=Max("submission__created_at"),
             latest_problem_submission_at=Max("problem_stats__last_submission_at"),
+            latest_progress_at=Max("progress__last_submit"),
         )
         return qs.annotate(
             recent_activity_at=Greatest(
                 Coalesce("last_login", self.ACTIVITY_FALLBACK),
                 Coalesce("latest_submission_at", self.ACTIVITY_FALLBACK),
                 Coalesce("latest_problem_submission_at", self.ACTIVITY_FALLBACK),
+                Coalesce("latest_progress_at", self.ACTIVITY_FALLBACK),
             )
         ).order_by(F("recent_activity_at").desc(nulls_last=True), "username")
 
