@@ -66,6 +66,19 @@
   </div>
 </div>
 
+<div class="card border-0 shadow-sm rounded-4 mt-4">
+  <div class="card-header bg-light fw-semibold">🤖 AI Coach</div>
+  <div class="card-body">
+    <div id="coachDaily" class="mb-3 text-muted">Đang tải kế hoạch hôm nay...</div>
+    <div id="coachWeekly" class="text-muted">Đang tải kế hoạch tuần...</div>
+  </div>
+</div>
+
+
+<div class="text-center mt-3">
+  <a href="/analytics/user/{{ user.id }}/" class="btn btn-primary rounded-pill px-4 shadow-sm">View Learning Analytics</a>
+</div>
+
 <div class="text-center mt-4">
   <button id="btnAIPath" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
       🤖 Xem lộ trình học AI
@@ -75,6 +88,23 @@
 <div id="aiResult" class="mt-3 text-start"></div>
 
 <script>
+async function loadCoachPlan() {
+  const res = await fetch('/api/student/{{ user.id }}/training_plan');
+  const data = await res.json();
+  let daily = `<h6 class=\"fw-bold\">${data.daily.title}</h6><ul>`;
+  for (const task of data.daily.tasks) {
+    daily += `<li>${task.problems.length} bài ${task.skill}: ${task.problems.join(', ') || 'chọn theo kỹ năng'}</li>`;
+  }
+  daily += `<li>${data.daily.contest_practice} contest practice</li></ul>`;
+  document.getElementById('coachDaily').innerHTML = daily;
+
+  let weekly = `<h6 class=\"fw-bold\">${data.weekly.title}</h6><ul>`;
+  for (const d of data.weekly.days) weekly += `<li>Day ${d.day}: ${d.focus}</li>`;
+  weekly += '</ul>';
+  document.getElementById('coachWeekly').innerHTML = weekly;
+}
+loadCoachPlan();
+
 document.getElementById('btnAIPath').addEventListener('click', async () => {
   const res = await fetch('/problems/ai_learning_path/');
   const data = await res.json();

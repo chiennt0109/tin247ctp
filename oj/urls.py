@@ -8,6 +8,8 @@ from submissions import views_callback
 
 from oj import views as roadmap_views
 from . import views_api
+from learning_analytics import api as learning_analytics_api
+from learning_analytics import views as learning_analytics_views
 urlpatterns = [
     # ==========================
     # 🌐 Trang chủ
@@ -49,11 +51,27 @@ urlpatterns = [
     path("run_code/page/", views.run_code_page, name="run_code_page"),
     path("api/run_code/", views.api_run_code, name="api_run_code"),
 
+    path("api/student/<int:id>/analytics", learning_analytics_api.student_analytics, name="student_analytics"),
+    path("api/student/<int:id>/skills", learning_analytics_api.student_skills, name="student_skills"),
+    path("api/student/<int:id>/weakness", learning_analytics_api.student_weakness, name="student_weakness"),
+    path("api/student/<int:id>/recommendations", learning_analytics_api.student_recommendations, name="student_recommendations"),
+    path("api/student/<int:id>/learning-path", learning_analytics_api.student_learning_path, name="student_learning_path"),
+    path("api/student/<int:id>/contest-analysis", learning_analytics_api.student_contest_analysis, name="student_contest_analysis"),
+    path("api/student/<int:id>/training_plan", learning_analytics_api.student_training_plan, name="student_training_plan"),
+    path("api/student/<int:id>/weak_skills", learning_analytics_api.student_weak_skills, name="student_weak_skills"),
+    path("api/admin/user/<int:id>/learning_profile", learning_analytics_api.admin_user_learning_profile, name="admin_user_learning_profile"),
+    path("api/skill_detection", learning_analytics_api.skill_detection, name="skill_detection"),
+    path("api/skill_coverage", learning_analytics_api.skill_coverage, name="skill_coverage"),
+    path("api/roadmap/<slug:track>", learning_analytics_api.roadmap_track, name="roadmap_track"),
+    path("api/learning_leaderboard", learning_analytics_api.learning_leaderboard, name="learning_leaderboard"),
+
     # ==========================
     # 🧩 Quản trị & AI Tools
     # ==========================
     path("admin/", admin.site.urls),
     path("admin/problems/ai_analyze_problem/", views_admin.ai_analyze_problem, name="ai_analyze_problem"),
+    path("admin/learning-analytics/", learning_analytics_views.admin_learning_dashboard, name="admin_learning_analytics"),
+    path("analytics/user/<int:user_id>/", learning_analytics_views.user_learning_profile, name="analytics_user_learning_profile"),
 
     # ==========================
     # 👤 Tài khoản & Xác thực
@@ -75,5 +93,7 @@ urlpatterns = [
     
     
     path("arena/", include("arena.urls", namespace="arena")),
+    path("learning-analytics/", include(("learning_analytics.urls", "learning_analytics"), namespace="learning_analytics")),
+    path("analytics/", include(("learning_analytics.urls", "learning_analytics"), namespace="learning_analytics_public")),
 
 ]
