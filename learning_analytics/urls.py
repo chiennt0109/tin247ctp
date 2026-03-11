@@ -8,6 +8,7 @@ urlpatterns = [
     path("admin/", views.admin_learning_dashboard, name="admin_dashboard"),
     path("admin/students/", views.student_dashboard, name="student_dashboard"),
     path("admin/user/<int:user_id>/", views.user_learning_profile, name="user_learning_profile"),
+    path("user/<int:user_id>/", views.user_learning_profile, name="user_learning_profile_public"),
     path("admin/class/", views.class_dashboard, name="class_dashboard"),
     path("admin/topics/", views.topic_dashboard, name="topic_dashboard"),
     path("admin/contests/", views.contest_dashboard, name="contest_dashboard"),

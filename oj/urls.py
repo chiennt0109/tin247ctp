@@ -68,6 +68,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("admin/problems/ai_analyze_problem/", views_admin.ai_analyze_problem, name="ai_analyze_problem"),
     path("admin/learning-analytics/", learning_analytics_views.admin_learning_dashboard, name="admin_learning_analytics"),
+    path("analytics/user/<int:user_id>/", learning_analytics_views.user_learning_profile, name="analytics_user_learning_profile"),
 
     # ==========================
     # 👤 Tài khoản & Xác thực
