@@ -15,6 +15,7 @@ from .serializers import (
 from .skill_engine import SkillEngine
 from .models import UserSkill
 from .profile_service import LearningProfileService
+from .models import UserSkillStats
 from .skill_detector import detect_and_assign
 from .coverage_analyzer import SkillCoverageAnalyzer
 from .roadmap_builder import RoadmapBuilder
@@ -93,10 +94,11 @@ def student_contest_analysis(request, id):
 def student_training_plan(request, id):
     user = User.objects.get(pk=id)
     coach = AICoach()
-    return JsonResponse({
-        "daily": coach.daily_training_plan(user),
-        "weekly": coach.weekly_training_plan(user),
-    })
+    payload = coach.training_plan(user)
+    # backward compatibility for existing UI
+    payload["daily"] = payload.get("daily_training", {})
+    payload["weekly"] = payload.get("weekly_training", {})
+    return JsonResponse(payload)
 
 
 @require_GET
@@ -146,3 +148,28 @@ def roadmap_track(request, track):
 def learning_leaderboard(request):
     data = LearningLeaderboardService().compute(top_n=3)
     return JsonResponse(data)
+
+
+@require_GET
+def student_skill_mastery(request, id):
+    user = User.objects.get(pk=id)
+    stats = UserSkillStats.objects.filter(user=user).select_related("skill").order_by("mastery_score")
+    data = []
+    for st in stats:
+        if st.mastery_score < 30:
+            level = "Beginner"
+        elif st.mastery_score < 60:
+            level = "Intermediate"
+        elif st.mastery_score < 85:
+            level = "Advanced"
+        else:
+            level = "Expert"
+        data.append({
+            "skill": st.skill.name,
+            "mastery_score": st.mastery_score,
+            "level": level,
+            "problems_solved": st.solved_problems,
+            "attempts": st.attempts,
+            "successes": st.successes,
+        })
+    return JsonResponse({"skill_mastery": data})

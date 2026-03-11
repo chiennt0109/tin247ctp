@@ -20,6 +20,16 @@
         <h3 class="font-semibold mb-2">⚠ Cần Cố Gắng</h3>
         <ol class="list-decimal ml-5 space-y-1">{% for u in learning_leaderboard.needs_improvement %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
       </section>
+
+      <section>
+        <h3 class="font-semibold mb-2">📈 Learning Progress</h3>
+        <p class="text-xs text-gray-500 mb-1">Top skill learners</p>
+        <ol class="list-decimal ml-5 space-y-1 mb-2">{% for u in learning_leaderboard.learning_progress.top_skill_learners %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+        <p class="text-xs text-gray-500 mb-1">Fastest improvement</p>
+        <ol class="list-decimal ml-5 space-y-1 mb-2">{% for u in learning_leaderboard.learning_progress.fastest_improvement %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+        <p class="text-xs text-gray-500 mb-1">Students needing help</p>
+        <ol class="list-decimal ml-5 space-y-1">{% for u in learning_leaderboard.learning_progress.students_needing_help %}<li>{{ u.username }} <span class="text-gray-500">({{ u.score }})</span></li>{% empty %}<li>Chưa có dữ liệu</li>{% endfor %}</ol>
+      </section>
     </div>
   </div>
 </aside>

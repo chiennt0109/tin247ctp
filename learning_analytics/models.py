@@ -87,6 +87,10 @@ class UserSkillStats(models.Model):
     attempted_problems = models.PositiveIntegerField(default=0)
     solved_problems = models.PositiveIntegerField(default=0)
     skill_score = models.FloatField(default=0.0)
+    mastery_score = models.FloatField(default=0.0)
+    attempts = models.PositiveIntegerField(default=0)
+    successes = models.PositiveIntegerField(default=0)
+    last_practiced = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:

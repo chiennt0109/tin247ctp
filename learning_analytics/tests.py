@@ -135,3 +135,19 @@ class NewFeatureSmokeTests(SimpleTestCase):
         response = learning_leaderboard(request)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"hardworking", response.content)
+
+
+    @patch("learning_analytics.api.User")
+    @patch("learning_analytics.api.UserSkillStats")
+    def test_student_skill_mastery_api(self, stat_model, user_model):
+        from learning_analytics.api import student_skill_mastery
+
+        fake_user = SimpleNamespace(id=1)
+        user_model.objects.get.return_value = fake_user
+        stat_model.objects.filter.return_value.select_related.return_value.order_by.return_value = [
+            SimpleNamespace(skill=SimpleNamespace(name="BFS"), mastery_score=72.5, solved_problems=5, attempts=8, successes=5)
+        ]
+        request = RequestFactory().get('/api/student/1/skill_mastery')
+        response = student_skill_mastery(request, 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"skill_mastery", response.content)

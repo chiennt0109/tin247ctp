@@ -47,11 +47,11 @@ class RoadmapBuilder:
             for skill in self._ordered_skills(category):
                 problem = (
                     skill.problem_skills.select_related("problem")
-                    .order_by("problem__difficulty", "problem__ac_count")
+                    .order_by("problem__difficulty_rating", "problem__ac_count")
                     .first()
                 )
                 problem_obj = problem.problem if problem else None
-                difficulty = problem_obj.difficulty if problem_obj else ""
+                difficulty = problem_obj.difficulty_level if problem_obj else ""
                 LearningTrackStep.objects.create(
                     track=track,
                     order=order,

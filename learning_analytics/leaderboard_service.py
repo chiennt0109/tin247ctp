@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
-from django.db.models import Count, Q
 from django.utils import timezone
 
 from contests.models import Participation
@@ -33,6 +32,9 @@ class LearningLeaderboardService:
         hardworking = []
         breakthrough = []
         needs_improvement = []
+        top_skill_learners = []
+        fastest_improvement = []
+        students_needing_help = []
 
         for u in users:
             subs30 = Submission.objects.filter(user=u, created_at__gte=d30)
@@ -52,22 +54,34 @@ class LearningLeaderboardService:
             rating30 = sum((x.score * 8) - (x.penalty / 600 if x.penalty else 0) for x in p30)
             rating60 = sum((x.score * 8) - (x.penalty / 600 if x.penalty else 0) for x in p60)
             rating_growth = rating30 - rating60
-            new_skills = UserSkillStats.objects.filter(user=u, updated_at__gte=d30, skill_score__gte=0.6).count()
+            new_skills = UserSkillStats.objects.filter(user=u, updated_at__gte=d30, mastery_score__gte=60).count()
             hard_solved_30 = subs30.filter(verdict="Accepted", problem__difficulty="Hard").values("problem_id").distinct().count()
             progress_score = rating_growth + new_skills + hard_solved_30
 
             hardworking.append({"username": u.username, "score": round(activity_score, 2)})
             breakthrough.append({"username": u.username, "score": round(progress_score, 2)})
 
+            top_skill_learners.append({"username": u.username, "score": new_skills})
+            fastest_improvement.append({"username": u.username, "score": round(rating_growth + hard_solved_30, 2)})
+
             if acceptance_rate < 0.2 and failed >= 10 and submissions_30 > 0:
                 needs_improvement.append({"username": u.username, "score": round((1 - acceptance_rate) * failed, 2)})
+                students_needing_help.append({"username": u.username, "score": round((1 - acceptance_rate) * 100, 2)})
 
         hardworking.sort(key=lambda x: x["score"], reverse=True)
         breakthrough.sort(key=lambda x: x["score"], reverse=True)
         needs_improvement.sort(key=lambda x: x["score"], reverse=True)
+        top_skill_learners.sort(key=lambda x: x["score"], reverse=True)
+        fastest_improvement.sort(key=lambda x: x["score"], reverse=True)
+        students_needing_help.sort(key=lambda x: x["score"], reverse=True)
 
         return {
             "hardworking": hardworking[:top_n],
             "breakthrough": breakthrough[:top_n],
             "needs_improvement": needs_improvement[:top_n],
+            "learning_progress": {
+                "top_skill_learners": top_skill_learners[:top_n],
+                "fastest_improvement": fastest_improvement[:top_n],
+                "students_needing_help": students_needing_help[:top_n],
+            },
         }

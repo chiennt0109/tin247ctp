@@ -58,6 +58,7 @@ urlpatterns = [
     path("api/student/<int:id>/learning-path", learning_analytics_api.student_learning_path, name="student_learning_path"),
     path("api/student/<int:id>/contest-analysis", learning_analytics_api.student_contest_analysis, name="student_contest_analysis"),
     path("api/student/<int:id>/training_plan", learning_analytics_api.student_training_plan, name="student_training_plan"),
+    path("api/student/<int:id>/skill_mastery", learning_analytics_api.student_skill_mastery, name="student_skill_mastery"),
     path("api/student/<int:id>/weak_skills", learning_analytics_api.student_weak_skills, name="student_weak_skills"),
     path("api/admin/user/<int:id>/learning_profile", learning_analytics_api.admin_user_learning_profile, name="admin_user_learning_profile"),
     path("api/skill_detection", learning_analytics_api.skill_detection, name="skill_detection"),
