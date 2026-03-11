@@ -151,3 +151,26 @@ class NewFeatureSmokeTests(SimpleTestCase):
         response = student_skill_mastery(request, 1)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"skill_mastery", response.content)
+
+
+class SkillDetectorLogicTests(SimpleTestCase):
+    @patch("learning_analytics.skill_detector.Skill")
+    def test_normalize_and_detect_scores(self, skill_model):
+        from learning_analytics.skill_detector import detect_skill_scores, normalize_text
+
+        self.assertEqual(normalize_text("Shortest-Path!!!"), "shortest-path")
+
+        skill_model.objects.all.return_value = [
+            SimpleNamespace(name="BFS", slug="bfs"),
+            SimpleNamespace(name="Dijkstra", slug="dijkstra"),
+        ]
+
+        problem = SimpleNamespace(
+            title="Shortest Path in Grid",
+            statement="Use BFS or Dijkstra for shortest path.",
+            tags=SimpleNamespace(all=lambda: [SimpleNamespace(name="graph", slug="bfs")]),
+        )
+        scores = detect_skill_scores(problem)
+        self.assertIn("BFS", scores)
+        self.assertIn("Dijkstra", scores)
+        self.assertGreaterEqual(scores["BFS"], 2)
