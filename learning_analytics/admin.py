@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import DateTimeField, F, Max, Value
 from django.db.models.functions import Coalesce, Greatest
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -87,6 +88,24 @@ class UserAnalyticsAdmin(UserAdmin):
         # does not override recent activity ordering.
         return ()
 
+
+
+    def _recent_activity_order_param(self, request):
+        columns = list(self.get_list_display(request))
+        try:
+            index = columns.index("recent_activity") + 1
+        except ValueError:
+            return None
+        return f"-{index}"
+
+    def changelist_view(self, request, extra_context=None):
+        if "o" not in request.GET:
+            order_param = self._recent_activity_order_param(request)
+            if order_param:
+                query = request.GET.copy()
+                query["o"] = order_param
+                return HttpResponseRedirect(f"{request.path}?{query.urlencode()}")
+        return super().changelist_view(request, extra_context=extra_context)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request).annotate(

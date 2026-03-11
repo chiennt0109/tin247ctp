@@ -73,6 +73,11 @@ class AdminIntegrationTests(SimpleTestCase):
         self.assertIn("/learning-analytics/admin/user/7/", html)
 
 
+    def test_recent_activity_column_default_order_param(self):
+        request = RequestFactory().get("/admin/auth/user/")
+        self.assertEqual(self.model_admin._recent_activity_order_param(request), "-6")
+
+
 class AdminRecentActivityOrderingTests(TestCase):
     def setUp(self):
         self.site = AdminSite()
