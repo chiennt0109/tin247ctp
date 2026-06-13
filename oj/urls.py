@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from . import scratch as scratch_views
 from problems import views_admin
 from django.views.generic import RedirectView
 from submissions import views_callback
@@ -42,6 +43,12 @@ urlpatterns = [
     path("roadmap/run/", roadmap_views.run_code_for_roadmap, name="run_code_for_roadmap"),
 
     path("roadmap/api/check_login/", views_api.check_login, name="check_login"), 
+
+    # ==========================
+    # 🐱 Scratch independent module
+    # ==========================
+    path("scratch/", scratch_views.scratch_home, name="scratch_home"),
+    path("scratch/<slug:lesson_slug>/", scratch_views.scratch_lesson, name="scratch_lesson"),
 
 
     # ==========================
