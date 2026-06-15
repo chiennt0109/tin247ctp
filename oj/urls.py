@@ -48,6 +48,7 @@ urlpatterns = [
     # 🐱 Scratch independent module
     # ==========================
     path("scratch/", scratch_views.scratch_home, name="scratch_home"),
+    path("scratch/<slug:lesson_slug>/<slug:sub_slug>/", scratch_views.scratch_sub_lesson, name="scratch_sub_lesson"),
     path("scratch/<slug:lesson_slug>/", scratch_views.scratch_lesson, name="scratch_lesson"),
 
 
