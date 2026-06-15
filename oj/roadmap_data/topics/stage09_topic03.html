@@ -1,93 +1,807 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Đếm số thành phần liên thông trong đồ thị vô hướng.</li>
-  <li>Củng cố cách dùng DFS/BFS để tách các cụm đỉnh.</li>
-</ul>
+<!--
+  File đề xuất: oj/roadmap_data/topics/stage02_topic03.html
+  Bài giảng tương tác: Thành phần liên thông trong đồ thị vô hướng
+  Dùng được như một HTML fragment trong template Django/OJ.
+-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<style>
+  :root{
+    --cc-primary:#2563eb;
+    --cc-dark:#1e3a8a;
+    --cc-cyan:#0891b2;
+    --cc-green:#16a34a;
+    --cc-orange:#f97316;
+    --cc-purple:#7c3aed;
+    --cc-red:#ef4444;
+    --cc-ink:#0f172a;
+    --cc-muted:#64748b;
+    --cc-border:#dbe7ff;
+    --cc-soft:#eff6ff;
+    --cc-card:#ffffff;
+    --cc-code:#0f172a;
+  }
+  .cc-lesson-page{
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--cc-ink);
+    background:
+      radial-gradient(circle at top left, rgba(37,99,235,.13), transparent 32%),
+      radial-gradient(circle at 95% 12%, rgba(124,58,237,.11), transparent 26%),
+      linear-gradient(180deg,#f8fbff 0%,#ffffff 42%,#f8fbff 100%);
+    border-radius:24px; overflow:hidden; padding-bottom:32px;
+  }
+  .cc-hero{
+    position:relative; overflow:hidden; padding:44px 34px; color:#fff;
+    background:
+      linear-gradient(135deg,rgba(30,58,138,.98),rgba(37,99,235,.94) 50%,rgba(124,58,237,.88)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='290' height='210' viewBox='0 0 290 210'%3E%3Cg fill='none' stroke='rgba(255,255,255,.18)' stroke-width='3'%3E%3Ccircle cx='42' cy='52' r='10'/%3E%3Ccircle cx='114' cy='38' r='10'/%3E%3Ccircle cx='72' cy='122' r='10'/%3E%3Ccircle cx='190' cy='56' r='10'/%3E%3Ccircle cx='248' cy='112' r='10'/%3E%3Ccircle cx='178' cy='156' r='10'/%3E%3Cpath d='M52 51 104 40M47 61 68 112M111 48 77 114M199 63 240 105M184 148 242 118'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .cc-hero::after{content:"";position:absolute;width:260px;height:260px;right:-70px;top:-70px;border-radius:50%;background:rgba(255,255,255,.12);}
+  .cc-hero h1{font-weight:950;letter-spacing:-.04em;font-size:clamp(2rem,4vw,3.35rem);}
+  .cc-hero p{font-size:1.08rem;line-height:1.75;color:rgba(255,255,255,.92);max-width:960px;}
+  .cc-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.24);font-weight:850;margin:6px 6px 0 0;}
 
-<hr>
+  .cc-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--cc-border);}
+  .cc-progress-label{font-size:.9rem;color:var(--cc-muted);font-weight:850;}
+  .cc-progress{height:10px;background:#e5edff;border-radius:999px;overflow:hidden;}
+  .cc-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--cc-primary),var(--cc-purple));transition:width .15s ease;}
 
-<h2>📘 Ý tưởng</h2>
+  .cc-container{max-width:1120px;margin:0 auto;padding:28px 18px;}
+  .mini-slide{background:var(--cc-card);border:1px solid var(--cc-border);border-radius:22px;box-shadow:0 16px 36px rgba(15,23,42,.07);padding:26px;margin-bottom:24px;overflow:hidden;}
+  .mini-slide h2{display:flex;align-items:center;gap:12px;color:var(--cc-dark);font-weight:950;letter-spacing:-.02em;font-size:clamp(1.35rem,2.1vw,2rem);margin-bottom:16px;}
+  .mini-slide h3{font-weight:900;color:#1f2937;margin-top:22px;}
+  .mini-slide p,.mini-slide li{font-size:1.02rem;line-height:1.75;color:#334155;}
+  .section-icon{width:42px;height:42px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--cc-primary),var(--cc-purple));box-shadow:0 10px 22px rgba(37,99,235,.22);flex:0 0 auto;}
+
+  .lesson-callout{border:1px solid var(--cc-border);border-left:6px solid var(--cc-primary);background:linear-gradient(180deg,#f8fbff,#fff);border-radius:16px;padding:16px 18px;margin:16px 0;}
+  .lesson-callout.success{border-left-color:var(--cc-green);background:#f0fdf4;}
+  .lesson-callout.warning{border-left-color:var(--cc-orange);background:#fff7ed;}
+  .lesson-callout.danger{border-left-color:var(--cc-red);background:#fef2f2;}
+  .lesson-callout.purple{border-left-color:var(--cc-purple);background:#f5f3ff;}
+
+  .concept-card{height:100%;border:1px solid var(--cc-border);border-radius:18px;padding:18px;background:#fff;transition:transform .2s ease,box-shadow .2s ease;}
+  .concept-card:hover{transform:translateY(-3px);box-shadow:0 16px 28px rgba(15,23,42,.08);}
+  .concept-card .big-icon{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--cc-soft);color:var(--cc-primary);font-size:1.25rem;margin-bottom:12px;}
+  .badge-soft{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:var(--cc-soft);color:var(--cc-dark);font-weight:850;font-size:.86rem;}
+
+  .code-tabs .nav-link{font-weight:850;color:#334155;border-radius:12px 12px 0 0;}
+  .code-tabs .nav-link.active{color:#fff;background:linear-gradient(135deg,var(--cc-primary),var(--cc-purple));border-color:transparent;}
+  .code-panel{position:relative;background:var(--cc-code);border-radius:0 16px 16px 16px;overflow:hidden;border:1px solid #1e293b;}
+  .code-panel pre{margin:0;padding:22px 18px;max-height:620px;overflow:auto;background:var(--cc-code)!important;white-space:pre;}
+  .code-panel code{font-family:Consolas,"SFMono-Regular",Menlo,Monaco,monospace;font-size:.94rem;line-height:1.65;}
+  .copy-btn{position:absolute;right:12px;top:12px;z-index:2;border:0;border-radius:999px;padding:7px 12px;background:rgba(255,255,255,.12);color:#e5e7eb;font-weight:800;font-size:.85rem;}
+  .copy-btn:hover{background:rgba(255,255,255,.2);}
+
+  .compare-table{border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:16px;border:1px solid var(--cc-border);width:100%;background:#fff;}
+  .compare-table th,.compare-table td{border-bottom:1px solid #e2e8f0;padding:14px 16px;vertical-align:top;}
+  .compare-table th{background:#eff6ff;color:#1e3a8a;font-weight:900;}
+  .compare-table tr:last-child td{border-bottom:0;}
+
+  .algo-board{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:18px;}
+  @media(max-width:920px){.algo-board{grid-template-columns:1fr}.mini-slide{padding:20px}.cc-hero{padding:32px 22px}}
+
+  .graph-visual-card{background:linear-gradient(180deg,#ffffff,#f8fbff);border:1px solid var(--cc-border);border-radius:20px;padding:18px;box-shadow:0 14px 30px rgba(15,23,42,.06);}
+  .graph-svg-wrap{width:100%;min-height:350px;display:flex;justify-content:center;align-items:center;background:radial-gradient(circle at 50% 50%,rgba(37,99,235,.09),transparent 65%);border-radius:18px;border:1px dashed #bdd2ff;overflow:auto;}
+  .graph-svg{width:100%;max-width:650px;min-width:410px;height:350px;}
+  .graph-edge{stroke:#94a3b8;stroke-width:5;stroke-linecap:round;transition:.25s ease;}
+  .graph-edge.active{stroke:var(--cc-orange);stroke-width:7;}
+  .graph-node circle{fill:#fff;stroke:#93c5fd;stroke-width:5;filter:drop-shadow(0 8px 12px rgba(37,99,235,.15));transition:.25s ease;}
+  .graph-node text{font-weight:950;fill:#0f172a;font-size:24px;dominant-baseline:middle;text-anchor:middle;}
+  .graph-node.visited circle{fill:#dbeafe;stroke:var(--cc-primary);}
+  .graph-node.current circle{fill:#fef3c7;stroke:var(--cc-orange);transform:scale(1.06);transform-origin:center;}
+  .graph-node.component-1 circle{fill:#dbeafe;stroke:#2563eb;}
+  .graph-node.component-2 circle{fill:#dcfce7;stroke:#16a34a;}
+  .graph-node.component-3 circle{fill:#fef3c7;stroke:#f97316;}
+  .graph-node.component-4 circle{fill:#f5d0fe;stroke:#a21caf;}
+
+  .state-box{border:1px solid var(--cc-border);border-radius:18px;padding:16px;background:#fff;}
+  .structure-line,.visited-list{min-height:42px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .queue-item{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;background:#e0f2fe;color:#075985;font-weight:950;}
+  .visited-pill{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;border-radius:999px;background:#dbeafe;color:#1e3a8a;font-weight:950;padding:0 12px;}
+  .component-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;margin:4px;font-weight:850;}
+  .component-dot{display:inline-flex;width:12px;height:12px;border-radius:999px;background:var(--cc-primary);}
+  .component-dot.c2{background:var(--cc-green)}.component-dot.c3{background:var(--cc-orange)}.component-dot.c4{background:var(--cc-purple)}
+  .log-box{height:184px;overflow:auto;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px;font-family:Consolas,monospace;font-size:.92rem;line-height:1.6;}
+  .control-btn{border:0;border-radius:999px;padding:10px 15px;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--cc-primary),#3b82f6);box-shadow:0 10px 20px rgba(37,99,235,.22);}
+  .control-btn.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none;}
+  .control-btn.purple{background:linear-gradient(135deg,var(--cc-purple),#8b5cf6);}
+  .control-btn.green{background:linear-gradient(135deg,var(--cc-green),#22c55e);}
+
+  .practice-box{border:1px solid var(--cc-border);border-radius:20px;background:#fff;padding:20px;box-shadow:0 14px 30px rgba(15,23,42,.05);}
+  .practice-box textarea,.practice-box input{border-radius:14px;border:1px solid #cbd5e1;padding:12px;}
+  .result-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:74px;}
+  .mistake-card{border-radius:18px;border:1px solid #fecaca;background:#fff7f7;padding:16px;height:100%;}
+  .mistake-card h4{font-size:1rem;color:#991b1b;font-weight:950;}
+  .fix-card{border-radius:18px;border:1px solid #bbf7d0;background:#f0fdf4;padding:16px;height:100%;}
+  .fix-card h4{font-size:1rem;color:#166534;font-weight:950;}
+  .exercise-card{height:100%;border:1px solid var(--cc-border);border-radius:18px;background:#fff;padding:18px;}
+  .exercise-card h4{font-weight:950;color:#1e3a8a;font-size:1.08rem;}
+  .level-dot{display:inline-flex;width:14px;height:14px;border-radius:999px;margin-right:8px;background:var(--cc-primary);}
+  .level-dot.green{background:var(--cc-green)}.level-dot.orange{background:var(--cc-orange)}.level-dot.purple{background:var(--cc-purple)}.level-dot.red{background:var(--cc-red)}
+  .quiz-option{display:block;width:100%;text-align:left;border:1px solid var(--cc-border);background:#fff;border-radius:14px;padding:12px 14px;margin:10px 0;font-weight:750;color:#334155;transition:.18s ease;}
+  .quiz-option:hover{transform:translateX(3px);background:#eff6ff;}
+  .quiz-option.correct{border-color:#86efac;background:#f0fdf4;color:#166534;}
+  .quiz-option.wrong{border-color:#fecaca;background:#fef2f2;color:#991b1b;}
+  .mini-note{font-size:.92rem;color:#64748b;}
+  .floating-top{position:fixed;right:22px;bottom:22px;z-index:30;border:0;border-radius:999px;width:48px;height:48px;background:linear-gradient(135deg,var(--cc-primary),var(--cc-purple));color:#fff;box-shadow:0 14px 30px rgba(37,99,235,.3);}
+
+
+  /* ===== Robust code visibility fallback =====
+     The host OJ page may block CDN CSS/JS or load CSS in a different order.
+     These rules keep code visible even when Highlight.js does not run. */
+  .code-panel pre,
+  .code-panel code{
+    display:block;
+    min-height:80px;
+  }
+  .code-panel code:not(.hljs){
+    color:#e5e7eb;
+    background:transparent;
+  }
+  .code-panel code.hljs{
+    color:#abb2bf;
+    background:transparent;
+  }
+  .code-panel pre::-webkit-scrollbar{height:10px;width:10px;}
+  .code-panel pre::-webkit-scrollbar-thumb{background:#475569;border-radius:999px;}
+  .code-panel pre::-webkit-scrollbar-track{background:#111827;}
+  #ccLessonPage .tab-pane:not(.show):not(.active){display:none;}
+  #ccLessonPage .tab-pane.active{display:block;}
+
+</style>
+<div class="cc-lesson-page" id="ccLessonPage">
+<header class="cc-hero animate__animated animate__fadeIn">
+<div class="position-relative" style="z-index:2;">
+<span class="cc-chip"><i class="fa-solid fa-people-arrows"></i> Connected Components</span>
+<span class="cc-chip"><i class="fa-solid fa-magnifying-glass-location"></i> DFS/BFS đánh dấu cụm</span>
+<span class="cc-chip"><i class="fa-solid fa-map-location-dot"></i> Đồ thị vô hướng</span>
+<h1 class="mt-3 mb-3">Thành phần liên thông trong đồ thị</h1>
 <p>
-Khởi tạo tất cả đỉnh là <code>chưa thăm</code>.  
-Mỗi khi gặp 1 đỉnh chưa thăm → chạy DFS/BFS từ nó để đánh dấu toàn bộ cụm.  
-Mỗi lần như vậy tăng biến <code>component</code> thêm 1.
-</p>
-
-<hr>
-
-<h2>💻 Ví dụ Python</h2>
-<pre><code>n,m=map(int,input().split())
-adj=[[] for _ in range(n+1)]
-for _ in range(m):
-    u,v=map(int,input().split())
-    adj[u].append(v)
-    adj[v].append(u)
-
-def dfs(u,vis):
-    vis[u]=True
-    for v in adj[u]:
-        if not vis[v]:
-            dfs(v,vis)
-
-vis=[False]*(n+1)
-comp=0
-for i in range(1,n+1):
-    if not vis[i]:
-        comp+=1
-        dfs(i,vis)
-print("Số thành phần liên thông:",comp)</code></pre>
-
-<h2>💻 C++</h2>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+        Bài học này giúp em hiểu cách đếm số “cụm” đỉnh trong một đồ thị vô hướng. Mỗi cụm là một nhóm đỉnh có thể đi tới nhau bằng các cạnh.
+        Ta sẽ dùng DFS hoặc BFS để tô màu từng cụm, giống như tìm các nhóm bạn quen biết nhau trong một mạng xã hội.
+      </p>
+</div>
+</header>
+<div class="cc-progress-wrap py-3">
+<div class="cc-container py-0">
+<div class="d-flex justify-content-between align-items-center mb-2">
+<span class="cc-progress-label"><i class="fa-solid fa-bars-progress me-1"></i> Tiến độ bài học</span>
+<span class="cc-progress-label" id="ccProgressText">0%</span>
+</div>
+<div class="cc-progress"><div class="cc-progress-bar" id="ccProgressBar"></div></div>
+</div>
+</div>
+<main class="cc-container">
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-bullseye"></i></span> Mục tiêu bài học</h2>
+<div class="row g-3">
+<div class="col-md-6 col-lg-3"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-circle-nodes"></i></div><h3 class="h5">Hiểu component</h3><p>Biết thành phần liên thông là một cụm đỉnh có thể đi tới nhau.</p></div></div>
+<div class="col-md-6 col-lg-3"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-check-double"></i></div><h3 class="h5">Đánh dấu visited</h3><p>Biết dùng mảng <code>vis</code> để tránh duyệt lặp vô hạn.</p></div></div>
+<div class="col-md-6 col-lg-3"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-code"></i></div><h3 class="h5">Viết DFS/BFS</h3><p>Đếm số thành phần liên thông bằng DFS hoặc BFS.</p></div></div>
+<div class="col-md-6 col-lg-3"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><h3 class="h5">Tránh lỗi</h3><p>Không nhầm với đồ thị có hướng, không chỉ duyệt từ đỉnh 1.</p></div></div>
+</div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-lightbulb"></i></span> Ý tưởng cốt lõi</h2>
+<p>
+        Khởi tạo tất cả đỉnh là <code>chưa thăm</code>. Duyệt lần lượt các đỉnh từ <code>1</code> đến <code>n</code>.
+        Mỗi khi gặp một đỉnh chưa thăm, ta phát hiện một thành phần liên thông mới, tăng <code>component</code> thêm 1,
+        rồi chạy DFS/BFS từ đỉnh đó để đánh dấu toàn bộ cụm.
+      </p>
+<div class="lesson-callout success">
+<b>Hình dung đời sống:</b> Trong lớp học có nhiều nhóm bạn. Nếu em chọn một bạn chưa được xếp nhóm, sau đó tìm tất cả bạn có quan hệ trực tiếp/gián tiếp với bạn đó,
+        ta thu được một nhóm. Lặp lại đến khi không còn bạn nào chưa xếp nhóm.
+      </div>
+<table class="compare-table mt-3">
+<thead><tr><th>Bước</th><th>Việc cần làm</th><th>Vì sao cần làm?</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Tạo danh sách kề <code>adj</code></td><td>Lưu các đỉnh nối với nhau để DFS/BFS duyệt nhanh.</td></tr>
+<tr><td>2</td><td>Tạo mảng <code>vis</code></td><td>Biết đỉnh nào đã thuộc một component.</td></tr>
+<tr><td>3</td><td>Duyệt tất cả đỉnh <code>i = 1..n</code></td><td>Có thể đồ thị không liên thông, nên không chỉ xuất phát từ đỉnh 1.</td></tr>
+<tr><td>4</td><td>Nếu <code>vis[i] == false</code>, tăng <code>comp</code></td><td>Mỗi lần gặp đỉnh chưa thăm là bắt đầu một cụm mới.</td></tr>
+<tr><td>5</td><td>Chạy DFS/BFS từ <code>i</code></td><td>Đánh dấu toàn bộ các đỉnh trong cùng cụm.</td></tr>
+</tbody>
+</table>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-eye"></i></span> Mô phỏng trực quan: tô màu từng component</h2>
+<div class="algo-board">
+<div class="graph-visual-card">
+<div class="graph-svg-wrap">
+<svg aria-label="Mô phỏng thành phần liên thông" class="graph-svg" id="ccGraphSvg" viewbox="0 0 650 350">
+<line class="graph-edge" data-edge="1-2" x1="90" x2="190" y1="90" y2="70"></line>
+<line class="graph-edge" data-edge="2-3" x1="190" x2="270" y1="70" y2="145"></line>
+<line class="graph-edge" data-edge="1-3" x1="90" x2="270" y1="90" y2="145"></line>
+<line class="graph-edge" data-edge="4-5" x1="430" x2="540" y1="85" y2="125"></line>
+<line class="graph-edge" data-edge="6-7" x1="240" x2="360" y1="270" y2="255"></line>
+<g class="graph-node" data-node="1"><circle cx="90" cy="90" r="28"></circle><text x="90" y="92">1</text></g>
+<g class="graph-node" data-node="2"><circle cx="190" cy="70" r="28"></circle><text x="190" y="72">2</text></g>
+<g class="graph-node" data-node="3"><circle cx="270" cy="145" r="28"></circle><text x="270" y="147">3</text></g>
+<g class="graph-node" data-node="4"><circle cx="430" cy="85" r="28"></circle><text x="430" y="87">4</text></g>
+<g class="graph-node" data-node="5"><circle cx="540" cy="125" r="28"></circle><text x="540" y="127">5</text></g>
+<g class="graph-node" data-node="6"><circle cx="240" cy="270" r="28"></circle><text x="240" y="272">6</text></g>
+<g class="graph-node" data-node="7"><circle cx="360" cy="255" r="28"></circle><text x="360" y="257">7</text></g>
+<g class="graph-node" data-node="8"><circle cx="540" cy="270" r="28"></circle><text x="540" y="272">8</text></g>
+</svg>
+</div>
+<p class="mini-note mt-3 mb-0">
+            Đồ thị ví dụ có 8 đỉnh. Các cạnh: (1,2), (2,3), (1,3), (4,5), (6,7). Đỉnh 8 đứng một mình.
+          </p>
+</div>
+<div class="state-box">
+<h3 class="h5 mt-0"><i class="fa-solid fa-list-check text-primary me-2"></i> Trạng thái thuật toán</h3>
+<div class="mb-2"><b>Component hiện tại:</b> <span id="ccCurrentComponent">Chưa bắt đầu</span></div>
+<div class="mb-2"><b>Đã thăm:</b></div>
+<div class="visited-list mb-3" id="ccVisitedList"><span class="mini-note">Chưa có đỉnh nào.</span></div>
+<div class="mb-2"><b>Các nhóm đã tìm được:</b></div>
+<div class="mb-3" id="ccComponentList"><span class="mini-note">Nhấn “Bước tiếp” để bắt đầu.</span></div>
+<div class="d-flex flex-wrap gap-2 mb-3">
+<button class="control-btn" id="ccNextStep"><i class="fa-solid fa-forward-step me-1"></i> Bước tiếp</button>
+<button class="control-btn secondary" id="ccReset"><i class="fa-solid fa-rotate-left me-1"></i> Làm lại</button>
+</div>
+<div class="log-box" id="ccLogBox">Sẵn sàng mô phỏng...
+</div>
+</div>
+</div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-code"></i></span> Code mẫu đếm số thành phần liên thông</h2>
+<div class="lesson-callout warning">
+<b>Điểm dễ nhầm:</b> Hàm DFS/BFS chỉ đánh dấu một cụm. Muốn đếm tất cả component, bắt buộc phải có vòng lặp ngoài <code>for (i = 1..n)</code>.
+      </div>
+<ul class="nav nav-tabs code-tabs" id="ccCodeTabs1" role="tablist">
+<li class="nav-item" role="presentation"><button class="nav-link active" data-bs-target="#cc-cpp-main" data-bs-toggle="tab" id="cc-cpp-main-tab" role="tab" type="button"><i class="fa-brands fa-cuttlefish me-1"></i> C++</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" data-bs-target="#cc-py-main" data-bs-toggle="tab" id="cc-py-main-tab" role="tab" type="button"><i class="fa-brands fa-python me-1"></i> Python</button></li>
+</ul>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="cc-cpp-main" role="tabpanel"><div class="code-panel"><button class="copy-btn">Sao chép</button><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int n,m;
+
+int n, m;
 vector&lt;vector&lt;int&gt;&gt; adj;
 vector&lt;int&gt; vis;
-void dfs(int u){
-    vis[u]=1;
-    for(int v:adj[u])
-        if(!vis[v]) dfs(v);
-}
-int main(){
-    cin&gt;&gt;n&gt;&gt;m;
-    adj.assign(n+1,{});
-    for(int i=0;i&lt;m;i++){
-        int u,v;cin&gt;&gt;u&gt;&gt;v;
-        adj[u].push_back(v);
-        adj[v].push_back(u);
+
+void dfs(int u) {
+    vis[u] = 1;
+    for (int v : adj[u]) {
+        if (!vis[v]) dfs(v);
     }
-    vis.assign(n+1,0);
-    int comp=0;
-    for(int i=1;i&lt;=n;i++)
-        if(!vis[i]){
+}
+
+int main() {
+    cin &gt;&gt; n &gt;&gt; m;
+    adj.assign(n + 1, {});
+
+    for (int i = 0; i &lt; m; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+        adj[u].push_back(v);
+        adj[v].push_back(u); // đồ thị vô hướng
+    }
+
+    vis.assign(n + 1, 0);
+    int comp = 0;
+
+    for (int i = 1; i &lt;= n; i++) {
+        if (!vis[i]) {
             comp++;
             dfs(i);
         }
-    cout&lt;&lt;"Số thành phần liên thông: "&lt;&lt;comp;
-}</code></pre>
+    }
 
-<hr>
+    cout &lt;&lt; "So thanh phan lien thong: " &lt;&lt; comp;
+    return 0;
+}</code></pre></div></div>
+<div class="tab-pane fade" id="cc-py-main" role="tabpanel"><div class="code-panel"><button class="copy-btn">Sao chép</button><pre><code class="language-python">n, m = map(int, input().split())
+adj = [[] for _ in range(n + 1)]
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>In ra các thành phần liên thông (liệt kê đỉnh trong từng cụm).</li>
-  <li>Cho đồ thị có hướng, xác định số thành phần liên thông mạnh.</li>
-  <li>Vẽ đồ thị từ danh sách cạnh và tô màu từng component khác nhau.</li>
-</ol>
+for _ in range(m):
+    u, v = map(int, input().split())
+    adj[u].append(v)
+    adj[v].append(u)   # đồ thị vô hướng
 
-<details>
-  <summary><b>💡 Gợi ý bài 1</b></summary>
-  <pre><code>def dfs(u,vis,group):
-    vis[u]=True
-    group.append(u)
+def dfs(u, vis):
+    vis[u] = True
     for v in adj[u]:
         if not vis[v]:
-            dfs(v,vis,group)
+            dfs(v, vis)
 
-vis=[False]*(n+1)
-for i in range(1,n+1):
+vis = [False] * (n + 1)
+comp = 0
+
+for i in range(1, n + 1):
     if not vis[i]:
-        group=[]
-        dfs(i,vis,group)
-        print("Nhóm:",group)</code></pre>
-</details>
+        comp += 1
+        dfs(i, vis)
+
+print("So thanh phan lien thong:", comp)</code></pre></div></div>
+</div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-layer-group"></i></span> DFS hay BFS đều được</h2>
+<p>
+        Với bài đếm thành phần liên thông, DFS và BFS đều có độ phức tạp <code>O(n + m)</code>. Khác nhau chủ yếu ở cách duyệt:
+        DFS đi sâu bằng đệ quy/ngăn xếp, còn BFS lan rộng bằng hàng đợi.
+      </p>
+<ul class="nav nav-tabs code-tabs" id="ccCodeTabs2" role="tablist">
+<li class="nav-item" role="presentation"><button class="nav-link active" data-bs-target="#cc-cpp-bfs" data-bs-toggle="tab" id="cc-cpp-bfs-tab" role="tab" type="button">BFS C++</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" data-bs-target="#cc-py-bfs" data-bs-toggle="tab" id="cc-py-bfs-tab" role="tab" type="button">BFS Python</button></li>
+</ul>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="cc-cpp-bfs" role="tabpanel"><div class="code-panel"><button class="copy-btn">Sao chép</button><pre><code class="language-cpp">int count_components_bfs(int n, vector&lt;vector&lt;int&gt;&gt;&amp; adj) {
+    vector&lt;int&gt; vis(n + 1, 0);
+    int comp = 0;
+
+    for (int start = 1; start &lt;= n; start++) {
+        if (vis[start]) continue;
+
+        comp++;
+        queue&lt;int&gt; q;
+        q.push(start);
+        vis[start] = 1;
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+
+            for (int v : adj[u]) {
+                if (!vis[v]) {
+                    vis[v] = 1;
+                    q.push(v);
+                }
+            }
+        }
+    }
+
+    return comp;
+}</code></pre></div></div>
+<div class="tab-pane fade" id="cc-py-bfs" role="tabpanel"><div class="code-panel"><button class="copy-btn">Sao chép</button><pre><code class="language-python">from collections import deque
+
+def count_components_bfs(n, adj):
+    vis = [False] * (n + 1)
+    comp = 0
+
+    for start in range(1, n + 1):
+        if vis[start]:
+            continue
+
+        comp += 1
+        q = deque([start])
+        vis[start] = True
+
+        while q:
+            u = q.popleft()
+
+            for v in adj[u]:
+                if not vis[v]:
+                    vis[v] = True
+                    q.append(v)
+
+    return comp</code></pre></div></div>
+</div>
+<table class="compare-table mt-4">
+<thead><tr><th>Tiêu chí</th><th>DFS</th><th>BFS</th></tr></thead>
+<tbody>
+<tr><td>Cấu trúc dữ liệu</td><td>Đệ quy hoặc stack</td><td>Queue</td></tr>
+<tr><td>Khi nào tiện?</td><td>Đếm component, tìm chu trình, duyệt cây</td><td>Khoảng cách ngắn nhất trên đồ thị không trọng số</td></tr>
+<tr><td>Lưu ý</td><td>Python có thể lỗi độ sâu đệ quy nếu n lớn</td><td>Cần đánh dấu ngay khi đưa vào queue</td></tr>
+</tbody>
+</table>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-vial-circle-check"></i></span> Thực hành tương tác: nhập đồ thị và tìm component</h2>
+<div class="practice-box">
+<div class="row g-3">
+<div class="col-lg-5">
+<label class="form-label fw-bold">Số đỉnh n</label>
+<input class="form-control mb-3" id="ccPracticeN" value="8"/>
+<label class="form-label fw-bold">Danh sách cạnh</label>
+<textarea class="form-control" id="ccPracticeEdges" rows="8">1 2
+2 3
+1 3
+4 5
+6 7</textarea>
+<div class="d-flex flex-wrap gap-2 mt-3">
+<button class="control-btn green" id="ccRunPractice"><i class="fa-solid fa-play me-1"></i> Tìm component</button>
+<button class="control-btn secondary" id="ccLoadSample"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> Nạp ví dụ</button>
+</div>
+</div>
+<div class="col-lg-7">
+<div class="result-card" id="ccPracticeResult">
+              Nhập số đỉnh và danh sách cạnh, sau đó nhấn <b>Tìm component</b>.
+            </div>
+<div class="lesson-callout mt-3 mb-0">
+<b>Input trong bài thi thường có dạng:</b><br/>
+              Dòng 1: <code>n m</code><br/>
+<code>m</code> dòng tiếp theo, mỗi dòng gồm hai đỉnh <code>u v</code>.
+            </div>
+</div>
+</div>
+</div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-people-group"></i></span> Mở rộng: in ra từng thành phần liên thông</h2>
+<p>
+        Nếu đề bài yêu cầu không chỉ đếm số nhóm mà còn in các đỉnh trong từng nhóm, ta thêm một vector/list <code>group</code> để lưu các đỉnh được DFS duyệt trong component hiện tại.
+      </p>
+<ul class="nav nav-tabs code-tabs" id="ccCodeTabs3" role="tablist">
+<li class="nav-item" role="presentation"><button class="nav-link active" data-bs-target="#cc-cpp-group" data-bs-toggle="tab" id="cc-cpp-group-tab" role="tab" type="button">C++</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" data-bs-target="#cc-py-group" data-bs-toggle="tab" id="cc-py-group-tab" role="tab" type="button">Python</button></li>
+</ul>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="cc-cpp-group" role="tabpanel"><div class="code-panel"><button class="copy-btn">Sao chép</button><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int n, m;
+vector&lt;vector&lt;int&gt;&gt; adj;
+vector&lt;int&gt; vis;
+
+void dfs(int u, vector&lt;int&gt;&amp; group) {
+    vis[u] = 1;
+    group.push_back(u);
+
+    for (int v : adj[u]) {
+        if (!vis[v]) dfs(v, group);
+    }
+}
+
+int main() {
+    cin &gt;&gt; n &gt;&gt; m;
+    adj.assign(n + 1, {});
+
+    for (int i = 0; i &lt; m; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    vis.assign(n + 1, 0);
+    int comp = 0;
+
+    for (int i = 1; i &lt;= n; i++) {
+        if (!vis[i]) {
+            comp++;
+            vector&lt;int&gt; group;
+            dfs(i, group);
+
+            cout &lt;&lt; "Nhom " &lt;&lt; comp &lt;&lt; ": ";
+            for (int x : group) cout &lt;&lt; x &lt;&lt; " ";
+            cout &lt;&lt; "\n";
+        }
+    }
+
+    return 0;
+}</code></pre></div></div>
+<div class="tab-pane fade" id="cc-py-group" role="tabpanel"><div class="code-panel"><button class="copy-btn">Sao chép</button><pre><code class="language-python">def dfs(u, vis, group):
+    vis[u] = True
+    group.append(u)
+
+    for v in adj[u]:
+        if not vis[v]:
+            dfs(v, vis, group)
+
+vis = [False] * (n + 1)
+comp = 0
+
+for i in range(1, n + 1):
+    if not vis[i]:
+        comp += 1
+        group = []
+        dfs(i, vis, group)
+        print("Nhom", comp, ":", *group)</code></pre></div></div>
+</div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-triangle-exclamation"></i></span> Lỗi học sinh hay mắc</h2>
+<div class="row g-3">
+<div class="col-md-6"><div class="mistake-card"><h4><i class="fa-solid fa-xmark me-1"></i> Chỉ gọi <code>dfs(1)</code></h4><p>Chỉ duyệt được component chứa đỉnh 1, bỏ sót các cụm khác.</p></div></div>
+<div class="col-md-6"><div class="fix-card"><h4><i class="fa-solid fa-check me-1"></i> Cách sửa</h4><p>Luôn có vòng lặp ngoài: <code>for i = 1..n</code>, gặp đỉnh chưa thăm thì tăng <code>comp</code> và DFS/BFS.</p></div></div>
+<div class="col-md-6"><div class="mistake-card"><h4><i class="fa-solid fa-xmark me-1"></i> Quên thêm cạnh ngược</h4><p>Đề là đồ thị vô hướng nhưng chỉ viết <code>adj[u].push_back(v)</code>.</p></div></div>
+<div class="col-md-6"><div class="fix-card"><h4><i class="fa-solid fa-check me-1"></i> Cách sửa</h4><p>Với đồ thị vô hướng, phải thêm cả <code>adj[u].push_back(v)</code> và <code>adj[v].push_back(u)</code>.</p></div></div>
+<div class="col-md-6"><div class="mistake-card"><h4><i class="fa-solid fa-xmark me-1"></i> Nhầm liên thông mạnh</h4><p>Thành phần liên thông mạnh chỉ dùng cho đồ thị có hướng và khó hơn.</p></div></div>
+<div class="col-md-6"><div class="fix-card"><h4><i class="fa-solid fa-check me-1"></i> Cách sửa</h4><p>Bài này đang xét đồ thị vô hướng. Với đồ thị có hướng, cần học SCC như Kosaraju hoặc Tarjan.</p></div></div>
+</div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-dumbbell"></i></span> Bài tập luyện tập phân tầng</h2>
+<p>Bài tập được chia theo mức độ để học sinh yếu, khá và giỏi đều có đường đi rõ ràng.</p>
+<div class="row g-3">
+<div class="col-md-6 col-lg-3"><div class="exercise-card"><h4><span class="level-dot green"></span> Cơ bản</h4><ol><li>Nhập đồ thị vô hướng, in danh sách kề.</li><li>Đếm bậc của từng đỉnh.</li><li>Kiểm tra từ 1 có đi tới n không.</li></ol></div></div>
+<div class="col-md-6 col-lg-3"><div class="exercise-card"><h4><span class="level-dot"></span> Trung bình</h4><ol><li>Đếm số thành phần liên thông.</li><li>In ra các đỉnh trong từng component.</li><li>Tìm component có nhiều đỉnh nhất.</li></ol></div></div>
+<div class="col-md-6 col-lg-3"><div class="exercise-card"><h4><span class="level-dot orange"></span> Nâng cao</h4><ol><li>Đếm số cạnh cần thêm để đồ thị liên thông.</li><li>Kiểm tra đồ thị có phải cây không.</li><li>Đếm số component sau khi xóa một số cạnh.</li></ol></div></div>
+<div class="col-md-6 col-lg-3"><div class="exercise-card"><h4><span class="level-dot purple"></span> HSG</h4><ol><li>Liên thông trong lưới ô vuông.</li><li>DSU đếm component động.</li><li>So sánh DFS/BFS và DSU.</li></ol></div></div>
+</div>
+<div class="lesson-callout purple mt-4">
+<b>Công thức nhỏ:</b> Nếu đồ thị vô hướng có <code>comp</code> thành phần liên thông, số cạnh ít nhất cần thêm để toàn bộ đồ thị liên thông là <code>comp - 1</code>.
+      </div>
+</section>
+<section class="mini-slide animate__animated animate__fadeInUp">
+<h2><span class="section-icon"><i class="fa-solid fa-circle-question"></i></span> Quiz kiểm tra nhanh</h2>
+<div class="row g-3">
+<div class="col-lg-6">
+<div class="practice-box">
+<h3 class="h5 mt-0">Câu 1</h3>
+<p>Vì sao phải duyệt tất cả đỉnh từ 1 đến n?</p>
+<button class="quiz-option" data-correct="false">Vì DFS không thể dùng cho đồ thị vô hướng.</button>
+<button class="quiz-option" data-correct="true">Vì đồ thị có thể không liên thông, xuất phát từ 1 có thể bỏ sót component khác.</button>
+<button class="quiz-option" data-correct="false">Vì danh sách kề chỉ lưu được một cạnh.</button>
+</div>
+</div>
+<div class="col-lg-6">
+<div class="practice-box">
+<h3 class="h5 mt-0">Câu 2</h3>
+<p>Đồ thị có 4 component. Cần thêm ít nhất bao nhiêu cạnh để liên thông?</p>
+<button class="quiz-option" data-correct="false">4</button>
+<button class="quiz-option" data-correct="true">3</button>
+<button class="quiz-option" data-correct="false">2</button>
+</div>
+</div>
+</div>
+<div class="lesson-callout mt-3" id="ccQuizFeedback" style="display:none;"></div>
+</section>
+<p class="text-center text-info fw-bold mt-4">
+      ➡ Tiếp theo: Đường đi ngắn nhất bằng BFS trên đồ thị không trọng số.
+    </p>
+</main>
+<button class="floating-top" id="ccBackToTop" title="Lên đầu trang"><i class="fa-solid fa-arrow-up"></i></button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(function(){
+  const page = document.getElementById('ccLessonPage');
+  if(!page) return;
+
+  function safeHighlight(){
+    try{
+      if(window.hljs){
+        page.querySelectorAll('pre code').forEach((block) => {
+          if(!block.dataset.hlDone){
+            window.hljs.highlightElement(block);
+            block.dataset.hlDone = '1';
+          }
+        });
+      }
+    }catch(e){ console.warn('Highlight.js fallback:', e); }
+  }
+
+  // Bootstrap-tab fallback: works even if Bootstrap JS is not loaded by the OJ page.
+  page.querySelectorAll('.code-tabs [data-bs-toggle="tab"]').forEach((btn) => {
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const tabs = btn.closest('.code-tabs');
+      const content = tabs ? tabs.nextElementSibling : null;
+      if(!content) return;
+      tabs.querySelectorAll('.nav-link').forEach(x => {
+        x.classList.remove('active');
+        x.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      content.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('show','active'));
+      const target = page.querySelector(btn.getAttribute('data-bs-target'));
+      if(target) target.classList.add('show','active');
+      safeHighlight();
+    });
+  });
+
+  // Copy code buttons.
+  page.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const code = btn.parentElement ? btn.parentElement.querySelector('code') : null;
+      if(!code) return;
+      const text = code.innerText || code.textContent || '';
+      try{
+        await navigator.clipboard.writeText(text);
+        const old = btn.textContent;
+        btn.textContent = 'Đã chép';
+        setTimeout(() => btn.textContent = old, 1200);
+      }catch(e){
+        const old = btn.textContent;
+        btn.textContent = 'Không chép được';
+        setTimeout(() => btn.textContent = old, 1200);
+      }
+    });
+  });
+
+  // Lesson progress bar.
+  const progress = document.getElementById('ccProgressBar');
+  function updateProgress(){
+    if(!progress) return;
+    const rect = page.getBoundingClientRect();
+    const total = Math.max(1, page.scrollHeight - window.innerHeight);
+    const scrolled = Math.min(Math.max(-rect.top, 0), total);
+    progress.style.width = Math.round(scrolled / total * 100) + '%';
+  }
+  updateProgress();
+  window.addEventListener('scroll', updateProgress, {passive:true});
+
+  // Visual simulation data.
+  const graph = {
+    1:[2,3], 2:[1,3], 3:[1,2], 4:[5], 5:[4], 6:[7], 7:[6], 8:[]
+  };
+  const simSteps = [
+    {type:'start', comp:1, text:'Gặp đỉnh 1 chưa thăm → bắt đầu component 1.'},
+    {type:'visit', node:1, cls:'component-1', text:'Thăm đỉnh 1.'},
+    {type:'visit', node:2, cls:'component-1', edge:'1-2', text:'Từ 1 đi tới 2, đánh dấu 2 cùng component 1.'},
+    {type:'visit', node:3, cls:'component-1', edge:'2-3', text:'Từ 2 đi tới 3, đánh dấu 3 cùng component 1.'},
+    {type:'finish', comp:1, group:[1,2,3], text:'Kết thúc component 1: {1, 2, 3}.'},
+    {type:'start', comp:2, text:'Đỉnh 4 chưa thăm → bắt đầu component 2.'},
+    {type:'visit', node:4, cls:'component-2', text:'Thăm đỉnh 4.'},
+    {type:'visit', node:5, cls:'component-2', edge:'4-5', text:'Từ 4 đi tới 5, đánh dấu 5 cùng component 2.'},
+    {type:'finish', comp:2, group:[4,5], text:'Kết thúc component 2: {4, 5}.'},
+    {type:'start', comp:3, text:'Đỉnh 6 chưa thăm → bắt đầu component 3.'},
+    {type:'visit', node:6, cls:'component-3', text:'Thăm đỉnh 6.'},
+    {type:'visit', node:7, cls:'component-3', edge:'6-7', text:'Từ 6 đi tới 7, đánh dấu 7 cùng component 3.'},
+    {type:'finish', comp:3, group:[6,7], text:'Kết thúc component 3: {6, 7}.'},
+    {type:'start', comp:4, text:'Đỉnh 8 chưa thăm và không có cạnh → component 4.'},
+    {type:'visit', node:8, cls:'component-4', text:'Thăm đỉnh 8.'},
+    {type:'finish', comp:4, group:[8], text:'Kết thúc component 4: {8}. Tổng cộng có 4 component.'}
+  ];
+  let stepIndex = 0;
+  const visited = new Set();
+  const comps = [];
+  const logBox = document.getElementById('ccLogBox');
+  const visitedList = document.getElementById('ccVisitedList');
+  const componentList = document.getElementById('ccComponentList');
+  const currentComponent = document.getElementById('ccCurrentComponent');
+
+  function log(msg){
+    if(!logBox) return;
+    logBox.textContent += msg + '\n';
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+  function renderVisited(){
+    if(!visitedList) return;
+    visitedList.innerHTML = '';
+    if(!visited.size){
+      visitedList.innerHTML = '<span class="mini-note">Chưa có đỉnh nào.</span>';
+      return;
+    }
+    [...visited].sort((a,b)=>a-b).forEach(x => {
+      const span = document.createElement('span');
+      span.className = 'visited-pill';
+      span.textContent = x;
+      visitedList.appendChild(span);
+    });
+  }
+  function renderComps(){
+    if(!componentList) return;
+    componentList.innerHTML = '';
+    if(!comps.length){
+      componentList.innerHTML = '<span class="mini-note">Nhấn “Bước tiếp” để bắt đầu.</span>';
+      return;
+    }
+    comps.forEach((g,idx) => {
+      const span = document.createElement('span');
+      span.className = 'component-pill';
+      span.innerHTML = `<span class="component-dot c${Math.min(idx+1,4)}"></span> Component ${idx+1}: {${g.join(', ')}}`;
+      componentList.appendChild(span);
+    });
+  }
+  function resetSim(){
+    stepIndex = 0;
+    visited.clear();
+    comps.length = 0;
+    page.querySelectorAll('#ccGraphSvg .graph-node').forEach(n => n.classList.remove('visited','current','component-1','component-2','component-3','component-4'));
+    page.querySelectorAll('#ccGraphSvg .graph-edge').forEach(e => e.classList.remove('active'));
+    if(currentComponent) currentComponent.textContent = 'Chưa bắt đầu';
+    if(logBox) logBox.textContent = 'Sẵn sàng mô phỏng...\n';
+    renderVisited();
+    renderComps();
+  }
+  function applyStep(){
+    if(stepIndex >= simSteps.length){
+      log('Đã hoàn thành mô phỏng. Bấm “Làm lại” để chạy lại.');
+      return;
+    }
+    page.querySelectorAll('#ccGraphSvg .graph-node').forEach(n => n.classList.remove('current'));
+    const s = simSteps[stepIndex++];
+    if(s.type === 'start'){
+      if(currentComponent) currentComponent.textContent = 'Component ' + s.comp;
+      log('▶ ' + s.text);
+    }
+    if(s.type === 'visit'){
+      visited.add(s.node);
+      const node = page.querySelector(`#ccGraphSvg .graph-node[data-node="${s.node}"]`);
+      if(node) node.classList.add('visited','current',s.cls);
+      if(s.edge){
+        const edge = page.querySelector(`#ccGraphSvg .graph-edge[data-edge="${s.edge}"]`);
+        if(edge) edge.classList.add('active');
+      }
+      renderVisited();
+      log('✓ ' + s.text);
+    }
+    if(s.type === 'finish'){
+      comps.push(s.group);
+      renderComps();
+      log('■ ' + s.text);
+    }
+  }
+  document.getElementById('ccNextStep')?.addEventListener('click', applyStep);
+  document.getElementById('ccReset')?.addEventListener('click', resetSim);
+  resetSim();
+
+  // Practice parser and solver.
+  function parseGraph(nValue, edgesText){
+    const n = Number(String(nValue).trim());
+    if(!Number.isInteger(n) || n <= 0 || n > 1000) throw new Error('Số đỉnh n phải là số nguyên dương và không quá 1000 trong phần thực hành.');
+    const adj = Array.from({length:n+1}, () => []);
+    const lines = String(edgesText || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+    for(const line of lines){
+      const parts = line.split(/\s+/).map(Number);
+      if(parts.length < 2 || !Number.isInteger(parts[0]) || !Number.isInteger(parts[1])) throw new Error('Mỗi cạnh cần có dạng: u v');
+      const [u,v] = parts;
+      if(u < 1 || u > n || v < 1 || v > n) throw new Error(`Cạnh (${u}, ${v}) có đỉnh nằm ngoài đoạn 1..${n}.`);
+      adj[u].push(v);
+      adj[v].push(u);
+    }
+    return {n, adj};
+  }
+  function findComponents(n, adj){
+    const vis = Array(n+1).fill(false);
+    const result = [];
+    for(let i=1;i<=n;i++){
+      if(!vis[i]){
+        const group = [];
+        const stack = [i];
+        vis[i] = true;
+        while(stack.length){
+          const u = stack.pop();
+          group.push(u);
+          for(const v of adj[u]){
+            if(!vis[v]){ vis[v] = true; stack.push(v); }
+          }
+        }
+        group.sort((a,b)=>a-b);
+        result.push(group);
+      }
+    }
+    return result;
+  }
+  const practiceN = document.getElementById('ccPracticeN');
+  const practiceEdges = document.getElementById('ccPracticeEdges');
+  const practiceResult = document.getElementById('ccPracticeResult');
+  document.getElementById('ccLoadSample')?.addEventListener('click', () => {
+    if(practiceN) practiceN.value = '8';
+    if(practiceEdges) practiceEdges.value = '1 2\n2 3\n1 3\n4 5\n6 7';
+  });
+  document.getElementById('ccRunPractice')?.addEventListener('click', () => {
+    try{
+      const {n, adj} = parseGraph(practiceN ? practiceN.value : '', practiceEdges ? practiceEdges.value : '');
+      const compsFound = findComponents(n, adj);
+      const html = compsFound.map((g,idx) => `<span class="component-pill"><span class="component-dot c${Math.min(idx+1,4)}"></span> Nhóm ${idx+1}: ${g.join(', ')}</span>`).join('');
+      if(practiceResult) practiceResult.innerHTML = `<b>Kết quả:</b> Có <b>${compsFound.length}</b> thành phần liên thông.<div class="mt-2">${html}</div>`;
+    }catch(err){
+      if(practiceResult) practiceResult.innerHTML = `<span class="text-danger fw-bold">Lỗi:</span> ${err.message}`;
+    }
+  });
+
+  // Quiz.
+  page.querySelectorAll('.quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const parent = btn.closest('.practice-box') || page;
+      parent.querySelectorAll('.quiz-option').forEach(x => x.classList.remove('correct','wrong'));
+      const ok = btn.dataset.correct === 'true';
+      btn.classList.add(ok ? 'correct' : 'wrong');
+      const quizFeedback = document.getElementById('ccQuizFeedback');
+      if(quizFeedback){
+        quizFeedback.style.display = 'block';
+        quizFeedback.className = 'lesson-callout mt-3 ' + (ok ? 'success' : 'danger');
+        quizFeedback.innerHTML = ok
+          ? '<b>Chính xác!</b> Em đã nắm đúng ý tưởng component.'
+          : '<b>Chưa đúng.</b> Hãy nhớ: component được phát hiện khi gặp một đỉnh chưa thăm trong vòng lặp ngoài.';
+      }
+    });
+  });
+
+  document.getElementById('ccBackToTop')?.addEventListener('click', () => {
+    page.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  safeHighlight();
+})();
+</script>

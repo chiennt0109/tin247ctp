@@ -1,4 +1,375 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bài 5: Hãy tìm nhà của mèo Scratch!</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"><style>.scratch-page,.scratch-lesson{font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#fff7ed,#ecfeff 45%,#eef2ff);color:#1f2937}.scratch-hero{border-radius:28px;background:radial-gradient(circle at top left,#fde68a,transparent 30%),linear-gradient(135deg,#38bdf8,#a78bfa);color:white;box-shadow:0 20px 55px #7c3aed33}.scratch-card,.lesson-card{background:#ffffffd9;border:1px solid #fff;border-radius:24px;box-shadow:0 12px 30px #0f172a12;transition:.25s}.scratch-card:hover{transform:translateY(-8px) rotate(-.5deg);box-shadow:0 18px 45px #0f172a22}.badge-soft{background:#eef2ff;color:#4338ca}.stage-box{height:230px;border-radius:22px;background:linear-gradient(#ecfeff,#fff);border:3px solid #bae6fd;position:relative;overflow:hidden}.sprite{position:absolute;font-size:48px;left:24px;bottom:22px;transition:.5s}.block{display:inline-block;background:#ffbf3f;border-radius:10px;padding:7px 10px;margin:4px;font-weight:700}.nav-pills-custom a{display:block;padding:10px 12px;border-radius:12px;text-decoration:none;color:#334155}.nav-pills-custom a:hover{background:#e0f2fe}.read-progress{position:fixed;top:0;left:0;height:6px;background:linear-gradient(90deg,#fb923c,#22c55e,#38bdf8);z-index:9999;width:0}pre{background:#0f172a;color:#e2e8f0;padding:1rem;border-radius:16px;white-space:pre-wrap}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.code-tabs button.active{background:#2563eb;color:white}.quiz-option{cursor:pointer}.quiz-option.selected{outline:3px solid #38bdf8}.canvasbox{background:white;border:2px dashed #93c5fd;border-radius:16px}</style></head><body class="scratch-lesson"><div class="read-progress"></div><main class="container py-4"><section class="scratch-hero p-4 p-md-5 mb-4 animate__animated animate__fadeIn"><a class="btn btn-light btn-sm" href="/scratch/">← Quay lại Scratch</a><h1 class="display-6 fw-bold mt-3">🏠 Bài 5: Hãy tìm nhà của mèo Scratch!</h1><p class="lead">Mục tiêu: tạo đối tượng mới, thiết kế trò chơi tìm đường/mê cung.</p><div class="d-flex gap-2 flex-wrap"><span class="badge badge-soft">Mê cung, Điều khiển</span><span class="badge bg-success">Dễ hiểu</span></div></section><div class="row g-4"><aside class="col-lg-3"><div class="lesson-card p-3 sticky-top" style="top:20px"><h5>Điều hướng nhanh</h5><nav class="nav-pills-custom"><a href="#goal">🎯 Mục tiêu</a><a href="#story">📖 Câu chuyện</a><a href="#steps">🧩 Từng bước</a><a href="#sim">🎮 Mô phỏng</a><a href="#practice">✅ Thực hành</a><a href="#quiz">📝 Quiz</a></nav></div></aside><div class="col-lg-9"><section id="goal" class="lesson-card p-4 mb-4"><h2>🎯 Mục tiêu bài học</h2><ul><li>Tạo đối tượng mới, thiết kế trò chơi tìm đường/mê cung.</li><li>Biết ghép các khối lệnh theo thứ tự như xếp LEGO.</li><li>Tự kiểm tra chương trình bằng nút chạy thử.</li></ul></section><section id="story" class="lesson-card p-4 mb-4"><h2>📖 Câu chuyện dẫn nhập</h2><p>🏠 Hôm nay em là đạo diễn nhỏ của sân khấu Scratch. Nhân vật cần nghe lệnh, phản hồi và kể một câu chuyện thật vui. Hãy tưởng tượng mỗi khối lệnh là một mảnh ghép: ghép đúng thì nhân vật sẽ diễn đúng!</p><div class="flashcard alert alert-info"><b>Flashcard:</b> Nhấn để nhớ khái niệm.<div class="answer d-none mt-2">Sự kiện bắt đầu chương trình; điều khiển giúp lặp/chờ; chuyển động làm nhân vật thay đổi vị trí.</div></div></section><section id="knowledge" class="lesson-card p-4 mb-4"><h2>💡 Kiến thức chính</h2><div class="code-tabs mb-2"><button class="btn btn-sm active" data-tab="blocks">Khối Scratch</button><button class="btn btn-sm btn-outline-primary" data-tab="idea">Ý tưởng</button></div><pre data-pane="blocks"><code>Khi bấm cờ xanh
-  lặp lại / chờ / phát tin
-  di chuyển hoặc nói
-  kiểm tra điều kiện nếu cần</code></pre><pre data-pane="idea" style="display:none"><code>Ví dụ đời sống: muốn đi học đúng giờ, em làm tuần tự: thức dậy → vệ sinh → ăn sáng → đến trường.</code></pre></section><section id="steps" class="lesson-card p-4 mb-4"><h2>🧩 Hướng dẫn từng bước</h2><ol><li>Mở Scratch và chọn nhân vật/sân khấu phù hợp.</li><li>Thêm khối sự kiện <span class="block">khi bấm cờ xanh</span>.</li><li>Ghép các khối chính của bài: Mê cung, Điều khiển.</li><li>Chạy thử, quan sát, sửa lỗi nhỏ rồi lưu dự án.</li></ol></section><section id="sim" class="lesson-card p-4 mb-4"><h2>🎮 Mô phỏng trực quan</h2><div class="stage-box"><div class="sprite">🏠</div></div><button class="btn btn-warning mt-3" data-run data-emoji="🏠">▶ Chạy thử</button><button class="btn btn-info mt-3" data-run data-emoji="💬">Nói xin chào</button></section><section id="practice" class="lesson-card p-4 mb-4"><h2>✅ Thực hành tương tác</h2><div class="checklist"><label><input type="checkbox"> Em đã đặt tên dự án rõ ràng</label><br><label><input type="checkbox"> Em đã chạy thử ít nhất 2 lần</label><br><label><input type="checkbox"> Em đã thêm âm thanh/màu sắc/câu thoại vui</label><p class="mini-score fw-bold text-primary mt-2">0/3 nhiệm vụ</p></div><h3>🚧 Lỗi hay nhầm</h3><ul><li>Quên khối sự kiện nên bấm cờ xanh không chạy.</li><li>Đặt lệnh sai thứ tự khiến câu chuyện bị lộn xộn.</li><li>Lặp vô hạn nhưng không có điều kiện dừng.</li></ul></section><section class="lesson-card p-4 mb-4"><h2>🏋️ Bài tập phân tầng</h2><div class="row"><div class="col-md-6"><h5>Cơ bản</h5><ul><li>Làm nhân vật nói 2 câu.</li><li>Thêm một chuyển động đơn giản.</li></ul><h5>Trung bình</h5><ul><li>Thêm âm thanh hoặc đổi trang phục.</li><li>Tạo 3 bước hành động liên tiếp.</li></ul></div><div class="col-md-6"><h5>Nâng cao</h5><ul><li>Thêm điều kiện hoặc biến điểm.</li><li>Tạo phiên bản có 2 nhân vật.</li></ul><h5>HSG định hướng</h5><ul><li>Tối ưu kịch bản để dễ mở rộng.</li><li>Viết mô tả thuật toán bằng lời trước khi ghép khối.</li></ul></div></div></section><section id="quiz" class="lesson-card p-4 mb-4 quiz"><h2>📝 Quiz cuối bài</h2><div class="q mb-3"><strong>Câu 1: Trong bài này, khối nào giúp tạo đối tượng mới, thiết kế trò chơi t?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 2: Trong bài này, khối nào giúp tạo đối tượng mới, thiết kế trò chơi t?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 3: Trong bài này, khối nào giúp tạo đối tượng mới, thiết kế trò chơi t?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 4: Trong bài này, khối nào giúp tạo đối tượng mới, thiết kế trò chơi t?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 5: Trong bài này, khối nào giúp tạo đối tượng mới, thiết kế trò chơi t?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><button class="btn btn-success check-quiz">Kiểm tra đáp án</button><button class="btn btn-outline-secondary reset-quiz">Làm lại</button><span class="quiz-score fw-bold ms-3"></span></section><div class="d-flex justify-content-between mb-5"><a class="btn btn-outline-primary " href="/scratch/bai-04/">← Bài trước</a><a class="btn btn-primary " href="/scratch/bai-06/">Bài tiếp theo →</a></div></div></div></main><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>document.addEventListener('DOMContentLoaded',()=>{try{hljs.highlightAll()}catch(e){}const bar=document.querySelector('.read-progress');function prog(){let h=document.documentElement;bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100||0)+'%'};addEventListener('scroll',prog);prog();document.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>{let s=document.querySelector('.sprite'); if(s){s.style.left=(20+Math.random()*65)+'%';s.textContent=b.dataset.emoji||s.textContent;}});document.querySelectorAll('.code-tabs').forEach(t=>{t.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{t.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');t.parentElement.querySelectorAll('pre[data-pane]').forEach(p=>p.style.display=p.dataset.pane===btn.dataset.tab?'block':'none');});});document.querySelectorAll('.checklist input').forEach(i=>i.onchange=()=>{let box=i.closest('.checklist'),n=box.querySelectorAll('input:checked').length,total=box.querySelectorAll('input').length;box.querySelector('.mini-score').textContent=n+'/'+total+' nhiệm vụ';});document.querySelectorAll('.flashcard').forEach(c=>c.onclick=()=>c.querySelector('.answer').classList.toggle('d-none'));document.querySelectorAll('.quiz').forEach(q=>{q.querySelectorAll('.quiz-option').forEach(o=>o.onclick=()=>{let group=o.parentElement;group.querySelectorAll('.quiz-option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected')});q.querySelector('.check-quiz').onclick=()=>{let score=0,total=0;q.querySelectorAll('.q').forEach(item=>{total++;let sel=item.querySelector('.selected');let ok=sel&&sel.dataset.correct==='1';if(ok)score++;item.querySelector('.feedback').textContent=ok?'✅ Chính xác!':'❌ Thử xem lại khái niệm nhé.'});q.querySelector('.quiz-score').textContent='Điểm: '+score+'/'+total};q.querySelector('.reset-quiz').onclick=()=>{q.querySelectorAll('.selected').forEach(x=>x.classList.remove('selected'));q.querySelectorAll('.feedback').forEach(f=>f.textContent='');q.querySelector('.quiz-score').textContent=''};});const canvas=document.querySelector('canvas.draw');if(canvas){let ctx=canvas.getContext('2d'),x=40,y=40;ctx.fillStyle='#22c55e';function sq(){ctx.fillRect(x,y,24,24)}sq();document.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>{x+=+(b.dataset.dx||0);y+=+(b.dataset.dy||0);sq()})}})</script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Bài 5 Scratch: tạo trò chơi mê cung, điều khiển nhân vật bằng phím mũi tên, xử lý va chạm và chạm đích.">
+  <meta name="author" content="Nguyễn Trung Chiến">
+  <meta name="copyright" content="Nguyễn Trung Chiến - THPT chuyên Trần Phú - SĐT/Zalo 0934353569">
+  <link rel="canonical" href="https://tin247ctp.com/scratch/bai-05/">
+  <title>Bài 5: Robot Miu tìm trạm năng lượng!</title>
+  <style>
+    :root{--bg1:#fff7ed;--bg2:#ecfeff;--bg3:#eef2ff;--text:#172033;--muted:#667085;--line:#e5e7eb;--card:rgba(255,255,255,.93);--blue:#4c97ff;--purple:#9966ff;--orange:#ff9f1c;--yellow:#ffbf3f;--green:#22c55e;--red:#ef4444;--dark:#0f172a;--shadow:0 18px 48px rgba(15,23,42,.12);--radius:22px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:14.5px;line-height:1.55;color:var(--text);min-height:100vh;background:radial-gradient(circle at 8% 5%,rgba(255,191,63,.35),transparent 24rem),radial-gradient(circle at 94% 10%,rgba(76,151,255,.26),transparent 29rem),radial-gradient(circle at 50% 88%,rgba(34,197,94,.15),transparent 32rem),linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea,select,button,.allow-copy,.allow-copy *{user-select:text;-webkit-user-select:text}a{text-decoration:none;color:inherit}img,svg{max-width:100%;height:auto}.container-main{width:min(1180px,calc(100% - 28px));margin:0 auto}.page{position:relative;z-index:1}.read-progress{position:fixed;top:0;left:0;z-index:9999;height:5px;width:0;background:linear-gradient(90deg,var(--orange),var(--green),var(--blue),var(--purple));box-shadow:0 0 16px rgba(76,151,255,.45)}
+    .watermark-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.12}.watermark-layer::before{content:"";position:absolute;inset:-12%;background-image:repeating-linear-gradient(-26deg,transparent 0 92px,rgba(15,23,42,.10) 93px,rgba(15,23,42,.10) 94px,transparent 95px 180px),repeating-linear-gradient(26deg,transparent 0 130px,rgba(34,197,94,.08) 132px,transparent 134px 260px)}.wm{position:absolute;color:rgba(15,23,42,.34);font-weight:900;letter-spacing:.02em;transform:rotate(-22deg);text-align:center;line-height:1.25;white-space:normal;max-width:330px}.wm.big{font-size:clamp(1rem,2.3vw,1.85rem);max-width:520px;color:rgba(15,23,42,.30)}.wm.small{font-size:.76rem;color:rgba(15,23,42,.24)}
+    .copy-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);z-index:10000;background:#111827;color:white;padding:10px 14px;border-radius:999px;font-weight:800;box-shadow:0 14px 32px rgba(15,23,42,.30);opacity:0;transition:.25s;text-align:center;max-width:min(540px,calc(100vw - 28px));font-size:.86rem}.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 0}.pill,.back-link{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(255,255,255,.88);border-radius:999px;padding:8px 12px;font-weight:850;box-shadow:0 10px 24px rgba(15,23,42,.08);backdrop-filter:blur(10px)}
+    .hero{position:relative;overflow:hidden;color:white;border-radius:30px;padding:26px;box-shadow:var(--shadow);background:radial-gradient(circle at 15% 16%,rgba(255,255,255,.27),transparent 15rem),radial-gradient(circle at 90% 86%,rgba(255,255,255,.14),transparent 18rem),linear-gradient(135deg,#0ea5e9 0%,#20b486 48%,#9966ff 100%)}.hero-grid{display:grid;grid-template-columns:1.03fr .97fr;gap:24px;align-items:center;position:relative;z-index:1}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.32);font-weight:900;margin-bottom:10px;font-size:.9rem}h1{font-size:clamp(1.85rem,4.2vw,3.45rem);line-height:1.08;margin:0 0 12px;font-weight:950;letter-spacing:-.035em}.lead{font-size:clamp(.98rem,1.55vw,1.18rem);color:#f8fafc;margin:0;max-width:780px}.hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}.btnx{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:14px;padding:9px 13px;font-weight:900;cursor:pointer;transition:.2s;box-shadow:0 8px 18px rgba(15,23,42,.12);font-size:.9rem}.btnx:hover{transform:translateY(-2px)}.btn-white{background:white;color:#1d4ed8}.btn-darkx{background:#0f172a;color:white}.btn-soft{background:rgba(255,255,255,.20);color:white;border:1px solid rgba(255,255,255,.32)}.btn-green{background:#dcfce7;color:#15803d}.btn-blue{background:#dbeafe;color:#1d4ed8}.btn-orange{background:#ffbf3f;color:#3b2600}.btn-purple{background:#ede9fe;color:#6d28d9}.btn-red{background:#fee2e2;color:#b91c1c}
+    .author-box{margin-top:18px;display:grid;gap:3px;border-radius:18px;padding:12px 14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32);backdrop-filter:blur(12px);width:max-content;max-width:100%;font-weight:800}.author-box strong{font-size:.98rem}.author-box span{color:#fff7ed;font-size:.9rem}.hero-card{background:rgba(255,255,255,.90);color:#172033;border-radius:24px;padding:14px;box-shadow:0 24px 54px rgba(0,0,0,.20)}
+    .lesson-layout{display:grid;grid-template-columns:276px 1fr;gap:22px;margin:26px 0 42px}aside{position:sticky;top:14px;align-self:start}.toc{background:var(--card);border:1px solid white;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;backdrop-filter:blur(10px)}.toc h3{font-size:1rem;margin:0 0 10px;font-weight:950}.toc a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:13px;color:#334155;font-weight:800;margin-bottom:4px;font-size:.92rem}.toc a:hover,.toc a.active{background:#e0f2fe;color:#075985}.content{min-width:0}.cardx{background:var(--card);border:1px solid white;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:20px;scroll-margin-top:16px;backdrop-filter:blur(10px)}.section-title{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:clamp(1.18rem,1.8vw,1.75rem);font-weight:950;letter-spacing:-.02em}.title-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#fff2a6,#ff9f1c);color:#3b2600;box-shadow:0 10px 22px rgba(255,159,28,.20);flex:0 0 auto}.sub{color:var(--muted);margin-top:-5px}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.mini{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.07);height:100%;transition:.2s}.mini:hover{transform:translateY(-3px);box-shadow:0 16px 30px rgba(15,23,42,.11)}.mini h4,.mini h5{margin:0 0 7px;font-weight:950;font-size:1rem}.mini p{margin:0;color:#475569}.mini ul{padding-left:1.1rem;margin:.2rem 0 0}.mini li{margin:.25rem 0}.note{background:#ecfeff;border:1px solid #67e8f9;border-left:5px solid #06b6d4;border-radius:16px;padding:12px 14px;margin-top:14px}.warn{background:#fff7ed;border:1px solid #fed7aa;border-left:5px solid #fb923c}.ok{background:#f0fdf4;border:1px solid #86efac;border-left:5px solid #22c55e}
+    .story-grid{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:stretch}.story-box{background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1px solid #fed7aa;border-radius:20px;padding:16px}.story-scene,.stage{position:relative;overflow:hidden;border-radius:22px;min-height:270px;border:3px solid #bfdbfe;background:linear-gradient(#dbeafe 0 55%,#dcfce7 55%);box-shadow:inset 0 0 0 6px rgba(255,255,255,.45)}.sun{position:absolute;right:24px;top:22px;width:54px;height:54px;border-radius:50%;background:#fde047;box-shadow:0 0 35px rgba(253,224,71,.85)}.speech{position:absolute;left:18px;top:18px;max-width:250px;background:white;border:2px solid #93c5fd;border-radius:18px;padding:10px 12px;font-weight:900;color:#1e3a8a;box-shadow:0 12px 24px rgba(15,23,42,.12)}.avatar{position:absolute;font-size:4rem;filter:drop-shadow(0 10px 10px rgba(15,23,42,.18))}.av-main{left:44px;bottom:40px}.av-guide{right:62px;bottom:88px}.av-goal{right:42px;bottom:42px}.maze-preview{position:absolute;left:28px;right:28px;bottom:24px;top:90px;border-radius:16px;background:#f8fafc;border:3px solid #334155;overflow:hidden}.maze-wall{position:absolute;background:#334155;border-radius:6px}.maze-path-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:#facc15;box-shadow:0 0 18px #facc15}.scratch-shot{background:white;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 16px 38px rgba(15,23,42,.10)}.shot-caption{padding:10px 13px;background:#f8fafc;color:#475569;border-top:1px solid var(--line);font-size:.9rem}.legend{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:12px}.legend-item{background:white;border:1px solid var(--line);border-radius:14px;padding:10px;font-weight:800;color:#334155}.num{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#ffbf3f;color:#3b2600;font-weight:950;margin-right:5px}
+    .timeline{display:grid;gap:10px}.time-row{display:grid;grid-template-columns:120px 1fr 190px;gap:10px;align-items:center;background:white;border:1px solid var(--line);border-radius:16px;padding:10px 12px}.time-label{font-weight:950;color:#075985}.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:900;font-size:.82rem}.kbd{display:inline-flex;background:#111827;color:white;border-radius:8px;padding:2px 7px;font-size:.83rem;font-weight:900}.steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:56px 1fr minmax(210px,300px);gap:12px;align-items:center;background:white;border:1px solid var(--line);border-radius:19px;padding:12px;box-shadow:0 10px 24px rgba(15,23,42,.06)}.step-no{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-weight:950;font-size:1.15rem;background:linear-gradient(135deg,#ffbf3f,#ff7a1a);color:#3d2600}.step h4{margin:0 0 4px;font-weight:950;font-size:1rem}.step p{margin:0;color:#475569}.step-art{min-width:0}.block{display:inline-flex;align-items:center;gap:6px;border-radius:11px;padding:7px 10px;color:white;font-weight:950;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);margin:3px 0;font-size:.86rem}.block.event{background:#ffbf3f;color:#3b2600}.block.looks{background:#9966ff}.block.motion{background:#4c97ff}.block.control{background:#ffab19;color:#3b2600}.block.sense{background:#5cb1d6}.block.message{background:#ff8c1a;color:#3b2600}.block.sound{background:#d65cd6}.block.var{background:#ff8c1a;color:#3b2600}.script-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.code-card{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 10px 24px rgba(15,23,42,.07)}.code-head{padding:12px 14px;background:#f8fafc;border-bottom:1px solid var(--line);font-weight:950;display:flex;justify-content:space-between;gap:10px;align-items:center}.code-body{padding:12px}.stack{display:grid;gap:6px;align-items:start}.small-text{font-size:.86rem;color:#64748b;margin:.5rem 0 0}.script-note{border-left:5px solid var(--purple);background:#f5f3ff;border-color:#ddd6fe}.maze-sim{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:stretch}.maze-board{position:relative;height:360px;background:#f8fafc;border:4px solid #334155;border-radius:20px;overflow:hidden;box-shadow:inset 0 0 0 5px rgba(255,255,255,.55)}.wall{position:absolute;background:#334155;border-radius:7px}.goal{position:absolute;right:18px;top:18px;width:54px;height:54px;border-radius:16px;background:#dcfce7;border:3px solid #22c55e;display:grid;place-items:center;font-size:2rem}.player{position:absolute;left:22px;bottom:18px;width:46px;height:46px;border-radius:16px;background:white;border:3px solid #4c97ff;display:grid;place-items:center;font-size:1.8rem;transition:.15s;box-shadow:0 10px 20px rgba(15,23,42,.15)}.bubble{position:absolute;left:70px;bottom:74px;background:white;border:2px solid #93c5fd;border-radius:18px;padding:9px 12px;font-weight:900;opacity:0;transform:translateY(8px);transition:.25s;box-shadow:0 12px 24px rgba(15,23,42,.12);max-width:230px}.bubble.show{opacity:1;transform:translateY(0)}.control-panel{background:white;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.07)}.dir-grid{display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,46px);gap:8px;justify-content:center;margin:12px 0}.dir-grid button{border:none;border-radius:13px;background:#dbeafe;color:#1d4ed8;font-weight:950;cursor:pointer}.dir-grid .empty{background:transparent;box-shadow:none}.status-box{border:1px solid var(--line);border-radius:16px;padding:10px;background:#f8fafc;font-weight:850;color:#334155}.choices{display:grid;gap:10px}.choice{cursor:pointer;background:white;border:2px dashed #cbd5e1;border-radius:15px;padding:10px;transition:.2s}.choice:hover,.choice.selected{background:#ecfeff;border-color:#38bdf8;transform:scale(1.01)}.chosen-zone{min-height:112px;background:#f8fafc;border:2px dashed #93c5fd;border-radius:16px;padding:10px}.checklist{display:grid;gap:8px}.check-item{display:flex;gap:9px;align-items:flex-start;background:white;border:1px solid var(--line);border-radius:14px;padding:10px;font-weight:750}.check-item input{width:18px;height:18px;margin-top:3px}.mini-score{font-weight:950;color:#1d4ed8;margin-top:10px}.mistake{background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:12px}.mistake strong{color:#9a3412}.level{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;margin-bottom:8px;font-size:.8rem;font-weight:950}.lv1{background:#dcfce7;color:#166534}.lv2{background:#dbeafe;color:#1e40af}.lv3{background:#fef3c7;color:#92400e}.lv4{background:#f3e8ff;color:#6b21a8}.quiz{display:grid;gap:12px}.q{background:white;border:1px solid var(--line);border-radius:16px;padding:13px}.options{display:grid;gap:8px;margin-top:9px}.option{border:1px solid var(--line);border-radius:13px;padding:9px 11px;background:#f8fafc;font-weight:750;cursor:pointer;transition:.18s}.option:hover{background:#e0f2fe}.option.selected{outline:3px solid #38bdf8;background:#ecfeff}.option.correct{border-color:#22c55e;background:#dcfce7}.option.wrong{border-color:#ef4444;background:#fee2e2}.feedback{font-size:.9rem;margin-top:8px;font-weight:950}.footer-nav{display:flex;justify-content:space-between;gap:10px;margin:24px 0}.copyright-footer{margin:18px 0 44px;padding:16px;border-radius:20px;background:#0f172a;color:#e2e8f0;box-shadow:var(--shadow);text-align:center}.copyright-footer strong{display:block;font-size:1rem}.copyright-footer span{display:block;color:#cbd5e1}.scene-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}pre{background:#0f172a;color:#e2e8f0;border-radius:16px;padding:.9rem;white-space:pre-wrap;border:1px solid #1e293b;font-size:.88rem}code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    @media (max-width:980px){.hero-grid,.lesson-layout,.story-grid,.maze-sim{grid-template-columns:1fr}aside{position:static}.legend{grid-template-columns:repeat(2,minmax(0,1fr))}.time-row{grid-template-columns:1fr}.step{grid-template-columns:50px 1fr}.step .step-art{grid-column:1 / -1}.grid-3,.grid-4,.script-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:640px){body{font-size:14px}.topbar{flex-direction:column;align-items:flex-start}.hero{padding:20px;border-radius:24px}.cardx{padding:16px}.grid-2,.grid-3,.grid-4,.legend,.script-grid{grid-template-columns:1fr}.footer-nav{flex-direction:column}.maze-board{height:320px}.dir-grid{grid-template-columns:repeat(3,54px)}}@media print{body{background:white;color:#111}.read-progress,.topbar,aside,.footer-nav,.hero-actions,.btnx,.copy-toast,.control-panel{display:none!important}.lesson-layout,.hero-grid,.story-grid,.maze-sim{display:block}.cardx,.hero,.toc{box-shadow:none;border:1px solid #ddd;break-inside:avoid}.watermark-layer{opacity:.18}}
+  </style>
+</head>
+<body>
+  <div class="watermark-layer" aria-hidden="true">
+    <div class="wm big" style="left:7%;top:14%">Nguyễn Trung Chiến<br>THPT chuyên Trần Phú<br>0934353569</div>
+    <div class="wm" style="right:6%;top:18%">Scratch · Tin học sáng tạo</div>
+    <div class="wm small" style="left:12%;top:42%">Nguyễn Trung Chiến · 0934353569</div>
+    <div class="wm small" style="right:10%;top:48%">THPT chuyên Trần Phú</div>
+    <div class="wm big" style="left:30%;top:68%">Bản quyền bài giảng<br>Nguyễn Trung Chiến</div>
+    <div class="wm small" style="right:15%;bottom:8%">Zalo: 0934353569</div>
+  </div>
+  <div class="read-progress" id="readProgress"></div>
+  <div class="copy-toast" id="copyToast">Nội dung thuộc bản quyền Nguyễn Trung Chiến - THPT chuyên Trần Phú.</div>
+
+  <div class="page">
+    <div class="container-main">
+      <div class="topbar">
+        <a class="back-link" href="https://tin247ctp.com/scratch/">← 🏠 Trang chủ Scratch</a>
+        <div class="pill">🧭 Scratch 1 · Bài 5 · Mê cung</div>
+      </div>
+
+      <header class="hero" id="top">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">🎮 Bài học trò chơi đầu tiên</div>
+            <h1>Robot Miu tìm trạm năng lượng!</h1>
+            <p class="lead">Tạo trò chơi mê cung: điều khiển nhân vật bằng phím mũi tên, tránh tường, chạm đích và xử lý thắng/thua.</p>
+            <div class="hero-actions">
+              <a class="btnx btn-white" href="#story">📖 Nghe câu chuyện</a>
+              <a class="btnx btn-soft" href="#object-code">💻 Xem code từng đối tượng</a>
+              <a class="btnx btn-darkx" href="#homework">🏠 Bài tập về nhà</a>
+            </div>
+            <div class="author-box">
+              <strong>👨‍🏫 Nguyễn Trung Chiến</strong>
+              <span>🏫 THPT chuyên Trần Phú</span>
+              <span>📱 SĐT/Zalo: 0934353569</span>
+            </div>
+          </div>
+          <div class="hero-card">
+            <div class="scratch-shot">
+              <svg viewBox="0 0 900 520" role="img" aria-label="Minh họa trò chơi mê cung trong Scratch">
+                <rect width="900" height="520" fill="#f1f5f9"/>
+                <rect x="0" y="0" width="900" height="48" fill="#4c97ff"/>
+                <text x="28" y="31" fill="white" font-size="18" font-weight="900">Scratch</text>
+                <rect x="38" y="78" width="260" height="388" rx="18" fill="#fff" stroke="#cbd5e1"/>
+                <text x="58" y="108" fill="#0f172a" font-size="18" font-weight="900">1. Code điều khiển</text>
+                <rect x="60" y="135" width="190" height="36" rx="13" fill="#ffbf3f"/><text x="78" y="158" font-size="13" font-weight="900" fill="#3b2600">Khi bấm cờ xanh</text>
+                <rect x="82" y="181" width="180" height="36" rx="13" fill="#ffab19"/><text x="100" y="204" font-size="13" font-weight="900" fill="#3b2600">Lặp mãi mãi</text>
+                <rect x="104" y="227" width="166" height="36" rx="13" fill="#4c97ff"/><text x="122" y="250" font-size="13" font-weight="900" fill="#fff">Nếu bấm phím →</text>
+                <rect x="104" y="273" width="154" height="36" rx="13" fill="#5cb1d6"/><text x="122" y="296" font-size="13" font-weight="900" fill="#fff">Nếu chạm tường</text>
+                <rect x="104" y="319" width="144" height="36" rx="13" fill="#5cb1d6"/><text x="122" y="342" font-size="13" font-weight="900" fill="#fff">Nếu chạm đích</text>
+                <rect x="324" y="78" width="536" height="388" rx="18" fill="#fff" stroke="#cbd5e1"/>
+                <text x="348" y="108" fill="#0f172a" font-size="18" font-weight="900">2. Sân khấu mê cung</text>
+                <rect x="354" y="126" width="476" height="312" rx="16" fill="#f8fafc" stroke="#334155" stroke-width="5"/>
+                <rect x="354" y="184" width="300" height="22" fill="#334155" rx="6"/>
+                <rect x="502" y="184" width="22" height="160" fill="#334155" rx="6"/>
+                <rect x="422" y="264" width="258" height="22" fill="#334155" rx="6"/>
+                <rect x="690" y="126" width="22" height="230" fill="#334155" rx="6"/>
+                <rect x="564" y="358" width="250" height="22" fill="#334155" rx="6"/>
+                <rect x="740" y="146" width="58" height="58" rx="16" fill="#dcfce7" stroke="#22c55e" stroke-width="4"/><text x="750" y="187" font-size="34">🔋</text>
+                <rect x="382" y="374" width="56" height="56" rx="16" fill="white" stroke="#4c97ff" stroke-width="4"/><text x="393" y="414" font-size="34">🤖</text>
+                <text x="372" y="465" fill="#475569" font-size="14" font-weight="800">Robot xuất phát ở góc dưới trái, tìm đường đến trạm năng lượng.</text>
+              </svg>
+              <div class="shot-caption">Bài học chuyển từ “kể chuyện” sang “tạo trò chơi”: nhân vật phải được điều khiển và biết phản ứng khi chạm vật cản.</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="lesson-layout">
+        <aside>
+          <nav class="toc" aria-label="Điều hướng bài học">
+            <h3>📌 Điều hướng nhanh</h3>
+            <a href="#goal">🎯 Mục tiêu</a>
+            <a href="#story">📖 Câu chuyện</a>
+            <a href="#run-story">🎬 Chạy kịch bản</a>
+            <a href="#scenario">📋 Kịch bản</a>
+            <a href="#steps">🧩 Từng bước</a>
+            <a href="#object-code">💻 Code đối tượng</a>
+            <a href="#simulation">🎮 Mô phỏng</a>
+            <a href="#practice">✅ Thực hành</a>
+            <a href="#homework">🏠 Bài tập về nhà</a>
+            <a href="#quiz">📝 Quiz</a>
+          </nav>
+        </aside>
+
+        <main class="content">
+          <section class="cardx" id="goal">
+            <h2 class="section-title"><span class="title-icon">🎯</span>Mục tiêu bài học</h2>
+            <p class="sub">Sau bài này, học sinh biết tạo một trò chơi tìm đường đơn giản trong Scratch.</p>
+            <div class="grid-3">
+              <div class="mini"><h4>🧱 Thiết kế mê cung</h4><p>Biết dùng phông nền hoặc màu tường để tạo đường đi và vật cản.</p></div>
+              <div class="mini"><h4>⌨️ Điều khiển nhân vật</h4><p>Dùng phím mũi tên để thay đổi vị trí nhân vật trên sân khấu.</p></div>
+              <div class="mini"><h4>🎯 Xử lý va chạm</h4><p>Nếu chạm tường thì quay lại vị trí xuất phát; nếu chạm đích thì thắng.</p></div>
+            </div>
+            <div class="note"><strong>Kiến thức chính:</strong> trò chơi mê cung cần 3 việc: điều khiển nhân vật, kiểm tra va chạm, và xác định điều kiện chiến thắng.</div>
+          </section>
+
+          <section class="cardx" id="story">
+            <h2 class="section-title"><span class="title-icon">📖</span>Câu chuyện: Robot Miu tìm trạm năng lượng</h2>
+            <div class="story-grid">
+              <div class="story-box">
+                <p>Trong <strong>Khu Vườn Mạch Điện</strong>, có một robot nhỏ tên là <strong>Robot Miu</strong>. Miu rất thích khám phá, nhưng hôm nay bạn ấy đi hơi xa và pin sắp hết.</p>
+                <p>May mắn thay, <strong>Đom Đóm Lumo</strong> xuất hiện và chỉ về phía <strong>Trạm Năng Lượng</strong>. Tuy nhiên, đường về bị chia thành nhiều lối nhỏ, có những bức tường đá màu xanh đậm chắn ngang.</p>
+                <p>Nhiệm vụ của học sinh là lập trình để điều khiển Robot Miu đi đúng đường, tránh chạm tường và về tới trạm năng lượng an toàn.</p>
+              </div>
+              <div class="story-scene" aria-label="Robot Miu trong khu vườn mê cung">
+                <div class="sun"></div>
+                <div class="speech">Miu cần tìm đường về trạm năng lượng trước khi hết pin!</div>
+                <div class="maze-preview">
+                  <div class="maze-wall" style="left:0;top:58px;width:210px;height:16px"></div>
+                  <div class="maze-wall" style="left:128px;top:58px;width:16px;height:118px"></div>
+                  <div class="maze-wall" style="right:42px;top:0;width:16px;height:172px"></div>
+                  <div class="maze-wall" style="left:58px;bottom:58px;width:190px;height:16px"></div>
+                  <div class="maze-path-dot" style="left:26px;bottom:24px"></div>
+                  <div class="maze-path-dot" style="right:28px;top:28px;background:#22c55e"></div>
+                </div>
+                <div class="avatar av-main">🤖</div>
+                <div class="avatar av-guide">✨</div>
+                <div class="avatar av-goal">🔋</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx" id="run-story">
+            <h2 class="section-title"><span class="title-icon">🎬</span>Chạy kịch bản câu chuyện</h2>
+            <p class="sub">Cho học sinh quan sát trước để hiểu mình cần lập trình điều gì.</p>
+            <div class="maze-sim">
+              <div class="maze-board" id="storyBoard">
+                <div class="wall" style="left:0;top:72px;width:260px;height:22px"></div>
+                <div class="wall" style="left:170px;top:72px;width:22px;height:170px"></div>
+                <div class="wall" style="left:90px;top:195px;width:265px;height:22px"></div>
+                <div class="wall" style="right:78px;top:0;width:22px;height:250px"></div>
+                <div class="wall" style="left:235px;bottom:64px;width:270px;height:22px"></div>
+                <div class="goal">🔋</div>
+                <div class="player" id="storyPlayer">🤖</div>
+                <div class="bubble" id="storyBubble">Mình phải tìm trạm năng lượng!</div>
+              </div>
+              <div class="control-panel">
+                <h4>🎧 Nghe và hình dung nhiệm vụ</h4>
+                <p>Học sinh bấm chạy kịch bản để thấy: xuất phát → đi trong mê cung → tránh tường → chạm trạm năng lượng.</p>
+                <div class="scene-buttons">
+                  <button class="btnx btn-green" id="playStory">▶️ Chạy kịch bản</button>
+                  <button class="btnx btn-blue" id="resetStory">↺ Làm lại</button>
+                </div>
+                <div class="note ok"><strong>Câu hỏi gợi mở:</strong> Nếu Robot Miu chạm tường thì trò chơi nên làm gì? Nếu chạm pin thì thông báo gì?</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx" id="scenario">
+            <h2 class="section-title"><span class="title-icon">📋</span>Kịch bản trước khi lập trình</h2>
+            <p class="sub">Chuyển câu chuyện thành các luật của trò chơi.</p>
+            <div class="timeline">
+              <div class="time-row"><div class="time-label">Bắt đầu</div><div>Robot Miu đứng ở góc dưới bên trái, trạm năng lượng nằm ở góc trên bên phải.</div><div><span class="tag">Khởi tạo</span></div></div>
+              <div class="time-row"><div class="time-label">Điều khiển</div><div>Người chơi dùng 4 phím mũi tên để di chuyển Robot Miu trong mê cung.</div><div><span class="tag">Phím mũi tên</span></div></div>
+              <div class="time-row"><div class="time-label">Chạm tường</div><div>Nếu Robot Miu chạm màu tường, Robot trở về điểm xuất phát và nhắc người chơi thử lại.</div><div><span class="tag">Va chạm</span></div></div>
+              <div class="time-row"><div class="time-label">Chạm đích</div><div>Nếu Robot Miu chạm Trạm Năng Lượng, trò chơi phát tin “Chiến thắng”.</div><div><span class="tag">Thắng</span></div></div>
+              <div class="time-row"><div class="time-label">Kết thúc</div><div>Đom Đóm Lumo chúc mừng và trò chơi dừng lại.</div><div><span class="tag">Hoàn thành</span></div></div>
+            </div>
+            <div class="note warn"><strong>Chuẩn bị trước:</strong> vẽ tường mê cung bằng một màu thật rõ, ví dụ xanh đậm. Khi dùng khối <span class="kbd">chạm màu</span>, cần chọn đúng màu tường.</div>
+          </section>
+
+          <section class="cardx" id="steps">
+            <h2 class="section-title"><span class="title-icon">🧩</span>Hướng dẫn từng bước</h2>
+            <div class="steps">
+              <div class="step"><div class="step-no">1</div><div><h4>Tạo phông nền mê cung</h4><p>Vẽ đường đi màu sáng và tường màu xanh đậm. Chừa điểm xuất phát và điểm đích rõ ràng.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"/><rect x="24" y="24" width="252" height="102" rx="12" fill="#f8fafc" stroke="#334155" stroke-width="4"/><rect x="24" y="58" width="150" height="14" fill="#334155"/><rect x="116" y="58" width="14" height="52" fill="#334155"/><rect x="166" y="24" width="14" height="70" fill="#334155"/><text x="37" y="113" font-size="26">🤖</text><text x="232" y="57" font-size="26">🔋</text></svg></div></div>
+              <div class="step"><div class="step-no">2</div><div><h4>Thêm đối tượng</h4><p>Tạo Robot Miu, Đom Đóm Lumo và Trạm Năng Lượng. Đặt tên rõ ràng trong danh sách đối tượng.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"/><text x="44" y="84" font-size="42">🤖 ✨ 🔋</text><text x="35" y="120" fill="#475569" font-size="14" font-weight="800">3 đối tượng chính của trò chơi</text></svg></div></div>
+              <div class="step"><div class="step-no">3</div><div><h4>Lập trình di chuyển</h4><p>Cho Robot Miu phản ứng với 4 phím mũi tên: trái, phải, lên, xuống.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"/><rect x="40" y="26" width="190" height="32" rx="12" fill="#ffbf3f"/><text x="58" y="47" font-size="12" font-weight="900" fill="#3b2600">Khi bấm cờ xanh</text><rect x="62" y="66" width="168" height="32" rx="12" fill="#ffab19"/><text x="80" y="87" font-size="12" font-weight="900" fill="#3b2600">Lặp mãi mãi</text><rect x="82" y="106" width="156" height="32" rx="12" fill="#4c97ff"/><text x="100" y="127" font-size="12" font-weight="900" fill="#fff">Nếu phím →</text></svg></div></div>
+              <div class="step"><div class="step-no">4</div><div><h4>Thêm luật va chạm</h4><p>Nếu chạm màu tường thì Robot quay lại vị trí xuất phát; nếu chạm pin thì chiến thắng.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"/><rect x="32" y="34" width="178" height="32" rx="12" fill="#5cb1d6"/><text x="48" y="55" font-size="12" font-weight="900" fill="#fff">Nếu chạm màu tường</text><rect x="54" y="74" width="174" height="32" rx="12" fill="#4c97ff"/><text x="70" y="95" font-size="12" font-weight="900" fill="#fff">về điểm xuất phát</text><rect x="32" y="114" width="148" height="28" rx="10" fill="#5cb1d6"/><text x="48" y="133" font-size="11" font-weight="900" fill="#fff">Nếu chạm pin</text></svg></div></div>
+            </div>
+          </section>
+
+          <section class="cardx" id="object-code">
+            <h2 class="section-title"><span class="title-icon">💻</span>Code cụ thể cho từng đối tượng</h2>
+            <p class="sub">Học sinh làm theo phần này để hoàn thiện bài chính.</p>
+            <div class="script-grid">
+              <article class="code-card"><div class="code-head">🤖 Robot Miu <span class="tag">Nhân vật chính</span></div><div class="code-body"><div class="stack"><span class="block event">Khi bấm vào cờ xanh</span><span class="block looks">hiện</span><span class="block motion">đi tới x: -190 y: -130</span><span class="block motion">đặt kiểu xoay trái-phải</span><span class="block control">lặp mãi mãi</span><span class="block control">nếu phím mũi tên phải được bấm</span><span class="block motion">thay đổi x một lượng 5</span><span class="block control">nếu phím mũi tên trái được bấm</span><span class="block motion">thay đổi x một lượng -5</span><span class="block control">nếu phím mũi tên lên được bấm</span><span class="block motion">thay đổi y một lượng 5</span><span class="block control">nếu phím mũi tên xuống được bấm</span><span class="block motion">thay đổi y một lượng -5</span></div><p class="small-text">Đây là phần điều khiển cơ bản. Sau đó thêm luật chạm tường và chạm đích bên dưới.</p></div></article>
+              <article class="code-card"><div class="code-head">🤖 Robot Miu <span class="tag">Luật va chạm</span></div><div class="code-body"><div class="stack"><span class="block control">trong vòng lặp mãi mãi</span><span class="block sense">nếu chạm màu tường xanh đậm</span><span class="block looks">nói “Ôi! Mình chạm tường rồi.” trong 1 giây</span><span class="block motion">đi tới x: -190 y: -130</span><span class="block sense">nếu chạm Trạm Năng Lượng</span><span class="block looks">nói “Mình đã nạp năng lượng thành công!” trong 2 giây</span><span class="block message">phát tin Chiến thắng</span><span class="block control">dừng tất cả</span></div><p class="small-text">Nếu học sinh chưa quen “chạm màu”, giáo viên cho các em dùng ống hút màu để chọn đúng màu tường.</p></div></article>
+              <article class="code-card"><div class="code-head">✨ Đom Đóm Lumo <span class="tag">Hướng dẫn</span></div><div class="code-body"><div class="stack"><span class="block event">Khi bấm vào cờ xanh</span><span class="block looks">hiện</span><span class="block motion">đi tới x: -80 y: 130</span><span class="block looks">nói “Dùng phím mũi tên để đưa Robot Miu về trạm năng lượng!” trong 3 giây</span><span class="block message">Khi nhận tin Chiến thắng</span><span class="block looks">nói “Tuyệt vời! Cậu đã tìm đúng đường.” trong 3 giây</span></div></div></article>
+              <article class="code-card"><div class="code-head">🔋 Trạm Năng Lượng <span class="tag">Đích đến</span></div><div class="code-body"><div class="stack"><span class="block event">Khi bấm vào cờ xanh</span><span class="block looks">hiện</span><span class="block motion">đi tới x: 190 y: 130</span><span class="block looks">đổi kích thước thành 80%</span><span class="block control">lặp mãi mãi</span><span class="block looks">đổi hiệu ứng màu một lượng 10</span><span class="block control">chờ 0.2 giây</span></div><p class="small-text">Hiệu ứng màu giúp học sinh dễ nhận ra đây là đích đến.</p></div></article>
+              <article class="code-card"><div class="code-head">🖼️ Sân khấu <span class="tag">Mê cung</span></div><div class="code-body"><div class="stack"><span class="block event">Khi bấm vào cờ xanh</span><span class="block looks">đổi phông nền thành Khu Vườn Mê Cung</span><span class="block sound">bắt đầu âm thanh nền nhẹ</span><span class="block message">Khi nhận tin Chiến thắng</span><span class="block looks">đổi phông nền thành Màn hình chúc mừng</span></div></div></article>
+              <article class="code-card"><div class="code-head">⭐ Nâng cấp thêm <span class="tag">Tùy chọn</span></div><div class="code-body"><div class="stack"><span class="block var">tạo biến Thời gian</span><span class="block event">Khi bấm vào cờ xanh</span><span class="block var">đặt Thời gian bằng 30</span><span class="block control">lặp lại cho đến khi Thời gian = 0</span><span class="block control">chờ 1 giây</span><span class="block var">thay đổi Thời gian một lượng -1</span></div><p class="small-text">Phần này dành cho học sinh làm nhanh hoặc nhóm khá.</p></div></article>
+            </div>
+            <div class="note script-note"><strong>Cách kiểm tra nhanh:</strong> chạy thử từng phần. Trước tiên kiểm tra di chuyển, sau đó kiểm tra chạm tường, cuối cùng kiểm tra chạm đích.</div>
+          </section>
+
+          <section class="cardx" id="simulation">
+            <h2 class="section-title"><span class="title-icon">🎮</span>Mô phỏng điều khiển mê cung</h2>
+            <div class="maze-sim">
+              <div class="maze-board" id="gameBoard">
+                <div class="wall" style="left:0;top:72px;width:260px;height:22px"></div>
+                <div class="wall" style="left:170px;top:72px;width:22px;height:170px"></div>
+                <div class="wall" style="left:90px;top:195px;width:265px;height:22px"></div>
+                <div class="wall" style="right:78px;top:0;width:22px;height:250px"></div>
+                <div class="wall" style="left:235px;bottom:64px;width:270px;height:22px"></div>
+                <div class="goal">🔋</div>
+                <div class="player" id="player">🤖</div>
+                <div class="bubble" id="gameBubble">Dùng nút điều khiển hoặc phím mũi tên!</div>
+              </div>
+              <div class="control-panel">
+                <h4>🎛️ Điều khiển thử</h4>
+                <p>Nhấn các nút hoặc dùng phím mũi tên để đưa Robot Miu về trạm năng lượng.</p>
+                <div class="dir-grid">
+                  <span class="empty"></span><button data-move="up">↑</button><span class="empty"></span>
+                  <button data-move="left">←</button><button data-move="reset">↺</button><button data-move="right">→</button>
+                  <span class="empty"></span><button data-move="down">↓</button><span class="empty"></span>
+                </div>
+                <div class="status-box" id="gameStatus">Trạng thái: Sẵn sàng</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx" id="arrange">
+            <h2 class="section-title"><span class="title-icon">🧠</span>Sắp xếp luật trò chơi</h2>
+            <p class="sub">Chọn đúng thứ tự xử lý trong trò chơi mê cung.</p>
+            <div class="grid-2">
+              <div><h4 class="fw-bold">Kho hành động</h4><div class="choices">
+                <div class="choice" data-key="start"><span class="block event">Khi bấm vào cờ xanh</span></div>
+                <div class="choice" data-key="move"><span class="block motion">Điều khiển bằng phím mũi tên</span></div>
+                <div class="choice" data-key="wall"><span class="block sense">Nếu chạm tường thì quay lại xuất phát</span></div>
+                <div class="choice" data-key="goal"><span class="block message">Nếu chạm đích thì phát tin Chiến thắng</span></div>
+              </div></div>
+              <div><h4 class="fw-bold">Thứ tự em chọn</h4><div class="chosen-zone" id="chosenZone"></div><div class="scene-buttons"><button class="btnx btn-green" id="checkOrder">Kiểm tra</button><button class="btnx btn-blue" id="resetOrder">Làm lại</button></div><p class="fw-bold" id="orderFeedback"></p></div>
+            </div>
+          </section>
+
+          <section class="cardx" id="practice">
+            <h2 class="section-title"><span class="title-icon">✅</span>Thực hành trên Scratch</h2>
+            <div class="grid-2">
+              <div>
+                <h4 class="fw-bold">Checklist hoàn thành</h4>
+                <div class="checklist">
+                  <label class="check-item"><input type="checkbox"> Em đã tạo phông nền mê cung rõ đường đi và tường.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã thêm Robot Miu, Đom Đóm Lumo và Trạm Năng Lượng.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã lập trình 4 phím mũi tên cho Robot Miu.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã thêm luật chạm tường quay về điểm xuất phát.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã thêm luật chạm đích để chiến thắng.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã chạy thử ít nhất 3 lần.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã sửa lỗi nếu nhân vật đi xuyên tường hoặc không chạm đích.</label>
+                </div>
+                <div class="mini-score" id="taskScore">0/7 nhiệm vụ</div>
+              </div>
+              <div>
+                <h4 class="fw-bold">Lỗi học sinh hay nhầm</h4>
+                <div class="grid-2">
+                  <div class="mistake"><strong>Chọn sai màu tường:</strong> Robot không quay lại khi chạm tường.</div>
+                  <div class="mistake"><strong>Tốc độ quá nhanh:</strong> nhân vật dễ xuyên qua khe hẹp.</div>
+                  <div class="mistake"><strong>Đích quá nhỏ:</strong> Robot khó chạm được trạm năng lượng.</div>
+                  <div class="mistake"><strong>Quên đặt vị trí ban đầu:</strong> mỗi lần chạy thử xuất phát ở vị trí khác nhau.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx">
+            <h2 class="section-title"><span class="title-icon">🏋️</span>Bài tập phân tầng</h2>
+            <div class="grid-4">
+              <div class="mini"><span class="level lv1">Cơ bản</span><ul><li>Tạo mê cung đơn giản có một đường đi.</li><li>Robot chạm tường thì về điểm xuất phát.</li></ul></div>
+              <div class="mini"><span class="level lv2">Trung bình</span><ul><li>Thêm 2 ngã rẽ sai trong mê cung.</li><li>Thêm lời hướng dẫn lúc bắt đầu.</li></ul></div>
+              <div class="mini"><span class="level lv3">Nâng cao</span><ul><li>Thêm biến thời gian đếm ngược.</li><li>Thêm âm thanh khi thắng hoặc chạm tường.</li></ul></div>
+              <div class="mini"><span class="level lv4">HSG định hướng</span><ul><li>Thêm 2 màn chơi có độ khó tăng dần.</li><li>Tạo nút “Chơi lại” sau khi thắng.</li></ul></div>
+            </div>
+          </section>
+
+          <section class="cardx" id="homework">
+            <h2 class="section-title"><span class="title-icon">🏠</span>Bài tập về nhà: Cánh Cụt Timo tìm kho cá</h2>
+            <p class="sub">Kịch bản gợi ý để học sinh tự thực hành lại kiến thức vừa học.</p>
+            <div class="story-box">
+              <p><strong>Câu chuyện:</strong> Cánh Cụt Timo bị lạc trong mê cung băng. Ở cuối mê cung có <strong>Kho Cá Bạc</strong>. Em hãy tạo trò chơi để đưa Timo đi qua các lối băng, tránh chạm vào vách băng xanh đậm và tới được kho cá.</p>
+              <p><strong>Nhân vật gợi ý:</strong> 🐧 Cánh Cụt Timo, 🐟 Kho Cá Bạc, ❄️ Bông Tuyết Hướng Dẫn.</p>
+            </div>
+            <div class="grid-3" style="margin-top:14px">
+              <div class="mini"><h4>1. Yêu cầu bắt buộc</h4><ul><li>Dùng phím mũi tên để điều khiển Timo.</li><li>Chạm tường thì quay lại điểm xuất phát.</li><li>Chạm kho cá thì thông báo chiến thắng.</li></ul></div>
+              <div class="mini"><h4>2. Gợi ý kịch bản</h4><ul><li>Bông Tuyết nói cách chơi trong 3 giây.</li><li>Timo xuất phát ở góc trái dưới.</li><li>Kho Cá Bạc đặt ở góc phải trên.</li></ul></div>
+              <div class="mini"><h4>3. Thử thách thêm</h4><ul><li>Thêm biến <strong>Điểm</strong> hoặc <strong>Thời gian</strong>.</li><li>Thêm 2 màn chơi.</li><li>Thêm âm thanh khi thắng.</li></ul></div>
+            </div>
+            <div class="note ok"><strong>Sản phẩm nộp:</strong> lưu dự án với tên <span class="kbd">Bai5_TenHocSinh_MeCung</span>, chụp ảnh màn hình code của nhân vật chính và chạy thử trước khi nộp.</div>
+          </section>
+
+          <section class="cardx" id="quiz">
+            <h2 class="section-title"><span class="title-icon">📝</span>Quiz cuối bài</h2>
+            <div class="quiz">
+              <div class="q"><strong>Câu 1. Trong trò chơi mê cung, khối nào thường dùng để kiểm tra nhân vật chạm tường?</strong><div class="options"><div class="option" data-correct="1">Khối cảm biến “chạm màu”.</div><div class="option">Khối đổi trang phục.</div><div class="option">Khối phát âm thanh.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 2. Vì sao nên đặt vị trí xuất phát khi bấm cờ xanh?</strong><div class="options"><div class="option">Để nhân vật biến mất mãi mãi.</div><div class="option" data-correct="1">Để mỗi lần chơi bắt đầu ở cùng một vị trí.</div><div class="option">Để xóa phông nền.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 3. Khi nhấn phím mũi tên phải, ta thường thay đổi giá trị nào?</strong><div class="options"><div class="option" data-correct="1">Tăng x.</div><div class="option">Giảm y.</div><div class="option">Đổi phông nền.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 4. Nếu Robot Miu chạm trạm năng lượng, trò chơi nên làm gì?</strong><div class="options"><div class="option">Quay lại xuất phát ngay.</div><div class="option" data-correct="1">Thông báo chiến thắng hoặc phát tin “Chiến thắng”.</div><div class="option">Xóa toàn bộ đối tượng.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 5. Lỗi nào khiến nhân vật không bị xử lý khi chạm tường?</strong><div class="options"><div class="option" data-correct="1">Chọn sai màu trong khối “chạm màu”.</div><div class="option">Đặt tên dự án quá ngắn.</div><div class="option">Dùng nhiều phông nền.</div></div><div class="feedback"></div></div>
+            </div>
+            <div class="scene-buttons"><button class="btnx btn-green" id="checkQuiz">Kiểm tra đáp án</button><button class="btnx btn-blue" id="resetQuiz">Làm lại</button><span class="fw-bold" id="quizScore"></span></div>
+          </section>
+
+          <div class="footer-nav">
+            <a class="btnx btn-blue" href="https://tin247ctp.com/scratch/bai-04/">← Bài trước</a>
+            <a class="btnx btn-soft" style="color:#0f172a;border-color:#cbd5e1;background:white" href="https://tin247ctp.com/scratch/bai-05/">↟ Bài hiện tại</a>
+            <a class="btnx btn-darkx" href="https://tin247ctp.com/scratch/bai-06/">Bài tiếp theo →</a>
+          </div>
+          <footer class="copyright-footer">
+            <strong>© Nguyễn Trung Chiến</strong>
+            <span>THPT chuyên Trần Phú · SĐT/Zalo: 0934353569</span>
+            <span>Bài giảng Scratch dùng cho mục đích dạy học. Vui lòng không sao chép, chỉnh sửa hoặc phân phối lại khi chưa được phép.</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const bar=document.getElementById('readProgress');
+      function prog(){const h=document.documentElement;bar.style.width=((h.scrollTop/(h.scrollHeight-h.clientHeight))*100||0)+'%'}
+      addEventListener('scroll',prog);prog();
+      const toast=document.getElementById('copyToast');let toastTimer=null;
+      function showToast(){clearTimeout(toastTimer);toast.classList.add('show');toastTimer=setTimeout(()=>toast.classList.remove('show'),1800)}
+      ['copy','cut','contextmenu','dragstart'].forEach(evt=>document.addEventListener(evt,e=>{const allow=e.target.closest&&e.target.closest('.allow-copy,input,textarea');if(!allow){e.preventDefault();showToast();}}));
+      document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(e.key==='F12'||(e.ctrlKey&&['c','x','s','p','u'].includes(k))||(e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(k))){e.preventDefault();showToast();}});
+
+      document.querySelectorAll('.toc a').forEach(a=>a.addEventListener('click',()=>document.querySelectorAll('.toc a').forEach(x=>x.classList.remove('active'))||a.classList.add('active')));
+
+      function bubble(el,text){el.textContent=text;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1600)}
+      const storyPlayer=document.getElementById('storyPlayer'), storyBubble=document.getElementById('storyBubble');
+      function resetStory(){storyPlayer.style.left='22px';storyPlayer.style.bottom='18px';storyPlayer.style.top='auto';bubble(storyBubble,'Mình phải tìm trạm năng lượng!')}
+      document.getElementById('resetStory').onclick=resetStory;
+      document.getElementById('playStory').onclick=()=>{resetStory();const steps=[[110,18,'Miu bắt đầu đi theo lối sáng.'],[110,125,'Cẩn thận! Có tường xanh đậm.'],[275,125,'Tìm được lối rẽ rồi!'],[275,275,'Trạm năng lượng ở phía trên.'],[454,275,'Thành công! Miu đã nạp pin.']];steps.forEach((s,i)=>setTimeout(()=>{storyPlayer.style.left=s[0]+'px';storyPlayer.style.bottom=s[1]+'px';bubble(storyBubble,s[2])},700+i*900));};
+      resetStory();
+
+      const player=document.getElementById('player'), gameBubble=document.getElementById('gameBubble'), status=document.getElementById('gameStatus');
+      const pos={x:22,y:296};const start={x:22,y:296};
+      const board=document.getElementById('gameBoard');
+      function setPlayer(){player.style.left=pos.x+'px';player.style.top=pos.y+'px'}
+      function rectsOverlap(a,b){return !(a.right<b.left||a.left>b.right||a.bottom<b.top||a.top>b.bottom)}
+      function getRectAt(x,y){return {left:x,top:y,right:x+46,bottom:y+46}}
+      function hitWall(x,y){const r=getRectAt(x,y);return Array.from(board.querySelectorAll('.wall')).some(w=>{const wr={left:w.offsetLeft,top:w.offsetTop,right:w.offsetLeft+w.offsetWidth,bottom:w.offsetTop+w.offsetHeight};return rectsOverlap(r,wr)})}
+      function hitGoal(){const g=board.querySelector('.goal');const r=getRectAt(pos.x,pos.y);const gr={left:g.offsetLeft,top:g.offsetTop,right:g.offsetLeft+g.offsetWidth,bottom:g.offsetTop+g.offsetHeight};return rectsOverlap(r,gr)}
+      function move(dir){if(dir==='reset'){pos.x=start.x;pos.y=start.y;setPlayer();status.textContent='Trạng thái: Đã về điểm xuất phát';bubble(gameBubble,'Làm lại từ đầu nhé!');return}let nx=pos.x,ny=pos.y,step=18;if(dir==='up')ny-=step;if(dir==='down')ny+=step;if(dir==='left')nx-=step;if(dir==='right')nx+=step;nx=Math.max(0,Math.min(board.clientWidth-46,nx));ny=Math.max(0,Math.min(board.clientHeight-46,ny));if(hitWall(nx,ny)){pos.x=start.x;pos.y=start.y;setPlayer();status.textContent='Trạng thái: Chạm tường, quay lại xuất phát';bubble(gameBubble,'Ôi! Mình chạm tường rồi.');return}pos.x=nx;pos.y=ny;setPlayer();status.textContent='Trạng thái: Đang di chuyển';if(hitGoal()){status.textContent='Trạng thái: Chiến thắng!';bubble(gameBubble,'Mình đã nạp năng lượng thành công!')}}
+      document.querySelectorAll('[data-move]').forEach(b=>b.addEventListener('click',()=>move(b.dataset.move)));
+      document.addEventListener('keydown',e=>{const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};if(map[e.key]){e.preventDefault();move(map[e.key])}});setPlayer();bubble(gameBubble,'Dùng nút điều khiển hoặc phím mũi tên!');
+
+      const chosen=[];const zone=document.getElementById('chosenZone');
+      document.querySelectorAll('.choice').forEach(c=>c.addEventListener('click',()=>{chosen.push(c.dataset.key);const item=document.createElement('div');item.className='choice selected';item.innerHTML=c.innerHTML;zone.appendChild(item)}));
+      document.getElementById('resetOrder').onclick=()=>{chosen.length=0;zone.innerHTML='';document.getElementById('orderFeedback').textContent=''};
+      document.getElementById('checkOrder').onclick=()=>{const ok=chosen.join('|')==='start|move|wall|goal';document.getElementById('orderFeedback').textContent=ok?'✅ Đúng thứ tự xử lý trò chơi!':'❌ Gợi ý: bắt đầu → điều khiển → chạm tường → chạm đích.'};
+
+      const checks=document.querySelectorAll('.checklist input');const score=document.getElementById('taskScore');
+      checks.forEach(i=>i.addEventListener('change',()=>{const n=document.querySelectorAll('.checklist input:checked').length;score.textContent=n+'/'+checks.length+' nhiệm vụ'}));
+
+      document.querySelectorAll('.option').forEach(o=>o.addEventListener('click',()=>{const group=o.closest('.options');group.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected')}));
+      document.getElementById('checkQuiz').onclick=()=>{let s=0,total=0;document.querySelectorAll('.q').forEach(q=>{total++;const sel=q.querySelector('.option.selected');const ok=sel&&sel.dataset.correct==='1';q.querySelectorAll('.option').forEach(o=>o.classList.remove('correct','wrong'));if(sel)sel.classList.add(ok?'correct':'wrong');if(ok)s++;q.querySelector('.feedback').textContent=ok?'✅ Chính xác!':'❌ Xem lại phần code và luật va chạm nhé.'});document.getElementById('quizScore').textContent='Điểm: '+s+'/'+total};
+      document.getElementById('resetQuiz').onclick=()=>{document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected','correct','wrong'));document.querySelectorAll('.feedback').forEach(f=>f.textContent='');document.getElementById('quizScore').textContent=''};
+    });
+  </script>
+</body>
+</html>

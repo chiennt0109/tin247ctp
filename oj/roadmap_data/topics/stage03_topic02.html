@@ -1,74 +1,1021 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Biết cách cài đặt các thuật toán sắp xếp cơ bản.</li>
-  <li>Hiểu vì sao có nhiều cách sắp xếp khác nhau.</li>
-  <li>So sánh hiệu quả giữa Selection Sort, Insertion Sort và Bubble Sort.</li>
-</ul>
+<style>
+:root {
+  --lesson-primary: #4f46e5;
+  --lesson-primary-dark: #3730a3;
+  --lesson-accent: #06b6d4;
+  --lesson-green: #16a34a;
+  --lesson-orange: #f97316;
+  --lesson-red: #ef4444;
+  --lesson-yellow: #facc15;
+  --lesson-bg: #f6f8ff;
+  --lesson-card: #ffffff;
+  --lesson-text: #1e293b;
+  --lesson-muted: #64748b;
+  --lesson-border: #dbe4ff;
+  --lesson-code: #0f172a;
+}
 
-<hr>
+.lesson-page {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--lesson-text);
+  background:
+    radial-gradient(circle at top left, rgba(79,70,229,.14), transparent 32rem),
+    radial-gradient(circle at 90% 10%, rgba(6,182,212,.16), transparent 28rem),
+    linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+  border-radius: 22px;
+  padding: clamp(18px, 2.6vw, 34px);
+  line-height: 1.75;
+}
+.lesson-page * { box-sizing: border-box; }
+.lesson-page h1, .lesson-page h2, .lesson-page h3 { line-height: 1.25; }
+.lesson-hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: clamp(26px, 4vw, 46px);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(67,56,202,.96), rgba(37,99,235,.92)),
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.25), transparent 20rem);
+  box-shadow: 0 25px 60px rgba(79,70,229,.25);
+  margin-bottom: 24px;
+}
+.lesson-hero:after {
+  content: "";
+  position: absolute;
+  width: 260px; height: 260px;
+  right: -85px; top: -80px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+}
+.hero-badge {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.14);
+  color: #eef2ff;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .92rem;
+  margin-bottom: 12px;
+}
+.lesson-hero h1 { margin: 0 0 12px; font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 900; }
+.lesson-hero p { color: #e0f2fe; max-width: 920px; font-size: 1.05rem; margin: 0; }
+.hero-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+.hero-stat { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.18); border-radius: 18px; padding: 14px; }
+.hero-stat b { display: block; font-size: 1.2rem; color: #fff; }
+.hero-stat span { color: #dbeafe; font-size: .9rem; }
+.lesson-progress-wrap { position: sticky; top: 0; z-index: 20; background: rgba(248,251,255,.82); backdrop-filter: blur(10px); padding: 10px 0 12px; }
+.lesson-progress { height: 10px; border-radius: 999px; background: #dbeafe; overflow: hidden; box-shadow: inset 0 1px 4px rgba(30,41,59,.12); }
+.lesson-progress-bar { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--lesson-primary), var(--lesson-accent)); transition: width .15s linear; }
+.lesson-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+.lesson-nav a { text-decoration: none; color: var(--lesson-primary-dark); background: #eef2ff; border: 1px solid #dbe4ff; border-radius: 999px; padding: 6px 10px; font-weight: 700; font-size: .9rem; }
+.lesson-card {
+  background: rgba(255,255,255,.94);
+  border: 1px solid var(--lesson-border);
+  border-radius: 24px;
+  padding: clamp(18px, 2.4vw, 28px);
+  margin: 20px 0;
+  box-shadow: 0 16px 42px rgba(30,64,175,.08);
+}
+.lesson-card h2 { color: var(--lesson-primary-dark); margin: 0 0 14px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+.lesson-card h3 { color: #334155; margin-top: 20px; font-weight: 850; }
+.mini-slide { animation: lessonFadeUp .55s ease both; }
+@keyframes lessonFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+.info-box { border-radius: 18px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.callout { border-left: 6px solid var(--lesson-accent); background: #ecfeff; border-radius: 16px; padding: 14px 16px; margin: 14px 0; }
+.warn { border-left-color: var(--lesson-orange); background: #fff7ed; }
+.danger { border-left-color: var(--lesson-red); background: #fff1f2; }
+.success { border-left-color: var(--lesson-green); background: #f0fdf4; }
+.lesson-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 18px; }
+.lesson-table { width: 100%; border-collapse: collapse; min-width: 780px; background: #fff; }
+.lesson-table th, .lesson-table td { border-bottom: 1px solid #e2e8f0; padding: 13px 14px; text-align: left; vertical-align: top; }
+.lesson-table th { background: #eef2ff; color: #312e81; font-weight: 900; }
+.lesson-table tr:last-child td { border-bottom: none; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-weight: 800; font-size: .88rem; }
+.pill.green { background: #dcfce7; color: #166534; }
+.pill.orange { background: #ffedd5; color: #9a3412; }
+.pill.red { background: #fee2e2; color: #991b1b; }
+.code-tabs { border: 1px solid var(--lesson-border); border-radius: 18px; overflow: hidden; background: var(--lesson-code); margin: 14px 0; }
+.tab-buttons { display: flex; flex-wrap: wrap; gap: 0; background: #edf2ff; border-bottom: 1px solid #dbe4ff; }
+.tab-btn { appearance: none; border: 0; background: transparent; padding: 12px 16px; font-weight: 900; color: #334155; cursor: pointer; }
+.tab-btn.active { background: var(--lesson-primary); color: #fff; }
+.tab-panel { display: none; position: relative; }
+.tab-panel.active { display: block; }
+.copy-btn { position: absolute; top: 10px; right: 10px; z-index: 3; border: 0; background: rgba(255,255,255,.13); color: #e2e8f0; border-radius: 999px; padding: 6px 10px; font-size: .8rem; cursor: pointer; }
+.copy-btn:hover { background: rgba(255,255,255,.25); }
+.lesson-page pre { margin: 0; max-height: 520px; overflow: auto; background: var(--lesson-code); color: #f8fafc; padding: 22px; font-size: 14.5px; line-height: 1.7; border-radius: 0; white-space: pre; tab-size: 4; }
+.lesson-page code { font-family: Consolas, Monaco, "Courier New", monospace; }
+.inline-code, .lesson-page p code, .lesson-page li code, .lesson-page td code { background: #fdf2f8; color: #be185d; border-radius: 7px; padding: 2px 6px; font-weight: 800; }
+.sort-visual { background: linear-gradient(180deg, #ffffff, #f8fbff); border: 1px solid #dbe4ff; border-radius: 22px; padding: 18px; }
+.array-bars { height: 210px; display: flex; align-items: flex-end; gap: 9px; padding: 14px; background: #f8fafc; border: 1px dashed #bfdbfe; border-radius: 18px; overflow-x: auto; }
+.bar-wrap { min-width: 54px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.bar { width: 42px; border-radius: 12px 12px 6px 6px; background: linear-gradient(180deg, #60a5fa, #4f46e5); color: white; display: flex; align-items: flex-start; justify-content: center; padding-top: 8px; font-weight: 900; transition: all .25s ease; box-shadow: 0 8px 16px rgba(37,99,235,.18); }
+.bar.compare { background: linear-gradient(180deg, #fbbf24, #f97316); transform: translateY(-8px); }
+.bar.swap { background: linear-gradient(180deg, #fb7185, #ef4444); transform: translateY(-10px); }
+.bar.sorted { background: linear-gradient(180deg, #34d399, #16a34a); }
+.index-label { font-size: .8rem; color: #64748b; font-weight: 800; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.btn-lesson { border: 0; border-radius: 999px; padding: 10px 14px; font-weight: 900; cursor: pointer; background: var(--lesson-primary); color: white; box-shadow: 0 8px 18px rgba(79,70,229,.2); }
+.btn-lesson.secondary { background: #fff; color: #334155; border: 1px solid #cbd5e1; box-shadow: none; }
+.btn-lesson.green { background: var(--lesson-green); }
+.btn-lesson.orange { background: var(--lesson-orange); }
+.btn-lesson:disabled { opacity: .5; cursor: not-allowed; }
+.select-lesson, .input-lesson, .textarea-lesson { width: 100%; border: 1px solid #cbd5e1; border-radius: 14px; padding: 11px 13px; font: inherit; outline: none; background: #fff; }
+.select-lesson:focus, .input-lesson:focus, .textarea-lesson:focus { border-color: var(--lesson-primary); box-shadow: 0 0 0 4px rgba(79,70,229,.12); }
+.log-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; min-height: 105px; max-height: 220px; overflow: auto; font-family: Consolas, Monaco, monospace; font-size: 14px; color: #334155; }
+.exercise-card { border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; background: #fff; }
+.exercise-card h3 { margin-top: 0; }
+.quiz-item { border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; margin: 12px 0; background: #fff; }
+.quiz-options { display: grid; gap: 8px; margin-top: 10px; }
+.quiz-option { text-align: left; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 14px; padding: 10px 12px; cursor: pointer; font-weight: 800; }
+.quiz-option.correct { background: #dcfce7; border-color: #22c55e; color: #166534; }
+.quiz-option.wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.feedback { margin-top: 8px; font-weight: 800; }
+.checklist { display: grid; gap: 10px; }
+.checkitem { display: flex; gap: 10px; align-items: flex-start; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; }
+.checkitem i { margin-top: 5px; color: var(--lesson-green); }
 
-<h2>📘 Lý thuyết</h2>
-<p>Mỗi thuật toán sắp xếp có đặc điểm riêng:</p>
-<table class="table table-bordered">
-  <thead class="table-light">
-    <tr><th>Tên</th><th>Ý tưởng</th><th>Độ phức tạp</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>Selection Sort</td><td>Chọn phần tử nhỏ nhất đưa lên đầu</td><td>O(n²)</td></tr>
-    <tr><td>Insertion Sort</td><td>Chèn từng phần tử vào vị trí đúng</td><td>O(n²)</td></tr>
-    <tr><td>Bubble Sort</td><td>So sánh cặp kề, đẩy phần tử lớn ra cuối</td><td>O(n²)</td></tr>
-  </tbody>
-</table>
+.counting-visual { background: linear-gradient(180deg, #ffffff, #f8fbff); border: 1px solid #dbe4ff; border-radius: 22px; padding: 18px; }
+.counting-array { display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 14px; }
+.count-chip { min-width:48px; text-align:center; padding:10px 12px; border-radius:14px; font-weight:900; background:#eef2ff; color:#312e81; border:1px solid #c7d2fe; }
+.count-chip.active { background:linear-gradient(180deg,#fbbf24,#f97316); color:#fff; border-color:#fb923c; transform:translateY(-2px); }
+.count-grid { overflow-x:auto; }
+.count-table { width:100%; min-width:520px; border-collapse:separate; border-spacing:8px; }
+.count-table th { font-size:.9rem; color:#475569; text-align:center; }
+.count-cell { min-width:56px; text-align:center; border-radius:14px; padding:12px 10px; background:#f8fafc; border:1px solid #cbd5e1; font-weight:900; }
+.count-cell.value { background:#e0f2fe; color:#0f766e; }
+.count-cell.focus { background:#fee2e2; border-color:#ef4444; color:#991b1b; transform:scale(1.04); }
+.count-cell.built { background:#dcfce7; border-color:#22c55e; color:#166534; }
+.output-strip { min-height:58px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px; border:1px dashed #bfdbfe; border-radius:16px; background:#f8fafc; }
+.output-item { min-width:42px; text-align:center; padding:8px 10px; border-radius:12px; background:linear-gradient(180deg,#34d399,#16a34a); color:#fff; font-weight:900; box-shadow:0 6px 12px rgba(22,163,74,.18); }
 
-<hr>
+@media (max-width: 900px) {
+  .grid-2, .grid-3, .hero-grid { grid-template-columns: 1fr; }
+  .lesson-page { padding: 14px; border-radius: 16px; }
+  .lesson-hero { border-radius: 20px; }
+  .bar-wrap { min-width: 46px; }
+  .bar { width: 36px; }
+}
+</style>
 
-<h2>💻 Ví dụ thực hành</h2>
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-arrow-down-wide-short"></i> Chuyên đề thuật toán cơ bản</div>
+    <h1>🧩 Sắp xếp mảng: Selection Sort, Insertion Sort, Bubble Sort</h1>
+    <p>
+      Bài học này giúp học sinh hiểu <b>vì sao cần sắp xếp</b>, cách cài đặt ba thuật toán cơ bản,
+      phân biệt khi nào nên tự cài đặt và khi nào nên dùng <code>sort</code> có sẵn trong bài thi.
+    </p>
+    <div class="hero-grid">
+      <div class="hero-stat"><b>3 thuật toán</b><span>Selection / Insertion / Bubble</span></div>
+      <div class="hero-stat"><b>O(n²)</b><span>Độ phức tạp cơ bản</span></div>
+      <div class="hero-stat"><b>Mô phỏng</b><span>Chạy từng bước trực quan</span></div>
+      <div class="hero-stat"><b>Bài tập</b><span>Phân loại rõ mức độ</span></div>
+    </div>
+  </div>
 
-<h4>C++ – Bubble Sort</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+  <div class="lesson-progress-wrap">
+    <div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div>
+    <div class="lesson-nav">
+      <a href="#goals">Mục tiêu</a>
+      <a href="#why">Vì sao sắp xếp?</a>
+      <a href="#compare">So sánh</a>
+      <a href="#simulation">Mô phỏng</a>
+      <a href="#code">Code mẫu</a>
+      <a href="#mistakes">Lỗi hay nhầm</a>
+      <a href="#practice">Bài tập</a>
+    </div>
+  </div>
+
+  <section class="lesson-card mini-slide" id="goals">
+    <h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2>
+    <div class="grid-2">
+      <div class="info-box">
+        <h3>Học xong cần làm được</h3>
+        <ul>
+          <li>Biết cách cài đặt <b>Selection Sort</b>, <b>Insertion Sort</b>, <b>Bubble Sort</b>.</li>
+          <li>Hiểu vì sao có nhiều cách sắp xếp khác nhau.</li>
+          <li>So sánh được hiệu quả giữa các thuật toán sắp xếp cơ bản.</li>
+          <li>Biết khi nào nên dùng <code>sort</code> có sẵn thay vì tự viết.</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h3>Ví dụ đời sống</h3>
+        <ul>
+          <li>Xếp học sinh theo điểm từ thấp đến cao.</li>
+          <li>Xếp danh sách sản phẩm theo giá.</li>
+          <li>Xếp thời gian hoàn thành bài thi.</li>
+          <li>Xếp số báo danh / mã học sinh để tìm kiếm nhanh hơn.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="why">
+    <h2><i class="fa-solid fa-lightbulb"></i> 1. Vì sao phải sắp xếp?</h2>
+    <p>
+      Sắp xếp là thao tác đưa các phần tử về một thứ tự nhất định, thường là <b>tăng dần</b> hoặc <b>giảm dần</b>.
+      Sau khi sắp xếp, nhiều bài toán trở nên dễ hơn: tìm kiếm nhị phân, tìm cặp số, thống kê, xếp hạng.
+    </p>
+    <div class="callout">
+      <b>Hình dung:</b> Nếu một lớp có 45 điểm kiểm tra lộn xộn, giáo viên muốn biết bạn nào thấp nhất, cao nhất,
+      hoặc xếp hạng theo điểm. Sắp xếp giúp danh sách trở nên có trật tự.
+    </div>
+    <div class="grid-3">
+      <div class="info-box"><span class="pill green"><i class="fa-solid fa-arrow-up-1-9"></i> Tăng dần</span><p>Ví dụ: <code>1 2 3 5 8</code></p></div>
+      <div class="info-box"><span class="pill orange"><i class="fa-solid fa-arrow-down-9-1"></i> Giảm dần</span><p>Ví dụ: <code>8 5 3 2 1</code></p></div>
+      <div class="info-box"><span class="pill"><i class="fa-solid fa-ranking-star"></i> Theo tiêu chí</span><p>Ví dụ: sắp xếp học sinh theo điểm, nếu bằng điểm thì theo tên.</p></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="compare">
+    <h2><i class="fa-solid fa-table-list"></i> 2. So sánh các thuật toán sắp xếp cơ bản</h2>
+    <div class="lesson-table-wrap">
+      <table class="lesson-table">
+        <thead>
+          <tr><th>Thuật toán</th><th>Ý tưởng ngắn gọn</th><th>Dấu hiệu nhận biết</th><th>Độ phức tạp</th><th>Dễ nhầm</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Selection Sort</b></td>
+            <td>Ở mỗi vị trí <code>i</code>, tìm phần tử nhỏ nhất trong đoạn còn lại rồi đổi lên.</td>
+            <td>Luôn có biến <code>min_pos</code> hoặc <code>min_idx</code>.</td>
+            <td><span class="pill orange">O(n²)</span></td>
+            <td>Nhầm với Bubble Sort vì cũng dùng 2 vòng lặp.</td>
+          </tr>
+          <tr>
+            <td><b>Insertion Sort</b></td>
+            <td>Lấy từng phần tử và chèn vào đúng vị trí trong đoạn đã sắp xếp.</td>
+            <td>Có biến <code>key</code>, dịch các phần tử lớn hơn sang phải.</td>
+            <td><span class="pill orange">O(n²)</span></td>
+            <td>Quên gán lại <code>a[j + 1] = key</code>.</td>
+          </tr>
+          <tr>
+            <td><b>Bubble Sort</b></td>
+            <td>So sánh từng cặp kề nhau, đổi chỗ nếu sai thứ tự.</td>
+            <td>Dùng <code>a[j]</code> và <code>a[j+1]</code>; phần tử lớn dần “nổi” về cuối.</td>
+            <td><span class="pill orange">O(n²)</span></td>
+            <td>Sai giới hạn <code>j &lt; n - i - 1</code>.</td>
+          </tr>
+          <tr>
+            <td><b>sort có sẵn</b></td>
+            <td>Hàm thư viện đã tối ưu.</td>
+            <td>C++: <code>sort(a.begin(), a.end())</code>; Python: <code>a.sort()</code>.</td>
+            <td><span class="pill green">thường O(n log n)</span></td>
+            <td>Trong bài thi thật, nên dùng nếu đề không yêu cầu tự cài.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn">
+      <b>Ghi nhớ cho học sinh mới học:</b> Ba thuật toán cơ bản giúp hiểu bản chất. Nhưng khi làm bài thi yêu cầu xử lý dữ liệu lớn,
+      nếu đề không bắt tự cài đặt, nên dùng <code>sort</code> có sẵn.
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="simulation">
+    <h2><i class="fa-solid fa-play"></i> 3. Mô phỏng từng bước</h2>
+    <div class="grid-2">
+      <div class="sort-visual">
+        <label><b>Chọn thuật toán</b></label>
+        <select class="select-lesson" id="algorithmSelect">
+          <option value="bubble">Bubble Sort - đổi cặp kề</option>
+          <option value="selection">Selection Sort - chọn nhỏ nhất</option>
+          <option value="insertion">Insertion Sort - chèn vào đoạn đúng</option>
+        </select>
+        <label style="display:block;margin-top:12px"><b>Mảng ví dụ</b></label>
+        <input class="input-lesson" id="arrayInput" value="5 3 8 1 2" />
+        <div class="controls">
+          <button class="btn-lesson" id="loadArrayBtn"><i class="fa-solid fa-rotate"></i> Nạp mảng</button>
+          <button class="btn-lesson green" id="nextStepBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button>
+          <button class="btn-lesson secondary" id="runAllBtn"><i class="fa-solid fa-bolt"></i> Chạy hết</button>
+        </div>
+        <div class="array-bars" id="arrayBars" aria-label="Mô phỏng mảng"></div>
+      </div>
+      <div class="sort-visual">
+        <h3 style="margin-top:0"><i class="fa-solid fa-clipboard-list"></i> Nhật ký thuật toán</h3>
+        <div class="log-box" id="sortLog">Nhấn “Nạp mảng”, sau đó bấm “Bước tiếp”.</div>
+        <div class="callout success">
+          <b>Cách quan sát:</b> Cột màu vàng/cam là đang so sánh, cột đỏ là đang đổi/chèn, cột xanh là phần đã gần hoàn tất.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="code">
+    <h2><i class="fa-solid fa-code"></i> 4. Code mẫu rõ ràng</h2>
+    <p>Mỗi thuật toán có code C++ và Python riêng. Các tab dưới đây dùng JavaScript thuần, không phụ thuộc Bootstrap JS.</p>
+
+    <h3>4.1. Bubble Sort</h3>
+    <div class="callout"><b>Ý tưởng:</b> So sánh cặp kề nhau <code>a[j]</code> và <code>a[j+1]</code>. Nếu sai thứ tự thì đổi chỗ.</div>
+    <div class="code-tabs" data-tabs="bubble">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="bubble-cpp">C++</button>
+        <button class="tab-btn" data-target="bubble-py">Python</button>
+      </div>
+      <div class="tab-panel active" id="bubble-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    for (int i = 0; i < n - 1; i++)
-        for (int j = 0; j < n - i - 1; j++)
-            if (a[j] > a[j + 1])
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    for (int i = 0; i &lt; n - 1; i++) {
+        for (int j = 0; j &lt; n - i - 1; j++) {
+            if (a[j] &gt; a[j + 1]) {
                 swap(a[j], a[j + 1]);
-    for (int x : a) cout << x << " ";
-}</code></pre>
+            }
+        }
+    }
 
-<h4>Python – Insertion Sort</h4>
-<pre><code>def insertion_sort(a):
-    for i in range(1, len(a)):
-        key = a[i]
-        j = i - 1
-        while j >= 0 and a[j] > key:
-            a[j + 1] = a[j]
-            j -= 1
-        a[j + 1] = key
+    for (int x : a) cout &lt;&lt; x &lt;&lt; &#x27; &#x27;;
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="bubble-py"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
 a = list(map(int, input().split()))
-insertion_sort(a)
-print(*a)</code></pre>
 
-<hr>
+for i in range(n - 1):
+    for j in range(n - i - 1):
+        if a[j] &gt; a[j + 1]:
+            a[j], a[j + 1] = a[j + 1], a[j]
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Nhập n và mảng n phần tử, in ra mảng sau khi sắp xếp tăng dần bằng Selection Sort.</li>
-  <li>Viết chương trình sắp xếp mảng giảm dần bằng Bubble Sort.</li>
-  <li>So sánh tốc độ sắp xếp giữa Bubble Sort và Insertion Sort với n = 10000 phần tử ngẫu nhiên.</li>
-</ol>
+print(*a)</code></pre></div>
+    </div>
 
-<details class="mt-3">
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python - Selection Sort
-a = [5, 3, 8, 1, 2]
-for i in range(len(a)):
-    min_idx = i
-    for j in range(i+1, len(a)):
-        if a[j] < a[min_idx]:
-            min_idx = j
-    a[i], a[min_idx] = a[min_idx], a[i]
-print(a)</code></pre>
-</details>
+    <h3>4.2. Selection Sort</h3>
+    <div class="callout"><b>Ý tưởng:</b> Ở vị trí <code>i</code>, tìm phần tử nhỏ nhất từ <code>i</code> đến cuối rồi đưa về vị trí <code>i</code>.</div>
+    <div class="code-tabs" data-tabs="selection">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="selection-cpp">C++</button>
+        <button class="tab-btn" data-target="selection-py">Python</button>
+      </div>
+      <div class="tab-panel active" id="selection-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    for (int i = 0; i &lt; n; i++) {
+        int min_pos = i;
+        for (int j = i + 1; j &lt; n; j++) {
+            if (a[j] &lt; a[min_pos]) min_pos = j;
+        }
+        swap(a[i], a[min_pos]);
+    }
+
+    for (int x : a) cout &lt;&lt; x &lt;&lt; &#x27; &#x27;;
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="selection-py"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
+a = list(map(int, input().split()))
+
+for i in range(n):
+    min_pos = i
+    for j in range(i + 1, n):
+        if a[j] &lt; a[min_pos]:
+            min_pos = j
+    a[i], a[min_pos] = a[min_pos], a[i]
+
+print(*a)</code></pre></div>
+    </div>
+
+    <h3>4.3. Insertion Sort</h3>
+    <div class="callout"><b>Ý tưởng:</b> Giống như xếp bài trên tay: lấy lá bài mới rồi chèn vào vị trí đúng trong phần đã xếp.</div>
+    <div class="code-tabs" data-tabs="insertion">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="insertion-cpp">C++</button>
+        <button class="tab-btn" data-target="insertion-py">Python</button>
+      </div>
+      <div class="tab-panel active" id="insertion-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    for (int i = 1; i &lt; n; i++) {
+        int key = a[i];
+        int j = i - 1;
+        while (j &gt;= 0 &amp;&amp; a[j] &gt; key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;
+    }
+
+    for (int x : a) cout &lt;&lt; x &lt;&lt; &#x27; &#x27;;
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="insertion-py"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
+a = list(map(int, input().split()))
+
+for i in range(1, n):
+    key = a[i]
+    j = i - 1
+    while j &gt;= 0 and a[j] &gt; key:
+        a[j + 1] = a[j]
+        j -= 1
+    a[j + 1] = key
+
+print(*a)</code></pre></div>
+    </div>
+
+    <h3>4.4. Khi làm bài thi: dùng sort có sẵn</h3>
+    <div class="callout warn">
+      Nếu đề bài chỉ yêu cầu “sắp xếp mảng” mà không bắt cài thuật toán cụ thể, dùng hàm có sẵn thường an toàn và nhanh hơn.
+    </div>
+    <div class="code-tabs" data-tabs="builtin">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="builtin-cpp">C++</button>
+        <button class="tab-btn" data-target="builtin-py">Python</button>
+      </div>
+      <div class="tab-panel active" id="builtin-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    sort(a.begin(), a.end());                  // tăng dần
+    // sort(a.rbegin(), a.rend());             // giảm dần
+    // sort(a.begin(), a.end(), greater&lt;int&gt;());
+
+    for (int x : a) cout &lt;&lt; x &lt;&lt; &#x27; &#x27;;
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="builtin-py"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
+a = list(map(int, input().split()))
+
+a.sort()                    # tăng dần
+# a.sort(reverse=True)      # giảm dần
+
+print(*a)</code></pre></div>
+    </div>
+
+    <h3>4.5. Mở rộng nhẹ: Counting Sort khi giá trị nhỏ</h3>
+    <div class="callout success">
+      Nếu biết <code>0 ≤ a[i] ≤ 100</code> hoặc giá trị nằm trong miền nhỏ, có thể đếm tần suất. Cách này rất hữu ích cho học sinh mới học mảng.
+    </div>
+    <div class="counting-visual">
+      <div class="grid-2">
+        <div>
+          <h4>🔍 Ví dụ trực quan</h4>
+          <p>Giả sử mảng là <code>4 2 2 8 3 3 1</code>. Counting Sort không đổi chỗ liên tục như Bubble Sort. Thay vào đó, ta làm <b>2 bước rõ ràng</b>:</p>
+          <ol>
+            <li><b>Đếm tần suất</b>: số <code>1</code> xuất hiện mấy lần, số <code>2</code> xuất hiện mấy lần, ...</li>
+            <li><b>Dựng lại mảng</b>: đi từ nhỏ đến lớn, giá trị nào có tần suất <code>k</code> thì ghi ra <code>k</code> lần.</li>
+          </ol>
+          <div class="callout success">
+            <b>Điểm quan trọng:</b> Counting Sort hợp khi miền giá trị nhỏ. Ví dụ điểm số từ 0 đến 10, số nguyên từ 0 đến 100,...
+          </div>
+          <div><b>Mảng ban đầu:</b></div>
+          <div class="counting-array" id="countingInputArray"></div>
+          <div class="controls">
+            <button class="btn-lesson" id="countingNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button>
+            <button class="btn-lesson secondary" id="countingResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button>
+          </div>
+        </div>
+        <div>
+          <h4>📊 Bảng đếm tần suất</h4>
+          <div class="count-grid">
+            <table class="count-table">
+              <tr id="countingValueRow"></tr>
+              <tr id="countingFreqRow"></tr>
+            </table>
+          </div>
+          <h4 style="margin-top:16px">🧱 Mảng sau khi dựng lại</h4>
+          <div class="output-strip" id="countingOutputStrip">Chưa có phần tử nào được ghi ra.</div>
+          <div class="log-box" id="countingLog" style="margin-top:12px">Nhấn “Bước tiếp” để quan sát Counting Sort hoạt động.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-tabs" data-tabs="counting">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="counting-cpp">C++</button>
+        <button class="tab-btn" data-target="counting-py">Python</button>
+      </div>
+      <div class="tab-panel active" id="counting-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;int&gt; cnt(101, 0);       // giả sử 0 &lt;= a[i] &lt;= 100
+
+    for (int i = 0; i &lt; n; i++) {
+        int x;
+        cin &gt;&gt; x;
+        cnt[x]++;
+    }
+
+    for (int x = 0; x &lt;= 100; x++) {
+        while (cnt[x] &gt; 0) {
+            cout &lt;&lt; x &lt;&lt; &#x27; &#x27;;
+            cnt[x]--;
+        }
+    }
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="counting-py"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
+a = list(map(int, input().split()))
+
+cnt = [0] * 101       # giả sử 0 &lt;= a[i] &lt;= 100
+for x in a:
+    cnt[x] += 1
+
+ans = []
+for x in range(101):
+    ans += [x] * cnt[x]
+
+print(*ans)</code></pre></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="mistakes">
+    <h2><i class="fa-solid fa-triangle-exclamation"></i> 5. Lỗi học sinh hay nhầm</h2>
+    <div class="checklist">
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Nhầm Selection Sort với Bubble Sort.</b><br>Selection tìm vị trí nhỏ nhất rồi đổi một lần; Bubble đổi nhiều cặp kề nhau.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Sai giới hạn vòng lặp Bubble Sort.</b><br>Nên dùng <code>j &lt; n - i - 1</code> để không truy cập vượt <code>a[j+1]</code>.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Quên đặt lại <code>min_pos = i</code> trong Selection Sort.</b><br>Mỗi vòng ngoài phải tìm lại vị trí nhỏ nhất của đoạn mới.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Quên gán <code>a[j + 1] = key</code> trong Insertion Sort.</b><br>Dịch phần tử xong phải đưa <code>key</code> vào vị trí trống.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Dùng thuật toán O(n²) cho n quá lớn.</b><br>Với <code>n = 100000</code>, nên dùng <code>sort</code> có sẵn hoặc thuật toán phù hợp hơn.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-keyboard"></i> 6. Thực hành nhanh trên mảng của em</h2>
+    <div class="grid-2">
+      <div>
+        <label><b>Nhập mảng</b></label>
+        <input class="input-lesson" id="practiceArray" value="9 1 5 1 3 8" />
+        <div class="controls">
+          <button class="btn-lesson" id="analyzeSortBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Phân tích</button>
+        </div>
+      </div>
+      <div class="log-box" id="practiceOutput">Kết quả sẽ hiện ở đây.</div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="practice">
+    <h2><i class="fa-solid fa-dumbbell"></i> 7. Bài tập luyện tập phân loại</h2>
+    <div class="grid-2">
+      <div class="exercise-card">
+        <h3>📘 Mức 1 - Cơ bản</h3>
+        <ol>
+          <li>Nhập <code>n</code> và mảng <code>n</code> số nguyên. In mảng tăng dần bằng Selection Sort.</li>
+          <li>Sắp xếp mảng giảm dần bằng Bubble Sort.</li>
+          <li>In ra mảng sau mỗi vòng ngoài của Bubble Sort để quan sát.</li>
+        </ol>
+      </div>
+      <div class="exercise-card">
+        <h3>📗 Mức 2 - Trung bình</h3>
+        <ol>
+          <li>Đếm số lần đổi chỗ của Bubble Sort.</li>
+          <li>Sắp xếp danh sách điểm, in điểm thấp nhất và cao nhất.</li>
+          <li>Dùng Insertion Sort để sắp xếp mảng đã gần đúng thứ tự.</li>
+        </ol>
+      </div>
+      <div class="exercise-card">
+        <h3>📙 Mức 3 - Nâng cao</h3>
+        <ol>
+          <li>Sắp xếp cặp <code>(điểm, mã học sinh)</code>: điểm tăng dần, nếu bằng thì mã tăng dần.</li>
+          <li>Cho mảng đã sắp xếp, tìm median.</li>
+          <li>Sắp xếp rồi loại bỏ các giá trị trùng nhau.</li>
+        </ol>
+      </div>
+      <div class="exercise-card">
+        <h3>🐉 Mức 4 - HSG định hướng</h3>
+        <ol>
+          <li>Sắp xếp để tìm hai số có tổng gần <code>K</code> nhất.</li>
+          <li>Sắp xếp sự kiện theo thời gian bắt đầu, nếu bằng thì theo thời gian kết thúc.</li>
+          <li>So sánh số phép gán của Selection Sort và Insertion Sort trên cùng input.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-circle-question"></i> 8. Quiz kiểm tra nhanh</h2>
+    <div class="quiz-item" data-answer="b">
+      <b>Câu 1.</b> Bubble Sort thường so sánh phần tử nào?
+      <div class="quiz-options">
+        <button class="quiz-option" data-choice="a">Phần tử đầu và cuối mảng</button>
+        <button class="quiz-option" data-choice="b">Hai phần tử kề nhau</button>
+        <button class="quiz-option" data-choice="c">Hai phần tử ngẫu nhiên</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+    <div class="quiz-item" data-answer="a">
+      <b>Câu 2.</b> Selection Sort cần tìm gì ở mỗi vòng ngoài?
+      <div class="quiz-options">
+        <button class="quiz-option" data-choice="a">Vị trí phần tử nhỏ nhất trong đoạn còn lại</button>
+        <button class="quiz-option" data-choice="b">Tổng các phần tử</button>
+        <button class="quiz-option" data-choice="c">Phần tử xuất hiện nhiều nhất</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+    <div class="quiz-item" data-answer="c">
+      <b>Câu 3.</b> Nếu đề thi có <code>n = 100000</code> và chỉ yêu cầu sắp xếp, lựa chọn hợp lý nhất là gì?
+      <div class="quiz-options">
+        <button class="quiz-option" data-choice="a">Luôn dùng Bubble Sort</button>
+        <button class="quiz-option" data-choice="b">Luôn dùng Selection Sort</button>
+        <button class="quiz-option" data-choice="c">Dùng hàm sort có sẵn nếu đề không bắt tự cài</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2>
+    <div class="callout success">
+      Ba thuật toán Selection Sort, Insertion Sort, Bubble Sort đều có độ phức tạp cơ bản <b>O(n²)</b>.
+      Chúng rất tốt để học tư duy vòng lặp, so sánh và đổi chỗ. Khi làm bài thi với dữ liệu lớn, hãy ưu tiên <code>sort</code> có sẵn nếu đề cho phép.
+    </div>
+    <p class="text-center" style="text-align:center;color:#2563eb;font-weight:900;font-size:1.05rem">
+      ➡ Tiếp theo: Luyện tập sắp xếp kết hợp tìm kiếm, đếm tần suất và xử lý cặp dữ liệu.
+    </p>
+  </section>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  function $(selector, root) { return (root || document).querySelector(selector); }
+  function $all(selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); }
+
+  function parseArray(text) {
+    return String(text || '').trim().split(/\s+/).filter(Boolean).map(Number).filter(function(x) { return Number.isFinite(x); });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(ch) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch];
+    });
+  }
+
+  function initProgress() {
+    var bar = $('#lessonProgressBar');
+    if (!bar) return;
+    function update() {
+      var doc = document.documentElement;
+      var scrollTop = window.scrollY || doc.scrollTop || 0;
+      var height = Math.max(1, doc.scrollHeight - window.innerHeight);
+      var percent = Math.min(100, Math.max(0, scrollTop / height * 100));
+      bar.style.width = percent + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
+  function initTabs() {
+    $all('.code-tabs').forEach(function(box) {
+      $all('.tab-btn', box).forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var targetId = btn.getAttribute('data-target');
+          $all('.tab-btn', box).forEach(function(b) { b.classList.remove('active'); });
+          $all('.tab-panel', box).forEach(function(p) { p.classList.remove('active'); });
+          btn.classList.add('active');
+          var target = document.getElementById(targetId);
+          if (target) target.classList.add('active');
+        });
+      });
+    });
+  }
+
+  function initCopy() {
+    $all('.copy-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var panel = btn.closest('.tab-panel') || btn.parentElement;
+        var code = panel ? $('code', panel) : null;
+        var text = code ? code.textContent : '';
+        function done() {
+          var old = btn.textContent;
+          btn.textContent = 'Đã chép';
+          setTimeout(function() { btn.textContent = old; }, 1200);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopy(text); done(); });
+        } else { fallbackCopy(text); done(); }
+      });
+    });
+    function fallbackCopy(text) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(area);
+    }
+  }
+
+  var sortState = { arr: [], steps: [], idx: 0 };
+
+  function makeSteps(arr, algo) {
+    var a = arr.slice();
+    var steps = [];
+    function push(message, compare, swap, sorted) {
+      steps.push({ arr: a.slice(), message: message, compare: compare || [], swap: swap || [], sorted: sorted || [] });
+    }
+    push('Bắt đầu với mảng: ' + a.join(' '));
+    var n = a.length;
+    if (algo === 'bubble') {
+      for (var i = 0; i < n - 1; i++) {
+        for (var j = 0; j < n - i - 1; j++) {
+          push('So sánh a[' + j + '] = ' + a[j] + ' và a[' + (j+1) + '] = ' + a[j+1], [j, j+1], [], range(n-i, n));
+          if (a[j] > a[j+1]) {
+            var tmp = a[j]; a[j] = a[j+1]; a[j+1] = tmp;
+            push('Đổi chỗ vì ' + a[j+1] + ' > ' + a[j], [], [j, j+1], range(n-i, n));
+          }
+        }
+        push('Sau vòng i = ' + i + ', phần tử lớn nhất còn lại đã về cuối.', [], [], range(n-i-1, n));
+      }
+    } else if (algo === 'selection') {
+      for (var si = 0; si < n; si++) {
+        var minPos = si;
+        push('Bắt đầu vị trí i = ' + si + '. Tạm coi min_pos = ' + si, [si], [], range(0, si));
+        for (var sj = si + 1; sj < n; sj++) {
+          push('So sánh a[' + sj + '] = ' + a[sj] + ' với min hiện tại a[' + minPos + '] = ' + a[minPos], [sj, minPos], [], range(0, si));
+          if (a[sj] < a[minPos]) {
+            minPos = sj;
+            push('Cập nhật min_pos = ' + minPos, [minPos], [], range(0, si));
+          }
+        }
+        if (minPos !== si) {
+          var tmp2 = a[si]; a[si] = a[minPos]; a[minPos] = tmp2;
+          push('Đổi a[' + si + '] với a[' + minPos + '] để đưa nhỏ nhất lên đầu đoạn.', [], [si, minPos], range(0, si+1));
+        } else {
+          push('Không cần đổi vì a[' + si + '] đã là nhỏ nhất của đoạn còn lại.', [], [], range(0, si+1));
+        }
+      }
+    } else {
+      for (var ii = 1; ii < n; ii++) {
+        var key = a[ii];
+        var jj = ii - 1;
+        push('Lấy key = a[' + ii + '] = ' + key + ', chèn vào đoạn đã sắp xếp bên trái.', [ii], [], range(0, ii));
+        while (jj >= 0 && a[jj] > key) {
+          push('Vì a[' + jj + '] = ' + a[jj] + ' > key = ' + key + ', dịch sang phải.', [jj, jj+1], [jj+1], range(0, ii));
+          a[jj + 1] = a[jj];
+          jj--;
+          push('Sau khi dịch: ' + a.join(' '), [], [jj+2], range(0, ii));
+        }
+        a[jj + 1] = key;
+        push('Đặt key vào vị trí ' + (jj+1) + '.', [], [jj+1], range(0, ii+1));
+      }
+    }
+    push('Hoàn tất: ' + a.join(' '), [], [], range(0, n));
+    return steps;
+  }
+
+  function range(l, r) {
+    var res = [];
+    for (var i = Math.max(0, l); i < r; i++) res.push(i);
+    return res;
+  }
+
+  function renderBars(step) {
+    var box = $('#arrayBars');
+    if (!box) return;
+    if (!step) { box.innerHTML = ''; return; }
+    var arr = step.arr || [];
+    var maxVal = Math.max.apply(null, arr.map(function(x) { return Math.abs(x); }).concat([1]));
+    box.innerHTML = arr.map(function(x, i) {
+      var h = 38 + Math.round(Math.abs(x) / maxVal * 132);
+      var cls = 'bar';
+      if ((step.sorted || []).indexOf(i) >= 0) cls += ' sorted';
+      if ((step.compare || []).indexOf(i) >= 0) cls += ' compare';
+      if ((step.swap || []).indexOf(i) >= 0) cls += ' swap';
+      return '<div class="bar-wrap"><div class="bar ' + cls.replace('bar ', '') + '" style="height:' + h + 'px">' + escapeHtml(x) + '</div><div class="index-label">i=' + i + '</div></div>';
+    }).join('');
+  }
+
+  function setLog(step, idx, total) {
+    var log = $('#sortLog');
+    if (!log || !step) return;
+    log.innerHTML = '<b>Bước ' + idx + '/' + (total - 1) + '</b><br>' + escapeHtml(step.message) + '<br><br><span style="color:#64748b">Mảng hiện tại: ' + escapeHtml(step.arr.join(' ')) + '</span>';
+  }
+
+  function resetSort() {
+    var arr = parseArray($('#arrayInput') ? $('#arrayInput').value : '');
+    if (arr.length === 0) arr = [5,3,8,1,2];
+    var algo = $('#algorithmSelect') ? $('#algorithmSelect').value : 'bubble';
+    sortState.arr = arr;
+    sortState.steps = makeSteps(arr, algo);
+    sortState.idx = 0;
+    renderBars(sortState.steps[0]);
+    setLog(sortState.steps[0], 0, sortState.steps.length);
+  }
+
+  function nextStep() {
+    if (!sortState.steps.length) resetSort();
+    if (sortState.idx < sortState.steps.length - 1) sortState.idx++;
+    renderBars(sortState.steps[sortState.idx]);
+    setLog(sortState.steps[sortState.idx], sortState.idx, sortState.steps.length);
+  }
+
+  function runAll() {
+    if (!sortState.steps.length) resetSort();
+    var btn = $('#runAllBtn');
+    if (btn) btn.disabled = true;
+    var timer = setInterval(function() {
+      if (sortState.idx >= sortState.steps.length - 1) {
+        clearInterval(timer);
+        if (btn) btn.disabled = false;
+        return;
+      }
+      nextStep();
+    }, 520);
+  }
+
+  function initSimulation() {
+    var load = $('#loadArrayBtn');
+    var next = $('#nextStepBtn');
+    var run = $('#runAllBtn');
+    var sel = $('#algorithmSelect');
+    if (load) load.addEventListener('click', resetSort);
+    if (next) next.addEventListener('click', nextStep);
+    if (run) run.addEventListener('click', runAll);
+    if (sel) sel.addEventListener('change', resetSort);
+    resetSort();
+  }
+
+
+  var countingState = { values: [], steps: [], idx: 0 };
+
+  function buildCountingSteps(arr) {
+    var minV = Math.min.apply(null, arr);
+    var maxV = Math.max.apply(null, arr);
+    var values = [];
+    for (var v = minV; v <= maxV; v++) values.push(v);
+    var freq = {};
+    values.forEach(function(v){ freq[v] = 0; });
+    var steps = [];
+    function snapshot(message, activeValue, outputList, builtValues) {
+      var freqClone = {};
+      values.forEach(function(v){ freqClone[v] = freq[v]; });
+      steps.push({
+        values: values.slice(),
+        freq: freqClone,
+        message: message,
+        activeValue: activeValue,
+        output: (outputList || []).slice(),
+        builtValues: (builtValues || []).slice()
+      });
+    }
+    snapshot('Bắt đầu. Tất cả tần suất đều bằng 0.', null, [], []);
+    arr.forEach(function(x, idx){
+      freq[x] += 1;
+      snapshot('Đọc a[' + idx + '] = ' + x + '. Tăng bộ đếm của giá trị ' + x + ' lên ' + freq[x] + '.', x, [], []);
+    });
+    var out = [];
+    values.forEach(function(v){
+      if (freq[v] === 0) {
+        snapshot('Giá trị ' + v + ' có tần suất 0 nên bỏ qua.', v, out, []);
+      } else {
+        for (var k = 0; k < freq[v]; k++) {
+          out.push(v);
+          snapshot('Giá trị ' + v + ' có tần suất ' + freq[v] + '. Ghi thêm một số ' + v + ' vào mảng kết quả.', v, out, [v]);
+        }
+      }
+    });
+    snapshot('Hoàn tất Counting Sort. Mảng sau sắp xếp là: ' + out.join(' '), null, out, values);
+    return { values: values, steps: steps };
+  }
+
+  function renderCountingStep() {
+    var inputBox = $('#countingInputArray');
+    var valueRow = $('#countingValueRow');
+    var freqRow = $('#countingFreqRow');
+    var outStrip = $('#countingOutputStrip');
+    var log = $('#countingLog');
+    if (!inputBox || !valueRow || !freqRow || !outStrip || !log) return;
+    var step = countingState.steps[countingState.idx];
+    if (!step) return;
+
+    inputBox.innerHTML = [4,2,2,8,3,3,1].map(function(x){
+      var cls = 'count-chip' + (step.activeValue === x ? ' active' : '');
+      return '<div class="' + cls + '">' + x + '</div>';
+    }).join('');
+
+    valueRow.innerHTML = '<th>Giá trị</th>' + step.values.map(function(v){
+      var cls = 'count-cell value' + (step.activeValue === v ? ' focus' : '') + ((step.builtValues || []).indexOf(v) >= 0 ? ' built' : '');
+      return '<td class="' + cls + '">' + v + '</td>';
+    }).join('');
+
+    freqRow.innerHTML = '<th>Tần suất</th>' + step.values.map(function(v){
+      var cls = 'count-cell' + (step.activeValue === v ? ' focus' : '') + ((step.builtValues || []).indexOf(v) >= 0 ? ' built' : '');
+      return '<td class="' + cls + '">' + step.freq[v] + '</td>';
+    }).join('');
+
+    outStrip.innerHTML = step.output.length
+      ? step.output.map(function(v){ return '<span class="output-item">' + v + '</span>'; }).join('')
+      : 'Chưa có phần tử nào được ghi ra.';
+
+    log.innerHTML = '<b>Bước ' + countingState.idx + '/' + (countingState.steps.length - 1) + '</b><br>' + escapeHtml(step.message);
+  }
+
+  function resetCounting() {
+    var sample = [4,2,2,8,3,3,1];
+    var built = buildCountingSteps(sample);
+    countingState.values = built.values;
+    countingState.steps = built.steps;
+    countingState.idx = 0;
+    renderCountingStep();
+  }
+
+  function nextCounting() {
+    if (!countingState.steps.length) resetCounting();
+    if (countingState.idx < countingState.steps.length - 1) countingState.idx++;
+    renderCountingStep();
+  }
+
+  function initCountingVisual() {
+    var next = $('#countingNextBtn');
+    var reset = $('#countingResetBtn');
+    if (next) next.addEventListener('click', nextCounting);
+    if (reset) reset.addEventListener('click', resetCounting);
+    resetCounting();
+  }
+
+  function initPractice() {
+    var btn = $('#analyzeSortBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      var arr = parseArray($('#practiceArray') ? $('#practiceArray').value : '');
+      var out = $('#practiceOutput');
+      if (!out) return;
+      if (!arr.length) { out.innerHTML = 'Hãy nhập ít nhất một số.'; return; }
+      var inc = arr.slice().sort(function(a,b) { return a-b; });
+      var dec = arr.slice().sort(function(a,b) { return b-a; });
+      var freq = {};
+      arr.forEach(function(x) { freq[x] = (freq[x] || 0) + 1; });
+      var dup = Object.keys(freq).filter(function(k) { return freq[k] > 1; });
+      out.innerHTML =
+        '<b>Mảng gốc:</b> ' + escapeHtml(arr.join(' ')) + '<br>' +
+        '<b>Tăng dần:</b> ' + escapeHtml(inc.join(' ')) + '<br>' +
+        '<b>Giảm dần:</b> ' + escapeHtml(dec.join(' ')) + '<br>' +
+        '<b>Nhỏ nhất:</b> ' + inc[0] + ', <b>Lớn nhất:</b> ' + inc[inc.length - 1] + '<br>' +
+        '<b>Giá trị trùng:</b> ' + (dup.length ? escapeHtml(dup.join(' ')) : 'Không có');
+    });
+  }
+
+  function initQuiz() {
+    $all('.quiz-item').forEach(function(item) {
+      var answer = item.getAttribute('data-answer');
+      var feedback = $('.feedback', item);
+      $all('.quiz-option', item).forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          $all('.quiz-option', item).forEach(function(b) { b.classList.remove('correct', 'wrong'); });
+          if (btn.getAttribute('data-choice') === answer) {
+            btn.classList.add('correct');
+            if (feedback) feedback.textContent = 'Đúng rồi!';
+          } else {
+            btn.classList.add('wrong');
+            var right = $('.quiz-option[data-choice="' + answer + '"]', item);
+            if (right) right.classList.add('correct');
+            if (feedback) feedback.textContent = 'Chưa đúng. Em xem lại phần lý thuyết ngay phía trên.';
+          }
+        });
+      });
+    });
+  }
+
+  function initHighlightSafe() {
+    if (window.hljs && typeof window.hljs.highlightAll === 'function') {
+      try { window.hljs.highlightAll(); } catch(e) {}
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initProgress();
+    initTabs();
+    initCopy();
+    initSimulation();
+    initCountingVisual();
+    initPractice();
+    initQuiz();
+    initHighlightSafe();
+  });
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

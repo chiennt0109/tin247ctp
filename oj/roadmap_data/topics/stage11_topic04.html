@@ -1,59 +1,227 @@
-<h2>🎯 Mục tiêu</h2>
-<ul>
-  <li>Hiểu cách lưu chuỗi bằng Trie.</li>
-  <li>Dùng Union-Find (DSU) để xác định nhóm liên thông.</li>
-</ul>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#06b6d4;--g:#16a34a;--o:#f97316;--r:#ef4444;--text:#1e293b;--b:#dbe4ff;--code:#0f172a}.lesson-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(79,70,229,.14),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(6,182,212,.16),transparent 28rem),linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border-radius:22px;padding:clamp(18px,2.6vw,34px);line-height:1.75}.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}.lesson-hero{position:relative;overflow:hidden;color:#fff;padding:clamp(26px,4vw,46px);border-radius:28px;background:linear-gradient(135deg,rgba(67,56,202,.96),rgba(37,99,235,.92));box-shadow:0 25px 60px rgba(79,70,229,.25);margin-bottom:24px}.lesson-hero:after{content:"";position:absolute;width:260px;height:260px;right:-85px;top:-80px;border-radius:999px;background:rgba(255,255,255,.14)}.hero-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#eef2ff;padding:7px 12px;border-radius:999px;font-weight:700;font-size:.92rem;margin-bottom:12px}.lesson-hero h1{margin:0 0 12px;font-size:clamp(1.75rem,4vw,3rem);font-weight:900}.lesson-hero p{color:#e0f2fe;max-width:1000px;font-size:1.05rem;margin:0}.hero-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}.hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px}.hero-stat b{display:block;font-size:1.2rem;color:#fff}.hero-stat span{color:#dbeafe;font-size:.9rem}.lesson-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.82);backdrop-filter:blur(10px);padding:10px 0 12px}.lesson-progress{height:10px;border-radius:999px;background:#dbeafe;overflow:hidden}.lesson-progress-bar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--p),var(--a));transition:width .15s linear}.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}.lesson-nav a{text-decoration:none;color:var(--pd);background:#eef2ff;border:1px solid #dbe4ff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:.9rem}.lesson-card{background:rgba(255,255,255,.94);border:1px solid var(--b);border-radius:24px;padding:clamp(18px,2.4vw,28px);margin:20px 0;box-shadow:0 16px 42px rgba(30,64,175,.08)}.lesson-card h2{color:var(--pd);margin:0 0 14px;font-weight:900;display:flex;align-items:center;gap:10px}.lesson-card h3{color:#334155;margin-top:20px;font-weight:850}.mini-slide{animation:lessonFadeUp .55s ease both}@keyframes lessonFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}.part-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}.part-badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 12px;font-weight:900;background:#eef2ff;color:#312e81}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.info-box{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0}.callout{border-left:6px solid var(--a);background:#ecfeff;border-radius:16px;padding:14px 16px;margin:14px 0}.warn{border-left-color:var(--o);background:#fff7ed}.danger{border-left-color:var(--r);background:#fff1f2}.success{border-left-color:var(--g);background:#f0fdf4}.lesson-table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:18px}.lesson-table{width:100%;border-collapse:collapse;min-width:860px;background:#fff}.lesson-table th,.lesson-table td{border-bottom:1px solid #e2e8f0;padding:13px 14px;text-align:left;vertical-align:top}.lesson-table th{background:#eef2ff;color:#312e81;font-weight:900}.lesson-table tr:last-child td{border-bottom:none}.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:800;font-size:.88rem}.green{background:#dcfce7;color:#166534}.orange{background:#ffedd5;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.cyan{background:#cffafe;color:#155e75}.code-tabs{border:1px solid var(--b);border-radius:18px;overflow:hidden;background:var(--code);margin:14px 0}.tab-buttons{display:flex;flex-wrap:wrap;background:#edf2ff;border-bottom:1px solid #dbe4ff}.tab-btn{appearance:none;border:0;background:transparent;padding:12px 16px;font-weight:900;color:#334155;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.tab-panel{display:none;position:relative}.tab-panel.active{display:block}.copy-btn{position:absolute;top:10px;right:10px;z-index:3;border:0;background:rgba(255,255,255,.13);color:#e2e8f0;border-radius:999px;padding:6px 10px;font-size:.8rem;cursor:pointer}.copy-btn:hover{background:rgba(255,255,255,.25)}.lesson-page pre{margin:0;max-height:580px;overflow:auto;background:var(--code);color:#f8fafc;padding:22px;font-size:14.5px;line-height:1.7;border-radius:0;white-space:pre;tab-size:4}.lesson-page code{font-family:Consolas,Monaco,"Courier New",monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{background:#fdf2f8;color:#be185d;border-radius:7px;padding:2px 6px;font-weight:800}.visual-box{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe4ff;border-radius:22px;padding:18px}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.btn-lesson{border:0;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;background:var(--p);color:white;box-shadow:0 8px 18px rgba(79,70,229,.2)}.btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none}.btn-lesson.orange{background:var(--o)}.btn-lesson.green{background:var(--g)}.input-lesson{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:11px 13px;font:inherit;outline:none;background:#fff}.input-lesson:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.12)}.dsu-nodes{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0}.dsu-node{width:62px;height:62px;border-radius:999px;background:#eef2ff;border:3px solid #c7d2fe;color:#312e81;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05rem;transition:.25s}.dsu-node.g0{background:#dcfce7;border-color:#22c55e;color:#166534}.dsu-node.g1{background:#cffafe;border-color:#06b6d4;color:#155e75}.dsu-node.g2{background:#ffedd5;border-color:#fb923c;color:#9a3412}.dsu-node.active{transform:scale(1.08);box-shadow:0 0 0 6px rgba(79,70,229,.12)}.parent-table{display:grid;grid-template-columns:repeat(6,minmax(44px,1fr));gap:8px;margin-top:12px}.parent-cell{border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;text-align:center;padding:8px;font-weight:900}.parent-cell b{display:block;color:#64748b;font-size:.78rem}.log-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:105px;max-height:260px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:14px;color:#334155}.trie-area{min-height:290px;background:#f8fafc;border:1px dashed #bfdbfe;border-radius:18px;padding:14px;overflow:auto}.trie-level{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:12px 0}.trie-node{min-width:50px;padding:9px 11px;border-radius:16px;background:#eef2ff;border:1px solid #c7d2fe;color:#312e81;text-align:center;font-weight:900;box-shadow:0 8px 18px rgba(79,70,229,.09)}.trie-node.end{background:#dcfce7;color:#166534;border-color:#22c55e}.trie-node.active{background:#fee2e2;color:#991b1b;border-color:#ef4444;transform:scale(1.06)}.word-chip{display:inline-flex;margin:4px 6px 4px 0;padding:7px 10px;border-radius:999px;background:#eef2ff;color:#312e81;font-weight:900}.exercise-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.exercise-card h3{margin-top:0}.quiz-item{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 0;background:#fff}.quiz-options{display:grid;gap:8px;margin-top:10px}.quiz-option{text-align:left;border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}.feedback{margin-top:8px;font-weight:800}.checklist{display:grid;gap:10px}.checkitem{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px}.checkitem i{margin-top:5px;color:var(--g)}@media(max-width:900px){.grid-2,.grid-3,.hero-grid{grid-template-columns:1fr}.lesson-page{padding:14px;border-radius:16px}.lesson-hero{border-radius:20px}.parent-table{grid-template-columns:repeat(3,1fr)}}
+</style>
 
-<hr>
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-sitemap"></i> Hai cấu trúc dữ liệu quan trọng</div>
+    <h1>🧩 DSU & Trie: Nhóm liên thông và cây tiền tố</h1>
+    <p>Bài học được tách rõ thành <b>2 phần độc lập</b>: <b>DSU / Union-Find</b> để quản lý các nhóm rời nhau trong đồ thị, và <b>Trie</b> để lưu, tìm kiếm chuỗi theo tiền tố.</p>
+    <div class="hero-grid"><div class="hero-stat"><b>DSU</b><span>Union, Find, nhóm liên thông</span></div><div class="hero-stat"><b>Trie</b><span>Insert, Search, Prefix</span></div><div class="hero-stat"><b>Mô phỏng</b><span>Chạy từng bước trực quan</span></div><div class="hero-stat"><b>Bài tập</b><span>Tách riêng DSU và Trie</span></div></div>
+  </div>
 
-<h2>📘 Lý thuyết</h2>
-<p><b>Trie</b> là cây ký tự: mỗi nút biểu diễn 1 ký tự, dùng để tìm kiếm chuỗi nhanh.<br>
-<b>Union-Find</b> quản lý các tập hợp disjoint – rất hiệu quả trong đồ thị.</p>
+  <div class="lesson-progress-wrap"><div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div><div class="lesson-nav"><a href="#goals">Mục tiêu</a><a href="#overview">Tổng quan</a><a href="#dsu">Phần 1: DSU</a><a href="#trie">Phần 2: Trie</a><a href="#compare">So sánh</a><a href="#mistakes">Lỗi hay nhầm</a><a href="#practice">Bài tập</a><a href="#quiz">Quiz</a></div></div>
 
-<hr>
+  <section class="lesson-card mini-slide" id="goals"><h2><i class="fa-solid fa-bullseye"></i> Mục tiêu</h2><div class="grid-2"><div class="info-box"><h3>Sau phần DSU</h3><ul><li>Hiểu DSU quản lý các <b>tập hợp rời nhau</b>.</li><li>Biết dùng <code>find</code>, <code>unite</code>.</li><li>Biết tối ưu bằng <b>path compression</b> và <b>union by size/rank</b>.</li><li>Ứng dụng đếm nhóm liên thông, kiểm tra cùng nhóm, Kruskal.</li></ul></div><div class="info-box"><h3>Sau phần Trie</h3><ul><li>Hiểu Trie là <b>cây ký tự</b>.</li><li>Biết thêm từ, tìm từ, kiểm tra tiền tố.</li><li>Biết khi nào dùng Trie thay cho tìm kiếm chuỗi thông thường.</li><li>Ứng dụng gợi ý từ, kiểm tra prefix, dictionary, bitwise trie định hướng nâng cao.</li></ul></div></div></section>
 
-<h2>💻 Trie (Python)</h2>
-<pre><code>class Trie:
-  def __init__(self): self.child={};self.end=False
-  def insert(self,s):
-    node=self
-    for c in s:
-      if c not in node.child: node.child[c]=Trie()
-      node=node.child[c]
-    node.end=True
-  def search(self,s):
-    node=self
-    for c in s:
-      if c not in node.child: return False
-      node=node.child[c]
-    return node.end
-root=Trie()
-for w in ["cat","car","dog"]: root.insert(w)
-print(root.search("car"))</code></pre>
+  <section class="lesson-card mini-slide" id="overview"><h2><i class="fa-solid fa-map"></i> Tổng quan: DSU và Trie khác nhau thế nào?</h2><div class="lesson-table-wrap"><table class="lesson-table"><thead><tr><th>Cấu trúc</th><th>Dùng cho dữ liệu gì?</th><th>Thao tác chính</th><th>Ứng dụng thường gặp</th><th>Không nên nhầm</th></tr></thead><tbody><tr><td><b>DSU / Union-Find</b></td><td>Các phần tử thuộc nhiều nhóm rời nhau.</td><td><code>find(x)</code>, <code>unite(a,b)</code>, kiểm tra cùng nhóm.</td><td>Đồ thị vô hướng, nhóm liên thông, Kruskal MST, online connectivity.</td><td>DSU không lưu đường đi cụ thể giữa 2 đỉnh.</td></tr><tr><td><b>Trie</b></td><td>Tập các chuỗi/ký tự có chung tiền tố.</td><td><code>insert(s)</code>, <code>search(s)</code>, <code>startsWith(prefix)</code>.</td><td>Từ điển, autocomplete, kiểm tra tiền tố, đếm số từ có prefix.</td><td>Trie không thay thế mọi bài string; KMP/Z/hash vẫn cần cho tìm mẫu trong văn bản dài.</td></tr></tbody></table></div></section>
 
-<h2>💻 Union-Find (C++)</h2>
-<pre><code>struct DSU{
-  vector&lt;int&gt; p;
-  DSU(int n){p.resize(n+1);iota(p.begin(),p.end(),0);}
-  int find(int x){return x==p[x]?x:p[x]=find(p[x]);}
-  void unite(int a,int b){
-    a=find(a);b=find(b);
-    if(a!=b)p[b]=a;
-  }
-};</code></pre>
+  <section class="lesson-card mini-slide" id="dsu"><div class="part-title"><span class="part-badge"><i class="fa-solid fa-people-group"></i> PHẦN 1</span><h2 style="margin:0">DSU / Union-Find</h2></div><p><b>DSU</b> quản lý các tập hợp rời nhau. Mỗi phần tử có một “đại diện nhóm” gọi là <b>root</b>. Khi nối hai phần tử, ta gộp hai nhóm lại.</p><div class="grid-3"><div class="info-box"><span class="pill green">find(x)</span><p>Tìm đại diện nhóm của <code>x</code>.</p></div><div class="info-box"><span class="pill orange">unite(a,b)</span><p>Gộp nhóm chứa <code>a</code> và nhóm chứa <code>b</code>.</p></div><div class="info-box"><span class="pill cyan">same(a,b)</span><p>Kiểm tra <code>find(a) == find(b)</code>.</p></div></div>
+    <h3>1.1. Mô phỏng DSU</h3><div class="grid-2"><div class="visual-box"><div class="dsu-nodes" id="dsuNodes"></div><div class="parent-table" id="parentTable"></div><div class="controls"><button class="btn-lesson" id="dsuNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="dsuResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div></div><div class="log-box" id="dsuLog">Nhấn “Bước tiếp” để xem DSU gộp nhóm.</div></div>
+    <h3>1.2. Code DSU chuẩn hiện đại</h3><div class="code-tabs" data-tabs="dsu-code"><div class="tab-buttons"><button class="tab-btn active" data-target="dsu-cpp">C++</button><button class="tab-btn" data-target="dsu-py">Python</button></div><div class="tab-panel active" id="dsu-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
 
-<hr>
+struct DSU {
+    vector&lt;int&gt; parent, sz;
 
-<h2>🧩 Bài tập</h2>
-<ol>
-  <li>Viết chương trình đếm số nhóm liên thông bằng DSU.</li>
-  <li>Kiểm tra xem hai từ có cùng tiền tố trong Trie không.</li>
-</ol>
+    DSU(int n) {
+        parent.resize(n + 1);
+        sz.assign(n + 1, 1);
+        iota(parent.begin(), parent.end(), 0);
+    }
 
-<details><summary><b>💡 Lời giải DSU</b></summary>
-<pre><code>dsu=DSU(5)
-dsu.unite(1,2)
-dsu.unite(3,4)
-groups=len(set(dsu.find(i) for i in range(1,6)))
-print(groups)</code></pre>
-</details>
+    int find(int x) {
+        if (x == parent[x]) return x;
+        return parent[x] = find(parent[x]); // path compression
+    }
+
+    bool unite(int a, int b) {
+        a = find(a);
+        b = find(b);
+        if (a == b) return false;
+
+        if (sz[a] &lt; sz[b]) swap(a, b);     // union by size
+        parent[b] = a;
+        sz[a] += sz[b];
+        return true;
+    }
+
+    bool same(int a, int b) {
+        return find(a) == find(b);
+    }
+};
+
+int main() {
+    int n, m;
+    cin &gt;&gt; n &gt;&gt; m;
+
+    DSU dsu(n);
+    for (int i = 0; i &lt; m; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+        dsu.unite(u, v);
+    }
+
+    int components = 0;
+    for (int i = 1; i &lt;= n; i++) {
+        if (dsu.find(i) == i) components++;
+    }
+
+    cout &lt;&lt; components;
+    return 0;
+}</code></pre></div><div class="tab-panel" id="dsu-py"><button class="copy-btn">Sao chép</button><pre><code>class DSU:
+    def __init__(self, n):
+        self.parent = list(range(n + 1))
+        self.size = [1] * (n + 1)
+
+    def find(self, x):
+        if x == self.parent[x]:
+            return x
+        self.parent[x] = self.find(self.parent[x])  # path compression
+        return self.parent[x]
+
+    def unite(self, a, b):
+        a = self.find(a)
+        b = self.find(b)
+        if a == b:
+            return False
+        if self.size[a] &lt; self.size[b]:
+            a, b = b, a
+        self.parent[b] = a
+        self.size[a] += self.size[b]
+        return True
+
+    def same(self, a, b):
+        return self.find(a) == self.find(b)
+
+n, m = map(int, input().split())
+dsu = DSU(n)
+for _ in range(m):
+    u, v = map(int, input().split())
+    dsu.unite(u, v)
+components = sum(1 for i in range(1, n + 1) if dsu.find(i) == i)
+print(components)</code></pre></div></div><div class="callout success"><b>Ghi nhớ DSU:</b> nếu đề có “nối hai phần tử”, “kiểm tra cùng nhóm”, “đếm số nhóm”, hãy nghĩ tới DSU.</div></section>
+
+  <section class="lesson-card mini-slide" id="trie"><div class="part-title"><span class="part-badge"><i class="fa-solid fa-font"></i> PHẦN 2</span><h2 style="margin:0">Trie / Prefix Tree</h2></div><p><b>Trie</b> là cây ký tự. Mỗi cạnh/nút tương ứng một ký tự. Các từ có chung tiền tố sẽ đi chung một đoạn đường trong cây.</p><div class="grid-3"><div class="info-box"><span class="pill green">insert(s)</span><p>Thêm chuỗi <code>s</code> vào Trie.</p></div><div class="info-box"><span class="pill orange">search(s)</span><p>Kiểm tra chuỗi <code>s</code> có phải một từ hoàn chỉnh không.</p></div><div class="info-box"><span class="pill cyan">startsWith(p)</span><p>Kiểm tra có từ nào bắt đầu bằng tiền tố <code>p</code> không.</p></div></div>
+    <h3>2.1. Mô phỏng Trie</h3><div class="grid-2"><div class="visual-box"><label><b>Danh sách từ</b></label><input class="input-lesson" id="trieWords" value="cat car dog door"><label style="display:block;margin-top:10px"><b>Từ / tiền tố cần kiểm tra</b></label><input class="input-lesson" id="trieQuery" value="car"><div class="controls"><button class="btn-lesson" id="trieBuildBtn"><i class="fa-solid fa-tree"></i> Dựng Trie</button><button class="btn-lesson green" id="trieSearchBtn"><i class="fa-solid fa-magnifying-glass"></i> Tìm từ</button><button class="btn-lesson orange" id="triePrefixBtn"><i class="fa-solid fa-filter"></i> Kiểm tra tiền tố</button></div><div id="wordChips" style="margin-top:12px"></div></div><div><div class="trie-area" id="trieArea"></div><div class="log-box" id="trieLog" style="margin-top:12px">Nhấn “Dựng Trie” để xem cây ký tự.</div></div></div>
+    <h3>2.2. Code Trie rõ ràng</h3><div class="code-tabs" data-tabs="trie-code"><div class="tab-buttons"><button class="tab-btn active" data-target="trie-py">Python</button><button class="tab-btn" data-target="trie-cpp">C++</button></div><div class="tab-panel active" id="trie-py"><button class="copy-btn">Sao chép</button><pre><code>class TrieNode:
+    def __init__(self):
+        self.child = {}
+        self.end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, s):
+        node = self.root
+        for c in s:
+            if c not in node.child:
+                node.child[c] = TrieNode()
+            node = node.child[c]
+        node.end = True
+
+    def search(self, s):
+        node = self.root
+        for c in s:
+            if c not in node.child:
+                return False
+            node = node.child[c]
+        return node.end
+
+    def starts_with(self, prefix):
+        node = self.root
+        for c in prefix:
+            if c not in node.child:
+                return False
+            node = node.child[c]
+        return True
+
+trie = Trie()
+for word in ["cat", "car", "dog"]:
+    trie.insert(word)
+print(trie.search("car"))       # True
+print(trie.starts_with("ca"))   # True
+print(trie.search("ca"))        # False</code></pre></div><div class="tab-panel" id="trie-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+struct Trie {
+    struct Node {
+        int child[26];
+        bool end;
+        Node() {
+            memset(child, -1, sizeof(child));
+            end = false;
+        }
+    };
+
+    vector&lt;Node&gt; nodes;
+    Trie() { nodes.push_back(Node()); }
+
+    void insert(const string&amp; s) {
+        int cur = 0;
+        for (char ch : s) {
+            int c = ch - 'a';
+            if (nodes[cur].child[c] == -1) {
+                nodes[cur].child[c] = nodes.size();
+                nodes.push_back(Node());
+            }
+            cur = nodes[cur].child[c];
+        }
+        nodes[cur].end = true;
+    }
+
+    bool search(const string&amp; s) {
+        int cur = 0;
+        for (char ch : s) {
+            int c = ch - 'a';
+            if (nodes[cur].child[c] == -1) return false;
+            cur = nodes[cur].child[c];
+        }
+        return nodes[cur].end;
+    }
+
+    bool startsWith(const string&amp; prefix) {
+        int cur = 0;
+        for (char ch : prefix) {
+            int c = ch - 'a';
+            if (nodes[cur].child[c] == -1) return false;
+            cur = nodes[cur].child[c];
+        }
+        return true;
+    }
+};
+
+int main() {
+    Trie trie;
+    trie.insert("cat");
+    trie.insert("car");
+    trie.insert("dog");
+    cout &lt;&lt; trie.search("car") &lt;&lt; "\\n";
+    cout &lt;&lt; trie.startsWith("ca") &lt;&lt; "\\n";
+    return 0;
+}</code></pre></div></div><div class="callout success"><b>Ghi nhớ Trie:</b> nếu bài có nhiều từ và nhiều truy vấn tiền tố, Trie thường hiệu quả hơn tìm tuyến tính từng từ.</div></section>
+
+  <section class="lesson-card mini-slide" id="compare"><h2><i class="fa-solid fa-scale-balanced"></i> Khi nào dùng DSU, khi nào dùng Trie?</h2><div class="grid-2"><div class="info-box"><h3>Chọn DSU nếu đề có</h3><ul><li>Nối hai đỉnh / hai người / hai máy tính vào cùng nhóm.</li><li>Hỏi hai phần tử có cùng nhóm không.</li><li>Đếm số nhóm liên thông sau nhiều thao tác nối.</li><li>Kruskal: chọn cạnh để xây cây khung nhỏ nhất.</li></ul></div><div class="info-box"><h3>Chọn Trie nếu đề có</h3><ul><li>Thêm nhiều từ vào từ điển.</li><li>Hỏi một từ có tồn tại không.</li><li>Hỏi có từ nào bắt đầu bằng tiền tố không.</li><li>Đếm số từ có cùng prefix hoặc gợi ý autocomplete.</li></ul></div></div></section>
+
+  <section class="lesson-card mini-slide" id="mistakes"><h2><i class="fa-solid fa-triangle-exclamation"></i> Lỗi học sinh hay nhầm</h2><div class="checklist"><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>DSU: quên gọi find trước khi unite.</b><br>Phải gộp hai root, không gộp trực tiếp hai đỉnh chưa tìm đại diện.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>DSU: không path compression.</b><br>Code vẫn có thể đúng nhưng chậm hơn nhiều ở test lớn.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Trie: nhầm search với startsWith.</b><br><code>search("ca")</code> có thể sai, nhưng <code>startsWith("ca")</code> đúng nếu có từ “cat”, “car”.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Trie: không đánh dấu end.</b><br>Nếu không có <code>end</code>, sẽ không phân biệt được “car” là từ hoàn chỉnh hay chỉ là tiền tố.</div></div></div></section>
+
+  <section class="lesson-card mini-slide" id="practice"><h2><i class="fa-solid fa-dumbbell"></i> Bài tập luyện tập tách riêng</h2><div class="grid-2"><div class="exercise-card"><h3>📘 DSU - Cơ bản</h3><ol><li>Đếm số nhóm liên thông trong đồ thị vô hướng.</li><li>Kiểm tra hai đỉnh <code>u, v</code> có cùng component không.</li><li>Sau mỗi thao tác nối, in số nhóm còn lại.</li></ol></div><div class="exercise-card"><h3>📗 DSU - Nâng cao</h3><ol><li>Kruskal tìm cây khung nhỏ nhất.</li><li>Phát hiện cạnh tạo chu trình trong đồ thị vô hướng.</li><li>Offline query dạng nối cạnh và hỏi connectivity.</li></ol></div><div class="exercise-card"><h3>📙 Trie - Cơ bản</h3><ol><li>Thêm danh sách từ và kiểm tra một từ có tồn tại không.</li><li>Kiểm tra có từ nào bắt đầu bằng prefix <code>p</code> không.</li><li>Đếm số từ có cùng tiền tố.</li></ol></div><div class="exercise-card"><h3>🐉 Trie - HSG định hướng</h3><ol><li>Autocomplete: in tối đa 10 từ bắt đầu bằng prefix.</li><li>Đếm số từ có cùng tiền tố dài nhất.</li><li>Bitwise Trie tìm XOR lớn nhất.</li></ol></div></div></section>
+
+  <section class="lesson-card mini-slide" id="quiz"><h2><i class="fa-solid fa-circle-question"></i> Quiz kiểm tra nhanh</h2><div class="quiz-item" data-answer="b"><b>Câu 1.</b> DSU phù hợp nhất với dạng bài nào?<div class="quiz-options"><button class="quiz-option" data-choice="a">Tìm ký tự trong chuỗi</button><button class="quiz-option" data-choice="b">Gộp nhóm và kiểm tra cùng nhóm</button><button class="quiz-option" data-choice="c">Sắp xếp mảng</button></div><div class="feedback"></div></div><div class="quiz-item" data-answer="a"><b>Câu 2.</b> Trong Trie, biến <code>end</code> dùng để làm gì?<div class="quiz-options"><button class="quiz-option" data-choice="a">Đánh dấu một từ kết thúc tại nút đó</button><button class="quiz-option" data-choice="b">Lưu số component</button><button class="quiz-option" data-choice="c">Tìm root của nhóm</button></div><div class="feedback"></div></div><div class="quiz-item" data-answer="c"><b>Câu 3.</b> <code>search("ca")</code> và <code>startsWith("ca")</code> khác nhau thế nào?<div class="quiz-options"><button class="quiz-option" data-choice="a">Không khác nhau</button><button class="quiz-option" data-choice="b">search chỉ dùng cho số nguyên</button><button class="quiz-option" data-choice="c">search kiểm tra từ hoàn chỉnh, startsWith kiểm tra tiền tố</button></div><div class="feedback"></div></div></section>
+
+  <section class="lesson-card mini-slide"><h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2><div class="callout success"><b>DSU</b> dùng để quản lý nhóm rời nhau và trả lời nhanh các câu hỏi liên thông. <b>Trie</b> dùng để lưu chuỗi theo tiền tố và tìm kiếm từ/prefix nhanh. Hai phần này nên học tách rõ để tránh nhầm giữa bài đồ thị và bài xử lý chuỗi.</div></section>
+</div>
+
+<script>
+(function(){'use strict';function $(s,r){return(r||document).querySelector(s)}function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}function initProgress(){var bar=$('#lessonProgressBar');if(!bar)return;function upd(){var d=document.documentElement,st=window.scrollY||d.scrollTop||0,h=Math.max(1,d.scrollHeight-window.innerHeight);bar.style.width=Math.min(100,Math.max(0,st/h*100))+'%'}window.addEventListener('scroll',upd,{passive:true});upd()}function initTabs(){$all('.code-tabs').forEach(function(box){$all('.tab-btn',box).forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-target');$all('.tab-btn',box).forEach(function(b){b.classList.remove('active')});$all('.tab-panel',box).forEach(function(p){p.classList.remove('active')});btn.classList.add('active');var t=document.getElementById(id);if(t)t.classList.add('active')})})})}function initCopy(){$all('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=btn.closest('.tab-panel')||btn.parentElement,c=p?p.querySelector('code'):null,txt=c?c.textContent:'';function ok(){var o=btn.textContent;btn.textContent='Đã chép';setTimeout(function(){btn.textContent=o},1200)}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(function(){fallback(txt);ok()})}else{fallback(txt);ok()}})});function fallback(txt){var a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a)}}
+var dsu={p:[0,1,2,3,4,5,6],sz:[0,1,1,1,1,1,1],step:0,ops:[[1,2],[3,4],[2,3],[5,6],[4,5]]};function find(x){while(dsu.p[x]!==x)x=dsu.p[x];return x}function unite(a,b){var ra=find(a),rb=find(b);if(ra===rb)return false;if(dsu.sz[ra]<dsu.sz[rb]){var t=ra;ra=rb;rb=t}dsu.p[rb]=ra;dsu.sz[ra]+=dsu.sz[rb];return true}function renderDsu(msg,act){var nodes=$('#dsuNodes'),tbl=$('#parentTable'),log=$('#dsuLog');if(!nodes||!tbl||!log)return;var roots={},idx=0;for(var i=1;i<=6;i++){var r=find(i);if(roots[r]===undefined)roots[r]=idx++}nodes.innerHTML='';for(var j=1;j<=6;j++){var cls='dsu-node g'+(roots[find(j)]%3)+(act&&act.indexOf(j)>=0?' active':'');nodes.innerHTML+='<div class="'+cls+'">'+j+'</div>'}tbl.innerHTML='';for(var k=1;k<=6;k++){tbl.innerHTML+='<div class="parent-cell"><b>parent['+k+']</b>'+dsu.p[k]+'</div>'}log.innerHTML=msg||'Nhấn “Bước tiếp” để xem DSU gộp nhóm.'}function resetDsu(){dsu.p=[0,1,2,3,4,5,6];dsu.sz=[0,1,1,1,1,1,1];dsu.step=0;renderDsu('Ban đầu mỗi đỉnh là một nhóm riêng: parent[x] = x.',[])}function nextDsu(){if(dsu.step>=dsu.ops.length){renderDsu('Hoàn tất mô phỏng. Các đỉnh đã được gộp theo các thao tác mẫu.',[]);return}var op=dsu.ops[dsu.step++],a=op[0],b=op[1],ra=find(a),rb=find(b),changed=unite(a,b);var msg='unite('+a+', '+b+'): root('+a+') = '+ra+', root('+b+') = '+rb+'. ';msg+=changed?'Hai nhóm khác nhau nên gộp lại.':'Hai đỉnh đã cùng nhóm nên không cần gộp.';renderDsu(msg,[a,b])}function initDsu(){$('#dsuNextBtn')&&$('#dsuNextBtn').addEventListener('click',nextDsu);$('#dsuResetBtn')&&$('#dsuResetBtn').addEventListener('click',resetDsu);resetDsu()}
+function buildTrie(words){var root={ch:'root',end:false,child:{}};words.forEach(function(w){var node=root;for(var i=0;i<w.length;i++){var c=w[i];if(!node.child[c])node.child[c]={ch:c,end:false,child:{}};node=node.child[c]}node.end=true});return root}var trieRoot=null,trieWords=[];function wordsFromInput(){return String($('#trieWords')?$('#trieWords').value:'').trim().split(/\s+/).filter(Boolean).map(function(w){return w.toLowerCase().replace(/[^a-z]/g,'')}).filter(Boolean)}function renderTrie(active){var area=$('#trieArea'),chips=$('#wordChips');if(!area)return;trieWords=wordsFromInput();if(!trieWords.length)trieWords=['cat','car','dog','door'];if(!trieRoot)trieRoot=buildTrie(trieWords);if(chips)chips.innerHTML=trieWords.map(function(w){return'<span class="word-chip">'+esc(w)+'</span>'}).join('');var levels=[];function walk(node,depth,path){if(!levels[depth])levels[depth]=[];levels[depth].push({label:node.ch,end:node.end,path:path});Object.keys(node.child).sort().forEach(function(c){walk(node.child[c],depth+1,path+c)})}walk(trieRoot,0,'');area.innerHTML=levels.map(function(level){return'<div class="trie-level">'+level.map(function(n){var cls='trie-node'+(n.end?' end':'')+(active&&active.indexOf(n.path)>=0?' active':'');return'<div class="'+cls+'">'+esc(n.label)+(n.end?' ✓':'')+'</div>'}).join('')+'</div>'}).join('')}function buildTrieUI(){trieWords=wordsFromInput();trieRoot=buildTrie(trieWords);renderTrie([]);var log=$('#trieLog');if(log)log.innerHTML='Đã dựng Trie từ các từ: '+esc(trieWords.join(', '))+'. Nút có dấu ✓ là nơi kết thúc một từ.'}function queryTrie(isPrefix){if(!trieRoot)buildTrieUI();var q=String($('#trieQuery')?$('#trieQuery').value:'').toLowerCase().replace(/[^a-z]/g,'');var node=trieRoot,path=[],ok=true;for(var i=0;i<q.length;i++){var c=q[i];if(!node.child[c]){ok=false;break}node=node.child[c];path.push(q.slice(0,i+1))}var found=ok&&(isPrefix||node.end);renderTrie(path);var log=$('#trieLog');if(log){var kind=isPrefix?'tiền tố':'từ hoàn chỉnh';log.innerHTML='Kiểm tra '+kind+' "'+esc(q)+'": <b style="color:'+(found?'#166534':'#991b1b')+'">'+(found?'ĐÚNG':'SAI')+'</b>.'+(ok&&!node.end&&!isPrefix?' Đường đi tồn tại nhưng chưa được đánh dấu là một từ hoàn chỉnh.':'')}}function initTrie(){$('#trieBuildBtn')&&$('#trieBuildBtn').addEventListener('click',buildTrieUI);$('#trieSearchBtn')&&$('#trieSearchBtn').addEventListener('click',function(){queryTrie(false)});$('#triePrefixBtn')&&$('#triePrefixBtn').addEventListener('click',function(){queryTrie(true)});buildTrieUI()}
+function initQuiz(){$all('.quiz-item').forEach(function(item){var ans=item.getAttribute('data-answer'),fb=item.querySelector('.feedback');$all('.quiz-option',item).forEach(function(btn){btn.addEventListener('click',function(){$all('.quiz-option',item).forEach(function(b){b.classList.remove('correct','wrong')});if(btn.getAttribute('data-choice')===ans){btn.classList.add('correct');if(fb)fb.textContent='Đúng rồi!'}else{btn.classList.add('wrong');var right=item.querySelector('.quiz-option[data-choice="'+ans+'"]');if(right)right.classList.add('correct');if(fb)fb.textContent='Chưa đúng. Em xem lại phần lý thuyết phía trên.'}})})})}function initHighlightSafe(){if(window.hljs&&typeof window.hljs.highlightAll==='function'){try{window.hljs.highlightAll()}catch(e){}}}document.addEventListener('DOMContentLoaded',function(){initProgress();initTabs();initCopy();initDsu();initTrie();initQuiz();initHighlightSafe()});})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

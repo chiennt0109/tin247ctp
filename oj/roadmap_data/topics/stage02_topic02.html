@@ -1,166 +1,1408 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu chuỗi là gì (string) và cách máy tính lưu chữ.</li>
-  <li>Nhập chuỗi từ bàn phím (cả có dấu cách và không có dấu cách).</li>
-  <li>Nối chuỗi, đo độ dài chuỗi, truy cập từng ký tự.</li>
-  <li>Làm các tác vụ cơ bản hay gặp: đếm số chữ 'a', đảo ngược chuỗi, so sánh chuỗi.</li>
-</ul>
+<!--
+  File đề xuất: oj/roadmap_data/topics/stage01_topic02.html
+  Bài giảng tương tác: Chuỗi ký tự, truy cập ký tự, thao tác chuỗi và chuyển đổi số - chữ
+  Dùng được như một HTML fragment trong template Django/OJ.
+-->
 
-<hr>
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<h2>1. Khai báo chuỗi</h2>
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- Highlight.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+
+<style>
+  :root{
+    --str-primary:#7c3aed;
+    --str-primary-dark:#5b21b6;
+    --str-secondary:#2563eb;
+    --str-success:#16a34a;
+    --str-warning:#f59e0b;
+    --str-danger:#ef4444;
+    --str-ink:#0f172a;
+    --str-muted:#64748b;
+    --str-border:#e2e8f0;
+    --str-soft:#f5f3ff;
+    --str-soft-blue:#eff6ff;
+    --str-soft-green:#ecfdf5;
+    --str-card:#ffffff;
+    --str-bg:#f8fafc;
+  }
+
+  .string-lesson{
+    background:
+      radial-gradient(circle at 8% 8%, rgba(124,58,237,.13), transparent 28%),
+      radial-gradient(circle at 92% 12%, rgba(37,99,235,.11), transparent 25%),
+      linear-gradient(180deg, #f8fafc 0%, #ffffff 42%, #f8fafc 100%);
+    color:var(--str-ink);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  .string-lesson *{
+    box-sizing:border-box;
+  }
+
+  .string-hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg, #5b21b6 0%, #7c3aed 44%, #0f172a 100%);
+    color:white;
+    border-radius: 24px;
+    padding: 34px;
+    box-shadow:0 18px 42px rgba(124,58,237,.25);
+  }
+
+  .string-hero::after{
+    content:"";
+    position:absolute;
+    width:270px;
+    height:270px;
+    right:-90px;
+    top:-90px;
+    border-radius:50%;
+    background:rgba(255,255,255,.13);
+  }
+
+  .string-hero::before{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    right:170px;
+    bottom:-78px;
+    border-radius:50%;
+    background:rgba(255,255,255,.10);
+  }
+
+  .string-hero-content{
+    position:relative;
+    z-index:2;
+  }
+
+  .string-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.20);
+    backdrop-filter:blur(8px);
+    font-weight:700;
+    font-size:.92rem;
+  }
+
+  .string-hero h1{
+    font-weight:900;
+    line-height:1.08;
+    margin:18px 0 12px;
+    letter-spacing:-.04em;
+  }
+
+  .string-hero p{
+    color:rgba(255,255,255,.88);
+    font-size:1.06rem;
+    max-width:760px;
+  }
+
+  .string-stat{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:18px;
+    padding:14px 16px;
+    height:100%;
+  }
+
+  .string-stat b{
+    display:block;
+    font-size:1.28rem;
+  }
+
+  .string-stat span{
+    color:rgba(255,255,255,.80);
+    font-size:.9rem;
+  }
+
+  .lesson-progress-wrap{
+    position:sticky;
+    top:0;
+    z-index:30;
+    background:rgba(248,250,252,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(226,232,240,.7);
+    padding:12px 0 10px;
+  }
+
+  .lesson-progress-track{
+    height:10px;
+    background:#e2e8f0;
+    border-radius:999px;
+    overflow:hidden;
+  }
+
+  .lesson-progress-fill{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg, #7c3aed, #2563eb, #16a34a);
+    border-radius:999px;
+    transition:width .18s ease;
+  }
+
+  .lesson-nav-pills{
+    display:flex;
+    gap:10px;
+    overflow:auto;
+    padding-bottom:2px;
+    scrollbar-width:thin;
+  }
+
+  .lesson-nav-pills a{
+    white-space:nowrap;
+    text-decoration:none;
+    color:#334155;
+    background:white;
+    border:1px solid var(--str-border);
+    border-radius:999px;
+    padding:8px 12px;
+    font-size:.9rem;
+    font-weight:700;
+    box-shadow:0 6px 14px rgba(15,23,42,.04);
+  }
+
+  .lesson-nav-pills a:hover{
+    color:var(--str-primary);
+    border-color:#c4b5fd;
+  }
+
+  .mini-slide{
+    background:var(--str-card);
+    border:1px solid var(--str-border);
+    border-radius:24px;
+    padding:26px;
+    margin-bottom:22px;
+    box-shadow:0 16px 36px rgba(15,23,42,.06);
+  }
+
+  .slide-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:1.45rem;
+    font-weight:900;
+    letter-spacing:-.025em;
+    margin-bottom:12px;
+  }
+
+  .slide-title .icon-circle{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    background:linear-gradient(135deg, var(--str-primary), var(--str-secondary));
+    box-shadow:0 10px 20px rgba(124,58,237,.22);
+    flex:0 0 auto;
+  }
+
+  .slide-subtitle{
+    color:var(--str-muted);
+    margin-bottom:18px;
+    font-size:1rem;
+  }
+
+  .objective-card{
+    border:1px solid var(--str-border);
+    border-radius:18px;
+    padding:16px;
+    height:100%;
+    background:linear-gradient(180deg, #ffffff, #fafafa);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+
+  .objective-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 26px rgba(15,23,42,.08);
+  }
+
+  .objective-card i{
+    color:var(--str-primary);
+    font-size:1.2rem;
+    margin-right:8px;
+  }
+
+  .concept-callout{
+    border:1px solid #ddd6fe;
+    border-left:6px solid var(--str-primary);
+    background:linear-gradient(90deg, #f5f3ff, #ffffff);
+    border-radius:18px;
+    padding:16px 18px;
+  }
+
+  .warning-callout{
+    border:1px solid #fde68a;
+    border-left:6px solid var(--str-warning);
+    background:linear-gradient(90deg, #fffbeb, #ffffff);
+    border-radius:18px;
+    padding:16px 18px;
+  }
+
+  .success-callout{
+    border:1px solid #bbf7d0;
+    border-left:6px solid var(--str-success);
+    background:linear-gradient(90deg, #ecfdf5, #ffffff);
+    border-radius:18px;
+    padding:16px 18px;
+  }
+
+  .code-tab-card{
+    border:1px solid var(--str-border);
+    border-radius:20px;
+    overflow:hidden;
+    background:white;
+    box-shadow:0 10px 24px rgba(15,23,42,.05);
+  }
+
+  .code-tab-card .nav-tabs{
+    border-bottom:1px solid var(--str-border);
+    background:#f8fafc;
+    padding:8px 8px 0;
+  }
+
+  .code-tab-card .nav-link{
+    border:0;
+    color:#475569;
+    font-weight:800;
+    border-radius:13px 13px 0 0;
+    padding:10px 16px;
+  }
+
+  .code-tab-card .nav-link.active{
+    color:#111827;
+    background:white;
+    box-shadow:0 -2px 0 var(--str-primary) inset;
+  }
+
+  .code-panel{
+    position:relative;
+    padding:10px;
+    background:white;
+  }
+
+  .code-panel pre{
+    margin:0;
+    max-width:100%;
+    overflow-x:auto;
+    border-radius:16px;
+    background:#0f172a;
+    padding:16px;
+  }
+
+  .code-panel code.hljs,
+  .code-panel pre code{
+    background:#0f172a !important;
+    color:#e5e7eb;
+    font-size:.94rem;
+    line-height:1.58;
+    white-space:pre;
+    tab-size:4;
+  }
+
+  .copy-code-btn{
+    position:absolute;
+    top:20px;
+    right:20px;
+    border:0;
+    border-radius:999px;
+    padding:7px 11px;
+    color:white;
+    background:rgba(255,255,255,.16);
+    font-weight:800;
+    font-size:.8rem;
+    z-index:5;
+  }
+
+  .copy-code-btn:hover{
+    background:rgba(255,255,255,.25);
+  }
+
+  .word-board{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .char-tile{
+    width:64px;
+    height:74px;
+    border-radius:16px;
+    border:1px solid #c4b5fd;
+    background:linear-gradient(180deg, #ffffff, #ede9fe);
+    box-shadow:0 12px 24px rgba(124,58,237,.10);
+    overflow:hidden;
+    text-align:center;
+  }
+
+  .char-tile .char-main{
+    height:45px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:950;
+    font-size:1.45rem;
+  }
+
+  .char-tile .char-index{
+    height:29px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:850;
+    color:#5b21b6;
+    font-size:.82rem;
+    background:#ddd6fe;
+  }
+
+  .interactive-box{
+    border:1px solid var(--str-border);
+    background:white;
+    border-radius:22px;
+    padding:20px;
+    box-shadow:0 16px 36px rgba(15,23,42,.06);
+    height:100%;
+  }
+
+  .interactive-box h4{
+    font-weight:900;
+    letter-spacing:-.02em;
+    margin-bottom:12px;
+  }
+
+  .result-box{
+    background:#f8fafc;
+    border:1px dashed #cbd5e1;
+    border-radius:16px;
+    padding:14px 16px;
+    color:#334155;
+    min-height:60px;
+  }
+
+  .metric-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 10px;
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    border-radius:999px;
+    font-size:.9rem;
+    font-weight:800;
+    margin:4px 4px 4px 0;
+  }
+
+  .step-card{
+    border:1px solid var(--str-border);
+    border-radius:18px;
+    padding:16px;
+    height:100%;
+    background:#ffffff;
+  }
+
+  .step-number{
+    width:34px;
+    height:34px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--str-primary), var(--str-secondary));
+    color:white;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:950;
+    margin-bottom:10px;
+  }
+
+  .conversion-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+  }
+
+  .conversion-card{
+    border:1px solid var(--str-border);
+    border-radius:18px;
+    background:#ffffff;
+    padding:16px;
+  }
+
+  .conversion-card h5{
+    font-weight:900;
+    margin-bottom:8px;
+  }
+
+  .conversion-formula{
+    display:inline-block;
+    background:#0f172a;
+    color:#e5e7eb;
+    border-radius:12px;
+    padding:8px 10px;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-weight:800;
+    margin:4px 0;
+  }
+
+  .practice-list{
+    counter-reset:item;
+    list-style:none;
+    padding-left:0;
+    margin-bottom:0;
+  }
+
+  .practice-list li{
+    counter-increment:item;
+    display:flex;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid #e2e8f0;
+  }
+
+  .practice-list li:last-child{
+    border-bottom:0;
+  }
+
+  .practice-list li::before{
+    content:counter(item);
+    width:30px;
+    height:30px;
+    border-radius:11px;
+    background:#ede9fe;
+    color:#5b21b6;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:950;
+    flex:0 0 auto;
+  }
+
+  .quiz-option{
+    display:block;
+    width:100%;
+    text-align:left;
+    border:1px solid var(--str-border);
+    background:white;
+    border-radius:15px;
+    padding:12px 14px;
+    margin:8px 0;
+    transition:all .15s ease;
+  }
+
+  .quiz-option:hover{
+    border-color:#c4b5fd;
+    transform:translateX(3px);
+  }
+
+  .quiz-option.correct{
+    border-color:#22c55e;
+    background:#ecfdf5;
+  }
+
+  .quiz-option.wrong{
+    border-color:#ef4444;
+    background:#fef2f2;
+  }
+
+  .lesson-footer-next{
+    border-radius:22px;
+    background:linear-gradient(135deg, #0f172a, #5b21b6);
+    color:white;
+    padding:24px;
+    text-align:center;
+    box-shadow:0 16px 36px rgba(15,23,42,.14);
+  }
+
+  .lesson-footer-next p{
+    color:rgba(255,255,255,.86);
+    margin-bottom:0;
+  }
+
+  details.lesson-details{
+    border:1px solid var(--str-border);
+    border-radius:18px;
+    padding:14px 16px;
+    background:white;
+    margin-top:12px;
+  }
+
+  details.lesson-details summary{
+    cursor:pointer;
+    font-weight:900;
+  }
+
+  .table-responsive-clean{
+    width:100%;
+    overflow-x:auto;
+  }
+
+  .mini-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    overflow:hidden;
+    border-radius:16px;
+    border:1px solid var(--str-border);
+  }
+
+  .mini-table th,
+  .mini-table td{
+    padding:12px;
+    border-bottom:1px solid var(--str-border);
+    vertical-align:top;
+  }
+
+  .mini-table tr:last-child td{
+    border-bottom:0;
+  }
+
+  .mini-table th{
+    background:#f8fafc;
+    color:#334155;
+  }
+
+  @media (max-width: 992px){
+    .string-hero{
+      padding:24px;
+    }
+    .mini-slide{
+      padding:20px;
+    }
+    .conversion-grid{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width: 576px){
+    .char-tile{
+      width:54px;
+      height:66px;
+    }
+    .char-tile .char-main{
+      height:39px;
+      font-size:1.25rem;
+    }
+    .char-tile .char-index{
+      height:27px;
+      font-size:.76rem;
+    }
+  }
+</style>
+
+<div class="string-lesson p-3 p-lg-4" id="stringLessonRoot">
+  <section class="string-hero animate__animated animate__fadeInDown" id="top">
+    <div class="string-hero-content">
+      <span class="string-badge"><i class="fa-solid fa-font"></i> Stage 01 · Chuỗi ký tự cơ bản</span>
+      <h1>Chuỗi ký tự: từ chữ, tên học sinh đến xử lý dữ liệu</h1>
+      <p>
+        Chuỗi giúp chương trình làm việc với chữ viết, tên người, mã học sinh, câu văn, mật khẩu, số điện thoại và cả những con số đang được lưu dưới dạng ký tự.
+      </p>
+      <div class="row g-3 mt-3">
+        <div class="col-6 col-lg-3">
+          <div class="string-stat"><b>string</b><span>Kiểu dữ liệu lưu văn bản</span></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="string-stat"><b>s[i]</b><span>Truy cập từng ký tự</span></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="string-stat"><b>stoi</b><span>Đổi chuỗi số sang số</span></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="string-stat"><b>'0'</b><span>Mốc đổi chữ số sang số</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lesson-progress-wrap mt-3">
+    <div class="lesson-progress-track mb-2">
+      <div class="lesson-progress-fill" id="stringLessonProgress"></div>
+    </div>
+    <div class="lesson-nav-pills">
+      <a href="#goals"><i class="fa-solid fa-bullseye me-1"></i>Mục tiêu</a>
+      <a href="#declare"><i class="fa-solid fa-code me-1"></i>Khai báo</a>
+      <a href="#input"><i class="fa-solid fa-keyboard me-1"></i>Nhập chuỗi</a>
+      <a href="#index"><i class="fa-solid fa-location-dot me-1"></i>Chỉ số</a>
+      <a href="#tasks"><i class="fa-solid fa-gears me-1"></i>Thao tác</a>
+      <a href="#convert"><i class="fa-solid fa-right-left me-1"></i>Số ↔ chữ</a>
+      <a href="#practice"><i class="fa-solid fa-dumbbell me-1"></i>Luyện tập</a>
+      <a href="#quiz"><i class="fa-solid fa-circle-question me-1"></i>Quiz</a>
+    </div>
+  </div>
+
+  <main class="mt-4">
+    <section class="mini-slide animate__animated animate__fadeInUp" id="goals">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-bullseye"></i></span>
+        <span>Mục tiêu bài học</span>
+      </div>
+      <p class="slide-subtitle">Sau bài này, học sinh có thể dùng chuỗi để xử lý tên, câu văn, ký tự và dữ liệu số đang nằm trong văn bản.</p>
+
+      <div class="row g-3">
+        <div class="col-md-6 col-xl-3">
+          <div class="objective-card"><i class="fa-solid fa-check-circle"></i>Hiểu chuỗi là gì và cách máy tính lưu chữ.</div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="objective-card"><i class="fa-solid fa-check-circle"></i>Nhập chuỗi từ bàn phím, gồm cả chuỗi có dấu cách và không có dấu cách.</div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="objective-card"><i class="fa-solid fa-check-circle"></i>Nối chuỗi, đo độ dài chuỗi, truy cập từng ký tự.</div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="objective-card"><i class="fa-solid fa-check-circle"></i>Làm các tác vụ cơ bản: đếm chữ <code>'a'</code>, đảo ngược chuỗi, so sánh chuỗi.</div>
+        </div>
+      </div>
+
+      <div class="concept-callout mt-3">
+        <b><i class="fa-solid fa-lightbulb me-1"></i>Ví dụ đời sống:</b>
+        Tên học sinh <code>"Nguyen Van An"</code>, mã học sinh <code>"HS2026"</code>, số điện thoại <code>"0934353569"</code> đều có thể được lưu bằng chuỗi.
+      </div>
+    </section>
+
+    <section class="mini-slide" id="declare">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-code"></i></span>
+        <span>1. Khai báo chuỗi</span>
+      </div>
+      <p class="slide-subtitle">Chuỗi là một dãy ký tự. Trong C++, ta dùng kiểu <code>string</code>; trong Python, chuỗi được viết trực tiếp bằng dấu nháy.</p>
+
+      <div class="row g-4 align-items-stretch">
+        <div class="col-lg-7">
+          <div class="code-tab-card">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#declare-cpp" type="button" role="tab"><i class="fa-solid fa-code me-1"></i>C++</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#declare-py" type="button" role="tab"><i class="fa-brands fa-python me-1"></i>Python</button>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="declare-cpp" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
     string s = "Xin chao";
     cout &lt;&lt; s;
+    return 0;
 }</code></pre>
-</td>
-<td>
-<pre><code>s = "Xin chao"
+                </div>
+              </div>
+              <div class="tab-pane fade" id="declare-py" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-python">s = "Xin chao"
 print(s)</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<hr>
+        <div class="col-lg-5">
+          <div class="interactive-box">
+            <h4><i class="fa-solid fa-table-cells-large text-primary me-2"></i>Chuỗi dưới dạng các ô ký tự</h4>
+            <p class="text-muted">Chuỗi <code>"Xin chao"</code> có thể hình dung như một dãy ô, mỗi ô chứa một ký tự.</p>
+            <div class="word-board" aria-label="Minh họa chuỗi Xin chao">
+              <div class="char-tile"><div class="char-main">X</div><div class="char-index">i = 0</div></div>
+              <div class="char-tile"><div class="char-main">i</div><div class="char-index">i = 1</div></div>
+              <div class="char-tile"><div class="char-main">n</div><div class="char-index">i = 2</div></div>
+              <div class="char-tile"><div class="char-main">␠</div><div class="char-index">i = 3</div></div>
+              <div class="char-tile"><div class="char-main">c</div><div class="char-index">i = 4</div></div>
+              <div class="char-tile"><div class="char-main">h</div><div class="char-index">i = 5</div></div>
+              <div class="char-tile"><div class="char-main">a</div><div class="char-index">i = 6</div></div>
+              <div class="char-tile"><div class="char-main">o</div><div class="char-index">i = 7</div></div>
+            </div>
+            <div class="success-callout mt-3">
+              <b>Ghi nhớ:</b> chỉ số của chuỗi cũng bắt đầu từ <code>0</code>, giống mảng.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<h2>2. Nhập chuỗi</h2>
+    <section class="mini-slide" id="input">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-keyboard"></i></span>
+        <span>2. Nhập chuỗi</span>
+      </div>
+      <p class="slide-subtitle">Có hai tình huống quan trọng: nhập một từ và nhập cả dòng có dấu cách.</p>
 
-<p><b>Trường hợp 1:</b> Nhập một từ (không có dấu cách)</p>
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>string name;
-cin >> name;
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <h5 class="fw-bold">Nhập một từ</h5>
+            <p class="mb-0 text-muted">Dùng khi dữ liệu không có dấu cách, ví dụ: <code>An</code>, <code>CodePath</code>, <code>ABC123</code>.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <h5 class="fw-bold">Nhập cả dòng</h5>
+            <p class="mb-0 text-muted">Dùng khi dữ liệu có dấu cách, ví dụ: <code>Nguyen Van A</code>, <code>Hoc lap trinh C++</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-tab-card">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#input-cpp-one" type="button" role="tab">C++ · nhập một từ</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#input-cpp-line" type="button" role="tab">C++ · nhập cả dòng</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#input-py" type="button" role="tab">Python</button>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="input-cpp-one" role="tabpanel">
+            <div class="code-panel">
+              <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">string name;
+cin &gt;&gt; name;
 cout &lt;&lt; "Hello " &lt;&lt; name;</code></pre>
-</td>
-<td>
-<pre><code>name = input()
-print("Hello", name)</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
-
-<p><b>Trường hợp 2:</b> Nhập cả dòng (có dấu cách, ví dụ: "Nguyen Van A")</p>
-
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>string full_name;
+            </div>
+          </div>
+          <div class="tab-pane fade" id="input-cpp-line" role="tabpanel">
+            <div class="code-panel">
+              <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">string full_name;
 getline(cin, full_name);
 cout &lt;&lt; "Chao ban " &lt;&lt; full_name;</code></pre>
-<p class="text-muted small">Lưu ý: nếu trước đó bạn đã dùng <code>cin &gt;&gt; ...</code> thì cần thêm <code>cin.ignore();</code> trước getline để bỏ ký tự xuống dòng còn sót lại.</p>
-</td>
-<td>
-<pre><code>full_name = input()
+            </div>
+            <div class="warning-callout m-3 mt-0">
+              <b>Lưu ý:</b> nếu trước đó bạn đã dùng <code>cin &gt;&gt; ...</code> thì cần thêm <code>cin.ignore();</code> trước <code>getline</code> để bỏ ký tự xuống dòng còn sót lại.
+            </div>
+          </div>
+          <div class="tab-pane fade" id="input-py" role="tabpanel">
+            <div class="code-panel">
+              <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-python">name = input()
+print("Hello", name)
+
+full_name = input()
 print("Chao ban", full_name)</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<hr>
+    <section class="mini-slide" id="index">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-location-dot"></i></span>
+        <span>3. Độ dài chuỗi và truy cập ký tự</span>
+      </div>
+      <p class="slide-subtitle">Chuỗi giống một mảng ký tự. Ta có thể lấy độ dài và truy cập từng ký tự bằng chỉ số.</p>
 
-<h2>3. Độ dài chuỗi và truy cập ký tự</h2>
-
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>string s = "abcXYZ";
-cout &lt;&lt; s.size() &lt;&lt; "\\n"; // in ra độ dài
-cout &lt;&lt; s[0];              // 'a'</code></pre>
-</td>
-<td>
-<pre><code>s = "abcXYZ"
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="code-tab-card">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#index-cpp" type="button" role="tab">C++</button></li>
+              <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#index-py" type="button" role="tab">Python</button></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="index-cpp" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">string s = "abcXYZ";
+cout &lt;&lt; s.size() &lt;&lt; "\n";  // in ra độ dài
+cout &lt;&lt; s[0];               // 'a'</code></pre>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="index-py" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-python">s = "abcXYZ"
 print(len(s))   # độ dài
 print(s[0])     # 'a'</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<hr>
+        <div class="col-lg-5">
+          <div class="interactive-box">
+            <h4><i class="fa-solid fa-hand-pointer text-primary me-2"></i>Thử truy cập ký tự</h4>
+            <label class="form-label fw-bold" for="demoStringInput">Nhập chuỗi</label>
+            <input class="form-control form-control-lg" id="demoStringInput" value="abcXYZ">
+            <label class="form-label fw-bold mt-3" for="demoIndexInput">Nhập chỉ số i</label>
+            <input class="form-control form-control-lg" id="demoIndexInput" type="number" value="0" min="0">
+            <button class="btn btn-primary mt-3" id="demoIndexBtn"><i class="fa-solid fa-magnifying-glass me-1"></i>Xem s[i]</button>
+            <div class="result-box mt-3" id="demoIndexResult">Chuỗi <code>abcXYZ</code> có độ dài <b>6</b>. Ký tự tại <code>i = 0</code> là <b>a</b>.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<h2>4. Ví dụ bài toán hay gặp: Đếm số ký tự 'a'</h2>
+    <section class="mini-slide" id="tasks">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-gears"></i></span>
+        <span>4. Các bài toán chuỗi hay gặp</span>
+      </div>
+      <p class="slide-subtitle">Khi mới học, hãy tập nhìn chuỗi như một dãy ký tự rồi duyệt từng ký tự bằng vòng lặp.</p>
 
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <h5 class="fw-bold"><i class="fa-solid fa-plus text-success me-1"></i>Ví dụ: Đếm số ký tự <code>'a'</code></h5>
+          <div class="code-tab-card">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#counta-cpp" type="button" role="tab">C++</button></li>
+              <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#counta-py" type="button" role="tab">Python</button></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="counta-cpp" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
     string s;
     getline(cin, s);
+
     int count_a = 0;
     for (int i = 0; i &lt; (int)s.size(); i++) {
-        if (s[i] == 'a' || s[i] == 'A') count_a++;
+        if (s[i] == 'a' || s[i] == 'A') {
+            count_a++;
+        }
     }
+
     cout &lt;&lt; count_a;
     return 0;
 }</code></pre>
-</td>
-<td>
-<pre><code>s = input()
+                </div>
+              </div>
+              <div class="tab-pane fade" id="counta-py" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-python">s = input()
 count_a = 0
+
 for ch in s:
     if ch == 'a' or ch == 'A':
         count_a += 1
+
 print(count_a)</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<hr>
+        <div class="col-lg-5">
+          <div class="interactive-box">
+            <h4><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>Phân tích chuỗi nhanh</h4>
+            <label class="form-label fw-bold" for="analyzeStringInput">Nhập một chuỗi bất kỳ</label>
+            <input class="form-control form-control-lg" id="analyzeStringInput" value="An hoc C++ 2026">
+            <button class="btn btn-success mt-3" id="analyzeStringBtn"><i class="fa-solid fa-chart-simple me-1"></i>Phân tích</button>
+            <div class="result-box mt-3" id="analyzeStringResult">
+              <span class="metric-pill"><i class="fa-solid fa-ruler"></i>Độ dài: 15</span>
+              <span class="metric-pill"><i class="fa-solid fa-a"></i>Số chữ a/A: 1</span>
+              <span class="metric-pill"><i class="fa-solid fa-hashtag"></i>Số chữ số: 4</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<h2>5. Bài tập tự luyện</h2>
-<ol>
-  <li>Nhập họ và tên, in ra câu: <code>Xin chào, [Tên]!</code> (chỉ lấy tên cuối).</li>
-  <li>Nhập một chuỗi, in ra chuỗi đảo ngược.</li>
-  <li>Cho chuỗi, đếm số lượng chữ số (0-9) xuất hiện trong đó.</li>
-</ol>
+      <div class="table-responsive-clean mt-4">
+        <table class="mini-table">
+          <thead>
+            <tr><th>Thao tác</th><th>Ý nghĩa</th><th>Ví dụ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>s.size()</code></td><td>Lấy độ dài chuỗi trong C++</td><td><code>"abc"</code> có độ dài 3</td></tr>
+            <tr><td><code>s[i]</code></td><td>Lấy ký tự tại vị trí i</td><td><code>s[0]</code> là ký tự đầu tiên</td></tr>
+            <tr><td>Duyệt từng ký tự</td><td>Dùng vòng lặp để kiểm tra từng chữ</td><td>Đếm chữ số, đếm chữ cái, đảo chuỗi</td></tr>
+            <tr><td>So sánh chuỗi</td><td>So sánh theo thứ tự từ điển</td><td><code>"An" &lt; "Binh"</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-<details class="mt-3">
-  <summary class="text-primary" style="cursor:pointer;"><b>🔍 Gợi ý / Lời giải mẫu Python cho bài "đảo ngược chuỗi"</b></summary>
-  <pre><code>s = input()
-rev = s[::-1]   # cắt ngược chuỗi
-print(rev)</code></pre>
-</details>
+    <section class="mini-slide" id="convert">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-right-left"></i></span>
+        <span>5. Ép kiểu và chuyển đổi số ↔ chữ</span>
+      </div>
+      <p class="slide-subtitle">Đây là phần rất hay gặp khi làm bài chuỗi: dữ liệu nhìn giống số nhưng thực chất đang là ký tự hoặc chuỗi.</p>
 
-<details class="mt-3">
-  <summary class="text-success" style="cursor:pointer;"><b>🔍 Gợi ý / Lời giải mẫu C++ cho bài đếm chữ số</b></summary>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
+      <div class="conversion-grid mb-4">
+        <div class="conversion-card">
+          <h5><i class="fa-solid fa-1 text-primary me-1"></i>Ký tự chữ số → số</h5>
+          <p class="text-muted mb-2">Nếu <code>c = '7'</code>, muốn lấy số <code>7</code>:</p>
+          <span class="conversion-formula">int x = c - '0';</span>
+          <p class="mt-2 mb-0 small text-muted">Vì các ký tự <code>'0'</code>, <code>'1'</code>, ..., <code>'9'</code> nằm liên tiếp trong bảng mã.</p>
+        </div>
+        <div class="conversion-card">
+          <h5><i class="fa-solid fa-font text-primary me-1"></i>Số 0..9 → ký tự chữ số</h5>
+          <p class="text-muted mb-2">Nếu <code>x = 7</code>, muốn tạo ký tự <code>'7'</code>:</p>
+          <span class="conversion-formula">char c = x + '0';</span>
+          <p class="mt-2 mb-0 small text-muted">Chỉ dùng trực tiếp khi <code>x</code> là một chữ số từ 0 đến 9.</p>
+        </div>
+        <div class="conversion-card">
+          <h5><i class="fa-solid fa-arrow-right-arrow-left text-primary me-1"></i>Chuỗi số → số nguyên</h5>
+          <p class="text-muted mb-2">Nếu <code>s = "2026"</code>, muốn đổi thành số <code>2026</code>:</p>
+          <span class="conversion-formula">int n = stoi(s);</span>
+          <p class="mt-2 mb-0 small text-muted">Trong Python dùng <code>int(s)</code>.</p>
+        </div>
+        <div class="conversion-card">
+          <h5><i class="fa-solid fa-repeat text-primary me-1"></i>Số nguyên → chuỗi</h5>
+          <p class="text-muted mb-2">Nếu <code>n = 2026</code>, muốn đổi thành chuỗi <code>"2026"</code>:</p>
+          <span class="conversion-formula">string s = to_string(n);</span>
+          <p class="mt-2 mb-0 small text-muted">Trong Python dùng <code>str(n)</code>.</p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <h5 class="fw-bold"><i class="fa-solid fa-code text-success me-1"></i>Ví dụ: tính tổng các chữ số trong chuỗi</h5>
+          <div class="code-tab-card">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#digit-sum-cpp" type="button" role="tab">C++</button></li>
+              <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#digit-sum-py" type="button" role="tab">Python</button></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="digit-sum-cpp" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
     string s;
     getline(cin, s);
+
+    int sum = 0;
+    for (char c : s) {
+        if (c &gt;= '0' &amp;&amp; c &lt;= '9') {
+            int digit = c - '0';
+            sum += digit;
+        }
+    }
+
+    cout &lt;&lt; sum;
+    return 0;
+}</code></pre>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="digit-sum-py" role="tabpanel">
+                <div class="code-panel">
+                  <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-python">s = input()
+sum_digits = 0
+
+for ch in s:
+    if '0' &lt;= ch &lt;= '9':
+        digit = ord(ch) - ord('0')
+        sum_digits += digit
+
+print(sum_digits)</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <details class="lesson-details">
+            <summary><i class="fa-solid fa-circle-info text-primary me-1"></i>Tại sao <code>c - '0'</code> lại ra số?</summary>
+            <div class="mt-3">
+              <p>Trong bảng mã, các ký tự chữ số được xếp liên tiếp:</p>
+              <div class="table-responsive-clean">
+                <table class="mini-table">
+                  <thead><tr><th>Ký tự</th><th>'0'</th><th>'1'</th><th>'2'</th><th>...</th><th>'7'</th></tr></thead>
+                  <tbody><tr><td>Giá trị tương đối</td><td>0</td><td>1</td><td>2</td><td>...</td><td>7</td></tr></tbody>
+                </table>
+              </div>
+              <p class="mb-0 mt-2">Vì vậy, khoảng cách từ <code>'0'</code> đến <code>'7'</code> chính là <code>7</code>.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="interactive-box mb-4">
+            <h4><i class="fa-solid fa-calculator text-primary me-2"></i>Thử chuyển đổi</h4>
+            <label class="form-label fw-bold" for="digitCharInput">Nhập một ký tự chữ số</label>
+            <input class="form-control form-control-lg" id="digitCharInput" maxlength="1" value="7">
+
+            <label class="form-label fw-bold mt-3" for="digitNumberInput">Nhập một số từ 0 đến 9</label>
+            <input class="form-control form-control-lg" id="digitNumberInput" type="number" min="0" max="9" value="5">
+
+            <label class="form-label fw-bold mt-3" for="numberStringInput">Nhập chuỗi số</label>
+            <input class="form-control form-control-lg" id="numberStringInput" value="2026">
+
+            <button class="btn btn-primary mt-3" id="convertBtn"><i class="fa-solid fa-shuffle me-1"></i>Chuyển đổi</button>
+            <div class="result-box mt-3" id="convertResult">Ký tự <code>'7'</code> đổi thành số <b>7</b>.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mini-slide" id="practice">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-dumbbell"></i></span>
+        <span>6. Bài tập tự luyện</span>
+      </div>
+      <p class="slide-subtitle">Các bài đầu ôn lại nội dung gốc; các bài sau luyện ép kiểu và chuyển đổi số - chữ.</p>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="interactive-box">
+            <h4><i class="fa-solid fa-list-check text-primary me-2"></i>Bài tập cơ bản</h4>
+            <ol class="practice-list">
+              <li>Nhập họ và tên, in ra câu: <code>Xin chào, [Tên]!</code> trong đó <code>[Tên]</code> là từ cuối cùng.</li>
+              <li>Nhập một chuỗi, in ra chuỗi đảo ngược.</li>
+              <li>Cho chuỗi, đếm số lượng chữ số <code>0..9</code> xuất hiện trong đó.</li>
+              <li>Nhập một chuỗi, đếm số chữ cái thường, chữ cái hoa và chữ số.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="interactive-box">
+            <h4><i class="fa-solid fa-right-left text-primary me-2"></i>Bài tập ép kiểu / số ↔ chữ</h4>
+            <ol class="practice-list">
+              <li>Nhập chuỗi bất kỳ, tính tổng các chữ số xuất hiện trong chuỗi. Ví dụ <code>"A12B3"</code> có tổng chữ số là <code>6</code>.</li>
+              <li>Nhập một ký tự chữ số <code>c</code>, in ra giá trị số tương ứng. Ví dụ <code>'8'</code> in ra <code>8</code>.</li>
+              <li>Nhập một số nguyên <code>x</code> từ 0 đến 9, in ra ký tự chữ số tương ứng.</li>
+              <li>Nhập số nguyên <code>n</code>, đổi sang chuỗi và in ra số lượng chữ số của <code>n</code>.</li>
+              <li>Mật mã chữ số: nhập chuỗi, mỗi chữ số tăng thêm 1 theo vòng tròn. Ví dụ <code>"A9B2"</code> thành <code>"A0B3"</code>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <details class="lesson-details mt-4">
+        <summary class="text-primary"><i class="fa-solid fa-code me-1"></i>Gợi ý / Lời giải mẫu Python cho bài đảo ngược chuỗi</summary>
+        <div class="code-panel mt-3">
+          <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-python">s = input()
+rev = s[::-1]   # cắt ngược chuỗi
+print(rev)</code></pre>
+        </div>
+      </details>
+
+      <details class="lesson-details">
+        <summary class="text-success"><i class="fa-solid fa-code me-1"></i>Gợi ý / Lời giải mẫu C++ cho bài đếm chữ số</summary>
+        <div class="code-panel mt-3">
+          <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    string s;
+    getline(cin, s);
+
     int cnt = 0;
     for (char c : s) {
-        if (c &gt;= '0' &amp;&amp; c &lt;= '9') cnt++;
+        if (c &gt;= '0' &amp;&amp; c &lt;= '9') {
+            cnt++;
+        }
     }
+
     cout &lt;&lt; cnt;
     return 0;
 }</code></pre>
-</details>
+        </div>
+      </details>
 
-<p class="mt-4 text-center text-info fw-bold">
-➡ Tiếp theo: Hàm - chia chương trình thành các “khối thông minh” có thể tái sử dụng.
-</p>
+      <details class="lesson-details">
+        <summary class="text-primary"><i class="fa-solid fa-code me-1"></i>Gợi ý C++: mật mã chữ số tăng thêm 1</summary>
+        <div class="code-panel mt-3">
+          <button class="copy-code-btn"><i class="fa-regular fa-copy me-1"></i>Copy</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    string s;
+    getline(cin, s);
+
+    for (char &amp;c : s) {
+        if (c &gt;= '0' &amp;&amp; c &lt;= '9') {
+            int digit = c - '0';
+            digit = (digit + 1) % 10;
+            c = char(digit + '0');
+        }
+    }
+
+    cout &lt;&lt; s;
+    return 0;
+}</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <section class="mini-slide" id="quiz">
+      <div class="slide-title">
+        <span class="icon-circle"><i class="fa-solid fa-circle-question"></i></span>
+        <span>7. Quiz kiểm tra nhanh</span>
+      </div>
+      <p class="slide-subtitle">Chọn đáp án đúng. Hệ thống sẽ phản hồi ngay để học sinh tự kiểm tra.</p>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="interactive-box quiz-card" data-answer="B">
+            <h5 class="fw-bold">Câu 1. Với <code>string s = "abc";</code>, <code>s[0]</code> là gì?</h5>
+            <button class="quiz-option" data-choice="A">A. <code>'b'</code></button>
+            <button class="quiz-option" data-choice="B">B. <code>'a'</code></button>
+            <button class="quiz-option" data-choice="C">C. <code>'c'</code></button>
+            <div class="result-box mt-2 quiz-feedback">Chưa chọn đáp án.</div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="interactive-box quiz-card" data-answer="A">
+            <h5 class="fw-bold">Câu 2. Trong C++, nhập cả dòng có dấu cách nên dùng lệnh nào?</h5>
+            <button class="quiz-option" data-choice="A">A. <code>getline(cin, s)</code></button>
+            <button class="quiz-option" data-choice="B">B. <code>cin &gt;&gt; s</code></button>
+            <button class="quiz-option" data-choice="C">C. <code>cout &lt;&lt; s</code></button>
+            <div class="result-box mt-2 quiz-feedback">Chưa chọn đáp án.</div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="interactive-box quiz-card" data-answer="C">
+            <h5 class="fw-bold">Câu 3. Muốn đổi ký tự <code>'8'</code> thành số <code>8</code>, dùng công thức nào?</h5>
+            <button class="quiz-option" data-choice="A">A. <code>'8' + '0'</code></button>
+            <button class="quiz-option" data-choice="B">B. <code>'8' * '0'</code></button>
+            <button class="quiz-option" data-choice="C">C. <code>'8' - '0'</code></button>
+            <div class="result-box mt-2 quiz-feedback">Chưa chọn đáp án.</div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="interactive-box quiz-card" data-answer="B">
+            <h5 class="fw-bold">Câu 4. Trong C++, đổi số nguyên <code>2026</code> thành chuỗi nên dùng gì?</h5>
+            <button class="quiz-option" data-choice="A">A. <code>stoi(2026)</code></button>
+            <button class="quiz-option" data-choice="B">B. <code>to_string(2026)</code></button>
+            <button class="quiz-option" data-choice="C">C. <code>getline(2026)</code></button>
+            <div class="result-box mt-2 quiz-feedback">Chưa chọn đáp án.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="lesson-footer-next">
+      <h3 class="fw-black mb-2"><i class="fa-solid fa-route me-2"></i>Tiếp theo: Hàm</h3>
+      <p>Hàm giúp chia chương trình thành các “khối thông minh” có thể tái sử dụng, giúp code ngắn gọn và dễ kiểm tra hơn.</p>
+    </div>
+  </main>
+</div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+
+<script>
+(function(){
+  function escapeHtml(text){
+    return String(text).replace(/[&<>"]/g, function(ch){
+      return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;'})[ch];
+    });
+  }
+
+  function initHighlight(){
+    if(window.hljs){
+      document.querySelectorAll('#stringLessonRoot pre code').forEach(function(block){
+        window.hljs.highlightElement(block);
+      });
+    }
+  }
+
+  function initCopyButtons(){
+    document.querySelectorAll('#stringLessonRoot .copy-code-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var code = btn.parentElement.querySelector('code');
+        if(!code) return;
+        navigator.clipboard.writeText(code.innerText).then(function(){
+          var old = btn.innerHTML;
+          btn.innerHTML = '<i class="fa-solid fa-check me-1"></i>Đã copy';
+          setTimeout(function(){ btn.innerHTML = old; }, 1200);
+        }).catch(function(){
+          btn.textContent = 'Không copy được';
+        });
+      });
+    });
+  }
+
+  function initProgress(){
+    var bar = document.getElementById('stringLessonProgress');
+    if(!bar) return;
+    function update(){
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var percent = docHeight <= 0 ? 0 : Math.min(100, Math.max(0, scrollTop / docHeight * 100));
+      bar.style.width = percent + '%';
+    }
+    window.addEventListener('scroll', update, {passive:true});
+    update();
+  }
+
+  function initIndexDemo(){
+    var strInput = document.getElementById('demoStringInput');
+    var idxInput = document.getElementById('demoIndexInput');
+    var btn = document.getElementById('demoIndexBtn');
+    var result = document.getElementById('demoIndexResult');
+    if(!strInput || !idxInput || !btn || !result) return;
+
+    function run(){
+      var s = strInput.value;
+      var i = Number(idxInput.value);
+      if(!Number.isInteger(i) || i < 0 || i >= s.length){
+        result.innerHTML = 'Chuỗi có độ dài <b>' + s.length + '</b>. Chỉ số hợp lệ là từ <code>0</code> đến <code>' + Math.max(0, s.length - 1) + '</code>.';
+        return;
+      }
+      result.innerHTML = 'Chuỗi <code>' + escapeHtml(s) + '</code> có độ dài <b>' + s.length + '</b>. Ký tự tại <code>i = ' + i + '</code> là <b>' + escapeHtml(s[i]) + '</b>.';
+    }
+
+    btn.addEventListener('click', run);
+    strInput.addEventListener('input', run);
+    idxInput.addEventListener('input', run);
+    run();
+  }
+
+  function initAnalyzer(){
+    var input = document.getElementById('analyzeStringInput');
+    var btn = document.getElementById('analyzeStringBtn');
+    var result = document.getElementById('analyzeStringResult');
+    if(!input || !btn || !result) return;
+
+    function run(){
+      var s = input.value;
+      var countA = 0;
+      var digits = 0;
+      var upper = 0;
+      var lower = 0;
+      for(var ch of s){
+        if(ch === 'a' || ch === 'A') countA++;
+        if(ch >= '0' && ch <= '9') digits++;
+        if(ch >= 'A' && ch <= 'Z') upper++;
+        if(ch >= 'a' && ch <= 'z') lower++;
+      }
+      var rev = Array.from(s).reverse().join('');
+      result.innerHTML =
+        '<span class="metric-pill"><i class="fa-solid fa-ruler"></i>Độ dài: ' + s.length + '</span>' +
+        '<span class="metric-pill"><i class="fa-solid fa-a"></i>Số a/A: ' + countA + '</span>' +
+        '<span class="metric-pill"><i class="fa-solid fa-hashtag"></i>Số chữ số: ' + digits + '</span>' +
+        '<span class="metric-pill"><i class="fa-solid fa-arrow-up-a-z"></i>Chữ hoa: ' + upper + '</span>' +
+        '<span class="metric-pill"><i class="fa-solid fa-arrow-down-a-z"></i>Chữ thường: ' + lower + '</span>' +
+        '<div class="mt-2">Đảo ngược: <code>' + escapeHtml(rev) + '</code></div>';
+    }
+
+    btn.addEventListener('click', run);
+    input.addEventListener('input', run);
+    run();
+  }
+
+  function initConverter(){
+    var charInput = document.getElementById('digitCharInput');
+    var numInput = document.getElementById('digitNumberInput');
+    var strInput = document.getElementById('numberStringInput');
+    var btn = document.getElementById('convertBtn');
+    var result = document.getElementById('convertResult');
+    if(!charInput || !numInput || !strInput || !btn || !result) return;
+
+    function run(){
+      var c = charInput.value || '';
+      var nRaw = numInput.value;
+      var s = strInput.value.trim();
+      var lines = [];
+
+      if(c.length === 1 && c >= '0' && c <= '9'){
+        lines.push('Ký tự <code>\'' + escapeHtml(c) + '\'</code> đổi thành số <b>' + (c.charCodeAt(0) - '0'.charCodeAt(0)) + '</b> bằng công thức <code>c - \'0\'</code>.');
+      }else{
+        lines.push('<span class="text-danger">Ô ký tự cần nhập đúng một chữ số từ 0 đến 9.</span>');
+      }
+
+      var n = Number(nRaw);
+      if(Number.isInteger(n) && n >= 0 && n <= 9){
+        lines.push('Số <code>' + n + '</code> đổi thành ký tự <b>\'' + String.fromCharCode(n + '0'.charCodeAt(0)) + '\'</b> bằng công thức <code>n + \'0\'</code>.');
+      }else{
+        lines.push('<span class="text-danger">Ô số cần nhập số nguyên từ 0 đến 9.</span>');
+      }
+
+      if(/^[-]?\d+$/.test(s)){
+        var maybe = Number(s);
+        lines.push('Chuỗi số <code>"' + escapeHtml(s) + '"</code> đổi sang số là <b>' + maybe + '</b>. Nếu đổi ngược lại, ta nhận chuỗi <code>"' + escapeHtml(String(maybe)) + '"</code>.');
+      }else{
+        lines.push('<span class="text-warning">Chuỗi số chỉ nên gồm các chữ số, có thể có dấu trừ ở đầu.</span>');
+      }
+
+      result.innerHTML = lines.join('<hr class="my-2">');
+    }
+
+    btn.addEventListener('click', run);
+    charInput.addEventListener('input', run);
+    numInput.addEventListener('input', run);
+    strInput.addEventListener('input', run);
+    run();
+  }
+
+  function initQuiz(){
+    document.querySelectorAll('#stringLessonRoot .quiz-card').forEach(function(card){
+      var answer = card.getAttribute('data-answer');
+      var feedback = card.querySelector('.quiz-feedback');
+      card.querySelectorAll('.quiz-option').forEach(function(option){
+        option.addEventListener('click', function(){
+          card.querySelectorAll('.quiz-option').forEach(function(btn){
+            btn.classList.remove('correct', 'wrong');
+          });
+          var chosen = option.getAttribute('data-choice');
+          if(chosen === answer){
+            option.classList.add('correct');
+            feedback.innerHTML = '<b class="text-success"><i class="fa-solid fa-check me-1"></i>Chính xác!</b> Em đã hiểu ý chính của phần này.';
+          }else{
+            option.classList.add('wrong');
+            feedback.innerHTML = '<b class="text-danger"><i class="fa-solid fa-xmark me-1"></i>Chưa đúng.</b> Hãy xem lại công thức hoặc ví dụ ngay phía trên.';
+          }
+        });
+      });
+    });
+  }
+
+  function initSmoothNav(){
+    document.querySelectorAll('#stringLessonRoot .lesson-nav-pills a').forEach(function(link){
+      link.addEventListener('click', function(e){
+        var target = document.querySelector(link.getAttribute('href'));
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    initHighlight();
+    initCopyButtons();
+    initProgress();
+    initIndexDemo();
+    initAnalyzer();
+    initConverter();
+    initQuiz();
+    initSmoothNav();
+  });
+})();
+</script>

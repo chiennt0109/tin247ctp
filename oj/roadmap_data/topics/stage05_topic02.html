@@ -1,64 +1,251 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu nguyên lý chia để trị.</li>
-  <li>Biết cách tách bài toán lớn thành các phần nhỏ, giải từng phần rồi kết hợp.</li>
-</ul>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#06b6d4;--g:#16a34a;--o:#f97316;--r:#ef4444;--bg:#f6f8ff;--text:#1e293b;--b:#dbe4ff;--code:#0f172a}
+.lesson-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(79,70,229,.14),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(6,182,212,.16),transparent 28rem),linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border-radius:22px;padding:clamp(18px,2.6vw,34px);line-height:1.75}
+.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}
+.lesson-hero{position:relative;overflow:hidden;color:#fff;padding:clamp(26px,4vw,46px);border-radius:28px;background:linear-gradient(135deg,rgba(67,56,202,.96),rgba(37,99,235,.92));box-shadow:0 25px 60px rgba(79,70,229,.25);margin-bottom:24px}
+.lesson-hero:after{content:"";position:absolute;width:260px;height:260px;right:-85px;top:-80px;border-radius:999px;background:rgba(255,255,255,.14)}
+.hero-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#eef2ff;padding:7px 12px;border-radius:999px;font-weight:700;font-size:.92rem;margin-bottom:12px}
+.lesson-hero h1{margin:0 0 12px;font-size:clamp(1.75rem,4vw,3rem);font-weight:900}.lesson-hero p{color:#e0f2fe;max-width:980px;font-size:1.05rem;margin:0}
+.hero-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}.hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px}.hero-stat b{display:block;font-size:1.2rem;color:#fff}.hero-stat span{color:#dbeafe;font-size:.9rem}
+.lesson-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.82);backdrop-filter:blur(10px);padding:10px 0 12px}.lesson-progress{height:10px;border-radius:999px;background:#dbeafe;overflow:hidden}.lesson-progress-bar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--p),var(--a));transition:width .15s linear}.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}.lesson-nav a{text-decoration:none;color:var(--pd);background:#eef2ff;border:1px solid #dbe4ff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:.9rem}
+.lesson-card{background:rgba(255,255,255,.94);border:1px solid var(--b);border-radius:24px;padding:clamp(18px,2.4vw,28px);margin:20px 0;box-shadow:0 16px 42px rgba(30,64,175,.08)}.lesson-card h2{color:var(--pd);margin:0 0 14px;font-weight:900;display:flex;align-items:center;gap:10px}.lesson-card h3{color:#334155;margin-top:20px;font-weight:850}.mini-slide{animation:lessonFadeUp .55s ease both}@keyframes lessonFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.info-box{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0}.callout{border-left:6px solid var(--a);background:#ecfeff;border-radius:16px;padding:14px 16px;margin:14px 0}.warn{border-left-color:var(--o);background:#fff7ed}.danger{border-left-color:var(--r);background:#fff1f2}.success{border-left-color:var(--g);background:#f0fdf4}
+.lesson-table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:18px}.lesson-table{width:100%;border-collapse:collapse;min-width:860px;background:#fff}.lesson-table th,.lesson-table td{border-bottom:1px solid #e2e8f0;padding:13px 14px;text-align:left;vertical-align:top}.lesson-table th{background:#eef2ff;color:#312e81;font-weight:900}.lesson-table tr:last-child td{border-bottom:none}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:800;font-size:.88rem}.green{background:#dcfce7;color:#166534}.orange{background:#ffedd5;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.cyan{background:#cffafe;color:#155e75}
+.code-tabs{border:1px solid var(--b);border-radius:18px;overflow:hidden;background:var(--code);margin:14px 0}.tab-buttons{display:flex;flex-wrap:wrap;background:#edf2ff;border-bottom:1px solid #dbe4ff}.tab-btn{appearance:none;border:0;background:transparent;padding:12px 16px;font-weight:900;color:#334155;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.tab-panel{display:none;position:relative}.tab-panel.active{display:block}.copy-btn{position:absolute;top:10px;right:10px;z-index:3;border:0;background:rgba(255,255,255,.13);color:#e2e8f0;border-radius:999px;padding:6px 10px;font-size:.8rem;cursor:pointer}.copy-btn:hover{background:rgba(255,255,255,.25)}
+.lesson-page pre{margin:0;max-height:560px;overflow:auto;background:var(--code);color:#f8fafc;padding:22px;font-size:14.5px;line-height:1.7;border-radius:0;white-space:pre;tab-size:4}.lesson-page code{font-family:Consolas,Monaco,"Courier New",monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{background:#fdf2f8;color:#be185d;border-radius:7px;padding:2px 6px;font-weight:800}
+.dc-visual{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe4ff;border-radius:22px;padding:18px}.array-line,.merge-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}.array-cell,.merge-box{min-width:46px;text-align:center;padding:9px 10px;border-radius:12px;background:#eef2ff;color:#312e81;border:1px solid #c7d2fe;font-weight:900;transition:.2s}.array-cell.active{background:linear-gradient(180deg,#fbbf24,#f97316);color:#fff;border-color:#fb923c;transform:translateY(-2px)}.tree-area{min-height:260px;padding:14px;border-radius:18px;background:#f8fafc;border:1px dashed #bfdbfe;overflow:auto}.tree-level{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:12px 0}.tree-node{padding:10px 12px;border-radius:16px;background:#eef2ff;color:#312e81;border:1px solid #c7d2fe;font-weight:900;min-width:120px;text-align:center;box-shadow:0 8px 18px rgba(79,70,229,.10)}.tree-node.done{background:#dcfce7;color:#166534;border-color:#22c55e}.tree-node.active{background:#fee2e2;color:#991b1b;border-color:#ef4444;transform:scale(1.03)}
+.log-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:105px;max-height:260px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:14px;color:#334155}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.btn-lesson{border:0;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;background:var(--p);color:#fff;box-shadow:0 8px 18px rgba(79,70,229,.2)}.btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none}.btn-lesson.orange{background:var(--o)}.input-lesson{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:11px 13px;font:inherit;outline:none;background:#fff}.input-lesson:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.12)}
+.merge-box.pick{background:#dcfce7;border-color:#22c55e;color:#166534;transform:translateY(-2px)}.merge-box.left{background:#eef2ff;color:#312e81}.merge-box.right{background:#cffafe;color:#155e75}.merge-box.out{background:linear-gradient(180deg,#86efac,#16a34a);color:#fff;border-color:#22c55e}
+.exercise-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.exercise-card h3{margin-top:0}.quiz-item{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 0;background:#fff}.quiz-options{display:grid;gap:8px;margin-top:10px}.quiz-option{text-align:left;border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}.feedback{margin-top:8px;font-weight:800}.checklist{display:grid;gap:10px}.checkitem{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px}.checkitem i{margin-top:5px;color:var(--g)}
+@media(max-width:900px){.grid-2,.grid-3,.hero-grid{grid-template-columns:1fr}.lesson-page{padding:14px;border-radius:16px}.lesson-hero{border-radius:20px}.tree-node{min-width:90px;font-size:.9rem}}
+</style>
 
-<hr>
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-code-branch"></i> Chuyên đề thuật toán nền tảng</div>
+    <h1>🧠 Chia để trị: Divide, Solve, Combine</h1>
+    <p>Bài học này giúp học sinh hiểu tư duy <b>chia bài toán lớn thành bài toán nhỏ</b>, giải từng phần rồi kết hợp lại. Đây là nền tảng của Binary Search, Merge Sort, Quick Sort, Segment Tree và nhiều thuật toán hiện đại.</p>
+    <div class="hero-grid">
+      <div class="hero-stat"><b>Divide</b><span>Chia bài toán</span></div>
+      <div class="hero-stat"><b>Solve</b><span>Giải bài toán con</span></div>
+      <div class="hero-stat"><b>Combine</b><span>Gộp kết quả</span></div>
+      <div class="hero-stat"><b>Ứng dụng</b><span>Sort, Search, Segment Tree</span></div>
+    </div>
+  </div>
 
-<h2>📘 Ý tưởng</h2>
-<p>“Chia để trị” gồm 3 bước:</p>
-<ol>
-  <li>Chia bài toán thành 2 hoặc nhiều phần nhỏ.</li>
-  <li>Giải quyết từng phần bằng đệ quy.</li>
-  <li>Kết hợp các kết quả để ra kết quả cuối.</li>
-</ol>
+  <div class="lesson-progress-wrap">
+    <div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div>
+    <div class="lesson-nav">
+      <a href="#goals">Mục tiêu</a><a href="#concept">Ý tưởng</a><a href="#simulation">Mô phỏng</a><a href="#code">Code mẫu</a><a href="#modern">Ứng dụng</a><a href="#merge">Merge</a><a href="#mistakes">Lỗi hay nhầm</a><a href="#practice">Bài tập</a>
+    </div>
+  </div>
 
-<hr>
+  <section class="lesson-card mini-slide" id="goals">
+    <h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2>
+    <div class="grid-2">
+      <div class="info-box"><h3>Học xong cần làm được</h3><ul><li>Hiểu nguyên lý <b>chia để trị</b>.</li><li>Biết tách bài toán lớn thành các phần nhỏ, giải từng phần rồi kết hợp.</li><li>Viết được hàm chia để trị đơn giản: tính tổng, tìm max, đếm số chẵn.</li><li>Nhận ra các bài có thể dùng Binary Search, Merge Sort, Segment Tree.</li></ul></div>
+      <div class="info-box"><h3>Ví dụ đời sống</h3><ul><li>Chia lớp thành nhóm nhỏ để kiểm tra bài nhanh hơn.</li><li>Tìm tên trong danh bạ đã sắp xếp bằng cách chia đôi.</li><li>Gộp hai danh sách đã sắp xếp thành một danh sách lớn.</li></ul></div>
+    </div>
+  </section>
 
-<h2>💻 Ví dụ: Tính tổng dãy số bằng chia để trị</h2>
+  <section class="lesson-card mini-slide" id="concept">
+    <h2><i class="fa-solid fa-diagram-project"></i> 1. Ý tưởng chia để trị</h2>
+    <p>“Chia để trị” gồm 3 bước quan trọng:</p>
+    <div class="grid-3">
+      <div class="info-box"><span class="pill green">1. Divide</span><h3>Chia</h3><p>Chia bài toán ban đầu thành hai hoặc nhiều bài toán nhỏ hơn.</p></div>
+      <div class="info-box"><span class="pill orange">2. Solve</span><h3>Giải</h3><p>Giải các bài toán con, thường bằng đệ quy hoặc một thuật toán phù hợp.</p></div>
+      <div class="info-box"><span class="pill cyan">3. Combine</span><h3>Kết hợp</h3><p>Gộp kết quả các bài toán con để tạo ra kết quả cuối cùng.</p></div>
+    </div>
+    <div class="callout"><b>Dấu hiệu nhận biết:</b> đề bài có thể chia đoạn <code>[l, r]</code> thành <code>[l, m]</code> và <code>[m+1, r]</code>, hoặc chia dữ liệu làm hai nửa rồi xử lý độc lập.</div>
+    <div class="callout warn"><b>Không phải cứ có đệ quy là chia để trị.</b> Chia để trị cần có ý tưởng chia bài toán thành bài toán con và thường có bước kết hợp kết quả.</div>
+  </section>
 
-<h4>C++</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+  <section class="lesson-card mini-slide" id="simulation">
+    <h2><i class="fa-solid fa-play"></i> 2. Mô phỏng: tính tổng mảng bằng chia để trị</h2>
+    <p>Với mảng <code>5 2 7 1 4 3 6 8</code>, ta chia đôi đến khi còn một phần tử, sau đó cộng kết quả từ dưới lên.</p>
+    <div class="grid-2">
+      <div class="dc-visual">
+        <label><b>Nhập mảng</b></label>
+        <input class="input-lesson" id="dcArrayInput" value="5 2 7 1 4 3 6 8">
+        <div class="controls"><button class="btn-lesson" id="dcNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="dcResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button><button class="btn-lesson orange" id="dcLoadBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Nạp ví dụ</button></div>
+        <div><b>Mảng hiện tại:</b></div><div class="array-line" id="dcArrayLine"></div>
+      </div>
+      <div><div class="tree-area" id="dcTreeArea"></div><div class="log-box" id="dcLog" style="margin-top:12px">Nhấn “Bước tiếp” để quan sát quá trình chia và gộp.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="code">
+    <h2><i class="fa-solid fa-code"></i> 3. Code mẫu: tính tổng dãy số bằng chia để trị</h2>
+    <p>Nội dung gốc của bài là tính tổng mảng bằng chia để trị. Bản dưới đây viết rõ hơn, có kiểu dữ liệu <code>long long</code> để tránh tràn số khi tổng lớn.</p>
+    <div class="code-tabs" data-tabs="sum">
+      <div class="tab-buttons"><button class="tab-btn active" data-target="sum-cpp">C++</button><button class="tab-btn" data-target="sum-py">Python</button></div>
+      <div class="tab-panel active" id="sum-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int sumRange(vector&lt;int&gt;& a, int l, int r){
-    if(l==r) return a[l];
-    int m=(l+r)/2;
-    return sumRange(a,l,m)+sumRange(a,m+1,r);
-}
-int main(){
-    int n;cin>>n;
-    vector&lt;int&gt; a(n);
-    for(int i=0;i&lt;n;i++)cin>>a[i];
-    cout&lt;&lt;sumRange(a,0,n-1);
-}</code></pre>
 
-<h4>Python</h4>
-<pre><code>def sum_range(a, l, r):
+long long sumRange(const vector&lt;int&gt;&amp; a, int l, int r) {
+    if (l == r) return a[l];          // bài toán nhỏ nhất
+
+    int m = (l + r) / 2;
+    long long leftSum = sumRange(a, l, m);
+    long long rightSum = sumRange(a, m + 1, r);
+
+    return leftSum + rightSum;        // kết hợp kết quả
+}
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    cout &lt;&lt; sumRange(a, 0, n - 1);
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="sum-py"><button class="copy-btn">Sao chép</button><pre><code>def sum_range(a, l, r):
     if l == r:
-        return a[l]
+        return a[l]          # bài toán nhỏ nhất
+
     m = (l + r) // 2
-    return sum_range(a, l, m) + sum_range(a, m + 1, r)
+    left_sum = sum_range(a, l, m)
+    right_sum = sum_range(a, m + 1, r)
+
+    return left_sum + right_sum
+
 n = int(input())
 a = list(map(int, input().split()))
-print(sum_range(a, 0, n-1))</code></pre>
 
-<hr>
+print(sum_range(a, 0, n - 1))</code></pre></div>
+    </div>
+    <div class="callout warn">Với bài chỉ tính tổng mảng, cách duyệt một vòng <code>O(n)</code> thường đơn giản hơn. Ví dụ này dùng để học tư duy chia để trị. Khi bài có nhiều truy vấn hoặc cấu trúc phức tạp hơn, tư duy này dẫn tới Segment Tree.</div>
+  </section>
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Tính tổng các phần tử trong mảng bằng chia để trị.</li>
-  <li>Tìm phần tử lớn nhất trong mảng bằng chia để trị.</li>
-  <li>Đếm số phần tử chẵn trong mảng bằng chia để trị.</li>
-</ol>
+  <section class="lesson-card mini-slide" id="modern">
+    <h2><i class="fa-solid fa-sparkles"></i> 4. Ứng dụng còn dùng nhiều hiện nay</h2>
+    <div class="lesson-table-wrap"><table class="lesson-table"><thead><tr><th>Ứng dụng</th><th>Cách chia</th><th>Cách kết hợp</th><th>Độ phức tạp thường gặp</th><th>Ghi chú</th></tr></thead><tbody>
+      <tr><td><b>Binary Search</b></td><td>Chia đôi khoảng tìm kiếm.</td><td>Giữ lại nửa có khả năng chứa đáp án.</td><td><span class="pill green">O(log n)</span></td><td>Cần dữ liệu có thứ tự hoặc tính đơn điệu.</td></tr>
+      <tr><td><b>Merge Sort</b></td><td>Chia mảng thành hai nửa.</td><td>Gộp hai nửa đã sắp xếp.</td><td><span class="pill cyan">O(n log n)</span></td><td>Tốt để hiểu tư duy chia rồi gộp.</td></tr>
+      <tr><td><b>Quick Sort</b></td><td>Chia theo pivot.</td><td>Nhỏ/lớn hơn pivot nằm đúng phía.</td><td><span class="pill cyan">Trung bình O(n log n)</span></td><td>Không nên tự viết ẩu nếu chưa chắc.</td></tr>
+      <tr><td><b>Segment Tree</b></td><td>Chia đoạn thành hai nửa.</td><td>Lưu kết quả đoạn cha từ hai đoạn con.</td><td><span class="pill cyan">Build O(n), query O(log n)</span></td><td>Mạnh cho truy vấn đoạn.</td></tr>
+    </tbody></table></div>
+  </section>
 
-<details>
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python
-def max_range(a, l, r):
-    if l == r: return a[l]
-    m = (l + r)//2
-    return max(max_range(a,l,m), max_range(a,m+1,r))
-a = [1,7,3,9,2,8]
-print(max_range(a,0,len(a)-1))</code></pre>
-</details>
+  <section class="lesson-card mini-slide" id="merge">
+    <h2><i class="fa-solid fa-layer-group"></i> 5. Mô phỏng gộp hai mảng đã sắp xếp</h2>
+    <p>Đây là bước “Combine” quan trọng trong Merge Sort. Khi hai nửa đã sắp xếp, ta dùng hai con trỏ để gộp thành một mảng tăng dần.</p>
+    <div class="grid-2">
+      <div class="dc-visual"><div><b>Mảng trái:</b></div><div class="merge-row" id="mergeLeft"></div><div><b>Mảng phải:</b></div><div class="merge-row" id="mergeRight"></div><div><b>Kết quả:</b></div><div class="merge-row" id="mergeOutput"></div><div class="controls"><button class="btn-lesson" id="mergeNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="mergeResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div></div>
+      <div class="log-box" id="mergeLog">Nhấn “Bước tiếp” để xem cách gộp hai mảng.</div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-magnifying-glass-chart"></i> 6. Khi nào nên dùng chia để trị?</h2>
+    <div class="grid-3">
+      <div class="info-box"><span class="pill green">Nên dùng</span><ul><li>Bài toán chia được thành hai nửa tương tự nhau.</li><li>Kết quả bài lớn tạo được từ kết quả bài nhỏ.</li><li>Cần tối ưu từ <code>O(n²)</code> xuống <code>O(n log n)</code>.</li></ul></div>
+      <div class="info-box"><span class="pill orange">Cân nhắc</span><ul><li>Bài chỉ cần một vòng lặp đơn giản.</li><li>Đệ quy quá sâu có nguy cơ tràn stack.</li><li>Bước kết hợp quá phức tạp.</li></ul></div>
+      <div class="info-box"><span class="pill red">Không nên ép dùng</span><ul><li>Chia xong nhưng không giảm độ khó.</li><li>Không có điều kiện dừng rõ ràng.</li><li>Dữ liệu nhỏ và cách đơn giản đã đủ tốt.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="mistakes">
+    <h2><i class="fa-solid fa-triangle-exclamation"></i> 7. Lỗi học sinh hay nhầm</h2>
+    <div class="checklist">
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Quên điều kiện dừng.</b><br>Với đoạn <code>[l, r]</code>, thường dừng khi <code>l == r</code> hoặc <code>l &gt; r</code> tùy bài.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Tính sai mốc giữa.</b><br>Nên dùng <code>m = l + (r - l) / 2</code> khi chỉ số lớn.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Chia sai đoạn.</b><br>Nếu dùng <code>[l, m]</code> thì nửa phải phải là <code>[m + 1, r]</code>, tránh lặp vô hạn.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Chỉ chia mà không biết gộp.</b><br>Bước kết hợp quyết định lời giải đúng hay sai.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="practice">
+    <h2><i class="fa-solid fa-dumbbell"></i> 8. Bài tập luyện tập phân loại</h2>
+    <div class="grid-2">
+      <div class="exercise-card"><h3>📘 Mức 1 - Cơ bản</h3><ol><li>Tính tổng mảng bằng chia để trị.</li><li>Tìm phần tử lớn nhất bằng chia để trị.</li><li>Đếm số phần tử chẵn bằng chia để trị.</li></ol></div>
+      <div class="exercise-card"><h3>📗 Mức 2 - Trung bình</h3><ol><li>Tìm min trong đoạn <code>[l, r]</code>.</li><li>Đếm số phần tử dương.</li><li>Kiểm tra mảng có toàn số chẵn hay không.</li></ol></div>
+      <div class="exercise-card"><h3>📙 Mức 3 - Nâng cao</h3><ol><li>Cài đặt Merge Sort.</li><li>Đếm số cặp nghịch thế bằng Merge Sort.</li><li>Tìm tổng lớn nhất của dãy con liên tiếp bằng chia để trị.</li></ol></div>
+      <div class="exercise-card"><h3>🐉 Mức 4 - HSG định hướng</h3><ol><li>Xây dựng Segment Tree truy vấn tổng đoạn.</li><li>Tìm cặp điểm gần nhất trên mặt phẳng bằng chia để trị.</li><li>Divide and conquer optimization khi học DP nâng cao.</li></ol></div>
+    </div>
+    <details class="mt-3"><summary style="cursor:pointer;color:#2563eb;font-weight:900">💡 Xem lời giải mẫu: tìm max bằng chia để trị</summary>
+      <div class="code-tabs" data-tabs="max">
+        <div class="tab-buttons"><button class="tab-btn active" data-target="max-cpp">C++</button><button class="tab-btn" data-target="max-py">Python</button></div>
+        <div class="tab-panel active" id="max-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int maxRange(const vector&lt;int&gt;&amp; a, int l, int r) {
+    if (l == r) return a[l];
+
+    int m = (l + r) / 2;
+    int leftMax = maxRange(a, l, m);
+    int rightMax = maxRange(a, m + 1, r);
+
+    return max(leftMax, rightMax);
+}
+
+int main() {
+    vector&lt;int&gt; a = {1, 7, 3, 9, 2, 8};
+    cout &lt;&lt; maxRange(a, 0, (int)a.size() - 1);
+    return 0;
+}</code></pre></div>
+        <div class="tab-panel" id="max-py"><button class="copy-btn">Sao chép</button><pre><code>def max_range(a, l, r):
+    if l == r:
+        return a[l]
+
+    m = (l + r) // 2
+    return max(max_range(a, l, m), max_range(a, m + 1, r))
+
+a = [1, 7, 3, 9, 2, 8]
+print(max_range(a, 0, len(a) - 1))</code></pre></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-circle-question"></i> 9. Quiz kiểm tra nhanh</h2>
+    <div class="quiz-item" data-answer="b"><b>Câu 1.</b> Chia để trị thường gồm những bước nào?<div class="quiz-options"><button class="quiz-option" data-choice="a">Nhập, xuất, kết thúc</button><button class="quiz-option" data-choice="b">Chia, giải bài toán con, kết hợp</button><button class="quiz-option" data-choice="c">Sắp xếp, tìm kiếm, in kết quả</button></div><div class="feedback"></div></div>
+    <div class="quiz-item" data-answer="a"><b>Câu 2.</b> Với bài tính tổng đoạn <code>[l, r]</code>, điều kiện dừng thường là:<div class="quiz-options"><button class="quiz-option" data-choice="a"><code>l == r</code></button><button class="quiz-option" data-choice="b"><code>l &lt; r</code></button><button class="quiz-option" data-choice="c">Không cần điều kiện dừng</button></div><div class="feedback"></div></div>
+    <div class="quiz-item" data-answer="c"><b>Câu 3.</b> Thuật toán nào là ví dụ điển hình của chia để trị?<div class="quiz-options"><button class="quiz-option" data-choice="a">Duyệt mảng một vòng</button><button class="quiz-option" data-choice="b">Cộng hai số</button><button class="quiz-option" data-choice="c">Merge Sort</button></div><div class="feedback"></div></div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2>
+    <div class="callout success">Chia để trị là tư duy rất quan trọng: <b>chia bài toán</b>, <b>giải bài toán con</b>, rồi <b>kết hợp kết quả</b>. Ví dụ tính tổng bằng chia để trị giúp học cấu trúc cơ bản; các ứng dụng mạnh hơn gồm Binary Search, Merge Sort, Quick Sort và Segment Tree.</div>
+    <p style="text-align:center;color:#2563eb;font-weight:900;font-size:1.05rem">➡ Tiếp theo: Merge Sort và các bài toán đếm nghịch thế, truy vấn đoạn.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
+function parseArray(t){return String(t||'').trim().split(/\s+/).filter(Boolean).map(Number).filter(function(x){return Number.isFinite(x)})}
+function initProgress(){var bar=$('#lessonProgressBar');if(!bar)return;function upd(){var d=document.documentElement,st=window.scrollY||d.scrollTop||0,h=Math.max(1,d.scrollHeight-window.innerHeight);bar.style.width=Math.min(100,Math.max(0,st/h*100))+'%'}window.addEventListener('scroll',upd,{passive:true});upd()}
+function initTabs(){$all('.code-tabs').forEach(function(box){$all('.tab-btn',box).forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-target');$all('.tab-btn',box).forEach(function(b){b.classList.remove('active')});$all('.tab-panel',box).forEach(function(p){p.classList.remove('active')});btn.classList.add('active');var t=document.getElementById(id);if(t)t.classList.add('active')})})})}
+function initCopy(){$all('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=btn.closest('.tab-panel')||btn.parentElement,c=p?p.querySelector('code'):null,txt=c?c.textContent:'';function ok(){var o=btn.textContent;btn.textContent='Đã chép';setTimeout(function(){btn.textContent=o},1200)}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(function(){fallback(txt);ok()})}else{fallback(txt);ok()}})});function fallback(txt){var a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a)}}
+var dc={arr:[],steps:[],idx:0};
+function clone(levels){return levels.map(function(l){return l.map(function(n){return{id:n.id,text:n.text,done:n.done,value:n.value}})})}
+function mark(levels,id,val){levels.forEach(function(l){l.forEach(function(n){if(n.id===id){n.done=true;n.value=val;n.text=n.text+' → '+val}})})}
+function buildSteps(arr){var levels=[],steps=[];function ensure(d){if(!levels[d])levels[d]=[]}function seg(l,r){return'['+l+','+r+'] = '+arr.slice(l,r+1).join(' ')}function rec(l,r,d){ensure(d);var id=l+'-'+r;levels[d].push({id:id,text:seg(l,r),done:false});steps.push({levels:clone(levels),activeId:id,message:'Xét đoạn ['+l+','+r+'].'});if(l===r){mark(levels,id,arr[l]);steps.push({levels:clone(levels),activeId:id,message:'Đoạn chỉ có một phần tử a['+l+'] = '+arr[l]+', trả về '+arr[l]+'.'});return arr[l]}var m=Math.floor((l+r)/2);steps.push({levels:clone(levels),activeId:id,message:'Chia đoạn ['+l+','+r+'] thành ['+l+','+m+'] và ['+(m+1)+','+r+'].'});var left=rec(l,m,d+1),right=rec(m+1,r,d+1),total=left+right;mark(levels,id,total);steps.push({levels:clone(levels),activeId:id,message:'Gộp kết quả: '+left+' + '+right+' = '+total+'.'});return total}if(arr.length){rec(0,arr.length-1,0);steps.push({levels:clone(levels),activeId:'',message:'Hoàn tất. Tổng toàn mảng = '+arr.reduce(function(s,x){return s+x},0)+'.'})}return steps}
+function renderDc(){var line=$('#dcArrayLine'),area=$('#dcTreeArea'),log=$('#dcLog');if(!line||!area||!log)return;var step=dc.steps[dc.idx];line.innerHTML=dc.arr.map(function(x,i){return'<div class="array-cell">'+esc(x)+'<br><span style="font-size:.75rem;color:#64748b">i='+i+'</span></div>'}).join('');if(!step){area.innerHTML='<div style="color:#64748b;font-weight:800;text-align:center;padding:20px">Chưa có dữ liệu</div>';return}area.innerHTML=step.levels.map(function(level){return'<div class="tree-level">'+level.map(function(n){var cls='tree-node'+(n.done?' done':'')+(n.id===step.activeId?' active':'');return'<div class="'+cls+'">'+esc(n.text)+'</div>'}).join('')+'</div>'}).join('');log.innerHTML='<b>Bước '+dc.idx+'/'+(dc.steps.length-1)+'</b><br>'+esc(step.message)}
+function resetDc(){var arr=parseArray($('#dcArrayInput')?$('#dcArrayInput').value:'');if(!arr.length)arr=[5,2,7,1,4,3,6,8];if(arr.length>10)arr=arr.slice(0,10);dc.arr=arr;dc.steps=buildSteps(arr);dc.idx=0;if($('#dcArrayInput'))$('#dcArrayInput').value=arr.join(' ');renderDc()}
+function nextDc(){if(!dc.steps.length)resetDc();if(dc.idx<dc.steps.length-1)dc.idx++;renderDc()}
+function initDc(){$('#dcNextBtn')&&$('#dcNextBtn').addEventListener('click',nextDc);$('#dcResetBtn')&&$('#dcResetBtn').addEventListener('click',resetDc);$('#dcLoadBtn')&&$('#dcLoadBtn').addEventListener('click',function(){if($('#dcArrayInput'))$('#dcArrayInput').value='5 2 7 1 4 3 6 8';resetDc()});resetDc()}
+var ms={left:[1,4,7],right:[2,3,8],i:0,j:0,out:[]};
+function renderMerge(msg){var l=$('#mergeLeft'),r=$('#mergeRight'),o=$('#mergeOutput'),log=$('#mergeLog');if(!l||!r||!o||!log)return;l.innerHTML=ms.left.map(function(x,idx){return'<div class="merge-box left'+(idx===ms.i?' pick':'')+'">'+x+'</div>'}).join('');r.innerHTML=ms.right.map(function(x,idx){return'<div class="merge-box right'+(idx===ms.j?' pick':'')+'">'+x+'</div>'}).join('');o.innerHTML=ms.out.length?ms.out.map(function(x){return'<div class="merge-box out">'+x+'</div>'}).join(''):'<span style="color:#64748b;font-weight:800">Chưa có phần tử nào</span>';log.innerHTML=msg||'So sánh phần tử đầu còn lại của hai mảng, chọn số nhỏ hơn đưa vào kết quả.'}
+function resetMerge(){ms={left:[1,4,7],right:[2,3,8],i:0,j:0,out:[]};renderMerge('Bắt đầu gộp hai mảng đã sắp xếp: [1,4,7] và [2,3,8].')}
+function nextMerge(){if(ms.i>=ms.left.length&&ms.j>=ms.right.length){renderMerge('Hoàn tất. Mảng sau khi gộp là: '+ms.out.join(' ')+'.');return}var msg='';if(ms.i>=ms.left.length){var rv=ms.right[ms.j++];ms.out.push(rv);msg='Mảng trái đã hết, đưa '+rv+' từ mảng phải vào kết quả.'}else if(ms.j>=ms.right.length){var lv=ms.left[ms.i++];ms.out.push(lv);msg='Mảng phải đã hết, đưa '+lv+' từ mảng trái vào kết quả.'}else if(ms.left[ms.i]<=ms.right[ms.j]){var pl=ms.left[ms.i++];ms.out.push(pl);msg='Chọn '+pl+' từ mảng trái.'}else{var pr=ms.right[ms.j++];ms.out.push(pr);msg='Chọn '+pr+' từ mảng phải.'}renderMerge(msg)}
+function initMerge(){$('#mergeNextBtn')&&$('#mergeNextBtn').addEventListener('click',nextMerge);$('#mergeResetBtn')&&$('#mergeResetBtn').addEventListener('click',resetMerge);resetMerge()}
+function initQuiz(){$all('.quiz-item').forEach(function(item){var ans=item.getAttribute('data-answer'),fb=item.querySelector('.feedback');$all('.quiz-option',item).forEach(function(btn){btn.addEventListener('click',function(){$all('.quiz-option',item).forEach(function(b){b.classList.remove('correct','wrong')});if(btn.getAttribute('data-choice')===ans){btn.classList.add('correct');if(fb)fb.textContent='Đúng rồi!'}else{btn.classList.add('wrong');var right=item.querySelector('.quiz-option[data-choice="'+ans+'"]');if(right)right.classList.add('correct');if(fb)fb.textContent='Chưa đúng. Em xem lại phần lý thuyết phía trên.'}})})})}
+function initHighlightSafe(){if(window.hljs&&typeof window.hljs.highlightAll==='function'){try{window.hljs.highlightAll()}catch(e){}}}
+document.addEventListener('DOMContentLoaded',function(){initProgress();initTabs();initCopy();initDc();initMerge();initQuiz();initHighlightSafe()});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

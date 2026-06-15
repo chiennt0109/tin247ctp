@@ -1,54 +1,471 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu khái niệm độ phức tạp thời gian của thuật toán.</li>
-  <li>Biết cách đọc, ước lượng và so sánh hiệu quả giữa các giải pháp.</li>
-  <li>Phân biệt O(1), O(n), O(n log n), O(n²).</li>
-</ul>
+<style>
+:root {
+  --lesson-primary: #4f46e5;
+  --lesson-primary-dark: #3730a3;
+  --lesson-accent: #06b6d4;
+  --lesson-green: #16a34a;
+  --lesson-orange: #f97316;
+  --lesson-red: #ef4444;
+  --lesson-yellow: #facc15;
+  --lesson-bg: #f6f8ff;
+  --lesson-card: #ffffff;
+  --lesson-text: #1e293b;
+  --lesson-muted: #64748b;
+  --lesson-border: #dbe4ff;
+  --lesson-code: #0f172a;
+}
 
-<hr>
+.lesson-page {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--lesson-text);
+  background:
+    radial-gradient(circle at top left, rgba(79,70,229,.14), transparent 32rem),
+    radial-gradient(circle at 90% 10%, rgba(6,182,212,.16), transparent 28rem),
+    linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+  border-radius: 22px;
+  padding: clamp(18px, 2.6vw, 34px);
+  line-height: 1.75;
+}
+.lesson-page * { box-sizing: border-box; }
+.lesson-page h1, .lesson-page h2, .lesson-page h3 { line-height: 1.25; }
+.lesson-hero {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: clamp(26px, 4vw, 46px);
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(67,56,202,.96), rgba(37,99,235,.92)),
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.25), transparent 20rem);
+  box-shadow: 0 25px 60px rgba(79,70,229,.25);
+  margin-bottom: 24px;
+}
+.lesson-hero:after {
+  content: "";
+  position: absolute;
+  width: 260px; height: 260px;
+  right: -85px; top: -80px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+}
+.hero-badge {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.14);
+  color: #eef2ff;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .92rem;
+  margin-bottom: 12px;
+}
+.lesson-hero h1 { margin: 0 0 12px; font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 900; }
+.lesson-hero p { color: #e0f2fe; max-width: 980px; font-size: 1.05rem; margin: 0; }
+.hero-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+.hero-stat { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.18); border-radius: 18px; padding: 14px; }
+.hero-stat b { display: block; font-size: 1.2rem; color: #fff; }
+.hero-stat span { color: #dbeafe; font-size: .9rem; }
 
-<h2>📘 Khái niệm cơ bản</h2>
-<p>Độ phức tạp thuật toán mô tả tốc độ tăng của số phép tính khi đầu vào lớn dần.</p>
-<p>Ví dụ: với n phần tử:</p>
-<ul>
-  <li><b>O(1)</b>: Hằng số – truy cập phần tử thứ i trong mảng.</li>
-  <li><b>O(n)</b>: Tuyến tính – duyệt toàn bộ mảng.</li>
-  <li><b>O(n log n)</b>: Hiệu quả – ví dụ Merge Sort, Quick Sort.</li>
-  <li><b>O(n²)</b>: Chậm hơn – ví dụ Bubble Sort, Insertion Sort.</li>
-</ul>
+.lesson-progress-wrap { position: sticky; top: 0; z-index: 20; background: rgba(248,251,255,.82); backdrop-filter: blur(10px); padding: 10px 0 12px; }
+.lesson-progress { height: 10px; border-radius: 999px; background: #dbeafe; overflow: hidden; box-shadow: inset 0 1px 4px rgba(30,41,59,.12); }
+.lesson-progress-bar { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--lesson-primary), var(--lesson-accent)); transition: width .15s linear; }
+.lesson-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+.lesson-nav a { text-decoration: none; color: var(--lesson-primary-dark); background: #eef2ff; border: 1px solid #dbe4ff; border-radius: 999px; padding: 6px 10px; font-weight: 700; font-size: .9rem; }
 
-<hr>
+.lesson-card {
+  background: rgba(255,255,255,.94);
+  border: 1px solid var(--lesson-border);
+  border-radius: 24px;
+  padding: clamp(18px, 2.4vw, 28px);
+  margin: 20px 0;
+  box-shadow: 0 16px 42px rgba(30,64,175,.08);
+}
+.lesson-card h2 { color: var(--lesson-primary-dark); margin: 0 0 14px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+.lesson-card h3 { color: #334155; margin-top: 20px; font-weight: 850; }
+.mini-slide { animation: lessonFadeUp .55s ease both; }
+@keyframes lessonFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
-<h2>📈 Minh họa bằng code</h2>
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+.info-box { border-radius: 18px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.callout { border-left: 6px solid var(--lesson-accent); background: #ecfeff; border-radius: 16px; padding: 14px 16px; margin: 14px 0; }
+.warn { border-left-color: var(--lesson-orange); background: #fff7ed; }
+.danger { border-left-color: var(--lesson-red); background: #fff1f2; }
+.success { border-left-color: var(--lesson-green); background: #f0fdf4; }
 
-<h4>C++</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+.lesson-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 18px; }
+.lesson-table { width: 100%; border-collapse: collapse; min-width: 820px; background: #fff; }
+.lesson-table th, .lesson-table td { border-bottom: 1px solid #e2e8f0; padding: 13px 14px; text-align: left; vertical-align: top; }
+.lesson-table th { background: #eef2ff; color: #312e81; font-weight: 900; }
+.lesson-table tr:last-child td { border-bottom: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-weight: 800; font-size: .88rem; }
+.pill.green { background: #dcfce7; color: #166534; }
+.pill.orange { background: #ffedd5; color: #9a3412; }
+.pill.red { background: #fee2e2; color: #991b1b; }
+.pill.cyan { background: #cffafe; color: #155e75; }
+
+.code-tabs { border: 1px solid var(--lesson-border); border-radius: 18px; overflow: hidden; background: var(--lesson-code); margin: 14px 0; }
+.tab-buttons { display: flex; flex-wrap: wrap; gap: 0; background: #edf2ff; border-bottom: 1px solid #dbe4ff; }
+.tab-btn { appearance: none; border: 0; background: transparent; padding: 12px 16px; font-weight: 900; color: #334155; cursor: pointer; }
+.tab-btn.active { background: var(--lesson-primary); color: #fff; }
+.tab-panel { display: none; position: relative; }
+.tab-panel.active { display: block; }
+.copy-btn { position: absolute; top: 10px; right: 10px; z-index: 3; border: 0; background: rgba(255,255,255,.13); color: #e2e8f0; border-radius: 999px; padding: 6px 10px; font-size: .8rem; cursor: pointer; }
+.copy-btn:hover { background: rgba(255,255,255,.25); }
+.lesson-page pre { margin: 0; max-height: 520px; overflow: auto; background: var(--lesson-code); color: #f8fafc; padding: 22px; font-size: 14.5px; line-height: 1.7; border-radius: 0; white-space: pre; tab-size: 4; }
+.lesson-page code { font-family: Consolas, Monaco, "Courier New", monospace; }
+.inline-code, .lesson-page p code, .lesson-page li code, .lesson-page td code { background: #fdf2f8; color: #be185d; border-radius: 7px; padding: 2px 6px; font-weight: 800; }
+
+.complexity-ladder { display: grid; gap: 12px; }
+.complexity-row { display: grid; grid-template-columns: 110px 1fr 90px; gap: 10px; align-items: center; }
+.complexity-name { font-weight: 900; color: #312e81; }
+.growth-track { height: 24px; background: #e0e7ff; border-radius: 999px; overflow: hidden; border: 1px solid #c7d2fe; }
+.growth-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #60a5fa, #4f46e5); width: 10%; transition: width .35s ease; }
+.growth-fill.green { background: linear-gradient(90deg, #86efac, #16a34a); }
+.growth-fill.orange { background: linear-gradient(90deg, #fdba74, #f97316); }
+.growth-fill.red { background: linear-gradient(90deg, #fda4af, #ef4444); }
+.growth-number { font-family: Consolas, monospace; font-weight: 900; color: #334155; text-align: right; }
+
+.sim-visual { background: linear-gradient(180deg, #ffffff, #f8fbff); border: 1px solid #dbe4ff; border-radius: 22px; padding: 18px; }
+.loop-grid { display: grid; grid-template-columns: repeat(10, minmax(28px,1fr)); gap: 8px; margin: 10px 0; }
+.loop-cell { min-height: 38px; display:flex; align-items:center; justify-content:center; border-radius: 10px; background:#eef2ff; border:1px solid #c7d2fe; font-weight:900; color:#312e81; transition:.2s; }
+.loop-cell.active { background: linear-gradient(180deg,#fbbf24,#f97316); color:#fff; transform: translateY(-3px); }
+.loop-cell.done { background:#dcfce7; color:#166534; border-color:#22c55e; }
+.loop-pair-grid { display:grid; grid-template-columns: repeat(5, minmax(36px,1fr)); gap:8px; margin:10px 0; }
+.loop-pair { min-height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#f8fafc; border:1px solid #cbd5e1; font-size:.85rem; font-weight:900; }
+.loop-pair.active { background:#fee2e2; color:#991b1b; border-color:#ef4444; transform:scale(1.05); }
+.log-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; min-height: 105px; max-height: 260px; overflow: auto; font-family: Consolas, Monaco, monospace; font-size: 14px; color: #334155; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.btn-lesson { border: 0; border-radius: 999px; padding: 10px 14px; font-weight: 900; cursor: pointer; background: var(--lesson-primary); color: white; box-shadow: 0 8px 18px rgba(79,70,229,.2); }
+.btn-lesson.secondary { background: #fff; color: #334155; border: 1px solid #cbd5e1; box-shadow: none; }
+.btn-lesson.green { background: var(--lesson-green); }
+.btn-lesson.orange { background: var(--lesson-orange); }
+.input-lesson, .select-lesson { width: 100%; border: 1px solid #cbd5e1; border-radius: 14px; padding: 11px 13px; font: inherit; outline: none; background: #fff; }
+.input-lesson:focus, .select-lesson:focus { border-color: var(--lesson-primary); box-shadow: 0 0 0 4px rgba(79,70,229,.12); }
+
+.exercise-card { border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; background: #fff; }
+.exercise-card h3 { margin-top: 0; }
+.quiz-item { border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; margin: 12px 0; background: #fff; }
+.quiz-options { display: grid; gap: 8px; margin-top: 10px; }
+.quiz-option { text-align: left; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 14px; padding: 10px 12px; cursor: pointer; font-weight: 800; }
+.quiz-option.correct { background: #dcfce7; border-color: #22c55e; color: #166534; }
+.quiz-option.wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.feedback { margin-top: 8px; font-weight: 800; }
+
+.checklist { display: grid; gap: 10px; }
+.checkitem { display: flex; gap: 10px; align-items: flex-start; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; }
+.checkitem i { margin-top: 5px; color: var(--lesson-green); }
+
+@media (max-width: 900px) {
+  .grid-2, .grid-3, .grid-4, .hero-grid { grid-template-columns: 1fr; }
+  .lesson-page { padding: 14px; border-radius: 16px; }
+  .lesson-hero { border-radius: 20px; }
+  .complexity-row { grid-template-columns: 90px 1fr; }
+  .growth-number { grid-column: 2; text-align:left; }
+}
+</style>
+
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-gauge-high"></i> Chuyên đề nền tảng khi làm bài thi</div>
+    <h1>⚡ Độ phức tạp thuật toán: đọc Big-O và ước lượng thời gian chạy</h1>
+    <p>
+      Bài học này giúp học sinh hiểu vì sao cùng một bài toán nhưng có lời giải chạy rất nhanh,
+      có lời giải lại bị quá thời gian. Trọng tâm là đọc được <b>O(1)</b>, <b>O(log n)</b>, <b>O(n)</b>,
+      <b>O(n log n)</b>, <b>O(n²)</b> và biết chọn thuật toán phù hợp với giới hạn đề.
+    </p>
+    <div class="hero-grid">
+      <div class="hero-stat"><b>Big-O</b><span>Ngôn ngữ đo tốc độ thuật toán</span></div>
+      <div class="hero-stat"><b>Ước lượng</b><span>Biết code có thể AC hay TLE</span></div>
+      <div class="hero-stat"><b>Mô phỏng</b><span>So sánh số phép tính trực quan</span></div>
+      <div class="hero-stat"><b>Bài thi</b><span>Chọn thuật toán theo n</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-progress-wrap">
+    <div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div>
+    <div class="lesson-nav">
+      <a href="#goals">Mục tiêu</a>
+      <a href="#concept">Khái niệm</a>
+      <a href="#growth">Tốc độ tăng</a>
+      <a href="#code">Code mẫu</a>
+      <a href="#estimate">Ước lượng</a>
+      <a href="#simulation">Mô phỏng</a>
+      <a href="#mistakes">Lỗi hay nhầm</a>
+      <a href="#practice">Bài tập</a>
+    </div>
+  </div>
+
+  <section class="lesson-card mini-slide" id="goals">
+    <h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2>
+    <div class="grid-2">
+      <div class="info-box">
+        <h3>Học xong cần làm được</h3>
+        <ul>
+          <li>Hiểu khái niệm <b>độ phức tạp thời gian</b> của thuật toán.</li>
+          <li>Biết cách đọc, ước lượng và so sánh hiệu quả giữa các giải pháp.</li>
+          <li>Phân biệt <code>O(1)</code>, <code>O(log n)</code>, <code>O(n)</code>, <code>O(n log n)</code>, <code>O(n²)</code>.</li>
+          <li>Nhìn vào vòng lặp để đoán nhanh độ phức tạp.</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h3>Ví dụ đời sống</h3>
+        <ul>
+          <li>Tìm một quyển sách bằng cách xem từng quyển: gần giống <code>O(n)</code>.</li>
+          <li>Tìm từ trong từ điển bằng cách mở giữa rồi chia đôi: gần giống <code>O(log n)</code>.</li>
+          <li>So sánh từng cặp học sinh trong lớp: gần giống <code>O(n²)</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="concept">
+    <h2><i class="fa-solid fa-brain"></i> 1. Độ phức tạp thuật toán là gì?</h2>
+    <p>
+      Độ phức tạp thuật toán mô tả <b>tốc độ tăng của số phép tính</b> khi đầu vào lớn dần.
+      Ta không đếm chính xác từng phép cộng, phép gán, phép so sánh, mà quan tâm xu hướng tăng theo <code>n</code>.
+    </p>
+    <div class="callout">
+      <b>Cách hiểu đơn giản:</b> Nếu <code>n</code> tăng gấp 10 lần, số việc thuật toán phải làm tăng khoảng bao nhiêu lần?
+      Câu trả lời này quan trọng hơn việc máy tính chạy nhanh hay chậm ở một test nhỏ.
+    </div>
+    <div class="grid-4">
+      <div class="info-box"><span class="pill green">O(1)</span><p>Hằng số. Ví dụ truy cập <code>a[i]</code>.</p></div>
+      <div class="info-box"><span class="pill cyan">O(log n)</span><p>Chia đôi liên tục. Ví dụ Binary Search.</p></div>
+      <div class="info-box"><span class="pill">O(n)</span><p>Duyệt một vòng qua mảng.</p></div>
+      <div class="info-box"><span class="pill orange">O(n²)</span><p>Hai vòng lặp lồng nhau.</p></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="growth">
+    <h2><i class="fa-solid fa-chart-line"></i> 2. So sánh tốc độ tăng</h2>
+    <p>
+      Dưới đây là mô phỏng số phép tính tương đối khi thay đổi <code>n</code>. Hãy thử nhập <code>n = 10</code>,
+      <code>100</code>, <code>1000</code>, <code>100000</code> để thấy sự khác biệt.
+    </p>
+    <div class="grid-2">
+      <div>
+        <label><b>Nhập n</b></label>
+        <input class="input-lesson" id="growthN" value="1000">
+        <div class="controls">
+          <button class="btn-lesson" id="growthBtn"><i class="fa-solid fa-calculator"></i> So sánh</button>
+        </div>
+        <div class="callout warn">
+          <b>Lưu ý:</b> Các số dưới đây là ước lượng để học sinh cảm nhận tốc độ tăng, không phải thời gian chạy chính xác.
+        </div>
+      </div>
+      <div class="complexity-ladder" id="growthLadder"></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="code">
+    <h2><i class="fa-solid fa-code"></i> 3. Minh họa bằng code: O(n) và O(1)</h2>
+    <p>
+      Cùng tính tổng từ <code>1</code> đến <code>n</code>, ta có hai cách. Cách dùng vòng lặp là <code>O(n)</code>;
+      cách dùng công thức là <code>O(1)</code>.
+    </p>
+    <div class="code-tabs" data-tabs="sum">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="sum-cpp-linear">C++ O(n)</button>
+        <button class="tab-btn" data-target="sum-cpp-formula">C++ O(1)</button>
+        <button class="tab-btn" data-target="sum-py-linear">Python O(n)</button>
+        <button class="tab-btn" data-target="sum-py-formula">Python O(1)</button>
+      </div>
+      <div class="tab-panel active" id="sum-cpp-linear"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
-    int n; cin >> n;
+    long long n;
+    cin &gt;&gt; n;
+
     long long s = 0;
-    for (int i = 1; i <= n; i++) s += i; // O(n)
-    cout << s;
-}</code></pre>
+    for (long long i = 1; i &lt;= n; i++) {
+        s += i;                 // chạy n lần
+    }
 
-<h4>Python</h4>
-<pre><code>n = int(input())
-s = sum(range(1, n+1))  # O(n)
-print(s)</code></pre>
+    cout &lt;&lt; s;
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="sum-cpp-formula"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
 
-<hr>
+int main() {
+    long long n;
+    cin &gt;&gt; n;
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Viết hàm tính tổng từ 1 đến n theo cách tuyến tính (O(n)).</li>
-  <li>Viết công thức trực tiếp tính tổng (O(1)).</li>
-  <li>So sánh thời gian chạy của hai cách trên với n = 10⁶.</li>
-</ol>
+    long long s = n * (n + 1) / 2;   // tính trực tiếp
 
-<details class="mt-3">
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python
-import time
+    cout &lt;&lt; s;
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="sum-py-linear"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
+
+s = 0
+for i in range(1, n + 1):
+    s += i        # chạy n lần
+
+print(s)</code></pre></div>
+      <div class="tab-panel" id="sum-py-formula"><button class="copy-btn">Sao chép</button><pre><code>n = int(input())
+
+s = n * (n + 1) // 2   # tính trực tiếp
+
+print(s)</code></pre></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-magnifying-glass-chart"></i> 4. Nhìn code đoán độ phức tạp</h2>
+    <div class="lesson-table-wrap">
+      <table class="lesson-table">
+        <thead>
+          <tr><th>Mẫu code</th><th>Nhận xét</th><th>Độ phức tạp thường gặp</th><th>Cần cẩn thận</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>x = a[i]</code></td>
+            <td>Truy cập trực tiếp một phần tử.</td>
+            <td><span class="pill green">O(1)</span></td>
+            <td>Không phụ thuộc vào <code>n</code>.</td>
+          </tr>
+          <tr>
+            <td><code>for i = 1..n</code></td>
+            <td>Một vòng lặp chạy theo <code>n</code>.</td>
+            <td><span class="pill">O(n)</span></td>
+            <td>Vòng lặp có thể chạy ít hơn nếu có <code>break</code>.</td>
+          </tr>
+          <tr>
+            <td><code>while n &gt; 0: n /= 2</code></td>
+            <td>Mỗi bước giảm một nửa.</td>
+            <td><span class="pill cyan">O(log n)</span></td>
+            <td>Thường gặp trong Binary Search.</td>
+          </tr>
+          <tr>
+            <td><code>for i = 1..n</code><br><code>for j = 1..n</code></td>
+            <td>Hai vòng lặp lồng nhau.</td>
+            <td><span class="pill orange">O(n²)</span></td>
+            <td>Nếu <code>n = 10⁵</code> thường rất dễ TLE.</td>
+          </tr>
+          <tr>
+            <td><code>sort(a.begin(), a.end())</code></td>
+            <td>Sắp xếp bằng thư viện.</td>
+            <td><span class="pill">O(n log n)</span></td>
+            <td>Thường dùng tốt trong bài thi.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="estimate">
+    <h2><i class="fa-solid fa-stopwatch"></i> 5. Ước lượng nhanh khi làm bài thi</h2>
+    <p>
+      Khi đọc đề, hãy nhìn giới hạn <code>n</code> trước. Nếu <code>n</code> lớn, thuật toán <code>O(n²)</code>
+      thường không phù hợp.
+    </p>
+    <div class="grid-2">
+      <div>
+        <label><b>Nhập n của đề bài</b></label>
+        <input class="input-lesson" id="estimateN" value="100000">
+        <label style="display:block;margin-top:10px"><b>Độ phức tạp dự kiến</b></label>
+        <select class="select-lesson" id="estimateType">
+          <option value="1">O(1)</option>
+          <option value="log">O(log n)</option>
+          <option value="n" selected>O(n)</option>
+          <option value="nlog">O(n log n)</option>
+          <option value="n2">O(n²)</option>
+        </select>
+        <div class="controls">
+          <button class="btn-lesson" id="estimateBtn"><i class="fa-solid fa-circle-check"></i> Kiểm tra khả năng chạy</button>
+        </div>
+      </div>
+      <div class="log-box" id="estimateOutput">Kết quả ước lượng sẽ hiện ở đây.</div>
+    </div>
+    <div class="callout warn">
+      Mốc tham khảo phổ biến: khoảng <b>10⁷ đến 10⁸ phép tính/giây</b> trong C++ tùy máy và loại phép tính.
+      Đây chỉ là kinh nghiệm ước lượng, không phải quy tắc tuyệt đối.
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="simulation">
+    <h2><i class="fa-solid fa-play"></i> 6. Mô phỏng: O(n) khác O(n²) như thế nào?</h2>
+    <div class="grid-2">
+      <div class="sim-visual">
+        <h3>O(n): một vòng lặp</h3>
+        <p>Với <code>n = 10</code>, thuật toán làm khoảng 10 việc.</p>
+        <div class="loop-grid" id="linearCells"></div>
+      </div>
+      <div class="sim-visual">
+        <h3>O(n²): hai vòng lặp</h3>
+        <p>Với <code>n = 10</code>, thuật toán làm khoảng 100 cặp việc.</p>
+        <div class="loop-pair-grid" id="squareCells"></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn-lesson" id="simNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button>
+      <button class="btn-lesson secondary" id="simResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button>
+    </div>
+    <div class="log-box" id="simLog" style="margin-top:14px">Nhấn “Bước tiếp” để xem số bước tăng như thế nào.</div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="mistakes">
+    <h2><i class="fa-solid fa-triangle-exclamation"></i> 7. Lỗi học sinh hay nhầm</h2>
+    <div class="checklist">
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Nhầm tốc độ máy với độ phức tạp.</b><br>Máy nhanh chỉ giúp chạy nhanh hơn một chút; thuật toán sai độ phức tạp vẫn có thể TLE khi <code>n</code> lớn.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Thấy 2 vòng lặp là luôn kết luận O(n²).</b><br>Nếu hai vòng lặp tách rời, có thể là <code>O(n + n)</code> = <code>O(n)</code>. Nếu lồng nhau, thường mới là <code>O(n²)</code>.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Không quan tâm giới hạn đề bài.</b><br>Trước khi code, cần xem <code>n</code> tối đa để chọn thuật toán.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Giữ cả hằng số và hệ số quá chi tiết.</b><br><code>O(3n + 5)</code> thường viết gọn thành <code>O(n)</code>.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="practice">
+    <h2><i class="fa-solid fa-dumbbell"></i> 8. Bài tập luyện tập phân loại</h2>
+    <div class="grid-2">
+      <div class="exercise-card">
+        <h3>📘 Mức 1 - Nhận biết</h3>
+        <ol>
+          <li>Xác định độ phức tạp của đoạn code có một vòng lặp từ <code>1</code> đến <code>n</code>.</li>
+          <li>Xác định độ phức tạp của đoạn code truy cập <code>a[5]</code>.</li>
+          <li>Giải thích vì sao <code>O(2n)</code> thường viết là <code>O(n)</code>.</li>
+        </ol>
+      </div>
+      <div class="exercise-card">
+        <h3>📗 Mức 2 - So sánh</h3>
+        <ol>
+          <li>Viết hàm tính tổng từ <code>1</code> đến <code>n</code> theo cách tuyến tính <code>O(n)</code>.</li>
+          <li>Viết công thức trực tiếp tính tổng <code>O(1)</code>.</li>
+          <li>So sánh hai cách với <code>n = 10⁶</code>.</li>
+        </ol>
+      </div>
+      <div class="exercise-card">
+        <h3>📙 Mức 3 - Phân tích code</h3>
+        <ol>
+          <li>Cho đoạn code hai vòng lặp lồng nhau, xác định độ phức tạp.</li>
+          <li>Phân tích thuật toán tìm kiếm nhị phân có độ phức tạp <code>O(log n)</code>.</li>
+          <li>Giải thích vì sao sắp xếp thư viện thường là <code>O(n log n)</code>.</li>
+        </ol>
+      </div>
+      <div class="exercise-card">
+        <h3>🐉 Mức 4 - Định hướng HSG</h3>
+        <ol>
+          <li>Với <code>n = 2 · 10⁵</code>, đề yêu cầu xử lý nhiều truy vấn, hãy loại bỏ các hướng <code>O(nq)</code>.</li>
+          <li>Cho bài tìm cặp tổng bằng <code>K</code>, so sánh <code>O(n²)</code>, <code>O(n log n)</code>, <code>O(n)</code>.</li>
+          <li>Đọc giới hạn đề và dự đoán nhóm thuật toán phù hợp.</li>
+        </ol>
+      </div>
+    </div>
+
+    <details class="mt-3">
+      <summary style="cursor:pointer;color:#2563eb;font-weight:900">💡 Xem lời giải mẫu Python so sánh O(n) và O(1)</summary>
+      <div class="code-tabs" data-tabs="sample">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-target="sample-py">Python</button>
+          <button class="tab-btn" data-target="sample-cpp">C++</button>
+        </div>
+        <div class="tab-panel active" id="sample-py"><button class="copy-btn">Sao chép</button><pre><code>import time
 
 def sum_linear(n):
     s = 0
@@ -60,11 +477,313 @@ def sum_formula(n):
     return n * (n + 1) // 2
 
 n = 1000000
+
 start = time.time()
 sum_linear(n)
 print("O(n):", round(time.time() - start, 6), "s")
 
 start = time.time()
 sum_formula(n)
-print("O(1):", round(time.time() - start, 6), "s")</code></pre>
-</details>
+print("O(1):", round(time.time() - start, 6), "s")</code></pre></div>
+        <div class="tab-panel" id="sample-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+long long sum_linear(long long n) {
+    long long s = 0;
+    for (long long i = 1; i &lt;= n; i++) s += i;
+    return s;
+}
+
+long long sum_formula(long long n) {
+    return n * (n + 1) / 2;
+}
+
+int main() {
+    long long n = 1000000;
+    cout &lt;&lt; sum_linear(n) &lt;&lt; "\\n";
+    cout &lt;&lt; sum_formula(n) &lt;&lt; "\\n";
+    return 0;
+}</code></pre></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-circle-question"></i> 9. Quiz kiểm tra nhanh</h2>
+    <div class="quiz-item" data-answer="b">
+      <b>Câu 1.</b> Một vòng lặp chạy từ <code>1</code> đến <code>n</code> thường có độ phức tạp nào?
+      <div class="quiz-options">
+        <button class="quiz-option" data-choice="a">O(1)</button>
+        <button class="quiz-option" data-choice="b">O(n)</button>
+        <button class="quiz-option" data-choice="c">O(n²)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+    <div class="quiz-item" data-answer="c">
+      <b>Câu 2.</b> Hai vòng lặp lồng nhau, mỗi vòng chạy khoảng <code>n</code> lần, thường là:
+      <div class="quiz-options">
+        <button class="quiz-option" data-choice="a">O(log n)</button>
+        <button class="quiz-option" data-choice="b">O(n)</button>
+        <button class="quiz-option" data-choice="c">O(n²)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+    <div class="quiz-item" data-answer="a">
+      <b>Câu 3.</b> Nếu <code>n = 100000</code>, thuật toán <code>O(n²)</code> thường có nguy cơ gì?
+      <div class="quiz-options">
+        <button class="quiz-option" data-choice="a">Rất dễ quá thời gian</button>
+        <button class="quiz-option" data-choice="b">Luôn chạy nhanh</button>
+        <button class="quiz-option" data-choice="c">Không phụ thuộc vào n</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2>
+    <div class="callout success">
+      Độ phức tạp giúp ta chọn thuật toán trước khi code. Hãy nhớ thứ tự tăng nhanh thường gặp:
+      <code>O(1)</code> → <code>O(log n)</code> → <code>O(n)</code> → <code>O(n log n)</code> → <code>O(n²)</code>.
+      Với bài thi, luôn đọc giới hạn <code>n</code> để tránh chọn lời giải quá chậm.
+    </div>
+    <p class="text-center" style="text-align:center;color:#2563eb;font-weight:900;font-size:1.05rem">
+      ➡ Tiếp theo: Luyện tập nhận biết độ phức tạp qua code và chọn thuật toán theo ràng buộc đề bài.
+    </p>
+  </section>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  function $(selector, root) { return (root || document).querySelector(selector); }
+  function $all(selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(ch) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch];
+    });
+  }
+
+  function safeNumber(value, fallback) {
+    var n = Number(String(value || '').replace(/,/g, '').trim());
+    if (!Number.isFinite(n) || n < 1) return fallback;
+    return Math.floor(n);
+  }
+
+  function formatNumber(x) {
+    if (!Number.isFinite(x)) return 'rất lớn';
+    if (x >= 1e12) return x.toExponential(2);
+    return Math.round(x).toLocaleString('en-US');
+  }
+
+  function initProgress() {
+    var bar = $('#lessonProgressBar');
+    if (!bar) return;
+    function update() {
+      var doc = document.documentElement;
+      var scrollTop = window.scrollY || doc.scrollTop || 0;
+      var height = Math.max(1, doc.scrollHeight - window.innerHeight);
+      var percent = Math.min(100, Math.max(0, scrollTop / height * 100));
+      bar.style.width = percent + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
+  function initTabs() {
+    $all('.code-tabs').forEach(function(box) {
+      $all('.tab-btn', box).forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var targetId = btn.getAttribute('data-target');
+          $all('.tab-btn', box).forEach(function(b) { b.classList.remove('active'); });
+          $all('.tab-panel', box).forEach(function(p) { p.classList.remove('active'); });
+          btn.classList.add('active');
+          var target = document.getElementById(targetId);
+          if (target) target.classList.add('active');
+        });
+      });
+    });
+  }
+
+  function initCopy() {
+    $all('.copy-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var panel = btn.closest('.tab-panel') || btn.parentElement;
+        var code = panel ? $('code', panel) : null;
+        var text = code ? code.textContent : '';
+        function done() {
+          var old = btn.textContent;
+          btn.textContent = 'Đã chép';
+          setTimeout(function() { btn.textContent = old; }, 1200);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopy(text); done(); });
+        } else { fallbackCopy(text); done(); }
+      });
+    });
+    function fallbackCopy(text) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(area);
+    }
+  }
+
+  function calcOps(n, type) {
+    var logn = Math.max(1, Math.log2(n));
+    if (type === '1') return 1;
+    if (type === 'log') return logn;
+    if (type === 'n') return n;
+    if (type === 'nlog') return n * logn;
+    if (type === 'n2') return n * n;
+    return n;
+  }
+
+  function initGrowth() {
+    var btn = $('#growthBtn');
+    var input = $('#growthN');
+    var out = $('#growthLadder');
+    if (!out) return;
+
+    function render() {
+      var n = safeNumber(input ? input.value : 1000, 1000);
+      var rows = [
+        ['O(1)', calcOps(n, '1'), 'green'],
+        ['O(log n)', calcOps(n, 'log'), 'green'],
+        ['O(n)', calcOps(n, 'n'), ''],
+        ['O(n log n)', calcOps(n, 'nlog'), 'orange'],
+        ['O(n²)', calcOps(n, 'n2'), 'red']
+      ];
+      var max = Math.max.apply(null, rows.map(function(r) { return Math.min(r[1], 1e9); }));
+      out.innerHTML = rows.map(function(r) {
+        var val = r[1];
+        var capped = Math.min(val, 1e9);
+        var width = Math.max(4, Math.min(100, capped / Math.max(1, max) * 100));
+        return '<div class="complexity-row">' +
+          '<div class="complexity-name">' + r[0] + '</div>' +
+          '<div class="growth-track"><div class="growth-fill ' + r[2] + '" style="width:' + width + '%"></div></div>' +
+          '<div class="growth-number">' + formatNumber(val) + '</div>' +
+          '</div>';
+      }).join('');
+    }
+    if (btn) btn.addEventListener('click', render);
+    if (input) input.addEventListener('keydown', function(e) { if (e.key === 'Enter') render(); });
+    render();
+  }
+
+  function initEstimate() {
+    var btn = $('#estimateBtn');
+    var out = $('#estimateOutput');
+    if (!btn || !out) return;
+    btn.addEventListener('click', function() {
+      var n = safeNumber($('#estimateN') ? $('#estimateN').value : 100000, 100000);
+      var type = $('#estimateType') ? $('#estimateType').value : 'n';
+      var ops = calcOps(n, type);
+      var status = '';
+      var cls = '';
+      if (ops <= 1e7) {
+        status = 'Khả năng chạy tốt trong C++ nếu code gọn.';
+        cls = 'color:#166534';
+      } else if (ops <= 1e8) {
+        status = 'Có thể chạy, nhưng cần code tối ưu và cẩn thận hằng số.';
+        cls = 'color:#9a3412';
+      } else {
+        status = 'Nguy cơ TLE cao. Nên tìm thuật toán tốt hơn.';
+        cls = 'color:#991b1b';
+      }
+      out.innerHTML =
+        '<b>n =</b> ' + formatNumber(n) + '<br>' +
+        '<b>Số phép tính ước lượng:</b> ' + formatNumber(ops) + '<br>' +
+        '<b>Nhận xét:</b> <span style="' + cls + ';font-weight:900">' + status + '</span><br><br>' +
+        '<span style="color:#64748b">Gợi ý: nếu kết quả quá lớn, hãy nghĩ tới sort, binary search, prefix sum, two pointers, hash, Fenwick/Segment Tree tùy bài.</span>';
+    });
+  }
+
+  var simState = { step: 0 };
+  function renderSimulation() {
+    var linear = $('#linearCells');
+    var square = $('#squareCells');
+    var log = $('#simLog');
+    if (!linear || !square || !log) return;
+    var s = simState.step;
+    linear.innerHTML = '';
+    for (var i = 1; i <= 10; i++) {
+      var cls = 'loop-cell' + (i < s ? ' done' : '') + (i === s ? ' active' : '');
+      linear.innerHTML += '<div class="' + cls + '">' + i + '</div>';
+    }
+    square.innerHTML = '';
+    for (var k = 1; k <= 25; k++) {
+      var cls2 = 'loop-pair' + (k === s ? ' active' : '');
+      square.innerHTML += '<div class="' + cls2 + '">cặp ' + k + '</div>';
+    }
+    if (s === 0) {
+      log.innerHTML = 'Bắt đầu. O(n) cần khoảng 10 bước, còn O(n²) với n = 10 cần khoảng 100 bước.';
+    } else if (s <= 10) {
+      log.innerHTML = '<b>Bước ' + s + '</b><br>O(n) đã làm ' + s + '/10 việc. O(n²) mới đang nhìn một phần nhỏ trong 100 cặp cần xét.';
+    } else {
+      log.innerHTML = '<b>O(n) đã xong từ bước 10.</b><br>Nhưng O(n²) vẫn còn rất nhiều cặp. Đây là lý do hai vòng lặp lồng nhau dễ chậm khi n lớn.';
+    }
+  }
+
+  function initSimulation() {
+    var next = $('#simNextBtn');
+    var reset = $('#simResetBtn');
+    if (next) next.addEventListener('click', function() {
+      simState.step = Math.min(25, simState.step + 1);
+      renderSimulation();
+    });
+    if (reset) reset.addEventListener('click', function() {
+      simState.step = 0;
+      renderSimulation();
+    });
+    renderSimulation();
+  }
+
+  function initQuiz() {
+    $all('.quiz-item').forEach(function(item) {
+      var answer = item.getAttribute('data-answer');
+      var feedback = $('.feedback', item);
+      $all('.quiz-option', item).forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          $all('.quiz-option', item).forEach(function(b) { b.classList.remove('correct', 'wrong'); });
+          if (btn.getAttribute('data-choice') === answer) {
+            btn.classList.add('correct');
+            if (feedback) feedback.textContent = 'Đúng rồi!';
+          } else {
+            btn.classList.add('wrong');
+            var right = $('.quiz-option[data-choice="' + answer + '"]', item);
+            if (right) right.classList.add('correct');
+            if (feedback) feedback.textContent = 'Chưa đúng. Em xem lại phần lý thuyết ngay phía trên.';
+          }
+        });
+      });
+    });
+  }
+
+  function initHighlightSafe() {
+    if (window.hljs && typeof window.hljs.highlightAll === 'function') {
+      try { window.hljs.highlightAll(); } catch(e) {}
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initProgress();
+    initTabs();
+    initCopy();
+    initGrowth();
+    initEstimate();
+    initSimulation();
+    initQuiz();
+    initHighlightSafe();
+  });
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

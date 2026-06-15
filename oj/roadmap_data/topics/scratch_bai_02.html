@@ -1,4 +1,438 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bài 2: Hãy nhảy cùng thỏ Bashful!</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"><style>.scratch-page,.scratch-lesson{font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#fff7ed,#ecfeff 45%,#eef2ff);color:#1f2937}.scratch-hero{border-radius:28px;background:radial-gradient(circle at top left,#fde68a,transparent 30%),linear-gradient(135deg,#38bdf8,#a78bfa);color:white;box-shadow:0 20px 55px #7c3aed33}.scratch-card,.lesson-card{background:#ffffffd9;border:1px solid #fff;border-radius:24px;box-shadow:0 12px 30px #0f172a12;transition:.25s}.scratch-card:hover{transform:translateY(-8px) rotate(-.5deg);box-shadow:0 18px 45px #0f172a22}.badge-soft{background:#eef2ff;color:#4338ca}.stage-box{height:230px;border-radius:22px;background:linear-gradient(#ecfeff,#fff);border:3px solid #bae6fd;position:relative;overflow:hidden}.sprite{position:absolute;font-size:48px;left:24px;bottom:22px;transition:.5s}.block{display:inline-block;background:#ffbf3f;border-radius:10px;padding:7px 10px;margin:4px;font-weight:700}.nav-pills-custom a{display:block;padding:10px 12px;border-radius:12px;text-decoration:none;color:#334155}.nav-pills-custom a:hover{background:#e0f2fe}.read-progress{position:fixed;top:0;left:0;height:6px;background:linear-gradient(90deg,#fb923c,#22c55e,#38bdf8);z-index:9999;width:0}pre{background:#0f172a;color:#e2e8f0;padding:1rem;border-radius:16px;white-space:pre-wrap}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.code-tabs button.active{background:#2563eb;color:white}.quiz-option{cursor:pointer}.quiz-option.selected{outline:3px solid #38bdf8}.canvasbox{background:white;border:2px dashed #93c5fd;border-radius:16px}</style></head><body class="scratch-lesson"><div class="read-progress"></div><main class="container py-4"><section class="scratch-hero p-4 p-md-5 mb-4 animate__animated animate__fadeIn"><a class="btn btn-light btn-sm" href="/scratch/">← Quay lại Scratch</a><h1 class="display-6 fw-bold mt-3">🐰 Bài 2: Hãy nhảy cùng thỏ Bashful!</h1><p class="lead">Mục tiêu: lập trình một đối tượng thực hiện nhiều hành động theo thứ tự, có âm thanh/trang phục/lặp.</p><div class="d-flex gap-2 flex-wrap"><span class="badge badge-soft">Thứ tự, Lặp, Âm thanh</span><span class="badge bg-success">Dễ hiểu</span></div></section><div class="row g-4"><aside class="col-lg-3"><div class="lesson-card p-3 sticky-top" style="top:20px"><h5>Điều hướng nhanh</h5><nav class="nav-pills-custom"><a href="#goal">🎯 Mục tiêu</a><a href="#story">📖 Câu chuyện</a><a href="#steps">🧩 Từng bước</a><a href="#sim">🎮 Mô phỏng</a><a href="#practice">✅ Thực hành</a><a href="#quiz">📝 Quiz</a></nav></div></aside><div class="col-lg-9"><section id="goal" class="lesson-card p-4 mb-4"><h2>🎯 Mục tiêu bài học</h2><ul><li>Lập trình một đối tượng thực hiện nhiều hành động theo thứ tự, có âm thanh/trang phục/lặp.</li><li>Biết ghép các khối lệnh theo thứ tự như xếp LEGO.</li><li>Tự kiểm tra chương trình bằng nút chạy thử.</li></ul></section><section id="story" class="lesson-card p-4 mb-4"><h2>📖 Câu chuyện dẫn nhập</h2><p>🐰 Hôm nay em là đạo diễn nhỏ của sân khấu Scratch. Nhân vật cần nghe lệnh, phản hồi và kể một câu chuyện thật vui. Hãy tưởng tượng mỗi khối lệnh là một mảnh ghép: ghép đúng thì nhân vật sẽ diễn đúng!</p><div class="flashcard alert alert-info"><b>Flashcard:</b> Nhấn để nhớ khái niệm.<div class="answer d-none mt-2">Sự kiện bắt đầu chương trình; điều khiển giúp lặp/chờ; chuyển động làm nhân vật thay đổi vị trí.</div></div></section><section id="knowledge" class="lesson-card p-4 mb-4"><h2>💡 Kiến thức chính</h2><div class="code-tabs mb-2"><button class="btn btn-sm active" data-tab="blocks">Khối Scratch</button><button class="btn btn-sm btn-outline-primary" data-tab="idea">Ý tưởng</button></div><pre data-pane="blocks"><code>Khi bấm cờ xanh
-  lặp lại / chờ / phát tin
-  di chuyển hoặc nói
-  kiểm tra điều kiện nếu cần</code></pre><pre data-pane="idea" style="display:none"><code>Ví dụ đời sống: muốn đi học đúng giờ, em làm tuần tự: thức dậy → vệ sinh → ăn sáng → đến trường.</code></pre></section><section id="steps" class="lesson-card p-4 mb-4"><h2>🧩 Hướng dẫn từng bước</h2><ol><li>Mở Scratch và chọn nhân vật/sân khấu phù hợp.</li><li>Thêm khối sự kiện <span class="block">khi bấm cờ xanh</span>.</li><li>Ghép các khối chính của bài: Thứ tự, Lặp, Âm thanh.</li><li>Chạy thử, quan sát, sửa lỗi nhỏ rồi lưu dự án.</li></ol></section><section id="sim" class="lesson-card p-4 mb-4"><h2>🎮 Mô phỏng trực quan</h2><div class="stage-box"><div class="sprite">🐰</div></div><button class="btn btn-warning mt-3" data-run data-emoji="🐰">▶ Chạy thử</button><button class="btn btn-info mt-3" data-run data-emoji="💬">Nói xin chào</button></section><section id="practice" class="lesson-card p-4 mb-4"><h2>✅ Thực hành tương tác</h2><div class="checklist"><label><input type="checkbox"> Em đã đặt tên dự án rõ ràng</label><br><label><input type="checkbox"> Em đã chạy thử ít nhất 2 lần</label><br><label><input type="checkbox"> Em đã thêm âm thanh/màu sắc/câu thoại vui</label><p class="mini-score fw-bold text-primary mt-2">0/3 nhiệm vụ</p></div><h3>🚧 Lỗi hay nhầm</h3><ul><li>Quên khối sự kiện nên bấm cờ xanh không chạy.</li><li>Đặt lệnh sai thứ tự khiến câu chuyện bị lộn xộn.</li><li>Lặp vô hạn nhưng không có điều kiện dừng.</li></ul></section><section class="lesson-card p-4 mb-4"><h2>🏋️ Bài tập phân tầng</h2><div class="row"><div class="col-md-6"><h5>Cơ bản</h5><ul><li>Làm nhân vật nói 2 câu.</li><li>Thêm một chuyển động đơn giản.</li></ul><h5>Trung bình</h5><ul><li>Thêm âm thanh hoặc đổi trang phục.</li><li>Tạo 3 bước hành động liên tiếp.</li></ul></div><div class="col-md-6"><h5>Nâng cao</h5><ul><li>Thêm điều kiện hoặc biến điểm.</li><li>Tạo phiên bản có 2 nhân vật.</li></ul><h5>HSG định hướng</h5><ul><li>Tối ưu kịch bản để dễ mở rộng.</li><li>Viết mô tả thuật toán bằng lời trước khi ghép khối.</li></ul></div></div></section><section id="quiz" class="lesson-card p-4 mb-4 quiz"><h2>📝 Quiz cuối bài</h2><div class="q mb-3"><strong>Câu 1: Trong bài này, khối nào giúp lập trình một đối tượng thực hiện nhiề?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 2: Trong bài này, khối nào giúp lập trình một đối tượng thực hiện nhiề?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 3: Trong bài này, khối nào giúp lập trình một đối tượng thực hiện nhiề?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 4: Trong bài này, khối nào giúp lập trình một đối tượng thực hiện nhiề?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 5: Trong bài này, khối nào giúp lập trình một đối tượng thực hiện nhiề?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><button class="btn btn-success check-quiz">Kiểm tra đáp án</button><button class="btn btn-outline-secondary reset-quiz">Làm lại</button><span class="quiz-score fw-bold ms-3"></span></section><div class="d-flex justify-content-between mb-5"><a class="btn btn-outline-primary " href="/scratch/bai-01/">← Bài trước</a><a class="btn btn-primary " href="/scratch/bai-03/">Bài tiếp theo →</a></div></div></div></main><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>document.addEventListener('DOMContentLoaded',()=>{try{hljs.highlightAll()}catch(e){}const bar=document.querySelector('.read-progress');function prog(){let h=document.documentElement;bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100||0)+'%'};addEventListener('scroll',prog);prog();document.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>{let s=document.querySelector('.sprite'); if(s){s.style.left=(20+Math.random()*65)+'%';s.textContent=b.dataset.emoji||s.textContent;}});document.querySelectorAll('.code-tabs').forEach(t=>{t.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{t.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');t.parentElement.querySelectorAll('pre[data-pane]').forEach(p=>p.style.display=p.dataset.pane===btn.dataset.tab?'block':'none');});});document.querySelectorAll('.checklist input').forEach(i=>i.onchange=()=>{let box=i.closest('.checklist'),n=box.querySelectorAll('input:checked').length,total=box.querySelectorAll('input').length;box.querySelector('.mini-score').textContent=n+'/'+total+' nhiệm vụ';});document.querySelectorAll('.flashcard').forEach(c=>c.onclick=()=>c.querySelector('.answer').classList.toggle('d-none'));document.querySelectorAll('.quiz').forEach(q=>{q.querySelectorAll('.quiz-option').forEach(o=>o.onclick=()=>{let group=o.parentElement;group.querySelectorAll('.quiz-option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected')});q.querySelector('.check-quiz').onclick=()=>{let score=0,total=0;q.querySelectorAll('.q').forEach(item=>{total++;let sel=item.querySelector('.selected');let ok=sel&&sel.dataset.correct==='1';if(ok)score++;item.querySelector('.feedback').textContent=ok?'✅ Chính xác!':'❌ Thử xem lại khái niệm nhé.'});q.querySelector('.quiz-score').textContent='Điểm: '+score+'/'+total};q.querySelector('.reset-quiz').onclick=()=>{q.querySelectorAll('.selected').forEach(x=>x.classList.remove('selected'));q.querySelectorAll('.feedback').forEach(f=>f.textContent='');q.querySelector('.quiz-score').textContent=''};});const canvas=document.querySelector('canvas.draw');if(canvas){let ctx=canvas.getContext('2d'),x=40,y=40;ctx.fillStyle='#22c55e';function sq(){ctx.fillRect(x,y,24,24)}sq();document.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>{x+=+(b.dataset.dx||0);y+=+(b.dataset.dy||0);sq()})}})</script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Bài 2 Scratch: lập trình điệu nhảy cho nhân vật bằng thứ tự lệnh, đổi trang phục, âm thanh, đợi, lặp lại và liên tục.">
+  <meta name="author" content="Nguyễn Trung Chiến">
+  <meta name="copyright" content="Nguyễn Trung Chiến - THPT chuyên Trần Phú - SĐT/Zalo 0934353569">
+  <link rel="canonical" href="https://tin247ctp.com/scratch/bai-02/">
+  <title>Bài 2: Hãy nhảy cùng thỏ Bashful!</title>
+  <style>
+    :root{
+      --bg1:#fff7ed;--bg2:#ecfeff;--bg3:#eef2ff;--text:#172033;--muted:#667085;
+      --line:#e5e7eb;--card:rgba(255,255,255,.88);--blue:#4c97ff;--purple:#9966ff;
+      --orange:#ff9f1c;--yellow:#ffbf3f;--green:#22c55e;--red:#ef4444;--dark:#0f172a;
+      --shadow:0 18px 48px rgba(15,23,42,.12);--radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      font-size:15px;line-height:1.62;color:var(--text);min-height:100vh;
+      background:
+        radial-gradient(circle at 8% 6%,rgba(255,191,63,.33),transparent 28rem),
+        radial-gradient(circle at 94% 10%,rgba(76,151,255,.28),transparent 31rem),
+        radial-gradient(circle at 60% 90%,rgba(153,102,255,.17),transparent 36rem),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 47%,var(--bg3));
+      -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+    }
+    input,select,textarea{user-select:text;-webkit-user-select:text}
+    a{text-decoration:none;color:inherit} button,input,select{font:inherit} svg{max-width:100%;height:auto}.page{position:relative;z-index:1}
+    .container-main{width:min(1140px,calc(100% - 28px));margin:0 auto}.read-progress{position:fixed;top:0;left:0;width:0;height:5px;z-index:9999;background:linear-gradient(90deg,var(--orange),var(--green),var(--blue),var(--purple));box-shadow:0 0 16px rgba(76,151,255,.4)}
+    .wm{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.10}.wm span{position:absolute;display:block;color:#0f172a;font-weight:950;white-space:nowrap;letter-spacing:.02em;transform:rotate(-24deg);opacity:.34;text-align:center}.wm .main{left:50%;top:52%;transform:translate(-50%,-50%) rotate(-24deg);font-size:clamp(1.15rem,2.5vw,2.15rem);line-height:1.3;white-space:normal;width:min(780px,90vw);opacity:.38}.wm .s1{left:-5%;top:8%;font-size:1.4rem}.wm .s2{right:-8%;top:12%;font-size:1.9rem}.wm .s3{left:8%;top:42%;font-size:1.55rem}.wm .s4{right:4%;top:38%;font-size:1.35rem}.wm .s5{left:-6%;bottom:14%;font-size:2rem}.wm .s6{right:10%;bottom:10%;font-size:1.45rem}.wm .s7{left:35%;top:21%;font-size:1.15rem}.wm .s8{left:42%;bottom:31%;font-size:1.25rem}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0}.pill,.back{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.88);border-radius:999px;padding:9px 13px;font-weight:850;box-shadow:0 10px 22px rgba(15,23,42,.07);backdrop-filter:blur(10px)}
+    .hero{position:relative;overflow:hidden;border-radius:32px;padding:28px 30px;box-shadow:var(--shadow);color:#fff;background:radial-gradient(circle at 16% 14%,rgba(255,255,255,.28),transparent 16rem),radial-gradient(circle at 92% 88%,rgba(255,255,255,.14),transparent 20rem),linear-gradient(135deg,#35a7ff 0%,#855cf8 56%,#ff8a00 100%)}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;position:relative;z-index:1}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.28);font-size:.86rem;font-weight:900;margin-bottom:10px}.hero h1{font-size:clamp(2rem,4vw,3.35rem);line-height:1.08;margin:0 0 12px;font-weight:950;letter-spacing:-.035em}.hero p{font-size:1.05rem;color:#fff7ed;margin:0}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.86);color:#4338ca;font-weight:850;border:1px solid rgba(255,255,255,.5)}
+    .teacher{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:10px 12px;align-items:center;max-width:390px;padding:13px 15px;border-radius:20px;background:rgba(255,255,255,.88);color:#1f2937;border:1px solid rgba(255,255,255,.6);box-shadow:0 14px 28px rgba(15,23,42,.14)}.teacher .avatar{font-size:2.1rem}.teacher strong{display:block;font-size:1rem}.teacher span{display:block;color:#5b6472;font-weight:650}.hero-scene{background:rgba(255,255,255,.90);color:var(--text);border-radius:26px;padding:14px;box-shadow:0 22px 48px rgba(0,0,0,.18)}
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:22px;margin:24px 0 44px}aside{position:sticky;top:14px;align-self:start}.toc,.card{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(10px)}.toc{padding:16px}.toc h3{font-size:1rem;margin:0 0 10px;font-weight:950}.toc a{display:flex;gap:9px;align-items:center;padding:9px 10px;border-radius:14px;color:#344054;font-weight:780;margin:2px 0}.toc a:hover,.toc a.active{background:#e0f2fe;color:#075985}.card{padding:24px;margin-bottom:20px;scroll-margin-top:16px}.title{display:flex;align-items:center;gap:11px;margin:0 0 9px;font-size:clamp(1.28rem,1.8vw,1.75rem);font-weight:950;letter-spacing:-.02em}.ti{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#fff2a6,#ff9f1c);box-shadow:0 9px 18px rgba(255,159,28,.2);flex:0 0 auto}.sub{color:var(--muted);margin:0 0 15px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.mini{height:100%;background:#fff;border:1px solid var(--line);border-radius:19px;padding:15px;box-shadow:0 10px 26px rgba(15,23,42,.06);transition:.2s}.mini:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(15,23,42,.11)}.mini h4{font-size:1.02rem;margin:0 0 6px;font-weight:950}.mini p{margin:0;color:#475569}.mini ul{margin:6px 0 0;padding-left:1.1rem}.note{background:#ecfeff;border:1px solid #67e8f9;border-left:6px solid #06b6d4;border-radius:17px;padding:13px 15px;margin-top:14px}
+    .story-timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}.story-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}.story-card b{display:block;margin-bottom:5px}.name-map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.name-card{text-align:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 8px 20px rgba(15,23,42,.05)}.name-card .emo{font-size:2.2rem;line-height:1}.name-card strong{display:block;margin-top:4px}.name-card span{font-size:.88rem;color:#667085}
+    .scratch-window{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 18px 40px rgba(15,23,42,.10)}.winbar{display:flex;align-items:center;gap:8px;background:#4c97ff;color:#fff;padding:9px 13px;font-weight:900}.dot{width:10px;height:10px;border-radius:50%;background:#fff;opacity:.85}.scratch-grid{display:grid;grid-template-columns:230px 1fr 300px;gap:0;min-height:390px}.palette{background:#fafafa;border-right:1px solid var(--line);padding:14px}.workspace{background:#fff;position:relative;padding:18px;border-right:1px solid var(--line);background-image:radial-gradient(#cbd5e1 1px,transparent 1px);background-size:18px 18px}.stage-panel{background:#f8fafc;padding:14px}.group-label{font-weight:950;margin-bottom:8px}.catbtn{display:inline-flex;align-items:center;gap:7px;margin:4px 3px 8px 0;padding:7px 10px;border-radius:999px;color:#fff;font-weight:850}.event{background:#ffbf3f;color:#3b2600}.motion{background:#4c97ff}.looks{background:#9966ff}.sound{background:#cf63cf}.control{background:#ffab19;color:#3b2600}.block{display:flex;width:max-content;max-width:100%;align-items:center;gap:7px;border-radius:12px;padding:8px 12px;margin:6px 0;color:#fff;font-weight:900;box-shadow:inset 0 -3px 0 rgba(0,0,0,.16)}.block.event,.block.control{color:#3b2600}.indent{margin-left:28px}.flag{display:inline-block;width:18px;height:15px;position:relative;background:#22c55e;border-radius:2px;box-shadow:-2px 0 0 #15803d}.flag:before{content:"";position:absolute;left:-5px;top:-3px;width:3px;height:22px;border-radius:2px;background:#15803d}.stage-img{position:relative;border-radius:18px;overflow:hidden;min-height:250px;background:linear-gradient(#dbeafe 0 57%,#dcfce7 57%);border:3px solid #bfdbfe}.sun{position:absolute;right:20px;top:18px;width:42px;height:42px;border-radius:50%;background:#fde047;box-shadow:0 0 28px rgba(253,224,71,.85)}.sprite-ele{position:absolute;left:100px;bottom:34px;font-size:4.4rem;filter:drop-shadow(0 12px 12px rgba(15,23,42,.18));transition:.45s}.sprite-banana{position:absolute;left:36px;bottom:58px;font-size:2.6rem}.sprite-drum{position:absolute;right:36px;bottom:53px;font-size:2.9rem}.speech{position:absolute;left:34px;top:28px;background:#fff;border:2px solid #94a3b8;border-radius:18px;padding:9px 12px;font-weight:900;box-shadow:0 12px 24px rgba(15,23,42,.12);max-width:230px}.sprite-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.sprite-chip{display:inline-flex;gap:5px;align-items:center;padding:7px 9px;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:850}.steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:54px 1fr;gap:12px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:13px;box-shadow:0 9px 22px rgba(15,23,42,.05)}.step-no{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#ffbf3f,#ff7a1a);color:#3d2600;font-size:1.18rem;font-weight:950}.step h4{margin:0 0 4px;font-size:1.02rem;font-weight:950}.step p{margin:0;color:#475569}.two-pane{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.sim-stage{position:relative;min-height:330px;overflow:hidden;border:4px solid #93c5fd;border-radius:24px;background:linear-gradient(#dbeafe 0 57%,#dcfce7 57%);box-shadow:inset 0 0 0 6px rgba(255,255,255,.45)}.cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9}.c1{width:110px;height:36px;left:38px;top:42px}.c2{width:138px;height:40px;right:42px;top:60px}.elephant{position:absolute;left:50px;bottom:48px;font-size:5.2rem;filter:drop-shadow(0 12px 12px rgba(15,23,42,.2));transition:.55s cubic-bezier(.2,.8,.2,1)}.elephant.jump{transform:translateY(-24px) rotate(-4deg)}.banana{position:absolute;left:45%;bottom:74px;font-size:3rem;cursor:pointer}.drum{position:absolute;right:40px;bottom:60px;font-size:3.2rem;cursor:pointer}.bubble{position:absolute;left:90px;top:80px;opacity:0;transform:translateY(10px);transition:.25s;background:#fff;border:2px solid #94a3b8;border-radius:20px;padding:10px 13px;font-weight:950;box-shadow:0 14px 28px rgba(15,23,42,.14)}.bubble.show{opacity:1;transform:translateY(0)}.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:15px;box-shadow:0 10px 26px rgba(15,23,42,.06)}.field{display:grid;gap:6px;margin-bottom:12px}.field label{font-weight:900}.field input,.field select{border:1px solid #cbd5e1;border-radius:13px;padding:10px 11px}.btns{display:flex;flex-wrap:wrap;gap:9px}.btnx{border:none;border-radius:15px;padding:10px 13px;font-weight:900;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:7px;box-shadow:0 8px 18px rgba(15,23,42,.10)}.btnx:hover{transform:translateY(-2px)}.btn-green{background:#dcfce7;color:#15803d}.btn-blue{background:#dbeafe;color:#1d4ed8}.btn-dark{background:#0f172a;color:#fff}.btn-purple{background:#ede9fe;color:#6d28d9}.btn-orange{background:#ffbf3f;color:#3b2600}.choices{display:grid;gap:9px}.choice{background:#fff;border:2px dashed #cbd5e1;border-radius:15px;padding:11px;cursor:pointer;transition:.18s}.choice:hover,.choice.selected{background:#ecfeff;border-color:#38bdf8}.zone{min-height:126px;border:2px dashed #93c5fd;background:#f8fafc;border-radius:17px;padding:12px}.checklist{display:grid;gap:8px}.check{display:flex;align-items:flex-start;gap:9px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:10px;font-weight:750}.check input{width:18px;height:18px;margin-top:3px}.score{font-weight:950;color:#1d4ed8;margin-top:10px}.mistake{background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:12px}.mistake strong{color:#9a3412}.level{display:inline-flex;border-radius:999px;padding:4px 9px;font-size:.82rem;font-weight:950;margin-bottom:7px}.lv1{background:#dcfce7;color:#166534}.lv2{background:#dbeafe;color:#1e40af}.lv3{background:#fef3c7;color:#92400e}.lv4{background:#f3e8ff;color:#6b21a8}.quiz{display:grid;gap:12px}.q{background:#fff;border:1px solid var(--line);border-radius:17px;padding:14px}.options{display:grid;gap:8px;margin-top:9px}.option{border:1px solid var(--line);border-radius:13px;padding:9px 11px;background:#f8fafc;font-weight:740;cursor:pointer}.option:hover{background:#e0f2fe}.option.selected{outline:3px solid #38bdf8;background:#ecfeff}.option.correct{border-color:#22c55e;background:#dcfce7}.option.wrong{border-color:#ef4444;background:#fee2e2}.feedback{font-size:.92rem;font-weight:950;margin-top:7px}.footer-nav{display:flex;justify-content:space-between;gap:10px;margin:22px 0}.copyright{margin:18px 0 42px;padding:17px;border-radius:21px;background:#0f172a;color:#e2e8f0;text-align:center;box-shadow:var(--shadow)}.copyright strong,.copyright span{display:block}.copyright span{color:#cbd5e1}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(18px);z-index:10001;opacity:0;background:#111827;color:#fff;border-radius:999px;padding:11px 15px;font-weight:850;box-shadow:0 14px 32px rgba(15,23,42,.32);transition:.22s;text-align:center;max-width:min(560px,calc(100vw - 30px));pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .object-code{display:grid;gap:14px}.code-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:15px;box-shadow:0 10px 26px rgba(15,23,42,.06)}.code-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.code-head h4{margin:0;font-size:1.03rem;font-weight:950}.script-badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:#eef2ff;color:#4338ca;padding:5px 9px;font-size:.82rem;font-weight:900;white-space:nowrap}.script-box{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:16px;padding:10px;overflow-x:auto}.script-box .block{font-size:.9rem}.indent2{margin-left:56px}.script-note{margin:9px 0 0;color:#475569;font-size:.93rem}.order-note{background:#fff7ed;border:1px solid #fed7aa;border-left:6px solid #ff9f1c;border-radius:17px;padding:12px 14px;margin-top:14px}
+    @media(max-width:980px){.hero-grid,.layout,.two-pane,.scratch-grid{grid-template-columns:1fr}aside{position:static}.grid3,.grid4,.story-timeline,.name-map{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace{min-height:300px}.scratch-grid{min-height:0}.palette,.workspace{border-right:none;border-bottom:1px solid var(--line)}}
+    @media(max-width:640px){body{font-size:14px}.topbar{align-items:flex-start;flex-direction:column}.hero{padding:22px;border-radius:25px}.card{padding:18px}.grid2,.grid3,.grid4,.story-timeline,.name-map{grid-template-columns:1fr}.footer-nav{flex-direction:column}.teacher{grid-template-columns:auto 1fr}.elephant{font-size:4.2rem}.banana{left:40%;font-size:2.5rem}.drum{font-size:2.7rem}}
+    @media print{body{background:#fff}.topbar,aside,.btnx,.read-progress,.toast{display:none!important}.layout,.hero-grid,.two-pane{display:block}.card,.hero,.toc{box-shadow:none;border:1px solid #ddd;break-inside:avoid}.wm{opacity:.12}}
+  </style>
+</head>
+<body>
+  <div class="wm" aria-hidden="true">
+    <span class="main">Nguyễn Trung Chiến<br>THPT chuyên Trần Phú<br>SĐT/Zalo 0934353569</span>
+    <span class="s1">Nguyễn Trung Chiến</span><span class="s2">THPT chuyên Trần Phú</span><span class="s3">0934353569</span><span class="s4">Scratch · Tin học</span><span class="s5">Nguyễn Trung Chiến</span><span class="s6">THPT chuyên Trần Phú</span><span class="s7">0934353569</span><span class="s8">Scratch 1</span>
+  </div>
+  <div class="read-progress" id="readProgress"></div>
+  <div class="toast" id="copyToast">Nội dung thuộc bản quyền Nguyễn Trung Chiến - THPT chuyên Trần Phú.</div>
+
+  <div class="page">
+    <div class="container-main">
+      <div class="topbar">
+        <a class="back" href="https://tin247ctp.com/scratch/">← Quay lại Scratch</a>
+        <a class="pill" href="https://tin247ctp.com/scratch/bai-02/"><span>🐰</span><span>Scratch cơ bản · Bài 2</span></a>
+      </div>
+
+      <header class="hero" id="top">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">🎭 Bài học theo câu chuyện</div>
+            <h1>🐘 Hãy nhảy cùng thỏ Bashful!</h1>
+            <p>Cùng mèo Scratch lập trình một điệu nhảy để thỏ Bashful tự tin vận động, nghe nhạc và vui chơi với các bạn.</p>
+            <div class="chips">
+              <span class="chip">🧩 Thứ tự lệnh</span><span class="chip">👗 Trang phục</span><span class="chip">🎵 Âm thanh</span><span class="chip">⏱️ Đợi</span><span class="chip">🔁 Lặp lại</span>
+            </div>
+            <div class="teacher">
+              <div class="avatar">👨‍🏫</div>
+              <div>
+                <strong>Nguyễn Trung Chiến</strong>
+                <span>🏫 THPT chuyên Trần Phú</span>
+                <span>📱 SĐT/Zalo: 0934353569</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-scene">
+            <div class="stage-img" style="min-height:300px">
+              <div class="sun"></div>
+              <div class="speech">Cùng tạo một điệu nhảy thật vui nhé!</div>
+              <div class="sprite-banana">🍌</div>
+              <div class="sprite-ele">🐘</div>
+              <div class="sprite-drum">🥁</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside>
+          <nav class="toc" aria-label="Điều hướng bài học">
+            <h3>🧭 Điều hướng nhanh</h3>
+            <a href="#goal">🎯 Mục tiêu</a>
+            <a href="#names">👥 Nhân vật</a>
+            <a href="#story">📖 Câu chuyện</a>
+            <a href="#interface">🖥️ Giao diện</a>
+            <a href="#steps">🧩 Từng bước</a>
+            <a href="#object-code">💻 Code đối tượng</a>
+            <a href="#simulation">🎮 Mô phỏng</a>
+            <a href="#arrange">🧱 Xếp khối</a>
+            <a href="#practice">✅ Thực hành</a>
+            <a href="#quiz">📝 Quiz</a>
+          </nav>
+        </aside>
+
+        <main>
+          <section class="card" id="goal">
+            <h2 class="title"><span class="ti">🎯</span>Mục tiêu bài học</h2>
+            <p class="sub">Sau bài này, học sinh biết lập trình một đối tượng thực hiện nhiều hành động theo đúng thứ tự.</p>
+            <div class="grid4">
+              <div class="mini"><h4>1. Chọn đối tượng</h4><p>Thêm Voi, Chuối và Trống vào sân khấu.</p></div>
+              <div class="mini"><h4>2. Đổi trang phục</h4><p>Làm Voi chuyển đổi giữa hai dáng nhảy.</p></div>
+              <div class="mini"><h4>3. Thêm âm thanh</h4><p>Cho Chuối và Trống phát âm thanh khi được nhấn.</p></div>
+              <div class="mini"><h4>4. Dùng lặp</h4><p>Dùng đợi, lặp lại và liên tục để chuyển động mượt hơn.</p></div>
+            </div>
+            <div class="note"><strong>Ý chính:</strong> Cùng một bộ khối lệnh nhưng nếu thay đổi thứ tự, thời gian chờ hoặc số lần lặp, kết quả chương trình sẽ khác nhau.</div>
+          </section>
+
+          <section class="card" id="names">
+            <h2 class="title"><span class="ti">👥</span>Tên nhân vật dùng trong bài</h2>
+            <p class="sub">Tên nhân vật được chuẩn hóa để học sinh dễ nhớ khi thực hành trên Scratch.</p>
+            <div class="name-map">
+              <div class="name-card"><div class="emo">🐱</div><strong>Mèo Scratch</strong><span>người hướng dẫn</span></div>
+              <div class="name-card"><div class="emo">🐰</div><strong>Thỏ Bashful</strong><span>bạn cần được giúp đỡ</span></div>
+              <div class="name-card"><div class="emo">🐘</div><strong>Voi Vũ Công</strong><span>nhân vật chính để lập trình</span></div>
+              <div class="name-card"><div class="emo">🍌</div><strong>Chuối Vui Nhộn</strong><span>đối tượng phát âm thanh</span></div>
+              <div class="name-card"><div class="emo">🥁</div><strong>Trống Nhịp Điệu</strong><span>đối tượng tạo nhịp</span></div>
+            </div>
+          </section>
+
+          <section class="card" id="story">
+            <h2 class="title"><span class="ti">📖</span>Câu chuyện: Điệu nhảy giúp Bashful tự tin</h2>
+            <p>Ở bài trước, thỏ Bashful đã biết nói lời chào với các bạn trong khu rừng. Bây giờ bạn ấy muốn tham gia vui chơi nhiều hơn, nhưng lại chưa biết nhảy múa. Mèo Scratch nảy ra ý tưởng: hãy tìm một người bạn nhảy thật đẹp để làm mẫu cho Bashful.</p>
+            <p>Cả nhóm đến rạp hát và gặp <strong>Voi Vũ Công</strong>. Voi sẽ biểu diễn vui hơn nếu có <strong>Chuối Vui Nhộn</strong> ở phía trước và <strong>Trống Nhịp Điệu</strong> tạo nhạc nền. Nhiệm vụ của chúng ta là lập trình cho Voi đổi dáng nhảy, cho Chuối và Trống phát âm thanh, sau đó dùng lặp để điệu nhảy diễn ra đều hơn.</p>
+            <div class="story-timeline">
+              <div class="story-card"><b>🐰 Vấn đề</b> Bashful muốn vận động nhưng chưa biết nhảy.</div>
+              <div class="story-card"><b>🐘 Người mẫu</b> Voi Vũ Công có hai dáng nhảy để chuyển đổi.</div>
+              <div class="story-card"><b>🍌🥁 Không khí</b> Chuối và Trống tạo âm thanh vui nhộn khi được nhấn.</div>
+              <div class="story-card"><b>🔁 Kết quả</b> Lệnh đúng thứ tự giúp điệu nhảy mượt và dễ quan sát.</div>
+            </div>
+          </section>
+
+          <section class="card" id="interface">
+            <h2 class="title"><span class="ti">🖥️</span>Mô hình giao diện Scratch của bài 2</h2>
+            <p class="sub">Học sinh cần chú ý chọn đúng đối tượng trước khi ghép khối lệnh.</p>
+            <div class="scratch-window">
+              <div class="winbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>Scratch · Bài 2: Điệu nhảy của Voi</span></div>
+              <div class="scratch-grid">
+                <div class="palette">
+                  <div class="group-label">Kho khối lệnh</div>
+                  <span class="catbtn event">Sự kiện</span>
+                  <span class="catbtn motion">Chuyển động</span>
+                  <span class="catbtn looks">Hiển thị</span>
+                  <span class="catbtn sound">Âm thanh</span>
+                  <span class="catbtn control">Điều khiển</span>
+                  <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                  <div class="block looks">Trang phục kế tiếp</div>
+                  <div class="block control">Đợi 0.2 giây</div>
+                  <div class="block sound">Phát âm thanh trống</div>
+                </div>
+                <div class="workspace">
+                  <div class="group-label">Khu lập trình của Voi Vũ Công</div>
+                  <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                  <div class="block motion indent">Đặt x = 0, y = -40</div>
+                  <div class="block control indent">Lặp lại 10 lần</div>
+                  <div class="block looks indent" style="margin-left:56px">Trang phục kế tiếp</div>
+                  <div class="block control indent" style="margin-left:56px">Đợi 0.2 giây</div>
+                  <div class="block motion indent" style="margin-left:56px">Di chuyển 10 bước</div>
+                </div>
+                <div class="stage-panel">
+                  <div class="group-label">Sân khấu</div>
+                  <div class="stage-img"><div class="sun"></div><div class="speech">Bashful ơi, cùng nhảy nào!</div><div class="sprite-banana">🍌</div><div class="sprite-ele">🐘</div><div class="sprite-drum">🥁</div></div>
+                  <div class="sprite-list"><span class="sprite-chip">🐘 Voi</span><span class="sprite-chip">🍌 Chuối</span><span class="sprite-chip">🥁 Trống</span><span class="sprite-chip">🐰 Bashful</span></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card" id="steps">
+            <h2 class="title"><span class="ti">🧩</span>Hướng dẫn từng bước</h2>
+            <div class="steps">
+              <div class="step"><div class="step-no">1</div><div><h4>Tạo sân khấu rạp hát</h4><p>Chọn phông nền phù hợp để tạo không khí biểu diễn cho điệu nhảy.</p></div></div>
+              <div class="step"><div class="step-no">2</div><div><h4>Thêm Voi Vũ Công</h4><p>Thêm đối tượng Voi, kiểm tra Voi có ít nhất hai trang phục để tạo hiệu ứng nhảy.</p></div></div>
+              <div class="step"><div class="step-no">3</div><div><h4>Thêm Chuối Vui Nhộn</h4><p>Đặt Chuối trước mặt Voi, sau đó lập trình để khi nhấn vào Chuối thì phát âm thanh.</p></div></div>
+              <div class="step"><div class="step-no">4</div><div><h4>Thêm Trống Nhịp Điệu</h4><p>Đặt Trống bên cạnh sân khấu và chọn âm thanh vui nhộn cho Trống.</p></div></div>
+              <div class="step"><div class="step-no">5</div><div><h4>Lập trình Voi đổi dáng</h4><p>Ghép: cờ xanh → trang phục kế tiếp → đợi. Khối đợi giúp học sinh nhìn thấy rõ Voi đang đổi dáng.</p></div></div>
+              <div class="step"><div class="step-no">6</div><div><h4>Dùng lặp lại</h4><p>Đặt các khối đổi trang phục và đợi vào trong khối lặp lại để điệu nhảy diễn ra nhiều lần.</p></div></div>
+              <div class="step"><div class="step-no">7</div><div><h4>Chạy thử và chỉnh tham số</h4><p>Thay đổi thời gian đợi, số lần lặp hoặc vị trí của Voi để điệu nhảy đẹp hơn.</p></div></div>
+            </div>
+            <div class="note"><strong>Ghi nhớ:</strong> Nếu chương trình chạy quá nhanh, hãy thêm hoặc tăng thời gian ở khối <strong>đợi ... giây</strong>.</div>
+          </section>
+
+
+          <section class="card" id="object-code">
+            <h2 class="title"><span class="ti">💻</span>Code cụ thể cho từng đối tượng</h2>
+            <p class="sub">Khi làm bài, học sinh cần chọn đúng đối tượng ở danh sách nhân vật rồi ghép đúng các khối lệnh dưới đây.</p>
+
+            <div class="object-code">
+              <div class="code-card">
+                <div class="code-head">
+                  <h4>🐘 Đối tượng 1: Voi Vũ Công</h4>
+                  <span class="script-badge">Code chính của bài</span>
+                </div>
+                <div class="script-box">
+                  <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                  <div class="block motion indent">Đi tới x: 0 y: -40</div>
+                  <div class="block looks indent">Hiện</div>
+                  <div class="block looks indent">Nói “Bashful ơi, cùng nhảy nào!” trong 2 giây</div>
+                  <div class="block control indent">Lặp lại 10 lần</div>
+                  <div class="block looks indent2">Trang phục kế tiếp</div>
+                  <div class="block motion indent2">Thay đổi y một lượng 15</div>
+                  <div class="block control indent2">Đợi 0.1 giây</div>
+                  <div class="block motion indent2">Thay đổi y một lượng -15</div>
+                  <div class="block control indent2">Đợi 0.2 giây</div>
+                </div>
+                <p class="script-note"><strong>Vai trò:</strong> Voi là nhân vật biểu diễn chính. Khối “trang phục kế tiếp” tạo dáng nhảy, khối “đợi” giúp chuyển động không bị quá nhanh.</p>
+              </div>
+
+              <div class="grid2">
+                <div class="code-card">
+                  <div class="code-head">
+                    <h4>🍌 Đối tượng 2: Chuối Vui Nhộn</h4>
+                    <span class="script-badge">Âm thanh vui</span>
+                  </div>
+                  <div class="script-box">
+                    <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                    <div class="block motion indent">Đi tới x: -135 y: -85</div>
+                    <div class="block looks indent">Đặt kích thước thành 80%</div>
+                    <div class="block looks indent">Hiện</div>
+                    <div class="block event">Khi bấm vào đối tượng này</div>
+                    <div class="block sound indent">Phát âm thanh Pop cho đến hết</div>
+                    <div class="block looks indent">Thay đổi hiệu ứng màu một lượng 25</div>
+                    <div class="block control indent">Đợi 0.2 giây</div>
+                    <div class="block looks indent">Xóa các hiệu ứng đồ họa</div>
+                  </div>
+                  <p class="script-note"><strong>Vai trò:</strong> Chuối tạo hiệu ứng vui khi học sinh bấm vào, giúp sân khấu sinh động hơn.</p>
+                </div>
+
+                <div class="code-card">
+                  <div class="code-head">
+                    <h4>🥁 Đối tượng 3: Trống Nhịp Điệu</h4>
+                    <span class="script-badge">Tạo nhịp</span>
+                  </div>
+                  <div class="script-box">
+                    <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                    <div class="block motion indent">Đi tới x: 155 y: -85</div>
+                    <div class="block looks indent">Đặt kích thước thành 85%</div>
+                    <div class="block looks indent">Hiện</div>
+                    <div class="block event">Khi bấm vào đối tượng này</div>
+                    <div class="block sound indent">Phát âm thanh Drum cho đến hết</div>
+                    <div class="block control indent">Lặp lại 2 lần</div>
+                    <div class="block looks indent2">Thay đổi kích thước một lượng 10</div>
+                    <div class="block control indent2">Đợi 0.1 giây</div>
+                    <div class="block looks indent2">Thay đổi kích thước một lượng -10</div>
+                  </div>
+                  <p class="script-note"><strong>Vai trò:</strong> Trống tạo nhịp và hiệu ứng phóng to/thu nhỏ để học sinh thấy rõ phản hồi khi bấm.</p>
+                </div>
+              </div>
+
+              <div class="grid2">
+                <div class="code-card">
+                  <div class="code-head">
+                    <h4>🐰 Đối tượng 4: Thỏ Bashful</h4>
+                    <span class="script-badge">Nhân vật câu chuyện</span>
+                  </div>
+                  <div class="script-box">
+                    <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                    <div class="block motion indent">Đi tới x: 130 y: -75</div>
+                    <div class="block looks indent">Hiện</div>
+                    <div class="block looks indent">Nói “Mình muốn học nhảy!” trong 2 giây</div>
+                    <div class="block control indent">Đợi 2 giây</div>
+                    <div class="block looks indent">Nói “Voi nhảy đẹp quá!” trong 2 giây</div>
+                  </div>
+                  <p class="script-note"><strong>Vai trò:</strong> Bashful giúp câu chuyện có mục tiêu rõ ràng: học nhảy để tự tin hơn.</p>
+                </div>
+
+                <div class="code-card">
+                  <div class="code-head">
+                    <h4>🐱 Đối tượng 5: Mèo Scratch</h4>
+                    <span class="script-badge">Người dẫn chuyện</span>
+                  </div>
+                  <div class="script-box">
+                    <div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div>
+                    <div class="block motion indent">Đi tới x: -160 y: -75</div>
+                    <div class="block looks indent">Hiện</div>
+                    <div class="block looks indent">Nói “Hôm nay chúng ta sẽ giúp Bashful học nhảy!” trong 2 giây</div>
+                    <div class="block control indent">Đợi 2 giây</div>
+                    <div class="block looks indent">Nói “Hãy bấm vào Chuối hoặc Trống để tạo âm thanh nhé!” trong 3 giây</div>
+                  </div>
+                  <p class="script-note"><strong>Vai trò:</strong> Mèo Scratch hướng dẫn người học và kết nối các đối tượng trên sân khấu.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-note">
+              <strong>Thứ tự làm bài khuyến nghị:</strong> tạo sân khấu → thêm đủ 5 đối tượng → lập trình Voi trước → lập trình Chuối và Trống → thêm lời thoại cho Bashful và Mèo Scratch → bấm cờ xanh để kiểm tra.
+            </div>
+          </section>
+
+          <section class="card" id="simulation">
+            <h2 class="title"><span class="ti">🎮</span>Mô phỏng điệu nhảy</h2>
+            <p class="sub">Bấm cờ xanh để thấy Voi nhảy, bấm Chuối hoặc Trống để nghe hiệu ứng mô phỏng.</p>
+            <div class="two-pane">
+              <div class="sim-stage">
+                <div class="cloud c1"></div><div class="cloud c2"></div>
+                <div class="bubble" id="bubble">Bashful ơi, cùng nhảy nào!</div>
+                <div class="elephant" id="elephant">🐘</div>
+                <div class="banana" id="banana" title="Bấm chuối">🍌</div>
+                <div class="drum" id="drum" title="Bấm trống">🥁</div>
+              </div>
+              <div class="panel">
+                <div class="field"><label for="waitTime">Thời gian đợi giữa hai dáng nhảy</label><select id="waitTime"><option value="260">0.2 giây</option><option value="420">0.4 giây</option><option value="700">0.7 giây</option></select></div>
+                <div class="field"><label for="repeatTimes">Số lần lặp</label><select id="repeatTimes"><option value="6">6 lần</option><option value="10" selected>10 lần</option><option value="16">16 lần</option></select></div>
+                <div class="btns"><button class="btnx btn-green" id="runDance"><span class="flag"></span>Bấm cờ xanh</button><button class="btnx btn-orange" id="playBanana">🍌 Chuối</button><button class="btnx btn-purple" id="playDrum">🥁 Trống</button><button class="btnx btn-blue" id="resetSim">Làm lại</button></div>
+                <div class="note"><strong>Quan sát:</strong> Khi số lần lặp tăng, điệu nhảy kéo dài hơn. Khi thời gian đợi quá nhỏ, chuyển động sẽ khó nhìn.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card" id="arrange">
+            <h2 class="title"><span class="ti">🧱</span>Sắp xếp khối lệnh</h2>
+            <p class="sub">Chọn các khối theo thứ tự để tạo điệu nhảy cơ bản cho Voi.</p>
+            <div class="grid2">
+              <div><h4>Kho khối</h4><div class="choices">
+                <div class="choice" data-key="flag"><div class="block event"><span class="flag"></span>Khi bấm cờ xanh</div></div>
+                <div class="choice" data-key="repeat"><div class="block control">Lặp lại 10 lần</div></div>
+                <div class="choice" data-key="costume"><div class="block looks">Trang phục kế tiếp</div></div>
+                <div class="choice" data-key="wait"><div class="block control">Đợi 0.2 giây</div></div>
+              </div></div>
+              <div><h4>Thứ tự em chọn</h4><div class="zone" id="chosenZone"></div><div class="btns" style="margin-top:12px"><button class="btnx btn-green" id="checkOrder">Kiểm tra</button><button class="btnx btn-blue" id="resetOrder">Làm lại</button></div><p id="orderFeedback" class="score"></p></div>
+            </div>
+          </section>
+
+          <section class="card" id="practice">
+            <h2 class="title"><span class="ti">✅</span>Thực hành trên Scratch</h2>
+            <div class="grid2">
+              <div>
+                <h4>Checklist hoàn thành</h4>
+                <div class="checklist">
+                  <label class="check"><input type="checkbox"> Đã thêm Voi Vũ Công vào sân khấu.</label>
+                  <label class="check"><input type="checkbox"> Đã thêm Chuối Vui Nhộn và Trống Nhịp Điệu.</label>
+                  <label class="check"><input type="checkbox"> Đã lập trình Voi đổi trang phục.</label>
+                  <label class="check"><input type="checkbox"> Đã thêm khối đợi để chuyển động dễ nhìn.</label>
+                  <label class="check"><input type="checkbox"> Đã dùng lặp lại hoặc liên tục.</label>
+                  <label class="check"><input type="checkbox"> Đã lập trình âm thanh cho Chuối hoặc Trống.</label>
+                  <label class="check"><input type="checkbox"> Đã kiểm tra code riêng của từng đối tượng.</label>
+                </div>
+                <div class="score" id="taskScore">0/7 nhiệm vụ</div>
+              </div>
+              <div>
+                <h4>Lỗi hay gặp</h4>
+                <div class="grid2">
+                  <div class="mistake"><strong>Chạy quá nhanh:</strong> thiếu khối đợi nên không thấy Voi đổi dáng.</div>
+                  <div class="mistake"><strong>Chọn nhầm đối tượng:</strong> ghép lệnh cho Chuối nhưng tưởng là Voi.</div>
+                  <div class="mistake"><strong>Không phát âm thanh:</strong> chưa dùng khối “khi bấm vào nhân vật này”.</div>
+                  <div class="mistake"><strong>Voi rời sân khấu:</strong> cần đặt lại vị trí x, y trước khi bắt đầu.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2 class="title"><span class="ti">🏋️</span>Bài tập phân tầng</h2>
+            <div class="grid4">
+              <div class="mini"><span class="level lv1">Cơ bản</span><ul><li>Lập trình Voi đổi hai trang phục.</li><li>Thêm khối đợi để nhìn rõ chuyển động.</li></ul></div>
+              <div class="mini"><span class="level lv2">Trung bình</span><ul><li>Cho Chuối phát âm thanh khi được nhấn.</li><li>Cho Trống lặp lại âm thanh 10 lần.</li></ul></div>
+              <div class="mini"><span class="level lv3">Nâng cao</span><ul><li>Kết hợp Voi nhảy và Trống đánh nhịp.</li><li>Đưa Bashful vào sân khấu để cổ vũ.</li></ul></div>
+              <div class="mini"><span class="level lv4">Sáng tạo</span><ul><li>Tạo một tiết mục có mở đầu, cao trào và kết thúc.</li><li>Viết kịch bản trước khi ghép khối.</li></ul></div>
+            </div>
+          </section>
+
+          <section class="card" id="quiz">
+            <h2 class="title"><span class="ti">📝</span>Quiz cuối bài</h2>
+            <div class="quiz">
+              <div class="q"><strong>Câu 1. Vì sao cần thêm khối “đợi ... giây” khi Voi đổi trang phục?</strong><div class="options"><div class="option" data-correct="1">Để chuyển động chậm hơn và dễ quan sát.</div><div class="option">Để xóa nhân vật khỏi sân khấu.</div><div class="option">Để đổi tên dự án.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 2. Trước khi lập trình cho Voi, em cần làm gì?</strong><div class="options"><div class="option">Đóng Scratch.</div><div class="option" data-correct="1">Chọn đúng đối tượng Voi trong danh sách đối tượng.</div><div class="option">Xóa toàn bộ phông nền.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 3. Khối nào phù hợp để Trống phát âm thanh khi được nhấn?</strong><div class="options"><div class="option" data-correct="1">Khi bấm vào nhân vật này.</div><div class="option">Khi phím cách được thả.</div><div class="option">Ẩn nhân vật.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 4. Khối “lặp lại 10 lần” giúp gì cho chương trình?</strong><div class="options"><div class="option">Chỉ đổi màu nền.</div><div class="option" data-correct="1">Thực hiện các khối bên trong nhiều lần.</div><div class="option">Tự lưu máy tính.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 5. Nếu Voi chạy ra khỏi sân khấu, cách sửa hợp lý là gì?</strong><div class="options"><div class="option">Tắt trình duyệt.</div><div class="option" data-correct="1">Đặt lại vị trí x, y của Voi trước khi chạy.</div><div class="option">Xóa khối cờ xanh.</div></div><div class="feedback"></div></div>
+            </div>
+            <div class="btns" style="margin-top:14px"><button class="btnx btn-green" id="checkQuiz">Kiểm tra đáp án</button><button class="btnx btn-blue" id="resetQuiz">Làm lại</button><span class="score" id="quizScore"></span></div>
+          </section>
+
+          <div class="footer-nav">
+            <a class="btnx btn-blue" href="https://tin247ctp.com/scratch/bai-01/">← Bài trước</a>
+            <a class="btnx btn-dark" href="https://tin247ctp.com/scratch/bai-03/">Bài tiếp theo →</a>
+          </div>
+
+          <footer class="copyright">
+            <strong>Nguyễn Trung Chiến</strong>
+            <span>THPT chuyên Trần Phú · SĐT/Zalo: 0934353569</span>
+            <span>Tài liệu học Scratch dành cho học sinh tự học và thực hành trên lớp.</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const bar=document.getElementById('readProgress');
+      const toast=document.getElementById('copyToast');
+      function progress(){const h=document.documentElement;bar.style.width=((h.scrollTop/(h.scrollHeight-h.clientHeight))*100||0)+'%'}
+      addEventListener('scroll',progress);progress();
+      function showToast(){toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),1700)}
+      ['copy','cut','dragstart'].forEach(evt=>document.addEventListener(evt,e=>{if(!e.target.matches('input,textarea,select')){e.preventDefault();showToast();}}));
+      document.addEventListener('contextmenu',e=>{e.preventDefault();showToast();});
+      document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(e.key==='F12'||(e.ctrlKey&&['c','x','s','p','u'].includes(k))||(e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(k))){e.preventDefault();showToast();}});
+
+      const elephant=document.getElementById('elephant'), bubble=document.getElementById('bubble');
+      const runDance=document.getElementById('runDance'), resetSim=document.getElementById('resetSim'), playBanana=document.getElementById('playBanana'), playDrum=document.getElementById('playDrum');
+      let simTimer=null;
+      function speak(text){bubble.textContent=text;bubble.classList.add('show');setTimeout(()=>bubble.classList.remove('show'),1400)}
+      runDance.onclick=()=>{clearInterval(simTimer);let n=0;const total=+document.getElementById('repeatTimes').value;const delay=+document.getElementById('waitTime').value;speak('Voi Vũ Công bắt đầu biểu diễn!');simTimer=setInterval(()=>{n++;elephant.classList.toggle('jump');elephant.style.left=(50+n*14)+'px';if(n>=total){clearInterval(simTimer);speak('Bashful thấy vui hơn rồi!');}},delay)};
+      resetSim.onclick=()=>{clearInterval(simTimer);elephant.classList.remove('jump');elephant.style.left='50px';speak('Sẵn sàng chạy lại chương trình!')};
+      playBanana.onclick=()=>speak('Chuối: ting ting! 🍌');
+      playDrum.onclick=()=>speak('Trống: tùng tùng tùng! 🥁');
+      document.getElementById('banana').onclick=()=>playBanana.click();
+      document.getElementById('drum').onclick=()=>playDrum.click();
+
+      const chosen=[];const zone=document.getElementById('chosenZone');
+      document.querySelectorAll('.choice').forEach(c=>c.addEventListener('click',()=>{chosen.push(c.dataset.key);const clone=c.firstElementChild.cloneNode(true);zone.appendChild(clone);c.classList.add('selected')}));
+      document.getElementById('checkOrder').onclick=()=>{const ok=['flag','repeat','costume','wait'].every((v,i)=>chosen[i]===v)&&chosen.length===4;document.getElementById('orderFeedback').textContent=ok?'✅ Đúng thứ tự cơ bản: bắt đầu → lặp → đổi trang phục → đợi.':'❌ Chưa đúng. Hãy bắt đầu bằng cờ xanh, sau đó dùng lặp lại, rồi đặt đổi trang phục và đợi bên trong.'};
+      document.getElementById('resetOrder').onclick=()=>{chosen.length=0;zone.innerHTML='';document.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected'));document.getElementById('orderFeedback').textContent=''};
+
+      const checks=document.querySelectorAll('.checklist input');
+      checks.forEach(i=>i.addEventListener('change',()=>{const n=document.querySelectorAll('.checklist input:checked').length;document.getElementById('taskScore').textContent=n+'/'+checks.length+' nhiệm vụ'}));
+
+      document.querySelectorAll('.option').forEach(o=>o.addEventListener('click',()=>{const q=o.closest('.q');q.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected')}));
+      document.getElementById('checkQuiz').onclick=()=>{let score=0,total=0;document.querySelectorAll('.q').forEach(q=>{total++;const sel=q.querySelector('.option.selected');const ok=sel&&sel.dataset.correct==='1';q.querySelectorAll('.option').forEach(o=>{o.classList.remove('correct','wrong');if(o.dataset.correct==='1')o.classList.add('correct')});if(sel&&!ok)sel.classList.add('wrong');if(ok)score++;q.querySelector('.feedback').textContent=ok?'✅ Chính xác!':'❌ Xem lại phần hướng dẫn rồi thử lại.'});document.getElementById('quizScore').textContent='Điểm: '+score+'/'+total};
+      document.getElementById('resetQuiz').onclick=()=>{document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected','correct','wrong'));document.querySelectorAll('.feedback').forEach(f=>f.textContent='');document.getElementById('quizScore').textContent=''};
+    });
+  </script>
+</body>
+</html>

@@ -1,59 +1,184 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu khái niệm <b>đệ quy</b>: hàm tự gọi lại chính nó.</li>
-  <li>Nắm được hai phần quan trọng của hàm đệ quy: <b>điều kiện dừng</b> và <b>lời gọi lại</b>.</li>
-</ul>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#06b6d4;--g:#16a34a;--o:#f97316;--r:#ef4444;--bg:#f6f8ff;--txt:#1e293b;--bd:#dbe4ff;--code:#0f172a}.lesson-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--txt);background:radial-gradient(circle at top left,rgba(79,70,229,.14),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(6,182,212,.16),transparent 28rem),linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border-radius:22px;padding:clamp(18px,2.6vw,34px);line-height:1.75}.lesson-page *{box-sizing:border-box}.lesson-hero{position:relative;overflow:hidden;color:#fff;padding:clamp(26px,4vw,46px);border-radius:28px;background:linear-gradient(135deg,rgba(67,56,202,.96),rgba(37,99,235,.92));box-shadow:0 25px 60px rgba(79,70,229,.25);margin-bottom:24px}.lesson-hero:after{content:"";position:absolute;width:260px;height:260px;right:-85px;top:-80px;border-radius:999px;background:rgba(255,255,255,.14)}.hero-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#eef2ff;padding:7px 12px;border-radius:999px;font-weight:700;font-size:.92rem;margin-bottom:12px}.lesson-hero h1{margin:0 0 12px;font-size:clamp(1.75rem,4vw,3rem);font-weight:900}.lesson-hero p{color:#e0f2fe;max-width:980px;font-size:1.05rem;margin:0}.hero-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}.hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px}.hero-stat b{display:block;font-size:1.2rem;color:#fff}.hero-stat span{color:#dbeafe;font-size:.9rem}.lesson-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.82);backdrop-filter:blur(10px);padding:10px 0 12px}.lesson-progress{height:10px;border-radius:999px;background:#dbeafe;overflow:hidden}.lesson-progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--p),var(--a));transition:width .15s linear}.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}.lesson-nav a{text-decoration:none;color:var(--pd);background:#eef2ff;border:1px solid var(--bd);border-radius:999px;padding:6px 10px;font-weight:700;font-size:.9rem}.lesson-card{background:rgba(255,255,255,.95);border:1px solid var(--bd);border-radius:24px;padding:clamp(18px,2.4vw,28px);margin:20px 0;box-shadow:0 16px 42px rgba(30,64,175,.08)}.lesson-card h2{color:var(--pd);margin:0 0 14px;font-weight:900;display:flex;align-items:center;gap:10px}.lesson-card h3{color:#334155;margin-top:20px;font-weight:850}.mini-slide{animation:fadeUp .55s ease both}@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.info-box{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0}.callout{border-left:6px solid var(--a);background:#ecfeff;border-radius:16px;padding:14px 16px;margin:14px 0}.warn{border-left-color:var(--o);background:#fff7ed}.danger{border-left-color:var(--r);background:#fff1f2}.success{border-left-color:var(--g);background:#f0fdf4}.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:800;font-size:.88rem}.pill.green{background:#dcfce7;color:#166534}.pill.orange{background:#ffedd5;color:#9a3412}.pill.red{background:#fee2e2;color:#991b1b}.pill.cyan{background:#cffafe;color:#155e75}.lesson-table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:18px}.lesson-table{width:100%;border-collapse:collapse;min-width:820px;background:#fff}.lesson-table th,.lesson-table td{border-bottom:1px solid #e2e8f0;padding:13px 14px;text-align:left;vertical-align:top}.lesson-table th{background:#eef2ff;color:#312e81;font-weight:900}.code-tabs{border:1px solid var(--bd);border-radius:18px;overflow:hidden;background:var(--code);margin:14px 0}.tab-buttons{display:flex;flex-wrap:wrap;background:#edf2ff;border-bottom:1px solid var(--bd)}.tab-btn{appearance:none;border:0;background:transparent;padding:12px 16px;font-weight:900;color:#334155;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.tab-panel{display:none;position:relative}.tab-panel.active{display:block}.copy-btn{position:absolute;top:10px;right:10px;z-index:3;border:0;background:rgba(255,255,255,.13);color:#e2e8f0;border-radius:999px;padding:6px 10px;font-size:.8rem;cursor:pointer}.lesson-page pre{margin:0;max-height:560px;overflow:auto;background:var(--code);color:#f8fafc;padding:22px;font-size:14.5px;line-height:1.7;border-radius:0;white-space:pre;tab-size:4}.lesson-page code{font-family:Consolas,Monaco,"Courier New",monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{background:#fdf2f8;color:#be185d;border-radius:7px;padding:2px 6px;font-weight:800}.stack-visual{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid var(--bd);border-radius:22px;padding:18px}.stack-area{min-height:290px;display:flex;flex-direction:column-reverse;gap:8px;justify-content:flex-start;padding:14px;border-radius:18px;background:#f8fafc;border:1px dashed #bfdbfe}.stack-frame{border-radius:14px;padding:10px 12px;background:linear-gradient(135deg,#eef2ff,#e0f2fe);border:1px solid #c7d2fe;font-weight:900;color:#312e81;box-shadow:0 8px 18px rgba(79,70,229,.11);animation:frameIn .25s ease both}.stack-frame.returning{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#166534;border-color:#22c55e}@keyframes frameIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}.flow-line{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}.flow-step{padding:10px 12px;border-radius:14px;background:#eef2ff;color:#312e81;font-weight:900;border:1px solid #c7d2fe}.flow-arrow{color:#64748b;font-weight:900}.log-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:105px;max-height:260px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:14px;color:#334155}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.btn-lesson{border:0;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;background:var(--p);color:white;box-shadow:0 8px 18px rgba(79,70,229,.2)}.btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none}.input-lesson{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:11px 13px;font:inherit;outline:none;background:#fff}.input-lesson:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.12)}.fib-bars{display:flex;gap:10px;align-items:flex-end;min-height:170px;padding:14px;background:#f8fafc;border:1px dashed #bfdbfe;border-radius:18px;overflow-x:auto}.fib-bar-wrap{min-width:90px;display:flex;flex-direction:column;align-items:center;gap:6px}.fib-bar{width:58px;border-radius:12px 12px 6px 6px;background:linear-gradient(180deg,#60a5fa,#4f46e5);color:white;display:flex;justify-content:center;align-items:flex-start;padding-top:7px;font-weight:900;transition:.25s;font-size:.8rem}.fib-bar.bad{background:linear-gradient(180deg,#fda4af,#ef4444)}.fib-bar.good{background:linear-gradient(180deg,#86efac,#16a34a)}.small-label{font-size:.8rem;color:#64748b;font-weight:800;text-align:center}.exercise-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.quiz-item{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 0;background:#fff}.quiz-options{display:grid;gap:8px;margin-top:10px}.quiz-option{text-align:left;border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}.feedback{margin-top:8px;font-weight:800}.checklist{display:grid;gap:10px}.checkitem{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px}.checkitem i{margin-top:5px;color:var(--g)}@media(max-width:900px){.grid-2,.grid-3,.hero-grid{grid-template-columns:1fr}.lesson-page{padding:14px;border-radius:16px}.lesson-hero{border-radius:20px}}
+</style>
 
-<hr>
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-rotate"></i> Chuyên đề nền tảng hiện đại</div>
+    <h1>🔁 Đệ quy hiện đại: Base Case, Call Stack, Memoization & DFS</h1>
+    <p>Bài học này giữ kiến thức cốt lõi về <b>đệ quy</b>, nhưng trình bày theo hướng thực tế hơn: hiểu <b>call stack</b>, biết khi nào nên dùng đệ quy, khi nào nên chuyển sang vòng lặp hoặc quy hoạch động để tránh lỗi và quá thời gian.</p>
+    <div class="hero-grid">
+      <div class="hero-stat"><b>Base case</b><span>Điều kiện dừng bắt buộc</span></div>
+      <div class="hero-stat"><b>Call stack</b><span>Hiểu chương trình đang gọi gì</span></div>
+      <div class="hero-stat"><b>Memoization</b><span>Đệ quy + ghi nhớ kết quả</span></div>
+      <div class="hero-stat"><b>DFS/Backtracking</b><span>Ứng dụng còn dùng nhiều</span></div>
+    </div>
+  </div>
 
-<h2>📘 Giải thích</h2>
-<p>Một hàm đệ quy có dạng:</p>
+  <div class="lesson-progress-wrap">
+    <div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div>
+    <div class="lesson-nav">
+      <a href="#goals">Mục tiêu</a><a href="#concept">Khái niệm</a><a href="#stack">Call stack</a><a href="#code">Code mẫu</a><a href="#modern">Hiện đại</a><a href="#memo">Memoization</a><a href="#mistakes">Lỗi hay nhầm</a><a href="#practice">Bài tập</a>
+    </div>
+  </div>
 
-<pre><code>// C++
-returnType function(parameters) {
-    if (điều kiện dừng) return kết_quả;
-    return function(tham_số_thay_đổi);
-}</code></pre>
+  <section class="lesson-card mini-slide" id="goals">
+    <h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2>
+    <div class="grid-2">
+      <div class="info-box"><h3>Học xong cần làm được</h3><ul><li>Hiểu khái niệm <b>đệ quy</b>: hàm tự gọi lại chính nó.</li><li>Nắm được hai phần quan trọng: <b>điều kiện dừng</b> và <b>lời gọi thu nhỏ bài toán</b>.</li><li>Hiểu vì sao không có điều kiện dừng sẽ gây <b>tràn stack</b>.</li><li>Biết phân biệt đệ quy nên dùng, đệ quy nên tránh, và đệ quy cần tối ưu bằng ghi nhớ.</li></ul></div>
+      <div class="info-box"><h3>Kiến thức cập nhật, thực dụng</h3><ul><li>Không dùng đệ quy ngây thơ cho Fibonacci lớn.</li><li>Không lạm dụng đệ quy cho bài chỉ cần vòng lặp đơn giản.</li><li>Ưu tiên <b>memoization</b>, <b>iterative DP</b>, hoặc vòng lặp khi dữ liệu lớn.</li><li>Đệ quy vẫn rất mạnh trong DFS, cây, chia để trị, quay lui.</li></ul></div>
+    </div>
+  </section>
 
-<p>Nếu không có điều kiện dừng, chương trình sẽ gọi vô hạn và <b>tràn stack</b>.</p>
+  <section class="lesson-card mini-slide" id="concept">
+    <h2><i class="fa-solid fa-brain"></i> 1. Đệ quy là gì?</h2>
+    <p><b>Đệ quy</b> là cách viết hàm trong đó hàm tự gọi lại chính nó để giải một phiên bản nhỏ hơn của bài toán ban đầu. Một hàm đệ quy tốt thường có hai phần:</p>
+    <div class="grid-2"><div class="info-box"><span class="pill green"><i class="fa-solid fa-stop"></i> Điều kiện dừng</span><p>Trường hợp nhỏ nhất có thể trả lời ngay. Ví dụ: <code>factorial(0) = 1</code>.</p></div><div class="info-box"><span class="pill orange"><i class="fa-solid fa-arrow-down-1-9"></i> Bước thu nhỏ</span><p>Gọi lại chính hàm đó với dữ liệu nhỏ hơn. Ví dụ: <code>factorial(n - 1)</code>.</p></div></div>
+    <div class="flow-line"><div class="flow-step">Bài toán lớn</div><div class="flow-arrow">→</div><div class="flow-step">Bài toán nhỏ hơn</div><div class="flow-arrow">→</div><div class="flow-step">Điều kiện dừng</div><div class="flow-arrow">→</div><div class="flow-step">Trả kết quả ngược lại</div></div>
+    <div class="callout danger"><b>Không còn nên dạy theo kiểu “cứ gọi lại là được”.</b> Học sinh phải luôn hỏi: dữ liệu có nhỏ đi không? Có điều kiện dừng không? Số lần gọi có quá nhiều không?</div>
+  </section>
 
-<hr>
+  <section class="lesson-card mini-slide" id="stack">
+    <h2><i class="fa-solid fa-layer-group"></i> 2. Mô phỏng Call Stack: factorial(n)</h2>
+    <p>Mỗi lần hàm gọi lại chính nó, máy tính tạo một <b>khung gọi hàm</b> trên stack. Khi gặp điều kiện dừng, các khung này lần lượt trả kết quả ngược lại.</p>
+    <div class="grid-2"><div class="stack-visual"><label><b>Nhập n nhỏ để mô phỏng</b></label><input class="input-lesson" id="factorialN" value="5"><div class="controls"><button class="btn-lesson" id="stackNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="stackResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div><div class="stack-area" id="stackArea"></div></div><div class="log-box" id="stackLog">Nhấn “Bước tiếp” để xem quá trình gọi hàm.</div></div>
+    <div class="callout warn">Với <code>n</code> rất lớn, số khung gọi hàm cũng lớn. Vì vậy Python có giới hạn độ sâu đệ quy, còn C++ cũng có thể tràn stack nếu gọi quá sâu.</div>
+  </section>
 
-<h2>💻 Ví dụ: Giai thừa n!</h2>
-
-<h4>C++</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+  <section class="lesson-card mini-slide" id="code">
+    <h2><i class="fa-solid fa-code"></i> 3. Code mẫu: Giai thừa n!</h2>
+    <p>Ví dụ giai thừa phù hợp để học cấu trúc đệ quy, nhưng trong bài thi lớn cần chú ý tràn số. Với C++, <code>long long</code> chỉ lưu được một số giai thừa nhỏ.</p>
+    <div class="code-tabs" data-tabs="factorial"><div class="tab-buttons"><button class="tab-btn active" data-target="fact-cpp">C++ đệ quy</button><button class="tab-btn" data-target="fact-py">Python đệ quy</button><button class="tab-btn" data-target="fact-iter">C++ vòng lặp</button></div>
+      <div class="tab-panel active" id="fact-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int factorial(int n){
-    if(n==0) return 1;
-    return n * factorial(n-1);
+
+long long factorial(int n) {
+    if (n == 0) return 1;              // điều kiện dừng
+    return 1LL * n * factorial(n - 1); // gọi bài toán nhỏ hơn
 }
-int main(){
-    int n;cin>>n;
-    cout<<factorial(n);
-}</code></pre>
 
-<h4>Python</h4>
-<pre><code>def factorial(n):
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    cout &lt;&lt; factorial(n);
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="fact-py"><button class="copy-btn">Sao chép</button><pre><code>def factorial(n):
     if n == 0:
-        return 1
+        return 1              # điều kiện dừng
     return n * factorial(n - 1)
-print(factorial(int(input())))</code></pre>
 
-<hr>
+n = int(input())
+print(factorial(n))</code></pre></div>
+      <div class="tab-panel" id="fact-iter"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Tính giai thừa của n (n!).</li>
-  <li>Tính tổng từ 1 đến n bằng đệ quy.</li>
-  <li>Tính Fibonaci thứ n (Fₙ = Fₙ₋₁ + Fₙ₋₂).</li>
-</ol>
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    long long ans = 1;
+    for (int i = 1; i &lt;= n; i++) ans *= i;
+    cout &lt;&lt; ans;
+    return 0;
+}</code></pre></div>
+    </div>
+  </section>
 
-<details>
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python
+  <section class="lesson-card mini-slide" id="modern">
+    <h2><i class="fa-solid fa-sparkles"></i> 4. Kiến thức hiện đại: dùng đệ quy đúng chỗ</h2>
+    <div class="lesson-table-wrap"><table class="lesson-table"><thead><tr><th>Tình huống</th><th>Nên làm gì?</th><th>Lý do</th><th>Ví dụ</th></tr></thead><tbody>
+      <tr><td>Bài toán có cấu trúc cây / đồ thị</td><td><span class="pill green">Có thể dùng đệ quy</span></td><td>DFS tự nhiên, code ngắn, dễ hiểu.</td><td>Duyệt cây, đếm component, DFS trên mê cung.</td></tr>
+      <tr><td>Bài toán chia đôi</td><td><span class="pill green">Đệ quy rất hợp</span></td><td>Mỗi bước chia thành bài toán nhỏ hơn.</td><td>Merge Sort, Quick Sort, Divide and Conquer.</td></tr>
+      <tr><td>Bài liệt kê khả năng</td><td><span class="pill cyan">Dùng quay lui</span></td><td>Đệ quy giúp thử - chọn - quay lại rõ ràng.</td><td>Sinh nhị phân, hoán vị, tổ hợp.</td></tr>
+      <tr><td>Fibonacci lớn bằng công thức đệ quy thường</td><td><span class="pill red">Không nên</span></td><td>Lặp lại quá nhiều lời gọi, độ phức tạp tăng rất nhanh.</td><td><code>fib(n-1) + fib(n-2)</code> không ghi nhớ.</td></tr>
+      <tr><td>Bài chỉ cần cộng từ 1 đến n</td><td><span class="pill orange">Ưu tiên vòng lặp / công thức</span></td><td>Đệ quy không làm bài đơn giản hơn, lại tăng rủi ro stack.</td><td>Tổng 1..n, giai thừa n nhỏ.</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="memo">
+    <h2><i class="fa-solid fa-memory"></i> 5. Fibonacci: từ đệ quy cũ sang memoization</h2>
+    <p>Fibonacci đệ quy ngây thơ thường được dùng để minh họa, nhưng <b>không nên dùng cho n lớn</b>. Cách hiện đại hơn là ghi nhớ kết quả đã tính, gọi là <b>memoization</b>.</p>
+    <div class="grid-2"><div class="info-box"><h3>So sánh số lời gọi ước lượng</h3><div class="fib-bars" id="fibBars"></div><label><b>Nhập n</b></label><input class="input-lesson" id="fibN" value="10"><div class="controls"><button class="btn-lesson" id="fibCompareBtn"><i class="fa-solid fa-chart-simple"></i> So sánh</button></div></div><div class="log-box" id="fibLog">Nhấn “So sánh” để xem vì sao Fibonacci đệ quy thường rất chậm.</div></div>
+    <div class="code-tabs" data-tabs="fib"><div class="tab-buttons"><button class="tab-btn active" data-target="fib-bad-py">Python chưa tối ưu</button><button class="tab-btn" data-target="fib-memo-py">Python memoization</button><button class="tab-btn" data-target="fib-dp-cpp">C++ DP lặp</button></div>
+      <div class="tab-panel active" id="fib-bad-py"><button class="copy-btn">Sao chép</button><pre><code># Chỉ dùng để minh họa, không dùng với n lớn
+
 def fib(n):
-    if n <= 1: return n
+    if n &lt;= 1:
+        return n
     return fib(n - 1) + fib(n - 2)
-print(fib(6))</code></pre>
-</details>
+
+print(fib(6))</code></pre></div>
+      <div class="tab-panel" id="fib-memo-py"><button class="copy-btn">Sao chép</button><pre><code>from functools import lru_cache
+
+@lru_cache(None)
+def fib(n):
+    if n &lt;= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+n = int(input())
+print(fib(n))</code></pre></div>
+      <div class="tab-panel" id="fib-dp-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    vector&lt;long long&gt; dp(n + 2, 0);
+    dp[0] = 0;
+    dp[1] = 1;
+    for (int i = 2; i &lt;= n; i++) dp[i] = dp[i - 1] + dp[i - 2];
+    cout &lt;&lt; dp[n];
+    return 0;
+}</code></pre></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide"><h2><i class="fa-solid fa-route"></i> 6. Mẫu tư duy khi viết đệ quy</h2><div class="grid-3"><div class="info-box"><span class="pill green">Bước 1</span><h3>Xác định bài toán nhỏ nhất</h3><p>Ví dụ <code>sum(1)=1</code>, <code>factorial(0)=1</code>, cây rỗng thì kết quả là 0.</p></div><div class="info-box"><span class="pill orange">Bước 2</span><h3>Viết công thức thu nhỏ</h3><p>Ví dụ <code>sum(n)=n+sum(n-1)</code>. Dữ liệu phải tiến dần về điều kiện dừng.</p></div><div class="info-box"><span class="pill cyan">Bước 3</span><h3>Ước lượng số lần gọi</h3><p>Nếu số lời gọi lặp lại quá nhiều, cần memoization, DP hoặc cách khác.</p></div></div></section>
+
+  <section class="lesson-card mini-slide" id="mistakes"><h2><i class="fa-solid fa-triangle-exclamation"></i> 7. Lỗi học sinh hay nhầm</h2><div class="checklist"><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Quên điều kiện dừng.</b><br>Hàm gọi mãi không kết thúc, dẫn đến tràn stack.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Tham số không nhỏ đi.</b><br>Ví dụ gọi <code>factorial(n)</code> bên trong chính <code>factorial(n)</code> thì không bao giờ tiến về điều kiện dừng.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Dùng Fibonacci đệ quy thường cho n lớn.</b><br>Cần memoization hoặc DP lặp.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Nghĩ đệ quy luôn tốt hơn vòng lặp.</b><br>Với bài đơn giản như tính tổng, vòng lặp hoặc công thức thường rõ và an toàn hơn.</div></div><div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Không chú ý giới hạn stack.</b><br>DFS rất sâu hoặc n quá lớn có thể cần chuyển sang stack tự quản lý hoặc vòng lặp.</div></div></div></section>
+
+  <section class="lesson-card mini-slide" id="practice"><h2><i class="fa-solid fa-dumbbell"></i> 8. Bài tập luyện tập phân loại</h2><div class="grid-2"><div class="exercise-card"><h3>📘 Mức 1 - Cơ bản</h3><ol><li>Tính giai thừa của <code>n</code> bằng đệ quy.</li><li>Tính tổng từ <code>1</code> đến <code>n</code> bằng đệ quy.</li><li>In các số từ <code>n</code> về <code>1</code> bằng đệ quy.</li></ol></div><div class="exercise-card"><h3>📗 Mức 2 - Hiểu call stack</h3><ol><li>Viết lại quá trình gọi hàm của <code>factorial(4)</code>.</li><li>Đếm số lần gọi hàm khi tính <code>sum_recursive(5)</code>.</li><li>Sửa một hàm đệ quy bị thiếu điều kiện dừng.</li></ol></div><div class="exercise-card"><h3>📙 Mức 3 - Ứng dụng còn dùng nhiều</h3><ol><li>Dùng DFS đệ quy để đếm số đỉnh trong một component.</li><li>Sinh tất cả xâu nhị phân độ dài <code>n</code>.</li><li>Dùng quay lui sinh các tổ hợp chập <code>k</code>.</li></ol></div><div class="exercise-card"><h3>🐉 Mức 4 - HSG định hướng</h3><ol><li>Fibonacci với memoization.</li><li>Đệ quy chia để trị: tìm max trong đoạn <code>[l,r]</code>.</li><li>DFS cây tính kích thước mỗi subtree.</li></ol></div></div>
+    <details class="mt-3"><summary style="cursor:pointer;color:#2563eb;font-weight:900">💡 Xem lời giải mẫu: Tổng 1..n bằng đệ quy</summary><div class="code-tabs" data-tabs="sum-rec"><div class="tab-buttons"><button class="tab-btn active" data-target="sum-rec-cpp">C++</button><button class="tab-btn" data-target="sum-rec-py">Python</button></div><div class="tab-panel active" id="sum-rec-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+long long sum_recursive(int n) {
+    if (n == 0) return 0;
+    return n + sum_recursive(n - 1);
+}
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    cout &lt;&lt; sum_recursive(n);
+    return 0;
+}</code></pre></div><div class="tab-panel" id="sum-rec-py"><button class="copy-btn">Sao chép</button><pre><code>def sum_recursive(n):
+    if n == 0:
+        return 0
+    return n + sum_recursive(n - 1)
+
+n = int(input())
+print(sum_recursive(n))</code></pre></div></div></details>
+  </section>
+
+  <section class="lesson-card mini-slide"><h2><i class="fa-solid fa-circle-question"></i> 9. Quiz kiểm tra nhanh</h2><div class="quiz-item" data-answer="b"><b>Câu 1.</b> Phần nào bắt buộc phải có trong hàm đệ quy để tránh gọi vô hạn?<div class="quiz-options"><button class="quiz-option" data-choice="a">Vòng lặp for</button><button class="quiz-option" data-choice="b">Điều kiện dừng</button><button class="quiz-option" data-choice="c">Mảng hai chiều</button></div><div class="feedback"></div></div><div class="quiz-item" data-answer="a"><b>Câu 2.</b> Fibonacci đệ quy thường chậm vì:<div class="quiz-options"><button class="quiz-option" data-choice="a">Tính lặp lại nhiều giá trị giống nhau</button><button class="quiz-option" data-choice="b">Không thể viết bằng Python</button><button class="quiz-option" data-choice="c">Không có điều kiện dừng</button></div><div class="feedback"></div></div><div class="quiz-item" data-answer="c"><b>Câu 3.</b> Bài nào sau đây thường hợp với đệ quy?<div class="quiz-options"><button class="quiz-option" data-choice="a">In tổng 1..n bằng công thức</button><button class="quiz-option" data-choice="b">Cộng hai số a và b</button><button class="quiz-option" data-choice="c">DFS trên cây hoặc đồ thị</button></div><div class="feedback"></div></div></section>
+
+  <section class="lesson-card mini-slide"><h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2><div class="callout success">Đệ quy không lỗi thời, nhưng cách học cần hiện đại hơn: hiểu call stack, luôn có điều kiện dừng, biết ước lượng số lời gọi, và biết thay đệ quy ngây thơ bằng memoization, DP hoặc vòng lặp khi cần. Đệ quy vẫn là công cụ rất mạnh trong DFS, cây, chia để trị và quay lui.</div><p style="text-align:center;color:#2563eb;font-weight:900;font-size:1.05rem">➡ Tiếp theo: Quay lui - dùng đệ quy để thử các khả năng một cách có kiểm soát.</p></section>
+</div>
+
+<script>
+(function(){'use strict';function $(s,r){return(r||document).querySelector(s)}function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}function esc(x){return String(x).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}function small(v,fb,mx){var n=Number(String(v||'').trim());if(!Number.isFinite(n))return fb;n=Math.floor(n);if(n<0)return fb;return Math.min(mx,n)}
+function initProgress(){var b=$('#lessonProgressBar');if(!b)return;function u(){var d=document.documentElement,t=window.scrollY||d.scrollTop||0,h=Math.max(1,d.scrollHeight-window.innerHeight);b.style.width=Math.min(100,Math.max(0,t/h*100))+'%'}window.addEventListener('scroll',u,{passive:true});u()}
+function initTabs(){$all('.code-tabs').forEach(function(box){$all('.tab-btn',box).forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-target');$all('.tab-btn',box).forEach(function(b){b.classList.remove('active')});$all('.tab-panel',box).forEach(function(p){p.classList.remove('active')});btn.classList.add('active');var t=document.getElementById(id);if(t)t.classList.add('active')})})})}
+function initCopy(){$all('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=btn.closest('.tab-panel')||btn.parentElement,c=p?$('code',p):null,text=c?c.textContent:'';function done(){var old=btn.textContent;btn.textContent='Đã chép';setTimeout(function(){btn.textContent=old},1200)}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(function(){fallback(text);done()})}else{fallback(text);done()}})});function fallback(text){var a=document.createElement('textarea');a.value=text;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a)}}
+var stackState={steps:[],idx:0};function buildSteps(n){var steps=[],frames=[];for(var x=n;x>=0;x--){frames.push({text:'factorial('+x+')',ret:false});steps.push({frames:frames.slice(),msg:x===0?'Gọi factorial(0). Đây là điều kiện dừng, trả về 1.':'Gọi factorial('+x+'). Vì chưa tới 0, cần gọi tiếp factorial('+(x-1)+').'})}var ans=1,rf=frames.slice();for(var r=0;r<=n;r++){if(r===0)ans=1;else ans*=r;rf=rf.map(function(f){return{text:f.text,ret:f.ret}});var pos=rf.findIndex(function(f){return f.text==='factorial('+r+')'});if(pos>=0)rf[pos].ret=true;steps.push({frames:rf.slice(),msg:(r===0?'factorial(0) trả 1':'factorial('+r+') trả '+ans)+'. Kết quả được trả ngược lên lời gọi phía trước.'});rf=rf.filter(function(f){return f.text!=='factorial('+r+')'})}steps.push({frames:[],msg:'Hoàn tất. factorial('+n+') = '+ans+'. Stack đã rỗng.'});return steps}
+function renderStack(){var a=$('#stackArea'),l=$('#stackLog');if(!a||!l)return;var st=stackState.steps[stackState.idx];if(!st)return;a.innerHTML=st.frames.map(function(f){return'<div class="stack-frame '+(f.ret?'returning':'')+'">'+esc(f.text)+'</div>'}).join('');if(!st.frames.length)a.innerHTML='<div style="color:#64748b;font-weight:800;text-align:center;padding:20px">Stack rỗng</div>';l.innerHTML='<b>Bước '+stackState.idx+'/'+(stackState.steps.length-1)+'</b><br>'+esc(st.msg)}function resetStack(){var n=small($('#factorialN')?$('#factorialN').value:5,5,8);if($('#factorialN'))$('#factorialN').value=n;stackState.steps=buildSteps(n);stackState.idx=0;renderStack()}function nextStack(){if(!stackState.steps.length)resetStack();if(stackState.idx<stackState.steps.length-1)stackState.idx++;renderStack()}function initStack(){var n=$('#stackNextBtn'),r=$('#stackResetBtn');if(n)n.addEventListener('click',nextStack);if(r)r.addEventListener('click',resetStack);resetStack()}
+function fibCalls(n){if(n<=1)return 1;var a=1,b=1;for(var i=2;i<=n;i++){var c=1+a+b;a=b;b=c}return b}function initFib(){var btn=$('#fibCompareBtn'),bars=$('#fibBars'),log=$('#fibLog');if(!btn||!bars||!log)return;function render(){var n=small($('#fibN')?$('#fibN').value:10,10,35);if($('#fibN'))$('#fibN').value=n;var naive=fibCalls(n),memo=n+1,max=Math.max(naive,memo,1);var items=[{name:'Đệ quy thường',value:naive,cls:'bad'},{name:'Memoization',value:memo,cls:'good'}];bars.innerHTML=items.map(function(it){var h=40+Math.round(Math.log10(it.value+1)/Math.log10(max+1)*110);return'<div class="fib-bar-wrap"><div class="fib-bar '+it.cls+'" style="height:'+h+'px">'+it.value.toLocaleString('en-US')+'</div><div class="small-label">'+it.name+'</div></div>'}).join('');log.innerHTML='<b>Với n = '+n+'</b><br>Fibonacci đệ quy thường tạo khoảng <b>'+naive.toLocaleString('en-US')+'</b> lời gọi hàm.<br>Memoization chỉ cần tính khoảng <b>'+memo.toLocaleString('en-US')+'</b> trạng thái.<br><br><span style="color:#991b1b;font-weight:900">Kết luận:</span> Fibonacci đệ quy thường chỉ nên dùng để minh họa, không dùng cho dữ liệu lớn.'}btn.addEventListener('click',render);render()}
+function initQuiz(){$all('.quiz-item').forEach(function(item){var ans=item.getAttribute('data-answer'),fb=$('.feedback',item);$all('.quiz-option',item).forEach(function(btn){btn.addEventListener('click',function(){$all('.quiz-option',item).forEach(function(b){b.classList.remove('correct','wrong')});if(btn.getAttribute('data-choice')===ans){btn.classList.add('correct');if(fb)fb.textContent='Đúng rồi!'}else{btn.classList.add('wrong');var right=$('.quiz-option[data-choice="'+ans+'"]',item);if(right)right.classList.add('correct');if(fb)fb.textContent='Chưa đúng. Em xem lại phần lý thuyết ngay phía trên.'}})})})}
+function initHl(){if(window.hljs&&typeof window.hljs.highlightAll==='function'){try{window.hljs.highlightAll()}catch(e){}}}document.addEventListener('DOMContentLoaded',function(){initProgress();initTabs();initCopy();initStack();initFib();initQuiz();initHl()})})();
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

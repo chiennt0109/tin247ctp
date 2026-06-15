@@ -1,4 +1,478 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bài 3: Tìm các bạn trong rừng!</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"><style>.scratch-page,.scratch-lesson{font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#fff7ed,#ecfeff 45%,#eef2ff);color:#1f2937}.scratch-hero{border-radius:28px;background:radial-gradient(circle at top left,#fde68a,transparent 30%),linear-gradient(135deg,#38bdf8,#a78bfa);color:white;box-shadow:0 20px 55px #7c3aed33}.scratch-card,.lesson-card{background:#ffffffd9;border:1px solid #fff;border-radius:24px;box-shadow:0 12px 30px #0f172a12;transition:.25s}.scratch-card:hover{transform:translateY(-8px) rotate(-.5deg);box-shadow:0 18px 45px #0f172a22}.badge-soft{background:#eef2ff;color:#4338ca}.stage-box{height:230px;border-radius:22px;background:linear-gradient(#ecfeff,#fff);border:3px solid #bae6fd;position:relative;overflow:hidden}.sprite{position:absolute;font-size:48px;left:24px;bottom:22px;transition:.5s}.block{display:inline-block;background:#ffbf3f;border-radius:10px;padding:7px 10px;margin:4px;font-weight:700}.nav-pills-custom a{display:block;padding:10px 12px;border-radius:12px;text-decoration:none;color:#334155}.nav-pills-custom a:hover{background:#e0f2fe}.read-progress{position:fixed;top:0;left:0;height:6px;background:linear-gradient(90deg,#fb923c,#22c55e,#38bdf8);z-index:9999;width:0}pre{background:#0f172a;color:#e2e8f0;padding:1rem;border-radius:16px;white-space:pre-wrap}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.code-tabs button.active{background:#2563eb;color:white}.quiz-option{cursor:pointer}.quiz-option.selected{outline:3px solid #38bdf8}.canvasbox{background:white;border:2px dashed #93c5fd;border-radius:16px}</style></head><body class="scratch-lesson"><div class="read-progress"></div><main class="container py-4"><section class="scratch-hero p-4 p-md-5 mb-4 animate__animated animate__fadeIn"><a class="btn btn-light btn-sm" href="/scratch/">← Quay lại Scratch</a><h1 class="display-6 fw-bold mt-3">🌳 Bài 3: Tìm các bạn trong rừng!</h1><p class="lead">Mục tiêu: phát tin nhắn đến nhiều đối tượng, các nhân vật phản hồi cùng lúc.</p><div class="d-flex gap-2 flex-wrap"><span class="badge badge-soft">Tin nhắn, Sự kiện</span><span class="badge bg-success">Dễ hiểu</span></div></section><div class="row g-4"><aside class="col-lg-3"><div class="lesson-card p-3 sticky-top" style="top:20px"><h5>Điều hướng nhanh</h5><nav class="nav-pills-custom"><a href="#goal">🎯 Mục tiêu</a><a href="#story">📖 Câu chuyện</a><a href="#steps">🧩 Từng bước</a><a href="#sim">🎮 Mô phỏng</a><a href="#practice">✅ Thực hành</a><a href="#quiz">📝 Quiz</a></nav></div></aside><div class="col-lg-9"><section id="goal" class="lesson-card p-4 mb-4"><h2>🎯 Mục tiêu bài học</h2><ul><li>Phát tin nhắn đến nhiều đối tượng, các nhân vật phản hồi cùng lúc.</li><li>Biết ghép các khối lệnh theo thứ tự như xếp LEGO.</li><li>Tự kiểm tra chương trình bằng nút chạy thử.</li></ul></section><section id="story" class="lesson-card p-4 mb-4"><h2>📖 Câu chuyện dẫn nhập</h2><p>🌳 Hôm nay em là đạo diễn nhỏ của sân khấu Scratch. Nhân vật cần nghe lệnh, phản hồi và kể một câu chuyện thật vui. Hãy tưởng tượng mỗi khối lệnh là một mảnh ghép: ghép đúng thì nhân vật sẽ diễn đúng!</p><div class="flashcard alert alert-info"><b>Flashcard:</b> Nhấn để nhớ khái niệm.<div class="answer d-none mt-2">Sự kiện bắt đầu chương trình; điều khiển giúp lặp/chờ; chuyển động làm nhân vật thay đổi vị trí.</div></div></section><section id="knowledge" class="lesson-card p-4 mb-4"><h2>💡 Kiến thức chính</h2><div class="code-tabs mb-2"><button class="btn btn-sm active" data-tab="blocks">Khối Scratch</button><button class="btn btn-sm btn-outline-primary" data-tab="idea">Ý tưởng</button></div><pre data-pane="blocks"><code>Khi bấm cờ xanh
-  lặp lại / chờ / phát tin
-  di chuyển hoặc nói
-  kiểm tra điều kiện nếu cần</code></pre><pre data-pane="idea" style="display:none"><code>Ví dụ đời sống: muốn đi học đúng giờ, em làm tuần tự: thức dậy → vệ sinh → ăn sáng → đến trường.</code></pre></section><section id="steps" class="lesson-card p-4 mb-4"><h2>🧩 Hướng dẫn từng bước</h2><ol><li>Mở Scratch và chọn nhân vật/sân khấu phù hợp.</li><li>Thêm khối sự kiện <span class="block">khi bấm cờ xanh</span>.</li><li>Ghép các khối chính của bài: Tin nhắn, Sự kiện.</li><li>Chạy thử, quan sát, sửa lỗi nhỏ rồi lưu dự án.</li></ol></section><section id="sim" class="lesson-card p-4 mb-4"><h2>🎮 Mô phỏng trực quan</h2><div class="stage-box"><div class="sprite">🌳</div></div><button class="btn btn-warning mt-3" data-run data-emoji="🌳">▶ Chạy thử</button><button class="btn btn-info mt-3" data-run data-emoji="💬">Nói xin chào</button></section><section id="practice" class="lesson-card p-4 mb-4"><h2>✅ Thực hành tương tác</h2><div class="checklist"><label><input type="checkbox"> Em đã đặt tên dự án rõ ràng</label><br><label><input type="checkbox"> Em đã chạy thử ít nhất 2 lần</label><br><label><input type="checkbox"> Em đã thêm âm thanh/màu sắc/câu thoại vui</label><p class="mini-score fw-bold text-primary mt-2">0/3 nhiệm vụ</p></div><h3>🚧 Lỗi hay nhầm</h3><ul><li>Quên khối sự kiện nên bấm cờ xanh không chạy.</li><li>Đặt lệnh sai thứ tự khiến câu chuyện bị lộn xộn.</li><li>Lặp vô hạn nhưng không có điều kiện dừng.</li></ul></section><section class="lesson-card p-4 mb-4"><h2>🏋️ Bài tập phân tầng</h2><div class="row"><div class="col-md-6"><h5>Cơ bản</h5><ul><li>Làm nhân vật nói 2 câu.</li><li>Thêm một chuyển động đơn giản.</li></ul><h5>Trung bình</h5><ul><li>Thêm âm thanh hoặc đổi trang phục.</li><li>Tạo 3 bước hành động liên tiếp.</li></ul></div><div class="col-md-6"><h5>Nâng cao</h5><ul><li>Thêm điều kiện hoặc biến điểm.</li><li>Tạo phiên bản có 2 nhân vật.</li></ul><h5>HSG định hướng</h5><ul><li>Tối ưu kịch bản để dễ mở rộng.</li><li>Viết mô tả thuật toán bằng lời trước khi ghép khối.</li></ul></div></div></section><section id="quiz" class="lesson-card p-4 mb-4 quiz"><h2>📝 Quiz cuối bài</h2><div class="q mb-3"><strong>Câu 1: Trong bài này, khối nào giúp phát tin nhắn đến nhiều đối tượng, các?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 2: Trong bài này, khối nào giúp phát tin nhắn đến nhiều đối tượng, các?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 3: Trong bài này, khối nào giúp phát tin nhắn đến nhiều đối tượng, các?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 4: Trong bài này, khối nào giúp phát tin nhắn đến nhiều đối tượng, các?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><div class="q mb-3"><strong>Câu 5: Trong bài này, khối nào giúp phát tin nhắn đến nhiều đối tượng, các?</strong><div class="quiz-option card p-2 my-1" data-correct="1">Khối sự kiện / điều khiển phù hợp</div><div class="quiz-option card p-2 my-1">Chỉ đổi màu nền rồi dừng</div><div class="feedback small fw-bold"></div></div><button class="btn btn-success check-quiz">Kiểm tra đáp án</button><button class="btn btn-outline-secondary reset-quiz">Làm lại</button><span class="quiz-score fw-bold ms-3"></span></section><div class="d-flex justify-content-between mb-5"><a class="btn btn-outline-primary " href="/scratch/bai-02/">← Bài trước</a><a class="btn btn-primary " href="/scratch/bai-04/">Bài tiếp theo →</a></div></div></div></main><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>document.addEventListener('DOMContentLoaded',()=>{try{hljs.highlightAll()}catch(e){}const bar=document.querySelector('.read-progress');function prog(){let h=document.documentElement;bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100||0)+'%'};addEventListener('scroll',prog);prog();document.querySelectorAll('[data-run]').forEach(b=>b.onclick=()=>{let s=document.querySelector('.sprite'); if(s){s.style.left=(20+Math.random()*65)+'%';s.textContent=b.dataset.emoji||s.textContent;}});document.querySelectorAll('.code-tabs').forEach(t=>{t.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{t.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');t.parentElement.querySelectorAll('pre[data-pane]').forEach(p=>p.style.display=p.dataset.pane===btn.dataset.tab?'block':'none');});});document.querySelectorAll('.checklist input').forEach(i=>i.onchange=()=>{let box=i.closest('.checklist'),n=box.querySelectorAll('input:checked').length,total=box.querySelectorAll('input').length;box.querySelector('.mini-score').textContent=n+'/'+total+' nhiệm vụ';});document.querySelectorAll('.flashcard').forEach(c=>c.onclick=()=>c.querySelector('.answer').classList.toggle('d-none'));document.querySelectorAll('.quiz').forEach(q=>{q.querySelectorAll('.quiz-option').forEach(o=>o.onclick=()=>{let group=o.parentElement;group.querySelectorAll('.quiz-option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected')});q.querySelector('.check-quiz').onclick=()=>{let score=0,total=0;q.querySelectorAll('.q').forEach(item=>{total++;let sel=item.querySelector('.selected');let ok=sel&&sel.dataset.correct==='1';if(ok)score++;item.querySelector('.feedback').textContent=ok?'✅ Chính xác!':'❌ Thử xem lại khái niệm nhé.'});q.querySelector('.quiz-score').textContent='Điểm: '+score+'/'+total};q.querySelector('.reset-quiz').onclick=()=>{q.querySelectorAll('.selected').forEach(x=>x.classList.remove('selected'));q.querySelectorAll('.feedback').forEach(f=>f.textContent='');q.querySelector('.quiz-score').textContent=''};});const canvas=document.querySelector('canvas.draw');if(canvas){let ctx=canvas.getContext('2d'),x=40,y=40;ctx.fillStyle='#22c55e';function sq(){ctx.fillRect(x,y,24,24)}sq();document.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>{x+=+(b.dataset.dx||0);y+=+(b.dataset.dy||0);sq()})}})</script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Bài 3 Scratch: Gọi bạn trong khu rừng xanh, lập trình Sên Nâu phát tin nhắn để Sóc Vàng và Nhím Lá phản hồi đúng thời điểm.">
+  <meta name="author" content="Nguyễn Trung Chiến">
+  <meta name="copyright" content="Nguyễn Trung Chiến - THPT chuyên Trần Phú - SĐT/Zalo 0934353569">
+  <link rel="canonical" href="https://tin247ctp.com/scratch/bai-03/">
+  <title>Bài 3: Gọi bạn trong khu rừng xanh!</title>
+  <style>
+    :root{
+      --bg1:#fff7ed;--bg2:#ecfeff;--bg3:#eef2ff;--text:#172033;--muted:#667085;
+      --line:#e5e7eb;--card:rgba(255,255,255,.90);--blue:#4c97ff;--purple:#9966ff;
+      --orange:#ff9f1c;--yellow:#ffbf3f;--green:#22c55e;--red:#ef4444;--dark:#0f172a;
+      --shadow:0 18px 48px rgba(15,23,42,.12);--radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      font-size:14.5px;line-height:1.55;color:var(--text);min-height:100vh;
+      background:
+        radial-gradient(circle at 8% 5%,rgba(255,191,63,.35),transparent 24rem),
+        radial-gradient(circle at 94% 10%,rgba(76,151,255,.26),transparent 29rem),
+        radial-gradient(circle at 50% 88%,rgba(34,197,94,.15),transparent 32rem),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+      -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+    }
+    input,textarea,select,button,.allow-copy,.allow-copy *{user-select:text;-webkit-user-select:text}
+    a{text-decoration:none;color:inherit} img,svg{max-width:100%;height:auto}
+    .container-main{width:min(1180px,calc(100% - 28px));margin:0 auto}
+    .page{position:relative;z-index:1}
+    .read-progress{position:fixed;top:0;left:0;z-index:9999;height:5px;width:0;background:linear-gradient(90deg,var(--orange),var(--green),var(--blue),var(--purple));box-shadow:0 0 16px rgba(76,151,255,.45)}
+    .watermark-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.12}
+    .watermark-layer::before{content:"";position:absolute;inset:-12%;background-image:
+      repeating-linear-gradient(-26deg,transparent 0 92px,rgba(15,23,42,.10) 93px,rgba(15,23,42,.10) 94px,transparent 95px 180px),
+      repeating-linear-gradient(26deg,transparent 0 130px,rgba(34,197,94,.08) 132px,transparent 134px 260px)}
+    .wm{position:absolute;color:rgba(15,23,42,.34);font-weight:900;letter-spacing:.02em;transform:rotate(-22deg);text-align:center;line-height:1.25;white-space:normal;max-width:330px}
+    .wm.big{font-size:clamp(1rem,2.3vw,1.85rem);max-width:520px;color:rgba(15,23,42,.30)}
+    .wm.small{font-size:.76rem;color:rgba(15,23,42,.24)}
+    .copy-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);z-index:10000;background:#111827;color:white;padding:10px 14px;border-radius:999px;font-weight:800;box-shadow:0 14px 32px rgba(15,23,42,.30);opacity:0;transition:.25s;text-align:center;max-width:min(540px,calc(100vw - 28px));font-size:.86rem}.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 0}
+    .pill,.back-link{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(255,255,255,.88);border-radius:999px;padding:8px 12px;font-weight:850;box-shadow:0 10px 24px rgba(15,23,42,.08);backdrop-filter:blur(10px)}
+    .hero{position:relative;overflow:hidden;color:white;border-radius:30px;padding:26px;box-shadow:var(--shadow);background:
+      radial-gradient(circle at 15% 16%,rgba(255,255,255,.27),transparent 15rem),
+      radial-gradient(circle at 90% 86%,rgba(255,255,255,.14),transparent 18rem),
+      linear-gradient(135deg,#20b486 0%,#4c97ff 52%,#9966ff 100%)}
+    .hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:24px;align-items:center;position:relative;z-index:1}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.32);font-weight:900;margin-bottom:10px;font-size:.9rem}
+    h1{font-size:clamp(1.85rem,4.2vw,3.45rem);line-height:1.08;margin:0 0 12px;font-weight:950;letter-spacing:-.035em}
+    .lead{font-size:clamp(.98rem,1.55vw,1.18rem);color:#f8fafc;margin:0;max-width:780px}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}.btnx{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:14px;padding:9px 13px;font-weight:900;cursor:pointer;transition:.2s;box-shadow:0 8px 18px rgba(15,23,42,.12);font-size:.9rem}.btnx:hover{transform:translateY(-2px)}.btn-white{background:white;color:#1d4ed8}.btn-darkx{background:#0f172a;color:white}.btn-soft{background:rgba(255,255,255,.20);color:white;border:1px solid rgba(255,255,255,.32)}.btn-green{background:#dcfce7;color:#15803d}.btn-blue{background:#dbeafe;color:#1d4ed8}.btn-orange{background:#ffedd5;color:#9a3412}.btn-purple{background:#ede9fe;color:#6d28d9}
+    .author-box{margin-top:18px;display:grid;grid-template-columns:1fr;gap:2px;border-radius:18px;padding:12px 14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32);width:max-content;max-width:100%;backdrop-filter:blur(12px)}.author-box strong{font-size:1rem}.author-box span{font-weight:750;color:#f8fafc}
+    .hero-visual{background:rgba(255,255,255,.88);color:var(--text);border-radius:24px;padding:12px;box-shadow:0 24px 54px rgba(0,0,0,.20)}
+    .lesson-layout{display:grid;grid-template-columns:260px 1fr;gap:22px;margin:24px 0 46px}aside{position:sticky;top:14px;align-self:start}.toc{background:var(--card);border:1px solid white;border-radius:var(--radius);box-shadow:var(--shadow);padding:15px;backdrop-filter:blur(10px)}.toc h3{font-size:1rem;margin:0 0 10px;font-weight:950}.toc a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:13px;color:#334155;font-weight:800;margin-bottom:2px;font-size:.9rem}.toc a:hover,.toc a.active{background:#e0f2fe;color:#075985}
+    .content{min-width:0}.cardx{background:var(--card);border:1px solid white;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:20px;scroll-margin-top:16px;backdrop-filter:blur(10px)}.section-title{display:flex;align-items:center;gap:10px;margin:0 0 10px;font-size:clamp(1.22rem,1.8vw,1.72rem);font-weight:950;letter-spacing:-.02em}.title-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#fff2a6,#ff9f1c);color:#3b2600;box-shadow:0 10px 22px rgba(255,159,28,.18);flex:0 0 auto}.sub{color:var(--muted);margin-top:-4px}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.mini{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 26px rgba(15,23,42,.07);height:100%;transition:.2s}.mini:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(15,23,42,.12)}.mini h4,.mini h5{margin:0 0 7px;font-weight:950}.mini p{margin:0;color:#475569}.mini ul{padding-left:1.1rem;margin:.1rem 0 0}.mini li{margin:.25rem 0}.note{background:#ecfeff;border:1px solid #67e8f9;border-left:5px solid #06b6d4;border-radius:16px;padding:12px 14px;margin-top:14px}
+    .scratch-shot{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 16px 38px rgba(15,23,42,.10)}.shot-caption{padding:10px 13px;background:#f8fafc;color:#475569;border-top:1px solid var(--line);font-size:.88rem}
+    .story-grid{display:grid;grid-template-columns:1fr 370px;gap:16px;align-items:stretch}.story-box{background:linear-gradient(135deg,#fff7ed,#fef3c7);border:1px solid #fed7aa;border-radius:20px;padding:16px}.forest-stage{position:relative;min-height:300px;overflow:hidden;border-radius:22px;background:linear-gradient(#bfdbfe 0 48%,#dcfce7 48% 100%);border:3px solid #93c5fd;box-shadow:inset 0 0 0 5px rgba(255,255,255,.45)}.sun{position:absolute;right:26px;top:22px;width:54px;height:54px;border-radius:50%;background:#fde047;box-shadow:0 0 28px rgba(253,224,71,.85)}.tree{position:absolute;bottom:74px}.t1{left:10px}.t2{right:16px}.bush{position:absolute;bottom:36px;width:118px;height:62px;border-radius:60px 60px 20px 20px;background:#16a34a;box-shadow:inset -12px -12px 0 rgba(0,0,0,.10)}.b1{left:35px}.b2{right:54px}.speech{position:absolute;background:white;border:2px solid #93c5fd;border-radius:18px;padding:9px 12px;font-weight:900;color:#1e3a8a;box-shadow:0 12px 24px rgba(15,23,42,.14);max-width:210px}.speech:after{content:"";position:absolute;left:30px;bottom:-10px;border-width:10px 9px 0 0;border-style:solid;border-color:white transparent transparent transparent}
+    .block{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:7px 10px;color:white;font-weight:950;box-shadow:inset 0 -3px 0 rgba(0,0,0,.16);font-size:.86rem;line-height:1.2}.event{background:#ffbf3f;color:#3b2600}.looks{background:#9966ff}.motion{background:#4c97ff}.control{background:#ffab19;color:#3b2600}.message{background:#ff8c1a;color:#3b2600}.sound{background:#cf63cf}.sensing{background:#5cb1d6}.operator{background:#59c059}.flag-icon{width:23px;height:20px;flex:0 0 auto;vertical-align:middle}.steps{display:grid;gap:12px}.step{display:grid;grid-template-columns:54px 1fr minmax(210px,290px);gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;box-shadow:0 10px 26px rgba(15,23,42,.06)}.step-no{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-weight:950;font-size:1.18rem;background:linear-gradient(135deg,#ffbf3f,#ff7a1a);color:#3d2600}.step h4{margin:0 0 3px;font-weight:950}.step p{margin:0;color:#475569}.timeline{display:grid;gap:10px;counter-reset:t}.timeline-item{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.timeline-item:before{counter-increment:t;content:counter(t);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#dcfce7;color:#166534;font-weight:950}.code-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.object-code{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 26px rgba(15,23,42,.06)}.object-code h4{margin:0 0 8px;font-weight:950}.script-stack{display:grid;gap:7px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:16px;padding:11px}.script-note{font-size:.86rem;color:#475569;margin-top:8px}.sim-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;align-items:stretch}.stage{position:relative;min-height:360px;border-radius:22px;overflow:hidden;border:4px solid #93c5fd;background:linear-gradient(#bfdbfe 0 48%,#dcfce7 48%);box-shadow:inset 0 0 0 6px rgba(255,255,255,.45)}.cloud{position:absolute;border-radius:999px;background:white;opacity:.92}.cloud.c1{width:115px;height:36px;left:34px;top:42px}.cloud.c2{width:150px;height:40px;right:45px;top:68px}.sprite{position:absolute;transition:.65s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 11px 12px rgba(15,23,42,.22))}.snail{left:42px;bottom:48px;width:92px}.squirrel{right:88px;bottom:55px;width:92px;opacity:0}.hedgehog{right:22px;bottom:62px;width:108px;opacity:0}.bubble{position:absolute;max-width:260px;background:white;border:2px solid #94a3b8;border-radius:22px;padding:10px 13px;font-weight:950;color:#172033;opacity:0;transform:translateY(8px);transition:.3s;box-shadow:0 14px 28px rgba(15,23,42,.14);z-index:3}.bubble.show{opacity:1;transform:translateY(0)}.bubble:after{content:"";position:absolute;left:26px;bottom:-12px;border-width:12px 10px 0 0;border-style:solid;border-color:white transparent transparent transparent}.bubble.snail-bubble{left:100px;bottom:152px}.bubble.squirrel-bubble{right:115px;bottom:158px}.bubble.hedgehog-bubble{right:20px;bottom:180px}.control-panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 10px 26px rgba(15,23,42,.06)}.control-panel h4{font-weight:950;margin:0 0 8px}.run-list{display:grid;gap:8px;margin:12px 0}.run-step{display:flex;gap:8px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:13px;padding:8px 10px;color:#475569;font-weight:750}.run-step.done{background:#dcfce7;border-color:#86efac;color:#166534}.choice{cursor:pointer;background:#fff;border:2px dashed #cbd5e1;border-radius:15px;padding:10px;transition:.2s}.choice:hover,.choice.selected{background:#ecfeff;border-color:#38bdf8;transform:scale(1.01)}.chosen-zone{min-height:105px;background:#f8fafc;border:2px dashed #93c5fd;border-radius:16px;padding:10px}.checklist{display:grid;gap:8px}.check-item{display:flex;gap:9px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:15px;padding:10px;font-weight:750}.check-item input{width:18px;height:18px;margin-top:2px}.mini-score{font-weight:950;color:#1d4ed8;margin-top:9px}.mistake{background:#fff7ed;border:1px solid #fed7aa;border-radius:16px;padding:12px}.mistake strong{color:#9a3412}.level{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;margin-bottom:7px;font-size:.8rem;font-weight:950}.lv1{background:#dcfce7;color:#166534}.lv2{background:#dbeafe;color:#1e40af}.lv3{background:#fef3c7;color:#92400e}.lv4{background:#f3e8ff;color:#6b21a8}.quiz{display:grid;gap:13px}.q{background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px}.options{display:grid;gap:8px;margin-top:9px}.option{border:1px solid var(--line);border-radius:13px;padding:9px 11px;background:#f8fafc;font-weight:750;cursor:pointer;transition:.18s}.option:hover{background:#e0f2fe}.option.selected{outline:3px solid #38bdf8;background:#ecfeff}.option.correct{border-color:#22c55e;background:#dcfce7}.option.wrong{border-color:#ef4444;background:#fee2e2}.feedback{font-size:.9rem;margin-top:8px;font-weight:950}.footer-nav{display:flex;justify-content:space-between;gap:10px;margin:22px 0}.copyright-footer{margin:16px 0 42px;padding:16px;border-radius:20px;background:#0f172a;color:#e2e8f0;box-shadow:var(--shadow);text-align:center}.copyright-footer strong{display:block;font-size:1rem}.copyright-footer span{display:block;color:#cbd5e1}
+    @media(max-width:980px){.hero-grid,.lesson-layout,.story-grid,.sim-grid{grid-template-columns:1fr}aside{position:static}.step{grid-template-columns:48px 1fr}.step .step-art{grid-column:1/-1}.grid-3,.grid-4,.code-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:640px){body{font-size:14px}.topbar{flex-direction:column;align-items:flex-start}.hero{padding:20px;border-radius:24px}.cardx{padding:16px}.grid-2,.grid-3,.grid-4,.code-grid{grid-template-columns:1fr}.footer-nav{flex-direction:column}.bubble.snail-bubble{left:40px;right:20px}.bubble.squirrel-bubble,.bubble.hedgehog-bubble{right:18px;left:40px}}
+    @media print{body{background:white;color:#111}.read-progress,.topbar,aside,.footer-nav,.hero-actions,.btnx,.copy-toast{display:none!important}.lesson-layout,.hero-grid,.story-grid,.sim-grid{display:block}.cardx,.hero,.toc{box-shadow:none;border:1px solid #ddd;break-inside:avoid}.watermark-layer{opacity:.20}}
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="icon-flag" viewBox="0 0 32 32"><path d="M7 4v24" stroke="#15803d" stroke-width="3" stroke-linecap="round"></path><path d="M9 5c5-3 9 3 15 0v13c-6 3-10-3-15 0V5z" fill="#22c55e" stroke="#15803d" stroke-width="1.5" stroke-linejoin="round"></path></symbol>
+    <symbol id="icon-tree" viewBox="0 0 130 150"><rect x="56" y="84" width="18" height="56" rx="6" fill="#92400e"></rect><circle cx="65" cy="54" r="42" fill="#22c55e"></circle><circle cx="35" cy="78" r="32" fill="#16a34a"></circle><circle cx="95" cy="78" r="32" fill="#16a34a"></circle></symbol>
+    <symbol id="icon-snail" viewBox="0 0 220 150"><ellipse cx="110" cy="115" rx="80" ry="25" fill="#a16207"></ellipse><circle cx="86" cy="80" r="48" fill="#f97316" stroke="#9a3412" stroke-width="6"></circle><path d="M86 80c24 1 28-30 5-31-25-1-35 32-12 52 28 24 75 5 75-34" fill="none" stroke="#fed7aa" stroke-width="9" stroke-linecap="round"></path><circle cx="168" cy="88" r="28" fill="#fde68a" stroke="#a16207" stroke-width="5"></circle><path d="M160 67l-8-28M177 67l9-28" stroke="#a16207" stroke-width="5" stroke-linecap="round"></path><circle cx="149" cy="34" r="6" fill="#111827"></circle><circle cx="188" cy="34" r="6" fill="#111827"></circle><path d="M165 96c8 5 16 5 24 0" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round"></path></symbol>
+    <symbol id="icon-squirrel" viewBox="0 0 190 190"><path d="M55 110c-28-35 7-74 42-48 12-31 55-44 75-13 22 34-11 70-42 64 25 28 8 58-28 56-45-3-69-33-47-59z" fill="#f59e0b" stroke="#92400e" stroke-width="5" stroke-linejoin="round"></path><path d="M118 60c32-40 70-10 47 32-12 23-39 27-58 13" fill="#f97316" stroke="#92400e" stroke-width="5" stroke-linecap="round"></path><ellipse cx="78" cy="116" rx="48" ry="44" fill="#fbbf24" stroke="#92400e" stroke-width="5"></ellipse><path d="M54 78c-4-30 10-52 28-62 4 25-2 43-18 62" fill="#f59e0b" stroke="#92400e" stroke-width="5" stroke-linejoin="round"></path><circle cx="65" cy="108" r="7" fill="#111827"></circle><circle cx="101" cy="108" r="7" fill="#111827"></circle><path d="M80 122l-8 8h18z" fill="#ef4444"></path><path d="M68 140c12 9 27 9 39 0" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round"></path><path d="M40 136c-22 12-27 31-10 39" fill="none" stroke="#92400e" stroke-width="8" stroke-linecap="round"></path></symbol>
+    <symbol id="icon-hedgehog" viewBox="0 0 190 170"><path d="M36 104 18 78l28 6-10-32 27 20 5-34 22 28 18-31 12 35 30-18-8 35 30-3-20 26c13 24-5 48-43 52H76c-38-2-59-22-40-54z" fill="#92400e" stroke="#5b3410" stroke-width="5" stroke-linejoin="round"></path><ellipse cx="96" cy="112" rx="64" ry="43" fill="#fbbf24" stroke="#92400e" stroke-width="5"></ellipse><circle cx="75" cy="105" r="7" fill="#111827"></circle><circle cx="116" cy="105" r="7" fill="#111827"></circle><path d="M94 117l-8 9h18z" fill="#ef4444"></path><path d="M77 136c13 10 27 10 40 0" fill="none" stroke="#111827" stroke-width="4" stroke-linecap="round"></path><circle cx="36" cy="128" r="10" fill="#fef3c7" stroke="#92400e" stroke-width="4"></circle></symbol>
+  </svg>
+
+  <div class="watermark-layer" aria-hidden="true">
+    <div class="wm big" style="left:10%;top:8%">Nguyễn Trung Chiến<br>THPT chuyên Trần Phú<br>0934353569</div>
+    <div class="wm small" style="left:62%;top:8%">Nguyễn Trung Chiến · Scratch</div>
+    <div class="wm small" style="left:24%;top:30%">THPT chuyên Trần Phú · 0934353569</div>
+    <div class="wm big" style="left:52%;top:42%">Nguyễn Trung Chiến<br>THPT chuyên Trần Phú</div>
+    <div class="wm small" style="left:6%;top:60%">Scratch · Nguyễn Trung Chiến</div>
+    <div class="wm small" style="left:66%;top:66%">SĐT/Zalo 0934353569</div>
+    <div class="wm big" style="left:18%;top:78%">Nguyễn Trung Chiến<br>0934353569</div>
+  </div>
+  <div class="read-progress" id="readProgress"></div>
+  <div class="copy-toast" id="copyToast">Nội dung thuộc bản quyền Nguyễn Trung Chiến - THPT chuyên Trần Phú.</div>
+
+  <div class="page">
+    <div class="container-main">
+      <div class="topbar">
+        <a class="back-link" href="https://tin247ctp.com/scratch/">← 🏠 Quay lại Scratch</a>
+        <a class="pill" href="https://tin247ctp.com/scratch/bai-03/"><svg class="flag-icon"><use href="#icon-flag"></use></svg><span>Scratch 1 · Bài 3</span></a>
+      </div>
+
+      <header class="hero" id="top">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow"><svg class="flag-icon"><use href="#icon-flag"></use></svg> Bài học về tin nhắn</div>
+            <h1>🌳 Bài 3: Gọi bạn trong khu rừng xanh!</h1>
+            <p class="lead">Lập trình để Sên Nâu phát tín hiệu gọi bạn. Khi nhận đúng tin nhắn, Sóc Vàng và Nhím Lá sẽ xuất hiện, nói chuyện và di chuyển đúng kịch bản.</p>
+            <div class="hero-actions">
+              <a class="btnx btn-white" href="#timeline">📋 Xem kịch bản</a>
+              <a class="btnx btn-soft" href="#object-code">💻 Code từng đối tượng</a>
+              <a class="btnx btn-darkx" href="#simulation">▶️ Chạy kịch bản</a>
+            </div>
+            <div class="author-box">
+              <strong>👨‍🏫 Nguyễn Trung Chiến</strong>
+              <span>🏫 THPT chuyên Trần Phú</span>
+              <span>📱 SĐT/Zalo: 0934353569</span>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="scratch-shot">
+              <svg viewBox="0 0 900 520" role="img" aria-label="Minh họa bài gọi bạn trong khu rừng xanh">
+                <rect width="900" height="520" fill="#f8fafc"></rect>
+                <rect x="0" y="0" width="900" height="48" fill="#4c97ff"></rect>
+                <text x="32" y="31" fill="#fff" font-size="18" font-weight="900">Scratch · Gọi bạn trong khu rừng xanh</text>
+                <rect x="22" y="70" width="205" height="420" rx="18" fill="#fff" stroke="#cbd5e1"></rect>
+                <text x="42" y="100" fill="#0f172a" font-size="17" font-weight="900">Khối quan trọng</text>
+                <rect x="42" y="128" width="142" height="36" rx="16" fill="#ffbf3f"></rect><text x="62" y="151" fill="#3b2600" font-size="13" font-weight="900">Sự kiện</text>
+                <rect x="42" y="174" width="142" height="36" rx="16" fill="#ff8c1a"></rect><text x="62" y="197" fill="#3b2600" font-size="13" font-weight="900">Tin nhắn</text>
+                <rect x="42" y="220" width="142" height="36" rx="16" fill="#9966ff"></rect><text x="62" y="243" fill="#fff" font-size="13" font-weight="900">Hiển thị</text>
+                <rect x="42" y="266" width="142" height="36" rx="16" fill="#4c97ff"></rect><text x="62" y="289" fill="#fff" font-size="13" font-weight="900">Chuyển động</text>
+                <rect x="250" y="70" width="295" height="420" rx="18" fill="#fff" stroke="#cbd5e1"></rect>
+                <text x="270" y="100" fill="#0f172a" font-size="17" font-weight="900">Kịch bản Sên Nâu</text>
+                <rect x="280" y="132" width="205" height="38" rx="13" fill="#ffbf3f"></rect><text x="302" y="156" fill="#3b2600" font-size="13" font-weight="900">Khi bấm cờ xanh</text>
+                <rect x="310" y="174" width="210" height="38" rx="13" fill="#9966ff"></rect><text x="330" y="198" fill="#fff" font-size="13" font-weight="900">Nói: Sóc ơi!</text>
+                <rect x="310" y="216" width="210" height="38" rx="13" fill="#ff8c1a"></rect><text x="330" y="240" fill="#3b2600" font-size="13" font-weight="900">Phát tin: Gọi sóc</text>
+                <rect x="310" y="258" width="210" height="38" rx="13" fill="#9966ff"></rect><text x="330" y="282" fill="#fff" font-size="13" font-weight="900">Nói: Nhím ơi!</text>
+                <rect x="310" y="300" width="210" height="38" rx="13" fill="#ff8c1a"></rect><text x="330" y="324" fill="#3b2600" font-size="13" font-weight="900">Phát tin: Gọi nhím</text>
+                <rect x="310" y="342" width="210" height="38" rx="13" fill="#ff8c1a"></rect><text x="330" y="366" fill="#3b2600" font-size="13" font-weight="900">Phát tin: Gọi tất cả</text>
+                <rect x="568" y="70" width="305" height="420" rx="18" fill="#fff" stroke="#cbd5e1"></rect>
+                <text x="588" y="100" fill="#0f172a" font-size="17" font-weight="900">Sân khấu khu rừng</text>
+                <rect x="592" y="118" width="256" height="250" rx="14" fill="#bfdbfe"></rect>
+                <rect x="592" y="245" width="256" height="123" fill="#dcfce7"></rect>
+                <circle cx="800" cy="154" r="28" fill="#fde047"></circle>
+                <use href="#icon-tree" x="610" y="170" width="80" height="96"></use><use href="#icon-tree" x="752" y="165" width="84" height="102"></use>
+                <use href="#icon-snail" x="640" y="252" width="70" height="52"></use>
+                <use href="#icon-squirrel" x="718" y="238" width="64" height="72"></use>
+                <use href="#icon-hedgehog" x="780" y="238" width="72" height="72"></use>
+                <text x="610" y="402" fill="#334155" font-size="14" font-weight="900">Tin nhắn giúp nhiều nhân vật phản hồi đúng lúc.</text>
+              </svg>
+              <div class="shot-caption">Bài học tập trung vào khối “phát tin nhắn” và “khi tôi nhận được tin nhắn”.</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="lesson-layout">
+        <aside>
+          <nav class="toc" aria-label="Điều hướng bài học">
+            <h3>🧭 Điều hướng nhanh</h3>
+            <a href="#goal">🎯 Mục tiêu</a>
+            <a href="#story">📖 Câu chuyện</a>
+            <a href="#simulation">🎬 Chạy kịch bản</a>
+            <a href="#timeline">📋 Kịch bản cần làm</a>
+            <a href="#interface">🧩 Tin nhắn trong Scratch</a>
+            <a href="#steps">✅ Từng bước làm bài</a>
+            <a href="#object-code">💻 Code từng đối tượng</a>
+            <a href="#arrange">🧠 Sắp xếp lệnh</a>
+            <a href="#practice">📝 Thực hành</a>
+            <a href="#quiz">❓ Quiz</a>
+          </nav>
+        </aside>
+
+        <main class="content">
+          <section class="cardx" id="goal">
+            <h2 class="section-title"><span class="title-icon">🎯</span>Mục tiêu bài học</h2>
+            <p class="sub">Sau bài học này, học sinh biết dùng tin nhắn để phối hợp nhiều nhân vật trong Scratch.</p>
+            <div class="grid-3">
+              <div class="mini"><h4>📨 Phát tin nhắn</h4><p>Sên Nâu gửi tín hiệu để gọi Sóc Vàng, gọi Nhím Lá hoặc gọi cả đội cùng xuất hiện.</p></div>
+              <div class="mini"><h4>👂 Nhận tin nhắn</h4><p>Sóc Vàng và Nhím Lá chỉ hành động khi nhận đúng tin nhắn dành cho mình.</p></div>
+              <div class="mini"><h4>🎬 Phối hợp kịch bản</h4><p>Các nhân vật xuất hiện, nói và di chuyển theo đúng thứ tự câu chuyện.</p></div>
+            </div>
+            <div class="note"><strong>Ý tưởng chính:</strong> Tin nhắn trong Scratch giống như lời gọi trên sân khấu. Một nhân vật gửi lời gọi, các nhân vật khác nghe đúng lời gọi thì bắt đầu hành động.</div>
+          </section>
+
+          <section class="cardx" id="story">
+            <h2 class="section-title"><span class="title-icon">📖</span>Câu chuyện: Tín hiệu rừng xanh</h2>
+            <div class="story-grid">
+              <div class="story-box">
+                <p>Trong khu rừng xanh có một buổi biểu diễn nhỏ. <strong>Sên Nâu Dẫn Đường</strong> được giao nhiệm vụ tập hợp đội bạn trước khi chương trình bắt đầu.</p>
+                <p><strong>Sóc Vàng</strong> đang luyện bước nhảy sau tán cây, còn <strong>Nhím Lá</strong> đang chuẩn bị đạo cụ trong bụi cỏ. Nếu gọi cùng lúc không có thứ tự, sân khấu sẽ rất rối.</p>
+                <p>Vì vậy, Sên Nâu dùng các tín hiệu riêng: <strong>Gọi sóc</strong>, <strong>Gọi nhím</strong>, rồi <strong>Gọi tất cả</strong>. Nhiệm vụ của học sinh là lập trình để mỗi nhân vật <strong>chỉ xuất hiện và trả lời khi nhận đúng tin nhắn</strong>.</p>
+              </div>
+              <div class="forest-stage">
+                <div class="sun"></div>
+                <svg class="tree t1" width="98" height="116"><use href="#icon-tree"></use></svg>
+                <svg class="tree t2" width="104" height="124"><use href="#icon-tree"></use></svg>
+                <div class="bush b1"></div><div class="bush b2"></div>
+                <svg style="position:absolute;left:48px;bottom:48px;width:82px"><use href="#icon-snail"></use></svg>
+                <svg style="position:absolute;right:100px;bottom:54px;width:72px"><use href="#icon-squirrel"></use></svg>
+                <svg style="position:absolute;right:24px;bottom:58px;width:86px"><use href="#icon-hedgehog"></use></svg>
+                <div class="speech" style="left:68px;top:32px">Đội rừng xanh ơi! Tập hợp nào!</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx" id="simulation">
+            <h2 class="section-title"><span class="title-icon">🎬</span>Chạy kịch bản câu chuyện</h2>
+            <p class="sub">Sau khi đọc câu chuyện, bấm “Chạy kịch bản” để học sinh nghe lại mạch truyện và hình dung rõ nhiệm vụ cần lập trình.</p>
+            <div class="sim-grid">
+              <div class="stage" id="stage">
+                <div class="cloud c1"></div><div class="cloud c2"></div>
+                <svg class="tree" style="left:16px;bottom:95px;width:86px"><use href="#icon-tree"></use></svg>
+                <svg class="tree" style="right:20px;bottom:92px;width:96px"><use href="#icon-tree"></use></svg>
+                <svg class="sprite snail" id="snailSprite"><use href="#icon-snail"></use></svg>
+                <svg class="sprite squirrel" id="squirrelSprite"><use href="#icon-squirrel"></use></svg>
+                <svg class="sprite hedgehog" id="hedgehogSprite"><use href="#icon-hedgehog"></use></svg>
+                <div class="bubble snail-bubble" id="snailBubble">Đội rừng xanh ơi! Chuẩn bị nào!</div>
+                <div class="bubble squirrel-bubble" id="squirrelBubble">Tớ có mặt!</div>
+                <div class="bubble hedgehog-bubble" id="hedgehogBubble">Tớ sẵn sàng!</div>
+              </div>
+              <div class="control-panel">
+                <h4>🎧 Nghe và quan sát kịch bản</h4>
+                <p>Cho học sinh quan sát từng bước trước, sau đó mới chuyển sang phần phân tích kịch bản và ghép khối lệnh.</p>
+                <div class="run-list">
+                  <div class="run-step" data-runstep="0">1. Sên Nâu xuất hiện, Sóc và Nhím ẩn</div>
+                  <div class="run-step" data-runstep="1">2. Sên Nâu gọi Sóc</div>
+                  <div class="run-step" data-runstep="2">3. Sóc nhận tin và trả lời</div>
+                  <div class="run-step" data-runstep="3">4. Sên Nâu gọi Nhím</div>
+                  <div class="run-step" data-runstep="4">5. Nhím nhận tin và trả lời</div>
+                  <div class="run-step" data-runstep="5">6. Gọi tất cả cùng chào</div>
+                </div>
+                <div class="hero-actions" style="margin-top:10px">
+                  <button class="btnx btn-green" id="runStory">▶️ Chạy kịch bản</button>
+                  <button class="btnx btn-blue" id="nextStory">⏭️ Từng bước</button>
+                  <button class="btnx btn-purple" id="resetStory">🔄 Làm lại</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+          <section class="cardx" id="timeline">
+            <h2 class="section-title"><span class="title-icon">📋</span>Kịch bản trước khi lập trình</h2>
+            <p class="sub">Trước khi ghép khối lệnh, cần xác định rõ ai làm gì và làm vào lúc nào.</p>
+            <div class="timeline">
+              <div class="timeline-item"><div><strong>Khởi động sân khấu:</strong> Chọn phông nền khu rừng. Sên Nâu xuất hiện ở bên trái. Sóc Vàng và Nhím Lá tạm ẩn sau cây/bụi cỏ.</div></div>
+              <div class="timeline-item"><div><strong>Sên Nâu mở màn:</strong> Sên Nâu đi một đoạn rồi nói: “Đội rừng xanh ơi! Chuẩn bị sân khấu nào!”</div></div>
+              <div class="timeline-item"><div><strong>Gọi Sóc:</strong> Sên Nâu nói “Sóc ơi!” rồi phát tin nhắn <strong>Gọi sóc</strong>. Sóc Vàng hiện ra và nói “Tớ có mặt!”</div></div>
+              <div class="timeline-item"><div><strong>Gọi Nhím:</strong> Sên Nâu nói “Nhím ơi!” rồi phát tin nhắn <strong>Gọi nhím</strong>. Nhím Lá hiện ra và nói “Tớ sẵn sàng!”</div></div>
+              <div class="timeline-item"><div><strong>Gọi tất cả:</strong> Sên Nâu nói “Đội rừng xanh ơi! Tập hợp nào!” rồi phát tin nhắn <strong>Gọi tất cả</strong>. Cả đội cùng chào khán giả.</div></div>
+            </div>
+          </section>
+
+          <section class="cardx" id="interface">
+            <h2 class="section-title"><span class="title-icon">🧩</span>Khối tin nhắn cần nhớ</h2>
+            <div class="grid-2">
+              <div class="mini"><h4>📤 Khối phát tin</h4><p><span class="block message">Phát tin [Gọi sóc]</span></p><p class="mt-2">Dùng cho nhân vật gửi tín hiệu đến một hoặc nhiều đối tượng khác.</p></div>
+              <div class="mini"><h4>📥 Khối nhận tin</h4><p><span class="block event">Khi tôi nhận được [Gọi sóc]</span></p><p class="mt-2">Dùng cho nhân vật bắt đầu hành động khi nhận đúng tin nhắn.</p></div>
+            </div>
+            <div class="note"><strong>Gợi ý đặt tên tin nhắn:</strong> dùng tên ngắn, rõ ràng như <strong>Gọi sóc</strong>, <strong>Gọi nhím</strong>, <strong>Gọi tất cả</strong>. Không nên đặt tên mơ hồ như “a”, “b”, “1”.</div>
+          </section>
+
+          <section class="cardx" id="steps">
+            <h2 class="section-title"><span class="title-icon">✅</span>Hướng dẫn từng bước làm bài</h2>
+            <p class="sub">Làm theo thứ tự này để tránh chọn nhầm nhân vật hoặc phát nhầm tin nhắn.</p>
+            <div class="steps">
+              <div class="step"><div class="step-no">1</div><div><h4>Chuẩn bị sân khấu</h4><p>Chọn phông nền khu rừng. Thêm các đối tượng: Sên Nâu, Sóc Vàng, Nhím Lá.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"></rect><rect x="20" y="20" width="260" height="105" rx="12" fill="#bfdbfe"></rect><rect x="20" y="82" width="260" height="43" fill="#dcfce7"></rect><use href="#icon-tree" x="30" y="42" width="62" height="76"></use><use href="#icon-snail" x="112" y="78" width="62" height="46"></use><use href="#icon-squirrel" x="180" y="64" width="52" height="60"></use><use href="#icon-hedgehog" x="226" y="62" width="56" height="62"></use></svg></div></div>
+              <div class="step"><div class="step-no">2</div><div><h4>Đặt vị trí ban đầu</h4><p>Cho Sên Nâu đứng bên trái. Sóc và Nhím đứng bên phải nhưng phải ẩn khi bấm cờ xanh.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"></rect><rect x="42" y="58" width="110" height="34" rx="12" fill="#4c97ff"></rect><text x="60" y="80" fill="#fff" font-size="13" font-weight="900">đi tới x, y</text><rect x="122" y="95" width="82" height="34" rx="12" fill="#9966ff"></rect><text x="148" y="117" fill="#fff" font-size="13" font-weight="900">ẩn</text></svg></div></div>
+              <div class="step"><div class="step-no">3</div><div><h4>Tạo các tin nhắn</h4><p>Trong nhóm Sự kiện, tạo 3 thông báo mới: <strong>Gọi sóc</strong>, <strong>Gọi nhím</strong>, <strong>Gọi tất cả</strong>.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"></rect><rect x="42" y="28" width="216" height="32" rx="14" fill="#ff8c1a"></rect><text x="70" y="49" fill="#3b2600" font-size="13" font-weight="900">Phát tin [Gọi sóc]</text><rect x="42" y="66" width="216" height="32" rx="14" fill="#ff8c1a"></rect><text x="70" y="87" fill="#3b2600" font-size="13" font-weight="900">Phát tin [Gọi nhím]</text><rect x="42" y="104" width="216" height="32" rx="14" fill="#ff8c1a"></rect><text x="70" y="125" fill="#3b2600" font-size="13" font-weight="900">Phát tin [Gọi tất cả]</text></svg></div></div>
+              <div class="step"><div class="step-no">4</div><div><h4>Lập trình Sên Nâu</h4><p>Sên Nâu là nhân vật điều khiển chính: di chuyển, nói, rồi phát tin gọi từng bạn.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"></rect><rect x="32" y="26" width="190" height="32" rx="12" fill="#ffbf3f"></rect><text x="56" y="47" fill="#3b2600" font-size="13" font-weight="900">Khi bấm cờ xanh</text><rect x="60" y="62" width="200" height="32" rx="12" fill="#9966ff"></rect><text x="80" y="83" fill="#fff" font-size="13" font-weight="900">Nói “Sóc ơi!”</text><rect x="60" y="98" width="200" height="32" rx="12" fill="#ff8c1a"></rect><text x="80" y="119" fill="#3b2600" font-size="13" font-weight="900">Phát tin [Gọi sóc]</text></svg></div></div>
+              <div class="step"><div class="step-no">5</div><div><h4>Lập trình Sóc và Nhím</h4><p>Mỗi bạn nhận tin nhắn riêng để hiện ra, nói câu trả lời và di chuyển nhẹ về phía Sên Nâu.</p></div><div class="step-art"><svg viewBox="0 0 300 150"><rect width="300" height="150" rx="16" fill="#fff" stroke="#dbe4f0"></rect><rect x="34" y="40" width="210" height="32" rx="12" fill="#ffbf3f"></rect><text x="54" y="61" fill="#3b2600" font-size="13" font-weight="900">Khi nhận [Gọi sóc]</text><rect x="64" y="76" width="100" height="32" rx="12" fill="#9966ff"></rect><text x="96" y="97" fill="#fff" font-size="13" font-weight="900">hiện</text><rect x="64" y="112" width="180" height="32" rx="12" fill="#9966ff"></rect><text x="82" y="133" fill="#fff" font-size="13" font-weight="900">Nói “Tớ có mặt!”</text></svg></div></div>
+            </div>
+          </section>
+
+          <section class="cardx" id="object-code">
+            <h2 class="section-title"><span class="title-icon">💻</span>Code cụ thể cho từng đối tượng</h2>
+            <p class="sub">Đây là phần chính để học sinh ghép khối lệnh trong Scratch. Làm lần lượt từng đối tượng theo đúng tin nhắn.</p>
+            <div class="code-grid">
+              <div class="object-code">
+                <h4>🐌 Đối tượng Sên Nâu Dẫn Đường</h4>
+                <div class="script-stack">
+                  <span class="block event"><svg class="flag-icon"><use href="#icon-flag"></use></svg>Khi bấm vào cờ xanh</span>
+                  <span class="block looks">hiện</span>
+                  <span class="block motion">đi tới x: -190 y: -70</span>
+                  <span class="block looks">nói “Đội rừng xanh ơi! Chuẩn bị nào!” trong 2 giây</span>
+                  <span class="block motion">lướt 2 giây tới x: -70 y: -70</span>
+                  <span class="block looks">nói “Sóc ơi!” trong 2 giây</span>
+                  <span class="block message">phát tin [Gọi sóc] và đợi</span>
+                  <span class="block control">đợi 1 giây</span>
+                  <span class="block looks">nói “Nhím ơi!” trong 2 giây</span>
+                  <span class="block message">phát tin [Gọi nhím] và đợi</span>
+                  <span class="block control">đợi 1 giây</span>
+                  <span class="block looks">nói “Đội rừng xanh ơi! Tập hợp nào!” trong 2 giây</span>
+                  <span class="block message">phát tin [Gọi tất cả]</span>
+                </div>
+                <div class="script-note">Sên Nâu là nhân vật gửi lệnh chính. Dùng “và đợi” để câu chuyện không chạy quá nhanh.</div>
+              </div>
+
+              <div class="object-code">
+                <h4>🐿️ Đối tượng Sóc Vàng</h4>
+                <div class="script-stack">
+                  <span class="block event"><svg class="flag-icon"><use href="#icon-flag"></use></svg>Khi bấm vào cờ xanh</span>
+                  <span class="block motion">đi tới x: 145 y: -58</span>
+                  <span class="block looks">ẩn</span>
+                  <span class="block event">Khi tôi nhận được [Gọi sóc]</span>
+                  <span class="block looks">hiện</span>
+                  <span class="block looks">nói “Tớ có mặt!” trong 2 giây</span>
+                  <span class="block motion">lướt 1 giây tới x: 55 y: -58</span>
+                  <span class="block event">Khi tôi nhận được [Gọi tất cả]</span>
+                  <span class="block looks">hiện</span>
+                  <span class="block looks">nói “Chào Sên Nâu, cùng bắt đầu nào!” trong 2 giây</span>
+                </div>
+                <div class="script-note">Sóc chỉ xuất hiện khi nhận tin “Gọi sóc”, sau đó cùng chào khi nhận tin “Gọi tất cả”.</div>
+              </div>
+
+              <div class="object-code">
+                <h4>🦔 Đối tượng Nhím Lá</h4>
+                <div class="script-stack">
+                  <span class="block event"><svg class="flag-icon"><use href="#icon-flag"></use></svg>Khi bấm vào cờ xanh</span>
+                  <span class="block motion">đi tới x: 190 y: -65</span>
+                  <span class="block looks">ẩn</span>
+                  <span class="block event">Khi tôi nhận được [Gọi nhím]</span>
+                  <span class="block looks">hiện</span>
+                  <span class="block looks">nói “Tớ sẵn sàng!” trong 2 giây</span>
+                  <span class="block motion">lướt 1 giây tới x: 110 y: -65</span>
+                  <span class="block event">Khi tôi nhận được [Gọi tất cả]</span>
+                  <span class="block looks">hiện</span>
+                  <span class="block looks">nói “Chào Sên Nâu, cùng bắt đầu nào!” trong 2 giây</span>
+                </div>
+                <div class="script-note">Nhím có cấu trúc giống Sóc, nhưng nhận tin “Gọi nhím”.</div>
+              </div>
+
+              <div class="object-code">
+                <h4>🌲 Sân khấu khu rừng</h4>
+                <div class="script-stack">
+                  <span class="block event"><svg class="flag-icon"><use href="#icon-flag"></use></svg>Khi bấm vào cờ xanh</span>
+                  <span class="block looks">chuyển phông nền thành [Forest]</span>
+                  <span class="block sound">phát âm thanh nền rừng nhỏ nếu có</span>
+                </div>
+                <div class="script-note">Không bắt buộc có âm thanh nền. Quan trọng nhất là bố cục sân khấu rõ ràng: Sên Nâu bên trái, các bạn trốn bên phải.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx" id="arrange">
+            <h2 class="section-title"><span class="title-icon">🧠</span>Sắp xếp thông báo đúng thứ tự</h2>
+            <p class="sub">Chọn các khối theo đúng thứ tự để hoàn thành kịch bản chính của Sên Nâu.</p>
+            <div class="grid-2">
+              <div>
+                <h4 class="fw-bold">Kho khối lệnh</h4>
+                <div class="choices">
+                  <div class="choice" data-key="flag"><span class="block event"><svg class="flag-icon"><use href="#icon-flag"></use></svg>Khi bấm cờ xanh</span></div>
+                  <div class="choice" data-key="squirrel"><span class="block message">phát tin [Gọi sóc]</span></div>
+                  <div class="choice" data-key="hedgehog"><span class="block message">phát tin [Gọi nhím]</span></div>
+                  <div class="choice" data-key="all"><span class="block message">phát tin [Gọi tất cả]</span></div>
+                </div>
+              </div>
+              <div>
+                <h4 class="fw-bold">Thứ tự em chọn</h4>
+                <div class="chosen-zone" id="chosenZone"></div>
+                <div class="hero-actions" style="margin-top:12px">
+                  <button class="btnx btn-green" id="checkOrder">✅ Kiểm tra</button>
+                  <button class="btnx btn-blue" id="resetOrder">🔄 Làm lại</button>
+                </div>
+                <p class="fw-bold" id="orderFeedback"></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx" id="practice">
+            <h2 class="section-title"><span class="title-icon">📝</span>Thực hành trên Scratch</h2>
+            <div class="grid-2">
+              <div>
+                <h4 class="fw-bold">Checklist hoàn thành</h4>
+                <div class="checklist">
+                  <label class="check-item"><input type="checkbox"> Em đã chọn phông nền khu rừng.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã thêm Sên Nâu, Sóc Vàng và Nhím Lá.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã cho Sóc Vàng và Nhím Lá ẩn khi bấm cờ xanh.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã tạo tin nhắn “Gọi sóc”.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã tạo tin nhắn “Gọi nhím”.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã tạo tin nhắn “Gọi tất cả”.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã lập trình đủ code cho Sên Nâu.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã lập trình Sóc Vàng và Nhím Lá phản hồi đúng tin nhắn.</label>
+                  <label class="check-item"><input type="checkbox"> Em đã chạy thử và sửa lỗi.</label>
+                </div>
+                <div class="mini-score" id="taskScore">0/9 nhiệm vụ</div>
+              </div>
+              <div>
+                <h4 class="fw-bold">Lỗi học sinh hay nhầm</h4>
+                <div class="grid-2">
+                  <div class="mistake"><strong>Quên ẩn nhân vật:</strong> Sóc Vàng và Nhím Lá xuất hiện ngay từ đầu nên câu chuyện mất bất ngờ.</div>
+                  <div class="mistake"><strong>Đặt sai tên tin nhắn:</strong> Sên Nâu phát “Gọi sóc” nhưng Sóc Vàng lại chờ một tin khác.</div>
+                  <div class="mistake"><strong>Không dùng “và đợi”:</strong> câu chuyện chạy quá nhanh, các lời thoại bị chồng lên nhau.</div>
+                  <div class="mistake"><strong>Chọn nhầm đối tượng:</strong> code của Sóc Vàng bị ghép vào Nhím Lá hoặc Sên Nâu.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cardx">
+            <h2 class="section-title"><span class="title-icon">🏋️</span>Bài tập phân tầng</h2>
+            <div class="grid-4">
+              <div class="mini"><span class="level lv1">Cơ bản</span><ul><li>Lập trình đúng kịch bản 3 nhân vật.</li><li>Sóc Vàng và Nhím Lá nói đúng câu trả lời.</li></ul></div>
+              <div class="mini"><span class="level lv2">Trung bình</span><ul><li>Thêm hiệu ứng xuất hiện cho Sóc Vàng và Nhím Lá.</li><li>Thêm âm thanh khi mỗi bạn xuất hiện.</li></ul></div>
+              <div class="mini"><span class="level lv3">Nâng cao</span><ul><li>Thêm bạn thứ ba như Bướm hoặc Khủng Long.</li><li>Tạo thêm tin nhắn “Gọi bạn mới”.</li></ul></div>
+              <div class="mini"><span class="level lv4">HSG định hướng</span><ul><li>Tạo phiên bản trò chơi tập hợp đội rừng xanh có điểm số.</li><li>Viết sơ đồ tin nhắn trước khi lập trình.</li></ul></div>
+            </div>
+          </section>
+
+          <section class="cardx" id="quiz">
+            <h2 class="section-title"><span class="title-icon">❓</span>Quiz cuối bài</h2>
+            <div class="quiz">
+              <div class="q"><strong>Câu 1. Khối “phát tin” dùng để làm gì?</strong><div class="options"><div class="option" data-correct="1">Gửi tín hiệu để đối tượng khác bắt đầu hành động.</div><div class="option">Xóa toàn bộ nhân vật trên sân khấu.</div><div class="option">Tự động lưu file Scratch.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 2. Vì sao Sóc Vàng và Nhím Lá cần ẩn khi bấm cờ xanh?</strong><div class="options"><div class="option">Để chương trình chạy chậm hơn.</div><div class="option" data-correct="1">Để các nhân vật chỉ xuất hiện đúng lúc khi nhận được tin nhắn.</div><div class="option">Để không dùng được khối tin nhắn.</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 3. Khi Sên Nâu nói “Sóc ơi!”, tin nhắn phù hợp là gì?</strong><div class="options"><div class="option" data-correct="1">Gọi sóc</div><div class="option">Gọi nhím</div><div class="option">Dừng tất cả</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 4. Khối “Khi tôi nhận được [Gọi nhím]” nên đặt ở đối tượng nào?</strong><div class="options"><div class="option">Sóc Vàng</div><div class="option" data-correct="1">Nhím Lá</div><div class="option">Phông nền</div></div><div class="feedback"></div></div>
+              <div class="q"><strong>Câu 5. Khi muốn cả đội cùng chào khán giả, nên dùng cách nào?</strong><div class="options"><div class="option">Chỉ đổi màu sân khấu.</div><div class="option" data-correct="1">Sên Nâu phát tin [Gọi tất cả], Sóc Vàng và Nhím Lá cùng nhận tin này.</div><div class="option">Tắt cờ xanh.</div></div><div class="feedback"></div></div>
+            </div>
+            <div class="hero-actions" style="margin-top:12px">
+              <button class="btnx btn-green" id="checkQuiz">✅ Kiểm tra đáp án</button>
+              <button class="btnx btn-blue" id="resetQuiz">🔄 Làm lại</button>
+              <span class="fw-bold" id="quizScore"></span>
+            </div>
+          </section>
+
+          <div class="footer-nav">
+            <a class="btnx btn-blue" href="https://tin247ctp.com/scratch/bai-02/">← Bài trước</a>
+            <a class="btnx btn-white" href="https://tin247ctp.com/scratch/">🏠 Trang chủ Scratch</a>
+            <a class="btnx btn-darkx" href="https://tin247ctp.com/scratch/bai-04/">Bài tiếp theo →</a>
+          </div>
+
+          <footer class="copyright-footer">
+            <strong>© Nguyễn Trung Chiến</strong>
+            <span>THPT chuyên Trần Phú · SĐT/Zalo: 0934353569</span>
+            <span>Tài liệu dùng cho học sinh học Scratch, không sao chép hoặc phân phối lại khi chưa được cho phép.</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const bar=document.getElementById('readProgress');
+      function prog(){const h=document.documentElement;bar.style.width=((h.scrollTop/(h.scrollHeight-h.clientHeight))*100||0)+'%'}
+      addEventListener('scroll',prog);prog();
+
+      const toast=document.getElementById('copyToast');
+      function showToast(msg){toast.textContent=msg||'Nội dung thuộc bản quyền Nguyễn Trung Chiến - THPT chuyên Trần Phú.';toast.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>toast.classList.remove('show'),1700)}
+      ['copy','cut','contextmenu','dragstart'].forEach(evt=>document.addEventListener(evt,e=>{if(e.target.closest('input,textarea,.allow-copy'))return;e.preventDefault();showToast()}));
+      document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(e.key==='F12'||(e.ctrlKey&&['c','s','p','u','x'].includes(k))||(e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(k))){e.preventDefault();showToast('Tài liệu có gắn bản quyền tác giả.')}});
+
+      document.querySelectorAll('.toc a').forEach(a=>a.addEventListener('click',()=>document.querySelectorAll('.toc a').forEach(x=>x.classList.remove('active'))||a.classList.add('active')));
+
+      const snail=document.getElementById('snailSprite'),squirrel=document.getElementById('squirrelSprite'),hedgehog=document.getElementById('hedgehogSprite');
+      const sb=document.getElementById('snailBubble'),rb=document.getElementById('squirrelBubble'),bb=document.getElementById('hedgehogBubble');
+      const runSteps=[...document.querySelectorAll('.run-step')];let simStep=0,simTimer=null;
+      const wait=ms=>new Promise(r=>setTimeout(r,ms));
+      function resetSim(){clearTimeout(simTimer);simStep=0;snail.style.left='42px';snail.style.bottom='48px';squirrel.style.opacity=0;hedgehog.style.opacity=0;squirrel.style.right='88px';hedgehog.style.right='22px';[sb,rb,bb].forEach(b=>b.classList.remove('show'));runSteps.forEach(s=>s.classList.remove('done'))}
+      function mark(i){if(runSteps[i])runSteps[i].classList.add('done')}
+      async function doStep(i){[sb,rb,bb].forEach(b=>b.classList.remove('show'));mark(i);if(i===0){resetSim();mark(0)}
+        if(i===1){snail.style.left='120px';sb.textContent='Sóc ơi!';sb.classList.add('show')}
+        if(i===2){squirrel.style.opacity=1;squirrel.style.right='150px';rb.textContent='Tớ có mặt!';rb.classList.add('show')}
+        if(i===3){sb.textContent='Nhím ơi!';sb.classList.add('show')}
+        if(i===4){hedgehog.style.opacity=1;hedgehog.style.right='90px';bb.textContent='Tớ sẵn sàng!';bb.classList.add('show')}
+        if(i===5){sb.textContent='Đội rừng xanh ơi! Tập hợp nào!';rb.textContent='Chào Sên Nâu, cùng bắt đầu nào!';bb.textContent='Chào Sên Nâu, cùng bắt đầu nào!';sb.classList.add('show');rb.classList.add('show');bb.classList.add('show')}
+      }
+      document.getElementById('resetStory').onclick=resetSim;
+      document.getElementById('nextStory').onclick=()=>{doStep(simStep);simStep=(simStep+1)%6};
+      document.getElementById('runStory').onclick=async()=>{resetSim();for(let i=0;i<6;i++){await doStep(i);await wait(i===0?600:1500)}};
+      resetSim();
+
+      const selected=[];const zone=document.getElementById('chosenZone');
+      function renderSelected(){zone.innerHTML='';selected.forEach(it=>{const d=document.createElement('div');d.className='choice selected';d.innerHTML=it.html;zone.appendChild(d)})}
+      document.querySelectorAll('.choice[data-key]').forEach(c=>c.addEventListener('click',()=>{if(selected.length>=4)return;selected.push({key:c.dataset.key,html:c.innerHTML});renderSelected()}));
+      document.getElementById('resetOrder').onclick=()=>{selected.length=0;renderSelected();document.getElementById('orderFeedback').textContent=''};
+      document.getElementById('checkOrder').onclick=()=>{const ok=['flag','squirrel','hedgehog','all'].every((k,i)=>selected[i]&&selected[i].key===k);document.getElementById('orderFeedback').textContent=ok?'✅ Đúng rồi! Sên Nâu gọi Sóc, gọi Nhím, rồi gọi tất cả.':'❌ Chưa đúng. Hãy bắt đầu bằng cờ xanh, sau đó gọi Sóc → gọi Nhím → gọi tất cả.'};
+
+      document.querySelectorAll('.checklist input').forEach(i=>i.addEventListener('change',()=>{const box=i.closest('.checklist'),n=box.querySelectorAll('input:checked').length,total=box.querySelectorAll('input').length;document.getElementById('taskScore').textContent=n+'/'+total+' nhiệm vụ'}));
+      document.querySelectorAll('.option').forEach(o=>o.addEventListener('click',()=>{const q=o.closest('.q');q.querySelectorAll('.option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected')}));
+      document.getElementById('checkQuiz').onclick=()=>{let score=0,total=0;document.querySelectorAll('.q').forEach(q=>{total++;const sel=q.querySelector('.option.selected');const ok=sel&&sel.dataset.correct==='1';q.querySelectorAll('.option').forEach(o=>{o.classList.remove('correct','wrong');if(o.dataset.correct==='1')o.classList.add('correct')});if(sel&&!ok)sel.classList.add('wrong');if(ok)score++;q.querySelector('.feedback').textContent=ok?'✅ Chính xác!':'❌ Xem lại phần tin nhắn rồi thử lại.'});document.getElementById('quizScore').textContent='Điểm: '+score+'/'+total};
+      document.getElementById('resetQuiz').onclick=()=>{document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected','correct','wrong'));document.querySelectorAll('.feedback').forEach(f=>f.textContent='');document.getElementById('quizScore').textContent=''};
+    });
+  </script>
+</body>
+</html>

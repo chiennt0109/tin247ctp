@@ -1,371 +1,1013 @@
+<!--
+  File đề xuất: oj/roadmap_data/topics/stage02_topic01.html
+  Bài giảng tương tác: Đồ thị - Graph từ cơ bản đến nâng cao
+  Dùng được như một HTML fragment trong template Django/OJ.
+-->
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
-:root {
-  --blue-main: #2563eb;
-  --blue-dark: #1e3a8a;
-  --text-color: #1e293b;
-}
+  :root{
+    --graph-primary:#2563eb;
+    --graph-primary-dark:#1e3a8a;
+    --graph-cyan:#0891b2;
+    --graph-green:#16a34a;
+    --graph-orange:#f97316;
+    --graph-purple:#7c3aed;
+    --graph-red:#ef4444;
+    --graph-ink:#0f172a;
+    --graph-muted:#64748b;
+    --graph-border:#dbe7ff;
+    --graph-soft:#eff6ff;
+    --graph-soft-2:#f8fbff;
+    --graph-card:#ffffff;
+    --graph-code:#0f172a;
+  }
 
-/* ====== TEXT ======= */
-h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
-h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
-h3 { color: #334155; margin-top: 25px; }
-p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
-ul { margin-left: 1.4rem; }
+  .graph-lesson-page{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color:var(--graph-ink);
+    background:
+      radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 32%),
+      linear-gradient(180deg, #f8fbff 0%, #ffffff 42%, #f8fbff 100%);
+    border-radius: 24px;
+    overflow:hidden;
+    padding: 0 0 32px 0;
+  }
 
-/* ====== CODE BLOCK ====== */
-pre {
-  background: #f1f5f9;
-  border-left: 4px solid var(--blue-main);
-  padding: 14px 18px;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-size: 15px;
-}
-code { font-family: Consolas, monospace; }
+  .graph-hero{
+    position:relative;
+    overflow:hidden;
+    padding: 42px 34px;
+    color:#fff;
+    background:
+      linear-gradient(135deg, rgba(30,58,138,.98), rgba(37,99,235,.93) 46%, rgba(8,145,178,.92)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='rgba(255,255,255,.16)' stroke-width='2'%3E%3Ccircle cx='35' cy='45' r='7'/%3E%3Ccircle cx='105' cy='80' r='7'/%3E%3Ccircle cx='165' cy='42' r='7'/%3E%3Ccircle cx='58' cy='158' r='7'/%3E%3Ccircle cx='170' cy='165' r='7'/%3E%3Cpath d='M42 48 99 77M112 78 158 46M106 87 62 153M112 87 165 160M65 157 163 165'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .graph-hero::after{
+    content:"";
+    position:absolute;
+    width:260px;height:260px;
+    right:-70px;top:-70px;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+  }
+  .graph-hero h1{font-weight:900; letter-spacing:-.04em; font-size:clamp(2rem, 4vw, 3.35rem);}
+  .graph-hero p{font-size:1.08rem; line-height:1.75; color:rgba(255,255,255,.92); max-width:900px;}
+  .graph-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 12px; border-radius:999px;
+    background:rgba(255,255,255,.15); color:#fff;
+    border:1px solid rgba(255,255,255,.23); font-weight:700;
+    margin:6px 6px 0 0;
+  }
 
-/* ====== CALLOUT ======= */
-.callout {
-  border-left: 6px solid #10b981;
-  background: #ecfeff;
-  padding: 10px 12px;
-  border-radius:8px;
-  margin: 12px 0;
-}
+  .graph-progress-wrap{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background:rgba(255,255,255,.9);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--graph-border);
+  }
+  .graph-progress-label{font-size:.9rem;color:var(--graph-muted);font-weight:700;}
+  .graph-progress{height:10px; background:#e5edff; border-radius:999px; overflow:hidden;}
+  .graph-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--graph-primary),var(--graph-cyan));transition:width .15s ease;}
 
-/* ====== SIMPLE GRAPH VISUAL ====== */
-.graph-demo {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-  margin: 25px 0;
-}
-.node {
-  width: 70px; height: 70px;
-  background: var(--blue-main); color: white;
-  border-radius: 50%;
-  display:flex; align-items:center; justify-content:center;
-  font-weight:bold; font-size:20px;
-}
-.edge {
-  margin-top:25px;
-  font-size:28px; color:var(--blue-main);
-}
+  .graph-container{max-width:1120px; margin:0 auto; padding:28px 18px;}
+  .mini-slide{
+    background:var(--graph-card);
+    border:1px solid var(--graph-border);
+    border-radius:22px;
+    box-shadow:0 16px 36px rgba(15,23,42,.07);
+    padding:26px;
+    margin-bottom:24px;
+    overflow:hidden;
+  }
+  .mini-slide h2{
+    display:flex; align-items:center; gap:12px;
+    color:var(--graph-primary-dark); font-weight:900; letter-spacing:-.02em;
+    font-size:clamp(1.35rem, 2.1vw, 2rem);
+    margin-bottom:16px;
+  }
+  .mini-slide h3{font-weight:850; color:#1f2937; margin-top:22px;}
+  .mini-slide p, .mini-slide li{font-size:1.02rem; line-height:1.75; color:#334155;}
+  .section-icon{
+    width:42px;height:42px; border-radius:14px;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#fff; background:linear-gradient(135deg,var(--graph-primary),var(--graph-cyan));
+    box-shadow:0 10px 22px rgba(37,99,235,.22);
+    flex:0 0 auto;
+  }
+
+  .lesson-callout{
+    border:1px solid var(--graph-border);
+    border-left:6px solid var(--graph-primary);
+    background:linear-gradient(180deg,#f8fbff,#fff);
+    border-radius:16px;
+    padding:16px 18px;
+    margin:16px 0;
+  }
+  .lesson-callout.success{border-left-color:var(--graph-green); background:#f0fdf4;}
+  .lesson-callout.warning{border-left-color:var(--graph-orange); background:#fff7ed;}
+  .lesson-callout.danger{border-left-color:var(--graph-red); background:#fef2f2;}
+  .lesson-callout.purple{border-left-color:var(--graph-purple); background:#f5f3ff;}
+
+  .concept-card{
+    height:100%;
+    border:1px solid var(--graph-border);
+    border-radius:18px;
+    padding:18px;
+    background:#fff;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .concept-card:hover{transform:translateY(-3px); box-shadow:0 16px 28px rgba(15,23,42,.08);}
+  .concept-card .big-icon{
+    width:46px;height:46px;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--graph-soft);color:var(--graph-primary);font-size:1.25rem;margin-bottom:12px;
+  }
+  .badge-soft{
+    display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;
+    background:var(--graph-soft); color:var(--graph-primary-dark); font-weight:800; font-size:.86rem;
+  }
+
+  .code-tabs .nav-link{
+    font-weight:800; color:#334155; border-radius:12px 12px 0 0;
+  }
+  .code-tabs .nav-link.active{
+    color:#fff; background:linear-gradient(135deg,var(--graph-primary),var(--graph-cyan)); border-color:transparent;
+  }
+  .code-panel{
+    position:relative;
+    background:var(--graph-code);
+    border-radius:0 16px 16px 16px;
+    overflow:hidden;
+    border:1px solid #1e293b;
+  }
+  .code-panel pre{
+    margin:0;
+    padding:22px 18px;
+    max-height:560px;
+    overflow:auto;
+    background:var(--graph-code)!important;
+    white-space:pre;
+  }
+  .code-panel code{font-family:Consolas,"SFMono-Regular",Menlo,Monaco,monospace;font-size:.94rem;line-height:1.65;}
+  .copy-btn{
+    position:absolute; right:12px; top:12px; z-index:2;
+    border:0; border-radius:999px; padding:7px 12px;
+    background:rgba(255,255,255,.12); color:#e5e7eb; font-weight:800; font-size:.85rem;
+  }
+  .copy-btn:hover{background:rgba(255,255,255,.2);}
+
+  .graph-visual-card{
+    background:linear-gradient(180deg,#ffffff,#f8fbff);
+    border:1px solid var(--graph-border);
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 14px 30px rgba(15,23,42,.06);
+  }
+  .graph-svg-wrap{
+    width:100%; min-height:330px;
+    display:flex; justify-content:center; align-items:center;
+    background:radial-gradient(circle at 50% 50%, rgba(37,99,235,.09), transparent 65%);
+    border-radius:18px;
+    border:1px dashed #bdd2ff;
+    overflow:auto;
+  }
+  .graph-svg{width:100%; max-width:560px; min-width:360px; height:330px;}
+  .graph-edge{stroke:#94a3b8; stroke-width:5; stroke-linecap:round; transition:.25s ease;}
+  .graph-edge.active{stroke:var(--graph-orange); stroke-width:7;}
+  .graph-node circle{fill:#fff; stroke:#93c5fd; stroke-width:5; filter:drop-shadow(0 8px 12px rgba(37,99,235,.15)); transition:.25s ease;}
+  .graph-node text{font-weight:900; fill:#0f172a; font-size:24px; dominant-baseline:middle; text-anchor:middle;}
+  .graph-node.visited circle{fill:#dbeafe; stroke:var(--graph-primary);}
+  .graph-node.current circle{fill:#fef3c7; stroke:var(--graph-orange); transform:scale(1.06); transform-origin:center;}
+  .graph-node.next circle{fill:#f0fdf4; stroke:var(--graph-green);}
+
+  .matrix-table{border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; border:1px solid var(--graph-border); width:100%; background:#fff;}
+  .matrix-table th,.matrix-table td{border:1px solid #e2e8f0; text-align:center; padding:10px; font-weight:800;}
+  .matrix-table th{background:#eff6ff;color:#1e3a8a;}
+  .matrix-table td.one{background:#dcfce7;color:#166534;}
+  .matrix-table td.zero{color:#94a3b8;}
+
+  .adj-list-box{
+    display:grid; gap:10px;
+    background:#f8fafc; border:1px solid var(--graph-border); border-radius:18px; padding:16px;
+  }
+  .adj-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .vertex-pill{min-width:58px;padding:8px 10px;border-radius:999px;background:#dbeafe;color:#1e3a8a;font-weight:900;text-align:center;}
+  .neighbor-pill{padding:7px 11px;border-radius:999px;background:#fff;border:1px solid #bfdbfe;font-weight:800;color:#334155;}
+
+  .algo-board{
+    display:grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+    gap:18px;
+  }
+  @media(max-width:900px){.algo-board{grid-template-columns:1fr}.mini-slide{padding:20px}.graph-hero{padding:32px 22px}}
+
+  .state-box{
+    border:1px solid var(--graph-border);
+    border-radius:18px;
+    padding:16px;
+    background:#fff;
+  }
+  .queue-line{min-height:42px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .queue-item{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;background:#e0f2fe;color:#075985;font-weight:900;}
+  .visited-list{min-height:42px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .visited-item{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#dcfce7;color:#166534;font-weight:900;}
+  .algo-log{max-height:170px;overflow:auto;background:#f8fafc;border-radius:14px;padding:12px;border:1px solid #e2e8f0;font-size:.95rem;}
+  .algo-log div{padding:4px 0;border-bottom:1px dashed #e5e7eb;}
+  .btn-lesson{
+    border:0;border-radius:999px;padding:10px 16px;font-weight:850;color:#fff;
+    background:linear-gradient(135deg,var(--graph-primary),var(--graph-cyan));
+    box-shadow:0 10px 18px rgba(37,99,235,.20);
+  }
+  .btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none;}
+  .btn-lesson.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+  .btn-lesson.orange{background:linear-gradient(135deg,#f97316,#f59e0b)}
+
+  .mistake-card{
+    border:1px solid #fecaca;
+    background:#fff7f7;
+    border-radius:18px;
+    padding:16px;
+    height:100%;
+  }
+  .mistake-card .wrong{color:#991b1b;font-weight:900;}
+  .mistake-card .right{color:#166534;font-weight:900;}
+
+  .recognition-card{
+    border:1px solid var(--graph-border);
+    border-radius:18px;
+    padding:16px;
+    background:#fff;
+    height:100%;
+  }
+  .recognition-card .signal{font-weight:900;color:var(--graph-primary-dark);}
+  .recognition-card .method{display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:7px 11px;border-radius:999px;background:#ecfeff;color:#155e75;font-weight:900;}
+
+  .practice-level{
+    border:1px solid var(--graph-border);
+    border-radius:20px;
+    padding:18px;
+    background:linear-gradient(180deg,#fff,#f8fbff);
+    height:100%;
+  }
+  .practice-level h3{margin-top:0;display:flex;align-items:center;gap:10px;}
+  .practice-level ol{padding-left:1.25rem;}
+  .practice-level li{margin-bottom:8px;}
+  .tag-level{font-size:.8rem;border-radius:999px;padding:5px 9px;font-weight:900;}
+  .tag-easy{background:#dcfce7;color:#166534}.tag-mid{background:#dbeafe;color:#1e3a8a}.tag-hard{background:#ffedd5;color:#9a3412}.tag-hsg{background:#ede9fe;color:#5b21b6}
+
+  .quiz-box{border:1px solid var(--graph-border);border-radius:20px;padding:18px;background:#fff;}
+  .quiz-option{
+    display:block;width:100%;text-align:left;border:1px solid #cbd5e1;background:#fff;border-radius:14px;padding:12px 14px;margin:9px 0;font-weight:750;color:#334155;
+    transition:.2s ease;
+  }
+  .quiz-option:hover{transform:translateX(3px);border-color:#93c5fd;background:#eff6ff;}
+  .quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#14532d;}
+  .quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#7f1d1d;}
+
+  .lesson-footer{
+    border-radius:22px;
+    padding:24px;
+    background:linear-gradient(135deg,#eff6ff,#ecfeff);
+    border:1px solid var(--graph-border);
+    text-align:center;
+  }
+
+  .scroll-safe{overflow-x:auto; max-width:100%;}
+  .text-gradient{background:linear-gradient(135deg,#fff,#dbeafe);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .small-note{font-size:.92rem;color:var(--graph-muted);}
 </style>
 
+<div class="graph-lesson-page" id="graphLessonPage">
+  <section class="graph-hero animate__animated animate__fadeIn">
+    <div class="position-relative" style="z-index:2;">
+      <span class="graph-chip"><i class="fa-solid fa-diagram-project"></i> Chủ đề nền tảng HSG</span>
+      <span class="graph-chip"><i class="fa-solid fa-route"></i> BFS / DFS / Đường đi</span>
+      <span class="graph-chip"><i class="fa-solid fa-list-check"></i> Có mô phỏng tương tác</span>
+      <h1 class="mt-3 mb-3">🕸️ ĐỒ THỊ – GRAPH<br><span class="text-gradient">từ trực quan đến thuật toán</span></h1>
+      <p>
+        Đồ thị xuất hiện trong mạng xã hội, bản đồ đường đi, robot di chuyển, lịch thi, cây thư mục và rất nhiều bài lập trình thi đấu.
+        Bài học này giúp học sinh hiểu chắc khái niệm <b>đỉnh</b>, <b>cạnh</b>, cách lưu đồ thị, BFS, DFS và cách nhận biết dạng bài.
+      </p>
+    </div>
+  </section>
 
-<h1>🕸️ Bài giảng: ĐỒ THỊ – GRAPH (Từ cơ bản → nâng cao)</h1>
+  <div class="graph-progress-wrap">
+    <div class="graph-container py-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="graph-progress-label"><i class="fa-solid fa-bars-progress me-1"></i> Tiến độ bài học</span>
+        <span class="graph-progress-label" id="graphProgressText">0%</span>
+      </div>
+      <div class="graph-progress"><div class="graph-progress-bar" id="graphProgressBar"></div></div>
+    </div>
+  </div>
 
-<p>
-Đồ thị (Graph) là một trong những chủ đề quan trọng nhất của Tin học.  
-Đồ thị xuất hiện trong: mạng xã hội, đường đi ngắn nhất, robot di chuyển, cây thư mục, lịch thi…  
-Các nội dung cần nắm bắt:
-</p>
+  <main class="graph-container">
 
-<ul>
-  <li>→ Hiểu được đỉnh, cạnh.</li>
-  <li>→ Biết lưu đồ thị, BFS/DFS.</li>
-  <li>→ Làm được bài connected component, đường đi.</li>
-  <li>→ Quy hoạch đồ thị, chu trình, bridge, articulation.</li>
-  <li>→ Khai thác sâu hơn: SCC, topo sort, DAG DP.</li>
-</ul>
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-bullseye"></i></span> Mục tiêu bài học</h2>
+      <div class="row g-3">
+        <div class="col-md-6 col-lg-4"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-circle-nodes"></i></div><b>Hiểu khái niệm</b><p class="mb-0">Đỉnh, cạnh, đồ thị có hướng, đồ thị vô hướng.</p></div></div>
+        <div class="col-md-6 col-lg-4"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-table-cells"></i></div><b>Biết cách lưu trữ</b><p class="mb-0">Danh sách cạnh, ma trận kề, danh sách kề.</p></div></div>
+        <div class="col-md-6 col-lg-4"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-shoe-prints"></i></div><b>Duyệt đồ thị</b><p class="mb-0">Nắm ý tưởng BFS, DFS và biết khi nào dùng.</p></div></div>
+        <div class="col-md-6 col-lg-4"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><b>Tránh lỗi phổ biến</b><p class="mb-0">Không nhầm hướng cạnh, chỉ số, visited, queue/stack.</p></div></div>
+        <div class="col-md-6 col-lg-4"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div><b>Nhận diện bài</b><p class="mb-0">Lan truyền, đường đi ngắn nhất, phụ thuộc, chu trình.</p></div></div>
+        <div class="col-md-6 col-lg-4"><div class="concept-card"><div class="big-icon"><i class="fa-solid fa-graduation-cap"></i></div><b>Luyện tập phân tầng</b><p class="mb-0">Cơ bản → Trung bình → Nâng cao → HSG.</p></div></div>
+      </div>
+    </section>
 
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-circle-question"></i></span> I. Đồ thị là gì?</h2>
+      <p>Một đồ thị <b>G</b> gồm hai thành phần chính:</p>
+      <div class="row g-3">
+        <div class="col-md-6"><div class="lesson-callout success"><h3 class="mt-0">Đỉnh – Vertex</h3><p class="mb-0">Là các đối tượng cần biểu diễn. Ví dụ: thành phố, học sinh, ô trên bàn cờ, tài khoản mạng xã hội.</p></div></div>
+        <div class="col-md-6"><div class="lesson-callout purple"><h3 class="mt-0">Cạnh – Edge</h3><p class="mb-0">Là mối liên hệ giữa hai đỉnh. Ví dụ: đường nối hai thành phố, quan hệ bạn bè, đường đi giữa hai ô.</p></div></div>
+      </div>
 
-<!-- ===================================================== -->
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu các khái niệm cơ bản: đỉnh (vertex), cạnh (edge).</li>
-  <li>Phân biệt đồ thị có hướng / vô hướng.</li>
-  <li>Biết 2 cách lưu trữ: ma trận kề – danh sách kề.</li>
-  <li>Sử dụng được các thuật toán cơ bản: BFS, DFS.</li>
-  <li>Nhận diện dạng bài áp dụng đồ thị.</li>
-</ul>
+      <div class="lesson-callout">
+        <b>Ví dụ đời sống:</b> Nếu mỗi đỉnh là một thành phố, thì mỗi cạnh là một con đường nối giữa hai thành phố. Bài toán tìm đường đi chính là bài toán trên đồ thị.
+      </div>
 
+      <div class="graph-visual-card mt-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-lg-7">
+            <div class="graph-svg-wrap">
+              <svg class="graph-svg" viewBox="0 0 520 330" role="img" aria-label="Sơ đồ đồ thị minh họa">
+                <line class="graph-edge edge-1-2" x1="110" y1="95" x2="260" y2="70"></line>
+                <line class="graph-edge edge-1-3" x1="110" y1="95" x2="205" y2="230"></line>
+                <line class="graph-edge edge-2-4" x1="260" y1="70" x2="395" y2="205"></line>
+                <line class="graph-edge edge-3-4" x1="205" y1="230" x2="395" y2="205"></line>
+                <g class="graph-node" data-node="1"><circle cx="110" cy="95" r="34"></circle><text x="110" y="100">1</text></g>
+                <g class="graph-node" data-node="2"><circle cx="260" cy="70" r="34"></circle><text x="260" y="75">2</text></g>
+                <g class="graph-node" data-node="3"><circle cx="205" cy="230" r="34"></circle><text x="205" y="235">3</text></g>
+                <g class="graph-node" data-node="4"><circle cx="395" cy="205" r="34"></circle><text x="395" y="210">4</text></g>
+              </svg>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <span class="badge-soft mb-2"><i class="fa-solid fa-lightbulb"></i> Đồ thị ví dụ</span>
+            <p><b>Tập đỉnh:</b> V = {1, 2, 3, 4}</p>
+            <p><b>Tập cạnh:</b> E = {(1,2), (1,3), (2,4), (3,4)}</p>
+            <div class="lesson-callout warning mb-0"><b>Điểm cần nhớ:</b> Đồ thị không nhất thiết phải vẽ đẹp hay có hình dạng cố định. Quan trọng là biết đỉnh nào nối với đỉnh nào.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- ===================================================== -->
-<h2>I. Đồ thị là gì?</h2>
-<p>
-Một đồ thị G gồm 2 phần:
-</p>
-<ul>
-  <li><b>V</b> – tập đỉnh</li>
-  <li><b>E</b> – tập cạnh nối giữa các đỉnh</li>
-</ul>
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-code-branch"></i></span> II. Đồ thị có hướng và vô hướng</h2>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="concept-card">
+            <div class="big-icon"><i class="fa-solid fa-arrows-left-right"></i></div>
+            <h3 class="mt-0">Đồ thị vô hướng</h3>
+            <p>Nếu có cạnh giữa <b>u</b> và <b>v</b>, ta có thể đi cả hai chiều: u → v và v → u.</p>
+            <pre class="mb-0"><code class="language-cpp">adj[u].push_back(v);
+adj[v].push_back(u); // thêm chiều ngược lại</code></pre>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="concept-card">
+            <div class="big-icon"><i class="fa-solid fa-arrow-right-long"></i></div>
+            <h3 class="mt-0">Đồ thị có hướng</h3>
+            <p>Nếu có cung u → v, chỉ đi được từ u sang v, không tự động đi ngược lại.</p>
+            <pre class="mb-0"><code class="language-cpp">adj[u].push_back(v); // chỉ thêm một chiều</code></pre>
+          </div>
+        </div>
+      </div>
+      <div class="lesson-callout danger">
+        <b>Lỗi rất hay gặp:</b> Đề bài nói “đường hai chiều” nhưng chỉ viết <code>adj[u].push_back(v)</code>. Khi đó chương trình thiếu cạnh ngược và kết quả BFS/DFS có thể sai.
+      </div>
+    </section>
 
-<div class="callout">
-💡 Hãy hình dung: <b>mỗi đỉnh là 1 thành phố</b>, và <b>cạnh là đường nối</b>.
-</div>
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-database"></i></span> III. Ba cách biểu diễn đồ thị</h2>
+      <p>Với đồ thị ví dụ V = {1,2,3,4}, E = {(1,2), (1,3), (2,4), (3,4)}, ta có ba cách biểu diễn thường gặp.</p>
 
-
-<!-- ===================================================== -->
-<h2>II. Ví dụ trực quan về đồ thị</h2>
-
-<p>Xét đồ thị vô hướng gồm <b>4 đỉnh</b> và <b>4 cạnh</b> như sau:</p>
-
-<div class="callout">
-<b>Tập đỉnh:</b> V = {1, 2, 3, 4}<br>
-<b>Tập cạnh:</b> E = {(1,2), (1,3), (2,4), (3,4)}
-</div>
-
-<h3>📌 1. Danh sách cạnh (Edge List)</h3>
-<pre><code>(1, 2)
+      <ul class="nav nav-tabs code-tabs" id="graphRepTabs" role="tablist">
+        <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#edgeListTab" type="button">1. Danh sách cạnh</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#adjListTab" type="button">2. Danh sách kề</button></li>
+        <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#matrixTab" type="button">3. Ma trận kề</button></li>
+      </ul>
+      <div class="tab-content border border-top-0 rounded-bottom p-3 bg-white">
+        <div class="tab-pane fade show active" id="edgeListTab">
+          <p><b>Danh sách cạnh</b> lưu trực tiếp từng cạnh. Dễ nhập dữ liệu, nhưng khi cần duyệt các đỉnh kề của một đỉnh thì chưa tối ưu.</p>
+          <pre><code class="language-text">(1, 2)
 (1, 3)
 (2, 4)
 (3, 4)</code></pre>
+        </div>
+        <div class="tab-pane fade" id="adjListTab">
+          <p><b>Danh sách kề</b> là cách dùng nhiều nhất trong lập trình thi đấu vì tiết kiệm bộ nhớ và duyệt cạnh nhanh.</p>
+          <div class="adj-list-box">
+            <div class="adj-row"><span class="vertex-pill">1</span><span class="neighbor-pill">2</span><span class="neighbor-pill">3</span></div>
+            <div class="adj-row"><span class="vertex-pill">2</span><span class="neighbor-pill">1</span><span class="neighbor-pill">4</span></div>
+            <div class="adj-row"><span class="vertex-pill">3</span><span class="neighbor-pill">1</span><span class="neighbor-pill">4</span></div>
+            <div class="adj-row"><span class="vertex-pill">4</span><span class="neighbor-pill">2</span><span class="neighbor-pill">3</span></div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="matrixTab">
+          <p><b>Ma trận kề</b> kiểm tra có cạnh hay không rất nhanh O(1), nhưng tốn bộ nhớ O(n²).</p>
+          <div class="scroll-safe">
+            <table class="matrix-table">
+              <thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+              <tbody>
+                <tr><th>1</th><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+                <tr><th>2</th><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+                <tr><th>3</th><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+                <tr><th>4</th><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-<h3>📌 2. Danh sách kề (Adjacency List)</h3>
-<pre><code>1: 2 3
-2: 1 4
-3: 1 4
-4: 2 3</code></pre>
+      <div class="row g-3 mt-3">
+        <div class="col-md-6"><div class="lesson-callout success"><b>Nên dùng danh sách kề khi:</b> n lớn, m không quá dày, cần BFS/DFS, connected components, đường đi.</div></div>
+        <div class="col-md-6"><div class="lesson-callout warning"><b>Nên dùng ma trận kề khi:</b> n nhỏ và cần kiểm tra cạnh u-v rất nhiều lần.</div></div>
+      </div>
+    </section>
 
-<h3>📌 3. Ma trận kề (Adjacency Matrix)</h3>
-<table>
-<thead>
-<tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
-</thead>
-<tbody>
-<tr><th>1</th><td>0</td><td>1</td><td>1</td><td>0</td></tr>
-<tr><th>2</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
-<tr><th>3</th><td>1</td><td>0</td><td>0</td><td>1</td></tr>
-<tr><th>4</th><td>0</td><td>1</td><td>1</td><td>0</td></tr>
-</tbody>
-</table>
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-laptop-code"></i></span> IV. Code tạo danh sách kề</h2>
+      <p>Đây là đoạn code nền tảng. Học sinh cần hiểu rõ từng dòng, đặc biệt là phần thêm cạnh hai chiều trong đồ thị vô hướng.</p>
 
-<h3>📌 4. Sơ đồ đồ thị</h3>
-
-<!-- Khung căn giữa -->
-<div style="
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  width:100%;
-  margin:20px 0;
-">
-  <div class="mermaid" style="text-align:center;">
-graph TD
-    %% Tầng 1
-    A1((1))
-
-    %% Tầng 2
-    A2((2))
-    A3((3))
-
-    %% Tầng 3
-    A4((4))
-    A5((5))
-    A6((6))
-    A7((7))
-
-    %% Tầng 4
-    A8((8))
-    A9((9))
-
-    %% Các cạnh
-    A1 --- A2
-    A1 --- A3
-
-    A2 --- A4
-    A2 --- A5
-
-    A3 --- A6
-    A3 --- A7
-
-    A4 --- A8
-    A6 --- A9
-  </div>
-</div>
-
-<!-- Mermaid JS CDN -->
-<script type="module">
-import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
-mermaid.initialize({ startOnLoad: true });
-</script>
-
-
-
-
-
-
-
-<!-- ===================================================== -->
-<h2>III. Hai cách lưu trữ đồ thị</h2>
-
-<h3>1. Ma trận kề (Adjacency Matrix)</h3>
-<p>
-Ma trận A[n][n], trong đó:
-</p>
-
-<ul>
-  <li>A[u][v] = 1 nếu có cạnh u → v</li>
-  <li>A[u][v] = 0 nếu không có cạnh</li>
-</ul>
-
-<p><b>Ưu điểm:</b> nhanh kiểm tra có cạnh không O(1)<br>
-<b>Nhược điểm:</b> tốn bộ nhớ O(n²)</p>
-
-<h3>2. Danh sách kề (Adjacency List)</h3>
-<p>
-Mỗi đỉnh lưu danh sách các đỉnh kề.
-</p>
-
-<p><b>Ưu điểm:</b> tiết kiệm bộ nhớ, duyệt cạnh rất nhanh O(V+E)<br>
-<b>Nhược điểm:</b> kiểm tra tồn tại cạnh chậm hơn</p>
-
-<h4>💻 C++ – Tạo danh sách kề</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+      <ul class="nav nav-tabs code-tabs" id="buildAdjTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#buildCpp" type="button"><i class="fa-solid fa-code me-1"></i> C++</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#buildPy" type="button"><i class="fa-brands fa-python me-1"></i> Python</button></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="buildCpp">
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="buildCppCode"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre><code id="buildCppCode" class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
-int main(){
-    int n,m; cin >> n >> m;
-    vector&lt;vector&lt;int&gt;&gt; adj(n+1);
+int main() {
+    int n, m;
+    cin &gt;&gt; n &gt;&gt; m;
 
-    for(int i=0;i<m;i++){
-        int u,v; cin >> u >> v;
+    vector&lt;vector&lt;int&gt;&gt; adj(n + 1);
+
+    for (int i = 0; i &lt; m; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+
+        // Nếu đồ thị vô hướng: thêm cả hai chiều
         adj[u].push_back(v);
-        adj[v].push_back(u); // vô hướng
+        adj[v].push_back(u);
     }
 
-    for(int i=1;i<=n;i++){
-        cout << "Đỉnh " << i << ": ";
-        for(int v : adj[i]) cout << v << " ";
-        cout << "\n";
+    for (int i = 1; i &lt;= n; i++) {
+        cout &lt;&lt; "Dinh " &lt;&lt; i &lt;&lt; ": ";
+        for (int v : adj[i]) {
+            cout &lt;&lt; v &lt;&lt; " ";
+        }
+        cout &lt;&lt; "\n";
     }
-}
-</code></pre>
 
-<h4>💻 Python</h4>
-<pre><code>n,m=map(int,input().split())
-adj=[[] for _ in range(n+1)]
+    return 0;
+}</code></pre>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="buildPy">
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="buildPyCode"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre><code id="buildPyCode" class="language-python">n, m = map(int, input().split())
+adj = [[] for _ in range(n + 1)]
 
 for _ in range(m):
-    u,v=map(int,input().split())
+    u, v = map(int, input().split())
+
+    # Nếu đồ thị vô hướng: thêm cả hai chiều
     adj[u].append(v)
     adj[v].append(u)
 
-for i in range(1,n+1):
-    print("Đỉnh",i,":",*adj[i])
-</code></pre>
+for i in range(1, n + 1):
+    print("Dinh", i, ":", *adj[i])</code></pre>
+          </div>
+        </div>
+      </div>
 
+      <div class="lesson-callout warning">
+        <b>Không nhầm:</b> Nếu đề đánh số đỉnh từ 1 đến n thì nên tạo <code>adj(n + 1)</code>. Nếu dùng <code>adj(n)</code> thì đỉnh n có thể gây lỗi truy cập ngoài mảng.
+      </div>
+    </section>
 
-<!-- ===================================================== -->
-<h2>IV. Duyệt đồ thị – BFS & DFS</h2>
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-person-walking-arrow-loop-left"></i></span> V. Duyệt đồ thị: BFS và DFS</h2>
+      <p><b>Duyệt đồ thị</b> nghĩa là đi qua các đỉnh có thể đến được từ một đỉnh bắt đầu. Hai thuật toán nền tảng là <b>BFS</b> và <b>DFS</b>.</p>
 
-<h3>1. BFS – Duyệt theo tầng</h3>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="concept-card">
+            <div class="big-icon"><i class="fa-solid fa-layer-group"></i></div>
+            <h3 class="mt-0">BFS – duyệt theo tầng</h3>
+            <p>Giống lan truyền từ nguồn ra xung quanh. Dùng <b>queue</b>. Rất quan trọng cho đường đi ngắn nhất trên đồ thị không trọng số.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="concept-card">
+            <div class="big-icon"><i class="fa-solid fa-arrow-down-long"></i></div>
+            <h3 class="mt-0">DFS – duyệt theo chiều sâu</h3>
+            <p>Đi sâu nhất có thể rồi quay lui. Dùng đệ quy hoặc stack. Hay dùng để tìm thành phần liên thông, chu trình, topo sort.</p>
+          </div>
+        </div>
+      </div>
 
-<div class="callout">
-💡 BFS giống như “lan truyền” hoặc “xếp hàng tại ATM”.  
-Dùng Queue để duyệt lần lượt từng tầng.
-</div>
+      <div class="algo-board mt-3">
+        <div class="graph-visual-card">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="btn-lesson" id="bfsModeBtn"><i class="fa-solid fa-layer-group"></i> BFS</button>
+            <button class="btn-lesson secondary" id="dfsModeBtn"><i class="fa-solid fa-arrow-down-long"></i> DFS</button>
+            <button class="btn-lesson green" id="algoStepBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button>
+            <button class="btn-lesson secondary" id="algoResetBtn"><i class="fa-solid fa-rotate-right"></i> Làm lại</button>
+          </div>
+          <div class="graph-svg-wrap">
+            <svg class="graph-svg" id="algoGraphSvg" viewBox="0 0 520 330" role="img" aria-label="Mô phỏng BFS DFS">
+              <line class="graph-edge algo-edge edge-1-2" x1="110" y1="95" x2="260" y2="70"></line>
+              <line class="graph-edge algo-edge edge-1-3" x1="110" y1="95" x2="205" y2="230"></line>
+              <line class="graph-edge algo-edge edge-2-4" x1="260" y1="70" x2="395" y2="205"></line>
+              <line class="graph-edge algo-edge edge-3-4" x1="205" y1="230" x2="395" y2="205"></line>
+              <g class="graph-node algo-node" data-node="1"><circle cx="110" cy="95" r="34"></circle><text x="110" y="100">1</text></g>
+              <g class="graph-node algo-node" data-node="2"><circle cx="260" cy="70" r="34"></circle><text x="260" y="75">2</text></g>
+              <g class="graph-node algo-node" data-node="3"><circle cx="205" cy="230" r="34"></circle><text x="205" y="235">3</text></g>
+              <g class="graph-node algo-node" data-node="4"><circle cx="395" cy="205" r="34"></circle><text x="395" y="210">4</text></g>
+            </svg>
+          </div>
+        </div>
+        <div class="state-box">
+          <h3 class="mt-0"><i class="fa-solid fa-play text-primary"></i> Mô phỏng <span id="algoModeName">BFS</span> từ đỉnh 1</h3>
+          <p class="small-note">Nhấn “Bước tiếp” để thấy cách thuật toán lấy đỉnh ra và thêm các đỉnh chưa thăm.</p>
+          <div class="mb-3">
+            <b id="frontierLabel">Queue hiện tại</b>
+            <div class="queue-line" id="frontierBox"></div>
+          </div>
+          <div class="mb-3">
+            <b>Đỉnh đã thăm</b>
+            <div class="visited-list" id="visitedBox"></div>
+          </div>
+          <div>
+            <b>Nhật ký</b>
+            <div class="algo-log" id="algoLog"></div>
+          </div>
+        </div>
+      </div>
 
-<pre><code>// BFS từ đỉnh 1
-vector<int> vis(n+1);
-queue<int> q;
+      <ul class="nav nav-tabs code-tabs mt-4" id="traverseTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#bfsCpp" type="button">BFS C++</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dfsCpp" type="button">DFS C++</button></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="bfsCpp">
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="bfsCppCode"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre><code id="bfsCppCode" class="language-cpp">vector&lt;int&gt; vis(n + 1, 0);
+queue&lt;int&gt; q;
+
 q.push(1);
-vis[1]=1;
+vis[1] = 1;
 
-while(!q.empty()){
-    int u=q.front(); q.pop();
-    for(int v:adj[u]){
-        if(!vis[v]){
-            vis[v]=1;
+while (!q.empty()) {
+    int u = q.front();
+    q.pop();
+
+    for (int v : adj[u]) {
+        if (!vis[v]) {
+            vis[v] = 1;
             q.push(v);
         }
     }
-}
-</code></pre>
+}</code></pre>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="dfsCpp">
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="dfsCppCode"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre><code id="dfsCppCode" class="language-cpp">vector&lt;int&gt; vis(n + 1, 0);
 
-<h3>2. DFS – Duyệt sâu</h3>
-<pre><code>void dfs(int u){
-    vis[u]=1;
-    for(int v:adj[u]){
-        if(!vis[v]) dfs(v);
+void dfs(int u) {
+    vis[u] = 1;
+
+    for (int v : adj[u]) {
+        if (!vis[v]) {
+            dfs(v);
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-triangle-exclamation"></i></span> VI. Những lỗi học sinh rất dễ nhầm</h2>
+      <div class="row g-3">
+        <div class="col-md-6 col-lg-3">
+          <div class="mistake-card">
+            <div class="wrong"><i class="fa-solid fa-xmark"></i> Nhầm 1-index và 0-index</div>
+            <p class="mb-2">Đề có đỉnh 1..n nhưng tạo mảng chỉ có n phần tử.</p>
+            <div class="right"><i class="fa-solid fa-check"></i> Dùng <code>adj(n+1)</code></div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="mistake-card">
+            <div class="wrong"><i class="fa-solid fa-xmark"></i> Quên cạnh ngược</div>
+            <p class="mb-2">Đồ thị vô hướng cần thêm cả u→v và v→u.</p>
+            <div class="right"><i class="fa-solid fa-check"></i> Viết đủ 2 dòng push</div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="mistake-card">
+            <div class="wrong"><i class="fa-solid fa-xmark"></i> Không đánh dấu visited</div>
+            <p class="mb-2">Có thể lặp vô hạn khi đồ thị có chu trình.</p>
+            <div class="right"><i class="fa-solid fa-check"></i> Đánh dấu ngay khi đưa vào queue</div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="mistake-card">
+            <div class="wrong"><i class="fa-solid fa-xmark"></i> Dùng BFS sai bài</div>
+            <p class="mb-2">BFS chỉ cho ngắn nhất khi mọi cạnh có trọng số bằng 1.</p>
+            <div class="right"><i class="fa-solid fa-check"></i> Có trọng số → học Dijkstra</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-compass"></i></span> VII. Nhận biết bài dùng đồ thị</h2>
+      <div class="row g-3">
+        <div class="col-md-6 col-lg-4"><div class="recognition-card"><div class="signal">Có “lan truyền”, “lây nhiễm”, “mỗi bước đi 4 hướng”</div><span class="method"><i class="fa-solid fa-layer-group"></i> BFS</span></div></div>
+        <div class="col-md-6 col-lg-4"><div class="recognition-card"><div class="signal">Đường đi ngắn nhất, mỗi cạnh có chi phí bằng 1</div><span class="method"><i class="fa-solid fa-route"></i> BFS khoảng cách</span></div></div>
+        <div class="col-md-6 col-lg-4"><div class="recognition-card"><div class="signal">Kiểm tra có đi được từ s đến t không</div><span class="method"><i class="fa-solid fa-shoe-prints"></i> BFS/DFS</span></div></div>
+        <div class="col-md-6 col-lg-4"><div class="recognition-card"><div class="signal">Đếm số nhóm tách rời, đảo, vùng, thành phần</div><span class="method"><i class="fa-solid fa-people-group"></i> Connected Components</span></div></div>
+        <div class="col-md-6 col-lg-4"><div class="recognition-card"><div class="signal">Có quan hệ phụ thuộc, thứ tự học môn, thứ tự công việc</div><span class="method"><i class="fa-solid fa-arrow-up-wide-short"></i> Topo Sort</span></div></div>
+        <div class="col-md-6 col-lg-4"><div class="recognition-card"><div class="signal">Cần phát hiện chu trình, vòng lặp phụ thuộc</div><span class="method"><i class="fa-solid fa-recycle"></i> DFS cycle</span></div></div>
+      </div>
+    </section>
+
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-list-check"></i></span> VIII. Các dạng bài quan trọng</h2>
+      <div class="row g-3">
+        <div class="col-md-6 col-xl-4"><div class="concept-card"><span class="badge-soft">Dạng 1</span><h3>Connected Components</h3><p>Đếm số thành phần liên thông. Duyệt từng đỉnh chưa thăm, mỗi lần gọi BFS/DFS là thêm một thành phần.</p></div></div>
+        <div class="col-md-6 col-xl-4"><div class="concept-card"><span class="badge-soft">Dạng 2</span><h3>Đường đi ngắn nhất BFS</h3><p>Trên đồ thị không trọng số, BFS từ s để tính khoảng cách nhỏ nhất đến các đỉnh khác.</p></div></div>
+        <div class="col-md-6 col-xl-4"><div class="concept-card"><span class="badge-soft">Dạng 3</span><h3>Cycle Detection</h3><p>Phát hiện chu trình trong đồ thị vô hướng hoặc có hướng. Cách kiểm tra hai loại này khác nhau.</p></div></div>
+        <div class="col-md-6 col-xl-4"><div class="concept-card"><span class="badge-soft">Dạng 4</span><h3>Topo Sort</h3><p>Sắp xếp các đỉnh theo thứ tự phụ thuộc trong đồ thị có hướng không chu trình.</p></div></div>
+        <div class="col-md-6 col-xl-4"><div class="concept-card"><span class="badge-soft">Dạng 5</span><h3>SCC</h3><p>Thành phần liên thông mạnh trong đồ thị có hướng, thường dùng Kosaraju hoặc Tarjan.</p></div></div>
+        <div class="col-md-6 col-xl-4"><div class="concept-card"><span class="badge-soft">Dạng 6</span><h3>Tree DP</h3><p>Khi đồ thị là cây, có thể quy hoạch động trên cây: subtree size, đường kính, chọn đỉnh tối ưu.</p></div></div>
+      </div>
+    </section>
+
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-clipboard-question"></i></span> IX. Kiểm tra nhanh</h2>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="quiz-box" data-quiz="1">
+            <h3 class="mt-0">Câu 1. Đồ thị vô hướng có cạnh (u, v), cần thêm cạnh vào danh sách kề như thế nào?</h3>
+            <button class="quiz-option" data-correct="false">Chỉ <code>adj[u].push_back(v)</code></button>
+            <button class="quiz-option" data-correct="true"><code>adj[u].push_back(v)</code> và <code>adj[v].push_back(u)</code></button>
+            <button class="quiz-option" data-correct="false">Không cần lưu cạnh</button>
+            <div class="small-note quiz-feedback"></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="quiz-box" data-quiz="2">
+            <h3 class="mt-0">Câu 2. BFS thường dùng cấu trúc dữ liệu nào?</h3>
+            <button class="quiz-option" data-correct="true">Queue – hàng đợi</button>
+            <button class="quiz-option" data-correct="false">Set – tập hợp</button>
+            <button class="quiz-option" data-correct="false">Map – ánh xạ</button>
+            <div class="small-note quiz-feedback"></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="quiz-box" data-quiz="3">
+            <h3 class="mt-0">Câu 3. Khi n rất lớn và m không quá dày, nên lưu đồ thị bằng cách nào?</h3>
+            <button class="quiz-option" data-correct="false">Ma trận kề n × n</button>
+            <button class="quiz-option" data-correct="true">Danh sách kề</button>
+            <button class="quiz-option" data-correct="false">Không lưu, vừa đọc vừa bỏ</button>
+            <div class="small-note quiz-feedback"></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="quiz-box" data-quiz="4">
+            <h3 class="mt-0">Câu 4. BFS đảm bảo đường đi ngắn nhất trong trường hợp nào?</h3>
+            <button class="quiz-option" data-correct="false">Mọi đồ thị có trọng số bất kỳ</button>
+            <button class="quiz-option" data-correct="true">Đồ thị không trọng số hoặc mọi cạnh có chi phí bằng 1</button>
+            <button class="quiz-option" data-correct="false">Chỉ đồ thị có 4 đỉnh</button>
+            <div class="small-note quiz-feedback"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-dumbbell"></i></span> X. Bài tập luyện tập phân tầng</h2>
+      <p>Bài tập được phân loại để học sinh không nhầm mục tiêu: phần đầu luyện cách lưu đồ thị, phần sau mới dùng BFS/DFS và các kỹ thuật nâng cao.</p>
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="practice-level">
+            <h3>📘 Cơ bản <span class="tag-level tag-easy">Lưu đồ thị</span></h3>
+            <ol>
+              <li>Nhập n, m và m cạnh. In danh sách kề của từng đỉnh.</li>
+              <li>Đếm bậc của từng đỉnh trong đồ thị vô hướng.</li>
+              <li>Đếm số cạnh đi ra của từng đỉnh trong đồ thị có hướng.</li>
+              <li>Kiểm tra hai đỉnh u, v có cạnh nối trực tiếp hay không với n nhỏ.</li>
+            </ol>
+            <details><summary><b>Gợi ý tránh nhầm</b></summary><p>Đồ thị vô hướng: bậc của đỉnh là <code>adj[i].size()</code>. Đồ thị có hướng: cần phân biệt bậc ra và bậc vào.</p></details>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="practice-level">
+            <h3>📗 Trung bình <span class="tag-level tag-mid">BFS / DFS</span></h3>
+            <ol>
+              <li>Kiểm tra có đường đi từ s đến t hay không.</li>
+              <li>Tìm số thành phần liên thông của đồ thị vô hướng.</li>
+              <li>Tính khoảng cách ngắn nhất từ s đến mọi đỉnh trên đồ thị không trọng số.</li>
+              <li>Kiểm tra đồ thị vô hướng có phải là cây hay không.</li>
+            </ol>
+            <details><summary><b>Gợi ý tránh nhầm</b></summary><p>Cây vô hướng có n đỉnh cần liên thông và có đúng n - 1 cạnh.</p></details>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="practice-level">
+            <h3>📙 Nâng cao <span class="tag-level tag-hard">Chu trình / Topo</span></h3>
+            <ol>
+              <li>Phát hiện chu trình trong đồ thị vô hướng.</li>
+              <li>Phát hiện chu trình trong đồ thị có hướng.</li>
+              <li>Sắp xếp topo các công việc có phụ thuộc.</li>
+              <li>Tìm thứ tự học các môn học sao cho thỏa mãn điều kiện tiên quyết.</li>
+            </ol>
+            <details><summary><b>Gợi ý tránh nhầm</b></summary><p>Chu trình vô hướng cần kiểm tra đỉnh cha. Chu trình có hướng thường dùng trạng thái 0/1/2 hoặc topo sort.</p></details>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="practice-level">
+            <h3>🐉 HSG <span class="tag-level tag-hsg">Chuyên sâu</span></h3>
+            <ol>
+              <li>Kosaraju tìm thành phần liên thông mạnh SCC.</li>
+              <li>Tarjan tìm cầu và khớp trong đồ thị vô hướng.</li>
+              <li>DP trên cây: kích thước cây con, chiều cao, đường kính.</li>
+              <li>Multi-source BFS: nhiều nguồn lan truyền cùng lúc.</li>
+            </ol>
+            <details><summary><b>Gợi ý định hướng</b></summary><p>Chỉ học phần này sau khi đã viết chắc DFS/BFS và hiểu danh sách kề.</p></details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mini-slide animate__animated animate__fadeInUp">
+      <h2><span class="section-icon"><i class="fa-solid fa-code"></i></span> XI. Mẫu lời giải: đếm thành phần liên thông</h2>
+      <p>Đây là bài rất quan trọng. Ý tưởng: duyệt tất cả các đỉnh, nếu đỉnh đó chưa thăm thì bắt đầu một lần DFS/BFS mới và tăng số thành phần.</p>
+      <ul class="nav nav-tabs code-tabs" id="ccTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ccCpp" type="button">C++</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#ccPy" type="button">Python</button></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="ccCpp">
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="ccCppCode"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre><code id="ccCppCode" class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int n, m;
+vector&lt;vector&lt;int&gt;&gt; adj;
+vector&lt;int&gt; visited;
+
+void dfs(int u) {
+    visited[u] = 1;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            dfs(v);
+        }
     }
 }
-</code></pre>
 
+int main() {
+    cin &gt;&gt; n &gt;&gt; m;
+    adj.assign(n + 1, {});
+    visited.assign(n + 1, 0);
 
-<!-- ===================================================== -->
-<h2>V. Dạng bài quan trọng (HỌC SINH GIỎI CẦN BIẾT)</h2>
+    for (int i = 0; i &lt; m; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
 
-<div class="callout"><b>1) Connected Components – số thành phần liên thông</b></div>
-<div class="callout"><b>2) Đường đi ngắn nhất BFS (trên đồ thị không trọng số)</b></div>
-<div class="callout"><b>3) Chu trình đồ thị (cycle detection)</b></div>
-<div class="callout"><b>4) Topo Sort – sắp xếp topo đồ thị có hướng</b></div>
-<div class="callout"><b>5) SCC – Thành phần liên thông mạnh (Kosaraju/Tarjan)</b></div>
-<div class="callout"><b>6) Tree DP – Quy hoạch động trên cây</b></div>
+    int components = 0;
+    for (int i = 1; i &lt;= n; i++) {
+        if (!visited[i]) {
+            components++;
+            dfs(i);
+        }
+    }
 
+    cout &lt;&lt; components;
+    return 0;
+}</code></pre>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="ccPy">
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="ccPyCode"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre><code id="ccPyCode" class="language-python">import sys
+sys.setrecursionlimit(10**7)
 
-<!-- ===================================================== -->
-<h2>VI. Nhận biết bài dùng đồ thị</h2>
+n, m = map(int, input().split())
+adj = [[] for _ in range(n + 1)]
+visited = [False] * (n + 1)
 
-<div class="callout">
-<b>🟦 1) Bài có “lan truyền”, “mỗi bước đi 4 hướng”</b>  
-→ Dùng BFS.
+for _ in range(m):
+    u, v = map(int, input().split())
+    adj[u].append(v)
+    adj[v].append(u)
+
+def dfs(u):
+    visited[u] = True
+    for v in adj[u]:
+        if not visited[v]:
+            dfs(v)
+
+components = 0
+for i in range(1, n + 1):
+    if not visited[i]:
+        components += 1
+        dfs(i)
+
+print(components)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="lesson-footer animate__animated animate__fadeInUp">
+      <h2 class="justify-content-center"><span class="section-icon"><i class="fa-solid fa-flag-checkered"></i></span> Tổng kết</h2>
+      <p class="mb-2">Nắm chắc <b>đỉnh – cạnh – danh sách kề – BFS – DFS – visited</b> là chìa khóa để giải phần lớn bài đồ thị cơ bản.</p>
+      <p class="fw-bold text-primary mb-0">➡ Tiếp theo: Luyện bài BFS/DFS theo từng dạng để hình thành phản xạ nhận diện đề.</p>
+    </div>
+
+  </main>
 </div>
 
-<div class="callout">
-<b>🟩 2) Bài “đường đi ngắn nhất” nhưng trọng số = 1</b>  
-→ BFS.
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(function(){
+  function safeQuery(sel, root=document){ return root.querySelector(sel); }
+  function safeQueryAll(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
 
-<div class="callout">
-<b>🟧 3) Bài “có phụ thuộc”, “thứ tự làm việc”</b>  
-→ Topo Sort.
-</div>
+  if (window.hljs) {
+    safeQueryAll('pre code').forEach(function(block){ window.hljs.highlightElement(block); });
+  }
 
-<div class="callout">
-<b>🟥 4) Bài nhiều nguồn – nhiều đích</b>  
-→ Multi-source BFS.
-</div>
+  const page = safeQuery('#graphLessonPage');
+  const bar = safeQuery('#graphProgressBar');
+  const text = safeQuery('#graphProgressText');
+  function updateProgress(){
+    if(!page || !bar || !text) return;
+    const rect = page.getBoundingClientRect();
+    const total = page.offsetHeight - window.innerHeight;
+    const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+    const pct = Math.round(scrolled / Math.max(total, 1) * 100);
+    bar.style.width = pct + '%';
+    text.textContent = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress, {passive:true});
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
 
-<div class="callout">
-<b>🟪 5) Bài cần xác định chu kỳ</b>  
-→ DFS.
-</div>
+  safeQueryAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', async function(){
+      const id = btn.getAttribute('data-copy-target');
+      const target = document.getElementById(id);
+      if(!target) return;
+      try{
+        await navigator.clipboard.writeText(target.innerText);
+        const old = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã copy';
+        setTimeout(function(){ btn.innerHTML = old; }, 1200);
+      }catch(e){
+        btn.textContent = 'Không copy được';
+      }
+    });
+  });
 
+  const adj = {1:[2,3], 2:[1,4], 3:[1,4], 4:[2,3]};
+  let mode = 'BFS';
+  let frontier = [1];
+  let visited = new Set([1]);
+  let processed = [];
+  let log = ['Bắt đầu từ đỉnh 1. Đánh dấu 1 đã thăm.'];
 
-<!-- ===================================================== -->
-<h2>VII. Bài tập luyện tập</h2>
-<p>Bài tập được chia theo cấp độ để học sinh yếu → giỏi đều theo được.</p>
+  const frontierBox = safeQuery('#frontierBox');
+  const visitedBox = safeQuery('#visitedBox');
+  const algoLog = safeQuery('#algoLog');
+  const modeName = safeQuery('#algoModeName');
+  const frontierLabel = safeQuery('#frontierLabel');
+  const bfsBtn = safeQuery('#bfsModeBtn');
+  const dfsBtn = safeQuery('#dfsModeBtn');
+  const stepBtn = safeQuery('#algoStepBtn');
+  const resetBtn = safeQuery('#algoResetBtn');
 
-<h3>📘 Cơ bản – dành cho học sinh yếu</h3>
-<ol>
-  <li>Tạo danh sách kề từ input.</li>
-  <li>Đếm bậc (degree) của từng đỉnh.</li>
-  <li>Kiểm tra xem đồ thị có cạnh song song không.</li>
-</ol>
+  function setMode(nextMode){
+    mode = nextMode;
+    if(bfsBtn && dfsBtn){
+      bfsBtn.className = mode === 'BFS' ? 'btn-lesson' : 'btn-lesson secondary';
+      dfsBtn.className = mode === 'DFS' ? 'btn-lesson' : 'btn-lesson secondary';
+    }
+    resetAlgo();
+  }
 
-<details>
-  <summary><b>💡 Gợi ý lời giải – Đếm bậc</b></summary>
-  <pre><code>for(int i=1;i<=n;i++)
-    cout << "deg(" << i << ") = " << adj[i].size();</code></pre>
-</details>
+  function resetAlgo(){
+    frontier = [1];
+    visited = new Set([1]);
+    processed = [];
+    log = ['Bắt đầu từ đỉnh 1. Đánh dấu 1 đã thăm.'];
+    renderAlgo();
+  }
 
+  function edgeKey(a,b){ return '.edge-' + Math.min(a,b) + '-' + Math.max(a,b); }
 
-<h3>📗 Trung bình – dành cho học sinh khá</h3>
-<ol>
-  <li>Tìm số thành phần liên thông (dùng DFS hoặc BFS).</li>
-  <li>Kiểm tra đồ thị có phải cây không.</li>
-  <li>Tìm đường đi từ s → t.</li>
-</ol>
+  function renderAlgo(current=null, newly=[]){
+    if(modeName) modeName.textContent = mode;
+    if(frontierLabel) frontierLabel.textContent = mode === 'BFS' ? 'Queue hiện tại' : 'Stack hiện tại';
+    if(frontierBox){
+      frontierBox.innerHTML = frontier.length ? frontier.map(x => '<span class="queue-item">' + x + '</span>').join('') : '<span class="small-note">Rỗng</span>';
+    }
+    if(visitedBox){
+      visitedBox.innerHTML = Array.from(visited).sort((a,b)=>a-b).map(x => '<span class="visited-item">' + x + '</span>').join('');
+    }
+    if(algoLog){
+      algoLog.innerHTML = log.map(x => '<div>' + x + '</div>').join('');
+      algoLog.scrollTop = algoLog.scrollHeight;
+    }
+    safeQueryAll('.algo-node').forEach(function(g){
+      const n = Number(g.getAttribute('data-node'));
+      g.classList.remove('visited','current','next');
+      if(visited.has(n)) g.classList.add('visited');
+      if(current === n) g.classList.add('current');
+      if(newly.includes(n)) g.classList.add('next');
+    });
+    safeQueryAll('.algo-edge').forEach(e => e.classList.remove('active'));
+    if(current !== null){
+      newly.forEach(v => {
+        const e = safeQuery(edgeKey(current, v));
+        if(e) e.classList.add('active');
+      });
+    }
+  }
 
+  function stepAlgo(){
+    if(frontier.length === 0){
+      log.push('Thuật toán kết thúc vì không còn đỉnh nào trong ' + (mode === 'BFS' ? 'queue.' : 'stack.'));
+      renderAlgo();
+      return;
+    }
+    const u = mode === 'BFS' ? frontier.shift() : frontier.pop();
+    processed.push(u);
+    const newly = [];
+    for(const v of adj[u]){
+      if(!visited.has(v)){
+        visited.add(v);
+        frontier.push(v);
+        newly.push(v);
+      }
+    }
+    if(newly.length){
+      log.push('Lấy đỉnh ' + u + ', thêm đỉnh chưa thăm: ' + newly.join(', ') + '.');
+    }else{
+      log.push('Lấy đỉnh ' + u + ', không có đỉnh mới để thêm.');
+    }
+    renderAlgo(u, newly);
+  }
 
-<h3>📙 Nâng cao – học sinh giỏi</h3>
-<ol>
-  <li>Tìm chu trình trong đồ thị vô hướng.</li>
-  <li>Tìm chu trình trong đồ thị có hướng (cycle detection).</li>
-  <li>Topo Sort.</li>
-</ol>
+  if(bfsBtn) bfsBtn.addEventListener('click', () => setMode('BFS'));
+  if(dfsBtn) dfsBtn.addEventListener('click', () => setMode('DFS'));
+  if(stepBtn) stepBtn.addEventListener('click', stepAlgo);
+  if(resetBtn) resetBtn.addEventListener('click', resetAlgo);
+  renderAlgo();
 
-
-<h3>🐉 HSG – Chuyên sâu</h3>
-<ol>
-  <li>Thuật toán Kosaraju tìm SCC.</li>
-  <li>Thuật toán Tarjan tìm articulation point / bridge.</li>
-  <li>DP trên cây: subtree size, đường kính cây.</li>
-</ol>
-
-
-<p style="text-align:center; color:#666; font-style:italic; margin-top:20px;">
-✨ Đồ thị là chủ đề cực lớn. Nắm vững cơ bản, BFS, DFS, và cách lưu trữ chính là chìa khóa để giải quyết 80% bài thi.
-</p>
+  safeQueryAll('.quiz-box').forEach(function(box){
+    const feedback = safeQuery('.quiz-feedback', box);
+    safeQueryAll('.quiz-option', box).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        safeQueryAll('.quiz-option', box).forEach(b => b.classList.remove('correct','wrong'));
+        const ok = btn.getAttribute('data-correct') === 'true';
+        btn.classList.add(ok ? 'correct' : 'wrong');
+        if(feedback){
+          feedback.innerHTML = ok
+            ? '<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> Chính xác.</span> Em đã chọn đúng ý quan trọng.'
+            : '<span class="text-danger fw-bold"><i class="fa-solid fa-xmark"></i> Chưa đúng.</span> Hãy đọc lại phần ví dụ và lỗi thường gặp.';
+        }
+      });
+    });
+  });
+})();
+</script>

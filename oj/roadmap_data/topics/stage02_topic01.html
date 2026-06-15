@@ -1,89 +1,735 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu mảng là gì và tại sao phải dùng mảng thay vì dùng từng biến lẻ tẻ.</li>
-  <li>Biết cách khai báo mảng 1 chiều (1D) và truy cập phần tử theo chỉ số.</li>
-  <li>Biết cách tính tổng, tìm min/max trong mảng.</li>
-  <li>Làm quen với mảng 2 chiều (ma trận) để lưu bảng điểm, ma trận pixel, v.v.</li>
-  <li>So sánh cách làm trong C++ và Python.</li>
-</ul>
+<!--
+  File: oj/roadmap_data/topics/stage01_topic01.html
+  Bài giảng tương tác: Mảng 1 chiều và mảng 2 chiều cơ bản
+  Dùng được như một HTML fragment trong template Django/OJ.
+-->
 
-<hr>
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<h2>1. Mảng là gì?</h2>
-<p>Hãy tưởng tượng em cần lưu điểm 5 môn của bạn Nam. Cách <b>tệ</b> nhất:</p>
-<pre><code>// C++
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- Highlight.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+
+<style>
+  :root{
+    --lesson-primary:#2563eb;
+    --lesson-primary-dark:#1d4ed8;
+    --lesson-soft:#eff6ff;
+    --lesson-success:#16a34a;
+    --lesson-warning:#f59e0b;
+    --lesson-danger:#ef4444;
+    --lesson-ink:#0f172a;
+    --lesson-muted:#64748b;
+    --lesson-border:#e2e8f0;
+    --lesson-card:#ffffff;
+    --lesson-bg:#f8fafc;
+  }
+
+  .interactive-lesson{
+    background:
+      radial-gradient(circle at 10% 5%, rgba(59,130,246,.12), transparent 28%),
+      radial-gradient(circle at 90% 12%, rgba(16,185,129,.10), transparent 24%),
+      linear-gradient(180deg, #f8fafc 0%, #ffffff 42%, #f8fafc 100%);
+    color:var(--lesson-ink);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  .lesson-hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg, #1d4ed8 0%, #2563eb 46%, #0f172a 100%);
+    color:white;
+    border-radius: 24px;
+    padding: 34px;
+    box-shadow:0 18px 40px rgba(37,99,235,.25);
+  }
+
+  .lesson-hero::after{
+    content:"";
+    position:absolute;
+    width:260px;
+    height:260px;
+    right:-80px;
+    top:-80px;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+  }
+
+  .lesson-hero::before{
+    content:"";
+    position:absolute;
+    width:140px;
+    height:140px;
+    right:160px;
+    bottom:-70px;
+    border-radius:50%;
+    background:rgba(255,255,255,.10);
+  }
+
+  .lesson-hero-content{
+    position:relative;
+    z-index:2;
+  }
+
+  .lesson-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.22);
+    color:#fff;
+    font-weight:700;
+    font-size:.92rem;
+  }
+
+  .lesson-title{
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 850;
+    letter-spacing:-.04em;
+    margin:18px 0 12px;
+  }
+
+  .lesson-subtitle{
+    max-width:850px;
+    color:rgba(255,255,255,.9);
+    font-size:1.1rem;
+    line-height:1.65;
+  }
+
+  .lesson-progress-shell{
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    background: rgba(248,250,252,.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226,232,240,.9);
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin: 22px 0;
+    box-shadow:0 8px 24px rgba(15,23,42,.06);
+  }
+
+  .lesson-progress-title{
+    font-weight:800;
+    color:var(--lesson-ink);
+  }
+
+  .progress{
+    height: 12px;
+    border-radius:999px;
+    background:#e2e8f0;
+  }
+
+  .progress-bar{
+    background:linear-gradient(90deg, #22c55e, #2563eb);
+  }
+
+  .card-lesson{
+    border:1px solid var(--lesson-border);
+    border-radius:22px;
+    box-shadow:0 12px 30px rgba(15,23,42,.08);
+    margin-bottom:24px;
+    overflow:hidden;
+    background:var(--lesson-card);
+  }
+
+  .card-lesson .card-header{
+    border:0;
+    background:linear-gradient(90deg, #eff6ff, #ffffff);
+    padding:18px 22px;
+  }
+
+  .card-lesson .card-body{
+    padding:24px;
+  }
+
+  .section-icon{
+    width:44px;
+    height:44px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:#dbeafe;
+    color:var(--lesson-primary);
+    margin-right:12px;
+    box-shadow: inset 0 0 0 1px rgba(37,99,235,.1);
+  }
+
+  .mini-slide-title{
+    display:flex;
+    align-items:center;
+    font-size:1.35rem;
+    font-weight:850;
+    margin:0;
+    color:#0f172a;
+  }
+
+  .lesson-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 11px;
+    border-radius:999px;
+    background:#f1f5f9;
+    color:#334155;
+    font-weight:700;
+    font-size:.9rem;
+    margin:4px 6px 4px 0;
+  }
+
+  .concept-box{
+    background:linear-gradient(180deg, #f8fafc, #ffffff);
+    border:1px dashed #cbd5e1;
+    border-radius:18px;
+    padding:18px;
+  }
+
+  .remember-box{
+    border-left: 6px solid var(--lesson-primary);
+    background:#eff6ff;
+    border-radius:16px;
+    padding:16px 18px;
+  }
+
+  .warning-box{
+    border-left: 6px solid var(--lesson-warning);
+    background:#fffbeb;
+    border-radius:16px;
+    padding:16px 18px;
+  }
+
+  .success-box{
+    border-left: 6px solid var(--lesson-success);
+    background:#ecfdf5;
+    border-radius:16px;
+    padding:16px 18px;
+  }
+
+  .lesson-table{
+    overflow:hidden;
+    border-radius:18px;
+    border:1px solid var(--lesson-border);
+  }
+
+  .lesson-table table{
+    margin:0;
+  }
+
+  .lesson-table th{
+    background:#f1f5f9;
+    color:#0f172a;
+    font-weight:800;
+  }
+
+  pre{
+    border-radius:16px;
+    background:#0f172a !important;
+    padding:16px;
+    margin:0;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+
+  pre code.hljs{
+    background:transparent !important;
+    color:#e5e7eb;
+    padding:0;
+    font-size:.92rem;
+    line-height:1.55;
+  }
+
+  .code-caption{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:#0f172a;
+    color:#cbd5e1;
+    padding:10px 14px;
+    border-radius:16px 16px 0 0;
+    font-size:.85rem;
+    font-weight:700;
+  }
+
+  .code-wrap pre{
+    border-radius:0 0 16px 16px;
+  }
+
+  .copy-btn{
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.08);
+    color:white;
+    border-radius:999px;
+    padding:4px 10px;
+    font-size:.8rem;
+  }
+
+  .copy-btn:hover{
+    background:rgba(255,255,255,.15);
+    color:white;
+  }
+
+  .array-board{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:flex-end;
+    min-height:92px;
+  }
+
+  .array-cell{
+    min-width:64px;
+    border-radius:16px;
+    background:linear-gradient(180deg, #ffffff, #eff6ff);
+    border:2px solid #bfdbfe;
+    text-align:center;
+    box-shadow:0 8px 18px rgba(37,99,235,.10);
+    transition:all .25s ease;
+    overflow:hidden;
+  }
+
+  .array-cell.active{
+    transform:translateY(-8px) scale(1.04);
+    border-color:#2563eb;
+    box-shadow:0 14px 26px rgba(37,99,235,.22);
+  }
+
+  .array-value{
+    display:block;
+    padding:13px 10px;
+    font-size:1.25rem;
+    font-weight:850;
+    color:#0f172a;
+  }
+
+  .array-index{
+    display:block;
+    padding:7px 8px;
+    background:#dbeafe;
+    color:#1d4ed8;
+    font-weight:800;
+    font-size:.82rem;
+  }
+
+  .matrix-grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(44px, 1fr));
+    gap:8px;
+    max-width:380px;
+  }
+
+  .matrix-cell{
+    border-radius:14px;
+    padding:14px 8px;
+    text-align:center;
+    border:2px solid #c7d2fe;
+    background:#eef2ff;
+    font-weight:850;
+    color:#312e81;
+  }
+
+  .matrix-cell:hover{
+    background:#dbeafe;
+    transform:translateY(-2px);
+  }
+
+  .interactive-panel{
+    background:linear-gradient(135deg, #f8fafc, #ffffff);
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 10px 24px rgba(15,23,42,.06);
+  }
+
+  .quiz-option{
+    border:1px solid #cbd5e1;
+    background:#fff;
+    border-radius:16px;
+    padding:13px 14px;
+    margin:8px 0;
+    width:100%;
+    text-align:left;
+    font-weight:700;
+    transition:all .2s ease;
+  }
+
+  .quiz-option:hover{
+    border-color:#2563eb;
+    transform:translateX(4px);
+    background:#eff6ff;
+  }
+
+  .quiz-option.correct{
+    border-color:#16a34a;
+    background:#ecfdf5;
+    color:#166534;
+  }
+
+  .quiz-option.wrong{
+    border-color:#ef4444;
+    background:#fef2f2;
+    color:#991b1b;
+  }
+
+  .practice-card{
+    height:100%;
+    border-radius:20px;
+    border:1px solid var(--lesson-border);
+    padding:18px;
+    background:#fff;
+    transition:all .25s ease;
+  }
+
+  .practice-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 14px 28px rgba(15,23,42,.09);
+  }
+
+  .step-pill{
+    width:34px;
+    height:34px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#dbeafe;
+    color:#1d4ed8;
+    font-weight:900;
+    margin-right:8px;
+  }
+
+  .timeline-item{
+    position:relative;
+    padding-left:30px;
+    margin-bottom:14px;
+  }
+
+  .timeline-item::before{
+    content:"";
+    position:absolute;
+    left:7px;
+    top:7px;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#2563eb;
+  }
+
+  .timeline-item::after{
+    content:"";
+    position:absolute;
+    left:12px;
+    top:22px;
+    width:2px;
+    height:calc(100% + 2px);
+    background:#bfdbfe;
+  }
+
+  .timeline-item:last-child::after{
+    display:none;
+  }
+
+  .fade-slide{
+    animation: fadeSlide .65s ease both;
+  }
+
+  @keyframes fadeSlide{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  @media (max-width: 768px){
+    .lesson-hero{
+      padding:24px;
+    }
+
+    .card-lesson .card-body{
+      padding:18px;
+    }
+
+    .lesson-table{
+      overflow-x:auto;
+    }
+
+    .array-cell{
+      min-width:54px;
+    }
+  }
+</style>
+
+<div class="interactive-lesson p-3 p-md-4" id="arrayLessonPage">
+  <!-- Header -->
+  <header class="lesson-hero animate__animated animate__fadeIn">
+    <div class="lesson-hero-content">
+      <span class="lesson-badge">
+        <i class="fa-solid fa-code"></i>
+        C++ cơ bản · Interactive Lesson
+      </span>
+
+      <h1 class="lesson-title">Mảng trong lập trình</h1>
+
+      <p class="lesson-subtitle mb-4">
+        Bài học này giúp em hiểu vì sao cần dùng mảng, cách khai báo mảng 1 chiều,
+        cách duyệt mảng để tính tổng, tìm giá trị lớn nhất/nhỏ nhất và bước đầu làm quen với mảng 2 chiều.
+      </p>
+
+      <div class="d-flex flex-wrap gap-2">
+        <span class="lesson-chip"><i class="fa-solid fa-layer-group text-primary"></i> Mảng 1 chiều</span>
+        <span class="lesson-chip"><i class="fa-solid fa-calculator text-success"></i> Tổng · Min · Max</span>
+        <span class="lesson-chip"><i class="fa-solid fa-table-cells text-warning"></i> Mảng 2 chiều</span>
+        <span class="lesson-chip"><i class="fa-solid fa-laptop-code text-info"></i> C++ và Python</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Lesson progress bar -->
+  <div class="lesson-progress-shell">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="lesson-progress-title">
+        <i class="fa-solid fa-route text-primary me-1"></i>
+        Tiến trình bài học
+      </span>
+      <span id="lessonProgressText" class="fw-bold text-primary">0%</span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Lesson progress">
+      <div id="lessonProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Objectives -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-bullseye"></i></span>
+        Mục tiêu bài học
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <p class="text-muted mb-3">
+        Sau bài này, em cần nắm được các ý nền tảng trước khi học sâu hơn về thuật toán xử lý dãy số.
+      </p>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="concept-box h-100">
+            <p class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Hiểu mảng là gì và tại sao phải dùng mảng thay vì dùng từng biến lẻ tẻ.</p>
+            <p class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Biết cách khai báo mảng 1 chiều và truy cập phần tử theo chỉ số.</p>
+            <p class="mb-0"><i class="fa-solid fa-check text-success me-2"></i>Biết cách tính tổng, tìm min/max trong mảng.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="concept-box h-100">
+            <p class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Làm quen với mảng 2 chiều để lưu bảng điểm, ma trận pixel, bàn cờ.</p>
+            <p class="mb-0"><i class="fa-solid fa-check text-success me-2"></i>So sánh cách làm trong C++ và Python để hiểu điểm giống và khác nhau.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Warm-up -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-lightbulb"></i></span>
+        Khởi động: Vì sao cần có mảng?
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+          <p>
+            Hãy tưởng tượng em cần lưu điểm của <b>5 môn học</b> cho bạn Nam.
+            Nếu chỉ có 5 môn, ta còn có thể dùng nhiều biến riêng lẻ. Nhưng nếu là
+            <b>45 học sinh</b>, <b>200 học sinh</b> hoặc <b>10 000 số</b> trong một bài thi lập trình,
+            cách dùng từng biến sẽ rất khó quản lý.
+          </p>
+
+          <div class="warning-box mb-3">
+            <b><i class="fa-solid fa-triangle-exclamation me-1"></i>Cách tệ nhất:</b>
+            đặt rất nhiều biến rời rạc rồi nhập từng biến một.
+          </div>
+
+          <div class="code-wrap mb-3">
+            <div class="code-caption">
+              <span><i class="fa-brands fa-cuttlefish me-1"></i> C++</span>
+              <button class="copy-btn" type="button" data-copy-target="badCode">Sao chép</button>
+            </div>
+<pre><code id="badCode" class="language-cpp">// C++
 int d1, d2, d3, d4, d5;
-cin >> d1 >> d2 >> d3 >> d4 >> d5;
-</code></pre>
+cin &gt;&gt; d1 &gt;&gt; d2 &gt;&gt; d3 &gt;&gt; d4 &gt;&gt; d5;</code></pre>
+          </div>
+        </div>
 
-<p>Nhưng nếu lớp có 45 bạn? 200 bạn? Cách trên sẽ không thể mở rộng.</p>
+        <div class="col-lg-5">
+          <div class="interactive-panel">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-gamepad text-primary me-2"></i>Thử suy nghĩ nhanh</h5>
+            <p class="mb-2">Nếu cần lưu điểm của 45 học sinh, mỗi học sinh có 5 môn, cách nào hợp lý hơn?</p>
 
-<p><b>Mảng</b> là một dãy các ô nhớ đứng cạnh nhau, đều cùng kiểu dữ liệu, và có thể truy cập bằng chỉ số.</p>
+            <button class="quiz-option" data-answer="wrong" data-feedback="Dùng từng biến sẽ tạo quá nhiều biến và rất khó lặp để xử lý.">
+              A. Tạo 225 biến riêng lẻ
+            </button>
 
-<p>Ví dụ lưu điểm 5 môn:</p>
+            <button class="quiz-option" data-answer="correct" data-feedback="Đúng. Mảng giúp gom nhiều dữ liệu cùng kiểu vào một cấu trúc dễ xử lý bằng vòng lặp.">
+              B. Dùng mảng để lưu dữ liệu theo chỉ số
+            </button>
 
-<table class="table table-bordered text-sm">
-<thead>
-<tr><th>C++</th><th>Python</th></tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<pre><code>int a[5];           // khai báo mảng 5 phần tử
-for (int i = 0; i < 5; i++) {
-    cin >> a[i];    // nhập từng điểm
+            <button class="quiz-option" data-answer="wrong" data-feedback="Không nên. Ghi tay không giúp chương trình tự tính toán được.">
+              C. Ghi điểm ra giấy rồi tự cộng
+            </button>
+
+            <div class="mt-3 small fw-bold" id="warmupFeedback"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is array -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-boxes-stacked"></i></span>
+        1. Mảng là gì?
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <div class="success-box mb-4">
+        <b>Mảng</b> là một dãy các ô nhớ đứng cạnh nhau, đều cùng kiểu dữ liệu,
+        và có thể truy cập bằng <b>chỉ số</b>.
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <h5 class="fw-bold"><i class="fa-solid fa-table-list text-primary me-2"></i>Minh họa mảng điểm 5 môn</h5>
+          <p class="text-muted">
+            Mỗi ô trong mảng giống như một ngăn tủ. Muốn lấy dữ liệu ở ngăn nào,
+            ta gọi đúng chỉ số của ngăn đó.
+          </p>
+
+          <div class="array-board mb-3" id="arrayBoard">
+            <div class="array-cell"><span class="array-value">8</span><span class="array-index">a[0]</span></div>
+            <div class="array-cell"><span class="array-value">7</span><span class="array-index">a[1]</span></div>
+            <div class="array-cell"><span class="array-value">9</span><span class="array-index">a[2]</span></div>
+            <div class="array-cell"><span class="array-value">6</span><span class="array-index">a[3]</span></div>
+            <div class="array-cell"><span class="array-value">10</span><span class="array-index">a[4]</span></div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-primary rounded-pill" type="button" onclick="highlightArrayCell(0)">Xem a[0]</button>
+            <button class="btn btn-outline-primary rounded-pill" type="button" onclick="highlightArrayCell(2)">Xem a[2]</button>
+            <button class="btn btn-outline-primary rounded-pill" type="button" onclick="highlightArrayCell(4)">Xem a[4]</button>
+          </div>
+
+          <div class="remember-box mt-3" id="arrayIndexMessage">
+            <b>Ghi nhớ:</b> Trong C++ và Python, chỉ số mảng bắt đầu từ <b>0</b>, không phải từ 1.
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="lesson-table">
+            <table class="table table-bordered align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width:50%">C++</th>
+                  <th style="width:50%">Python</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+<pre><code class="language-cpp">int a[5];           // khai báo mảng 5 phần tử
+for (int i = 0; i &lt; 5; i++) {
+    cin &gt;&gt; a[i];    // nhập từng điểm
 }</code></pre>
-</td>
-<td>
-<pre><code>a = []                       # danh sách rỗng
+                  </td>
+                  <td>
+<pre><code class="language-python">a = []                       # danh sách rỗng
 for i in range(5):
     x = int(input())
-    a.append(x)               # thêm vào cuối danh sách
-</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+    a.append(x)              # thêm vào cuối danh sách</code></pre>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-<div class="alert alert-info">
-<b>Ghi nhớ quan trọng:</b><br>
-- C++: chỉ số mảng bắt đầu từ 0.<br>
-- Python: cũng bắt đầu từ 0.<br>
-</div>
+          <div class="remember-box mt-3">
+            <b><i class="fa-solid fa-star me-1"></i>Ghi nhớ quan trọng:</b><br>
+            C++: chỉ số mảng bắt đầu từ <b>0</b>.<br>
+            Python: cũng bắt đầu từ <b>0</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<hr>
+  <!-- Compute array -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-arrows-rotate"></i></span>
+        2. Duyệt mảng và tính toán cơ bản
+      </h2>
+    </div>
 
-<h2>2. Duyệt mảng và tính toán cơ bản</h2>
+    <div class="card-body">
+      <p>
+        <b>Duyệt mảng</b> nghĩa là dùng vòng lặp đi qua từng phần tử trong mảng.
+        Khi duyệt, ta có thể cộng dồn để tính tổng, đếm số chẵn, tìm số lớn nhất hoặc nhỏ nhất.
+      </p>
 
-<h3>📌 Ví dụ: Tính tổng các phần tử trong mảng</h3>
+      <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+          <h5 class="fw-bold"><i class="fa-solid fa-plus text-success me-2"></i>Ví dụ: Tính tổng các phần tử trong mảng</h5>
 
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+          <div class="lesson-table">
+            <table class="table table-bordered align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>C++</th>
+                  <th>Python</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
     int n;
-    cin >> n;           // số lượng phần tử
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) {
-        cin >> a[i];
+    cin &gt;&gt; n;           // số lượng phần tử
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) {
+        cin &gt;&gt; a[i];
     }
 
     long long sum = 0;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i &lt; n; i++) {
         sum += a[i];
     }
 
-    cout << sum;
+    cout &lt;&lt; sum;
     return 0;
 }</code></pre>
-</td>
-<td>
-<pre><code>n = int(input())
+                  </td>
+                  <td>
+<pre><code class="language-python">n = int(input())
 a = list(map(int, input().split()))  # nhập n số trên 1 dòng
 
 total = 0
@@ -91,96 +737,330 @@ for x in a:
     total += x
 
 print(total)</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-<hr>
+        <div class="col-lg-5">
+          <div class="interactive-panel">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-play text-primary me-2"></i>Mô phỏng vòng lặp cộng tổng</h5>
+            <p class="text-muted mb-2">Mảng ví dụ: <b>[3, 5, 2, 4]</b></p>
 
-<h2>3. Tìm giá trị lớn nhất / nhỏ nhất trong mảng</h2>
+            <div class="array-board mb-3" id="sumDemoBoard">
+              <div class="array-cell"><span class="array-value">3</span><span class="array-index">i = 0</span></div>
+              <div class="array-cell"><span class="array-value">5</span><span class="array-index">i = 1</span></div>
+              <div class="array-cell"><span class="array-value">2</span><span class="array-index">i = 2</span></div>
+              <div class="array-cell"><span class="array-value">4</span><span class="array-index">i = 3</span></div>
+            </div>
 
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>int mx = a[0];
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-primary rounded-pill" type="button" onclick="nextSumStep()">
+                <i class="fa-solid fa-forward-step me-1"></i>Bước tiếp
+              </button>
+              <button class="btn btn-outline-secondary rounded-pill" type="button" onclick="resetSumDemo()">
+                Làm lại
+              </button>
+            </div>
+
+            <div class="remember-box mt-3" id="sumDemoText">
+              Ban đầu: <code>sum = 0</code>. Bấm “Bước tiếp” để xem vòng lặp hoạt động.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-keyboard text-primary me-2"></i>Thực hành nhanh: nhập mảng và xem kết quả</h5>
+        <p class="text-muted">Nhập các số cách nhau bởi dấu cách. Ví dụ: <code>4 7 2 10 6</code></p>
+
+        <div class="row g-2">
+          <div class="col-lg-8">
+            <input id="arrayInput" class="form-control form-control-lg rounded-pill" value="4 7 2 10 6" aria-label="Nhập mảng số nguyên">
+          </div>
+          <div class="col-lg-4 d-grid">
+            <button class="btn btn-success btn-lg rounded-pill" type="button" onclick="analyzeArrayInput()">
+              <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Phân tích mảng
+            </button>
+          </div>
+        </div>
+
+        <div id="arrayAnalyzeResult" class="row g-3 mt-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Min max -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-arrow-up-wide-short"></i></span>
+        3. Tìm giá trị lớn nhất / nhỏ nhất trong mảng
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <p>
+        Ý tưởng rất tự nhiên: giả sử phần tử đầu tiên là lớn nhất, sau đó đi qua các phần tử còn lại.
+        Nếu gặp số lớn hơn, ta cập nhật lại kết quả.
+      </p>
+
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="timeline-item">
+            <b>Bước 1:</b> Gán <code>mx = a[0]</code>.
+          </div>
+          <div class="timeline-item">
+            <b>Bước 2:</b> Duyệt từ vị trí <code>i = 1</code> đến <code>n - 1</code>.
+          </div>
+          <div class="timeline-item">
+            <b>Bước 3:</b> Nếu <code>a[i] &gt; mx</code>, cập nhật <code>mx = a[i]</code>.
+          </div>
+          <div class="timeline-item">
+            <b>Bước 4:</b> Sau khi duyệt xong, <code>mx</code> là giá trị lớn nhất.
+          </div>
+
+          <div class="warning-box mt-3">
+            <b>Lỗi học sinh hay gặp:</b> khởi tạo <code>mx = 0</code>.
+            Nếu mảng toàn số âm, cách này sẽ cho kết quả sai. Nên khởi tạo bằng <code>a[0]</code>.
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="lesson-table">
+            <table class="table table-bordered align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>C++</th>
+                  <th>Python</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+<pre><code class="language-cpp">int mx = a[0];
 for (int i = 1; i &lt; n; i++) {
     if (a[i] &gt; mx) mx = a[i];
 }
 cout &lt;&lt; mx;</code></pre>
-</td>
-<td>
-<pre><code>mx = a[0]
+                  </td>
+                  <td>
+<pre><code class="language-python">mx = a[0]
 for x in a[1:]:
     if x &gt; mx:
         mx = x
 print(mx)</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-<p class="text-muted">(Trong Python thật ra có sẵn <code>max(a)</code> và <code>min(a)</code>, nhưng ở đây chúng ta vẫn tự viết để hiểu thuật toán.)</p>
+          <p class="text-muted mt-3 mb-0">
+            Trong Python có sẵn <code>max(a)</code> và <code>min(a)</code>,
+            nhưng tự viết vòng lặp giúp em hiểu thuật toán.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<hr>
+  <!-- 2D array -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-table-cells-large"></i></span>
+        4. Mảng 2 chiều: dữ liệu dạng hàng - cột
+      </h2>
+    </div>
 
-<h2>4. Mảng 2 chiều (ma trận)</h2>
+    <div class="card-body">
+      <p>
+        Mảng 2 chiều dùng khi dữ liệu có dạng hàng-cột như bảng điểm nhiều bạn với nhiều môn,
+        ma trận ảnh, bàn cờ, sơ đồ chỗ ngồi, bảng nhiệt độ theo ngày và giờ.
+      </p>
 
-<p>Dùng khi dữ liệu có dạng hàng-cột như bảng điểm nhiều bạn vs nhiều môn, ma trận ảnh, bàn cờ,…</p>
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+          <div class="interactive-panel">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-border-all text-primary me-2"></i>Ma trận 3 hàng, 4 cột</h5>
 
-<table class="table table-bordered text-sm">
-<thead><tr><th>C++</th><th>Python</th></tr></thead>
-<tbody>
-<tr>
-<td>
-<pre><code>int a[3][4]; // ma trận 3 hàng, 4 cột
+            <div class="matrix-grid mb-3" id="matrixGrid">
+              <div class="matrix-cell" title="a[0][0]">a[0][0]</div>
+              <div class="matrix-cell" title="a[0][1]">a[0][1]</div>
+              <div class="matrix-cell" title="a[0][2]">a[0][2]</div>
+              <div class="matrix-cell" title="a[0][3]">a[0][3]</div>
+              <div class="matrix-cell" title="a[1][0]">a[1][0]</div>
+              <div class="matrix-cell" title="a[1][1]">a[1][1]</div>
+              <div class="matrix-cell" title="a[1][2]">a[1][2]</div>
+              <div class="matrix-cell" title="a[1][3]">a[1][3]</div>
+              <div class="matrix-cell" title="a[2][0]">a[2][0]</div>
+              <div class="matrix-cell" title="a[2][1]">a[2][1]</div>
+              <div class="matrix-cell" title="a[2][2]">a[2][2]</div>
+              <div class="matrix-cell" title="a[2][3]">a[2][3]</div>
+            </div>
+
+            <div class="remember-box">
+              Truy cập phần tử hàng <code>i</code>, cột <code>j</code>:
+              <br>C++: <code>a[i][j]</code>
+              <br>Python: <code>a[i][j]</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="lesson-table">
+            <table class="table table-bordered align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>C++</th>
+                  <th>Python</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+<pre><code class="language-cpp">int a[3][4]; // ma trận 3 hàng, 4 cột
 
 for (int i = 0; i &lt; 3; i++) {
     for (int j = 0; j &lt; 4; j++) {
         cin &gt;&gt; a[i][j];
     }
 }</code></pre>
-</td>
-<td>
-<pre><code>rows = 3
+                  </td>
+                  <td>
+<pre><code class="language-python">rows = 3
 cols = 4
 a = []
 
 for i in range(rows):
     row = list(map(int, input().split()))
-    a.append(row)
-</code></pre>
-</td>
-</tr>
-</tbody>
-</table>
+    a.append(row)</code></pre>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-<p>Truy cập phần tử hàng i, cột j:</p>
-<ul>
-  <li>C++: <code>a[i][j]</code></li>
-  <li>Python: <code>a[i][j]</code></li>
-</ul>
+          <div class="concept-box mt-3">
+            <b>Ví dụ đời sống:</b> Bảng điểm có 3 học sinh và 4 môn học.
+            Mỗi hàng là một học sinh, mỗi cột là một môn. Khi muốn lấy điểm Toán của học sinh thứ 2,
+            ta truy cập đúng hàng và đúng cột tương ứng.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<hr>
+  <!-- Quiz -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-circle-question"></i></span>
+        Kiểm tra nhanh sau bài học
+      </h2>
+    </div>
 
-<h2>🧪 Bài tập tự luyện</h2>
-<ol>
-  <li>Nhập n và một mảng n số nguyên. In ra tổng và giá trị lớn nhất.</li>
-  <li>Nhập ma trận kích thước R x C. In tổng từng hàng.</li>
-  <li>Đếm có bao nhiêu số chẵn trong mảng.</li>
-</ol>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-lg-4">
+          <div class="interactive-panel h-100">
+            <h5 class="fw-bold">Câu 1</h5>
+            <p>Mảng C++ <code>int a[5]</code> có các chỉ số hợp lệ nào?</p>
+            <button class="quiz-option" data-answer="wrong" data-feedback="Chỉ số bắt đầu từ 0, không phải từ 1.">A. 1 đến 5</button>
+            <button class="quiz-option" data-answer="correct" data-feedback="Đúng. Mảng 5 phần tử có chỉ số 0, 1, 2, 3, 4.">B. 0 đến 4</button>
+            <button class="quiz-option" data-answer="wrong" data-feedback="5 là chỉ số vượt ra ngoài mảng.">C. 0 đến 5</button>
+            <div class="small fw-bold mt-2 quiz-feedback"></div>
+          </div>
+        </div>
 
-<details class="mt-3">
-  <summary class="text-primary" style="cursor:pointer;"><b>🔍 Gợi ý / Lời giải mẫu (C++)</b></summary>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
+        <div class="col-lg-4">
+          <div class="interactive-panel h-100">
+            <h5 class="fw-bold">Câu 2</h5>
+            <p>Để tính tổng các phần tử, ta thường dùng kỹ thuật nào?</p>
+            <button class="quiz-option" data-answer="correct" data-feedback="Đúng. Duyệt từng phần tử và cộng dồn vào biến tổng.">A. Vòng lặp và biến cộng dồn</button>
+            <button class="quiz-option" data-answer="wrong" data-feedback="Sắp xếp không cần thiết để tính tổng.">B. Sắp xếp mảng</button>
+            <button class="quiz-option" data-answer="wrong" data-feedback="Đếm chữ số không liên quan đến tính tổng mảng.">C. Đếm chữ số</button>
+            <div class="small fw-bold mt-2 quiz-feedback"></div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="interactive-panel h-100">
+            <h5 class="fw-bold">Câu 3</h5>
+            <p>Mảng 2 chiều phù hợp để lưu dữ liệu nào?</p>
+            <button class="quiz-option" data-answer="wrong" data-feedback="Một số đơn lẻ không cần mảng 2 chiều.">A. Một số nguyên duy nhất</button>
+            <button class="quiz-option" data-answer="correct" data-feedback="Đúng. Bảng điểm có dạng hàng-cột, rất phù hợp với mảng 2 chiều.">B. Bảng điểm nhiều học sinh và nhiều môn</button>
+            <button class="quiz-option" data-answer="wrong" data-feedback="Tên một học sinh thường dùng chuỗi, không cần mảng 2 chiều.">C. Tên của một học sinh</button>
+            <div class="small fw-bold mt-2 quiz-feedback"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Practice -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-flask"></i></span>
+        Bài tập tự luyện
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="practice-card">
+            <span class="step-pill">1</span>
+            <b> Tổng và giá trị lớn nhất</b>
+            <p class="text-muted mt-2 mb-0">
+              Nhập <code>n</code> và một mảng <code>n</code> số nguyên. In ra tổng và giá trị lớn nhất.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="practice-card">
+            <span class="step-pill">2</span>
+            <b> Tổng từng hàng</b>
+            <p class="text-muted mt-2 mb-0">
+              Nhập ma trận kích thước <code>R x C</code>. In tổng từng hàng.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="practice-card">
+            <span class="step-pill">3</span>
+            <b> Đếm số chẵn</b>
+            <p class="text-muted mt-2 mb-0">
+              Đếm có bao nhiêu số chẵn trong mảng.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion" id="solutionAccordion">
+        <div class="accordion-item rounded-4 overflow-hidden mb-3">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cppSolution">
+              <i class="fa-brands fa-cuttlefish text-primary me-2"></i>
+              Gợi ý / Lời giải mẫu C++
+            </button>
+          </h2>
+          <div id="cppSolution" class="accordion-collapse collapse" data-bs-parent="#solutionAccordion">
+            <div class="accordion-body">
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
     int n;
-    cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i &lt; n; i++) cin >> a[i];
+    cin &gt;&gt; n;
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
 
     long long sum = 0;
     int mx = a[0];
@@ -192,16 +1072,25 @@ int main() {
         if (x % 2 == 0) even_count++;
     }
 
-    cout &lt;&lt; "Tong = " &lt;&lt; sum &lt;&lt; "\\n";
-    cout &lt;&lt; "Max = " &lt;&lt; mx &lt;&lt; "\\n";
-    cout &lt;&lt; "So chan = " &lt;&lt; even_count &lt;&lt; "\\n";
+    cout &lt;&lt; "Tong = " &lt;&lt; sum &lt;&lt; "\n";
+    cout &lt;&lt; "Max = " &lt;&lt; mx &lt;&lt; "\n";
+    cout &lt;&lt; "So chan = " &lt;&lt; even_count &lt;&lt; "\n";
     return 0;
 }</code></pre>
-</details>
+            </div>
+          </div>
+        </div>
 
-<details class="mt-3">
-  <summary class="text-success" style="cursor:pointer;"><b>🐍 Gợi ý / Lời giải mẫu (Python)</b></summary>
-  <pre><code>n = int(input())
+        <div class="accordion-item rounded-4 overflow-hidden">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#pythonSolution">
+              <i class="fa-brands fa-python text-success me-2"></i>
+              Gợi ý / Lời giải mẫu Python
+            </button>
+          </h2>
+          <div id="pythonSolution" class="accordion-collapse collapse" data-bs-parent="#solutionAccordion">
+            <div class="accordion-body">
+<pre><code class="language-python">n = int(input())
 a = list(map(int, input().split()))
 
 total = sum(a)
@@ -211,8 +1100,224 @@ even_count = sum(1 for x in a if x % 2 == 0)
 print("Tong =", total)
 print("Max =", mx)
 print("So chan =", even_count)</code></pre>
-</details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<p class="mt-4 text-center text-info fw-bold">
-➡ Tiếp theo: Chuỗi ký tự (xử lý text, tên học sinh, câu tiếng Việt có dấu).
-</p>
+  <!-- Summary -->
+  <section class="card card-lesson lesson-section animate__animated animate__fadeInUp">
+    <div class="card-header">
+      <h2 class="mini-slide-title">
+        <span class="section-icon"><i class="fa-solid fa-flag-checkered"></i></span>
+        Tổng kết
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-lg-4">
+          <div class="success-box h-100">
+            <b>1. Mảng giúp lưu nhiều giá trị cùng kiểu</b>
+            <p class="mb-0 mt-2">Thay vì tạo nhiều biến rời rạc, ta dùng mảng để quản lý dữ liệu có cấu trúc.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="remember-box h-100">
+            <b>2. Chỉ số bắt đầu từ 0</b>
+            <p class="mb-0 mt-2">Phần tử đầu tiên là <code>a[0]</code>, phần tử cuối cùng là <code>a[n - 1]</code>.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="concept-box h-100">
+            <b>3. Duyệt mảng là thao tác nền tảng</b>
+            <p class="mb-0 mt-2">Tính tổng, tìm min/max, đếm phần tử đều bắt đầu từ việc duyệt từng phần tử.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-4 text-center text-info fw-bold fs-5">
+        <i class="fa-solid fa-arrow-right-long me-1"></i>
+        Tiếp theo: Chuỗi ký tự — xử lý text, tên học sinh, câu tiếng Việt có dấu.
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<script>
+  // Highlight code safely when Highlight.js is available.
+  if (window.hljs) {
+    window.hljs.highlightAll();
+  }
+
+  // Lesson progress by scroll position inside the page.
+  (function(){
+    const progressBar = document.getElementById("lessonProgressBar");
+    const progressText = document.getElementById("lessonProgressText");
+
+    function updateProgress(){
+      const doc = document.documentElement;
+      const scrollTop = window.scrollY || doc.scrollTop;
+      const scrollHeight = doc.scrollHeight - window.innerHeight;
+      const percent = scrollHeight > 0 ? Math.min(100, Math.max(0, Math.round(scrollTop / scrollHeight * 100))) : 0;
+
+      if(progressBar) progressBar.style.width = percent + "%";
+      if(progressText) progressText.textContent = percent + "%";
+    }
+
+    window.addEventListener("scroll", updateProgress, {passive:true});
+    updateProgress();
+  })();
+
+  // Animate sections when they enter viewport.
+  (function(){
+    const sections = document.querySelectorAll(".lesson-section");
+
+    if(!("IntersectionObserver" in window)){
+      sections.forEach(section => section.classList.add("fade-slide"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add("fade-slide");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.12});
+
+    sections.forEach(section => observer.observe(section));
+  })();
+
+  // Copy code buttons.
+  document.querySelectorAll("[data-copy-target]").forEach(button => {
+    button.addEventListener("click", () => {
+      const target = document.getElementById(button.dataset.copyTarget);
+      if(!target) return;
+
+      navigator.clipboard.writeText(target.innerText).then(() => {
+        const oldText = button.textContent;
+        button.textContent = "Đã sao chép";
+        setTimeout(() => button.textContent = oldText, 1200);
+      });
+    });
+  });
+
+  // Quiz option feedback.
+  document.querySelectorAll(".quiz-option").forEach(button => {
+    button.addEventListener("click", function(){
+      const parent = this.closest(".interactive-panel") || this.parentElement;
+      const options = parent.querySelectorAll(".quiz-option");
+      const feedback = parent.querySelector(".quiz-feedback") || document.getElementById("warmupFeedback");
+
+      options.forEach(opt => {
+        opt.classList.remove("correct", "wrong");
+        opt.disabled = false;
+      });
+
+      if(this.dataset.answer === "correct"){
+        this.classList.add("correct");
+        if(feedback){
+          feedback.className = "small fw-bold mt-2 text-success";
+          feedback.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i>' + this.dataset.feedback;
+        }
+      }else{
+        this.classList.add("wrong");
+        if(feedback){
+          feedback.className = "small fw-bold mt-2 text-danger";
+          feedback.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i>' + this.dataset.feedback;
+        }
+      }
+    });
+  });
+
+  // Array visualizer.
+  function highlightArrayCell(index){
+    const cells = document.querySelectorAll("#arrayBoard .array-cell");
+    const msg = document.getElementById("arrayIndexMessage");
+
+    cells.forEach(cell => cell.classList.remove("active"));
+    if(cells[index]){
+      cells[index].classList.add("active");
+      const value = cells[index].querySelector(".array-value").innerText;
+      msg.innerHTML = '<b>Đang truy cập:</b> a[' + index + '] = <b>' + value + '</b>. Vì chỉ số bắt đầu từ 0 nên đây là ô thứ ' + (index + 1) + ' trong mảng.';
+    }
+  }
+
+  // Sum loop simulator.
+  const sumDemoValues = [3, 5, 2, 4];
+  let sumDemoIndex = 0;
+  let sumDemoTotal = 0;
+
+  function nextSumStep(){
+    const cells = document.querySelectorAll("#sumDemoBoard .array-cell");
+    const text = document.getElementById("sumDemoText");
+
+    cells.forEach(cell => cell.classList.remove("active"));
+
+    if(sumDemoIndex >= sumDemoValues.length){
+      text.innerHTML = '<b>Hoàn thành:</b> Tổng cuối cùng là <code>sum = ' + sumDemoTotal + '</code>.';
+      return;
+    }
+
+    const value = sumDemoValues[sumDemoIndex];
+    sumDemoTotal += value;
+    cells[sumDemoIndex].classList.add("active");
+
+    text.innerHTML =
+      'Bước i = <b>' + sumDemoIndex + '</b>: lấy <code>a[' + sumDemoIndex + '] = ' + value + '</code>, ' +
+      'cập nhật <code>sum = sum + a[' + sumDemoIndex + '] = ' + sumDemoTotal + '</code>.';
+
+    sumDemoIndex++;
+  }
+
+  function resetSumDemo(){
+    sumDemoIndex = 0;
+    sumDemoTotal = 0;
+    document.querySelectorAll("#sumDemoBoard .array-cell").forEach(cell => cell.classList.remove("active"));
+    document.getElementById("sumDemoText").innerHTML =
+      'Ban đầu: <code>sum = 0</code>. Bấm “Bước tiếp” để xem vòng lặp hoạt động.';
+  }
+
+  // Analyze user input.
+  function analyzeArrayInput(){
+    const input = document.getElementById("arrayInput");
+    const result = document.getElementById("arrayAnalyzeResult");
+
+    const values = input.value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(Number)
+      .filter(x => Number.isFinite(x));
+
+    if(values.length === 0){
+      result.innerHTML = '<div class="col-12"><div class="warning-box">Em cần nhập ít nhất một số nguyên.</div></div>';
+      return;
+    }
+
+    const total = values.reduce((acc, x) => acc + x, 0);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const evenCount = values.filter(x => x % 2 === 0).length;
+
+    result.innerHTML = `
+      <div class="col-md-3"><div class="success-box text-center"><b>Tổng</b><div class="fs-3 fw-bold">${total}</div></div></div>
+      <div class="col-md-3"><div class="remember-box text-center"><b>Lớn nhất</b><div class="fs-3 fw-bold">${maxValue}</div></div></div>
+      <div class="col-md-3"><div class="concept-box text-center"><b>Nhỏ nhất</b><div class="fs-3 fw-bold">${minValue}</div></div></div>
+      <div class="col-md-3"><div class="warning-box text-center"><b>Số chẵn</b><div class="fs-3 fw-bold">${evenCount}</div></div></div>
+    `;
+  }
+
+  // Make demo result visible on first load.
+  analyzeArrayInput();
+</script>

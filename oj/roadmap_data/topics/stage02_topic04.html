@@ -1,93 +1,905 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu vì sao cần đọc / ghi file thay vì chỉ nhập tay.</li>
-  <li>Biết cách đọc dữ liệu từ file đầu vào (.INP).</li>
-  <li>Biết cách ghi kết quả ra file đầu ra (.OUT).</li>
-</ul>
+<!-- Interactive Lesson Page: File I/O, freopen, template and contest tricks -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 
-<hr>
+<style>
+#exam-io-lesson {
+  --primary:#4f46e5;
+  --primary-2:#2563eb;
+  --accent:#06b6d4;
+  --success:#16a34a;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --soft:#f8fafc;
+  --soft-blue:#eef6ff;
+  --card:#ffffff;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--ink);
+  line-height:1.72;
+  max-width:1120px;
+  margin:0 auto;
+  padding:18px 10px 70px;
+}
+#exam-io-lesson * { box-sizing:border-box; }
+#exam-io-lesson .lesson-hero {
+  position:relative;
+  overflow:hidden;
+  border-radius:28px;
+  padding:34px;
+  color:white;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.35), transparent 28%),
+    linear-gradient(135deg,#4338ca 0%,#2563eb 48%,#06b6d4 100%);
+  box-shadow:0 22px 50px rgba(37,99,235,.24);
+}
+#exam-io-lesson .lesson-hero:after {
+  content:"";
+  position:absolute;
+  right:-80px;
+  bottom:-95px;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+}
+#exam-io-lesson .hero-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 14px;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.16);
+  border-radius:999px;
+  font-weight:700;
+  backdrop-filter:blur(8px);
+}
+#exam-io-lesson h1 {
+  font-size:clamp(28px,4vw,48px);
+  font-weight:900;
+  letter-spacing:-.04em;
+  margin:18px 0 12px;
+}
+#exam-io-lesson .hero-subtitle {
+  font-size:18px;
+  max-width:820px;
+  opacity:.95;
+  margin:0;
+}
+#exam-io-lesson .lesson-progress {
+  position:sticky;
+  top:0;
+  z-index:30;
+  height:10px;
+  border-radius:999px;
+  background:#e2e8f0;
+  overflow:hidden;
+  margin:18px 0 22px;
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,.05);
+}
+#exam-io-lesson .lesson-progress-inner {
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#4f46e5,#06b6d4,#22c55e);
+  transition:width .15s linear;
+}
+#exam-io-lesson .lesson-nav {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:22px 0;
+}
+#exam-io-lesson .lesson-nav a {
+  text-decoration:none;
+  color:#1e293b;
+  background:white;
+  border:1px solid #dbeafe;
+  border-radius:999px;
+  padding:9px 14px;
+  font-weight:800;
+  box-shadow:0 8px 18px rgba(15,23,42,.06);
+}
+#exam-io-lesson .lesson-nav a:hover { color:#2563eb; transform:translateY(-1px); }
+#exam-io-lesson .card-lesson {
+  border:1px solid #dbeafe;
+  border-radius:24px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 14px 36px rgba(15,23,42,.08);
+  margin-bottom:24px;
+  padding:24px;
+}
+#exam-io-lesson .card-title {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+#exam-io-lesson .title-icon {
+  width:42px;
+  height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  color:white;
+  background:linear-gradient(135deg,#4f46e5,#2563eb);
+  box-shadow:0 10px 24px rgba(79,70,229,.25);
+}
+#exam-io-lesson h2 {
+  font-size:24px;
+  font-weight:900;
+  color:#1e3a8a;
+  margin:0;
+  letter-spacing:-.02em;
+}
+#exam-io-lesson h3 {
+  font-size:19px;
+  font-weight:900;
+  color:#334155;
+  margin:18px 0 10px;
+}
+#exam-io-lesson p, #exam-io-lesson li {
+  font-size:16.5px;
+}
+#exam-io-lesson .mini-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:14px;
+}
+#exam-io-lesson .mini-card {
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(180deg,#ffffff,#f8fbff);
+}
+#exam-io-lesson .mini-card strong { display:block; color:#1e3a8a; margin-bottom:6px; }
+#exam-io-lesson .callout {
+  border-radius:18px;
+  padding:15px 17px;
+  margin:15px 0;
+  border:1px solid #bae6fd;
+  background:#f0f9ff;
+}
+#exam-io-lesson .callout.warning { border-color:#fed7aa; background:#fff7ed; }
+#exam-io-lesson .callout.success { border-color:#bbf7d0; background:#f0fdf4; }
+#exam-io-lesson .callout.danger { border-color:#fecaca; background:#fff1f2; }
+#exam-io-lesson .pill {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  border-radius:999px;
+  padding:6px 11px;
+  font-size:13px;
+  font-weight:900;
+  background:#eef2ff;
+  color:#3730a3;
+}
+#exam-io-lesson .lesson-tabs {
+  border:1px solid #dbeafe;
+  border-radius:20px;
+  overflow:hidden;
+  background:#fff;
+  margin:14px 0;
+}
+#exam-io-lesson .lesson-tab-buttons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:0;
+  background:#eff6ff;
+  border-bottom:1px solid #dbeafe;
+}
+#exam-io-lesson .lesson-tab-btn {
+  border:0;
+  background:transparent;
+  color:#334155;
+  padding:11px 16px;
+  font-weight:900;
+  cursor:pointer;
+}
+#exam-io-lesson .lesson-tab-btn.active {
+  color:#fff;
+  background:linear-gradient(135deg,#4f46e5,#2563eb);
+}
+#exam-io-lesson .lesson-tab-pane { padding:0; }
+#exam-io-lesson pre {
+  position:relative;
+  background:#0f172a !important;
+  color:#e5e7eb !important;
+  border-radius:18px;
+  padding:20px;
+  margin:0;
+  overflow:auto;
+  max-height:520px;
+  border:1px solid rgba(148,163,184,.25);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+}
+#exam-io-lesson .lesson-tab-pane pre { border-radius:0; border:0; max-height:560px; }
+#exam-io-lesson pre code,
+#exam-io-lesson code.hljs {
+  background:transparent !important;
+  color:inherit !important;
+  display:block;
+  white-space:pre;
+  font-family:"JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size:14.5px;
+  line-height:1.75;
+}
+#exam-io-lesson :not(pre)>code {
+  background:#eef2ff;
+  color:#be185d;
+  padding:2px 6px;
+  border-radius:7px;
+  font-weight:800;
+}
+#exam-io-lesson .code-shell { position:relative; }
+#exam-io-lesson .copy-btn {
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:5;
+  border:0;
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:12px;
+  font-weight:900;
+  color:white;
+  background:rgba(100,116,139,.85);
+}
+#exam-io-lesson table { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:16px; }
+#exam-io-lesson th { background:#eef2ff; color:#1e3a8a; }
+#exam-io-lesson th, #exam-io-lesson td { border:1px solid #e2e8f0; padding:11px 12px; vertical-align:top; }
+#exam-io-lesson .io-box {
+  border:1px dashed #93c5fd;
+  border-radius:18px;
+  padding:16px;
+  background:#f8fbff;
+}
+#exam-io-lesson textarea,
+#exam-io-lesson input,
+#exam-io-lesson select {
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  padding:11px 12px;
+  outline:none;
+}
+#exam-io-lesson textarea:focus,
+#exam-io-lesson input:focus,
+#exam-io-lesson select:focus {
+  border-color:#2563eb;
+  box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+#exam-io-lesson .btn-lesson {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:0;
+  border-radius:999px;
+  padding:10px 16px;
+  color:#fff;
+  background:linear-gradient(135deg,#4f46e5,#2563eb);
+  font-weight:900;
+  box-shadow:0 10px 22px rgba(37,99,235,.22);
+}
+#exam-io-lesson .btn-lesson.secondary {
+  color:#1e293b;
+  background:#fff;
+  border:1px solid #cbd5e1;
+  box-shadow:none;
+}
+#exam-io-lesson .quiz-option {
+  width:100%;
+  text-align:left;
+  border:1px solid #dbeafe;
+  background:#fff;
+  border-radius:16px;
+  padding:12px 14px;
+  margin:7px 0;
+  font-weight:800;
+}
+#exam-io-lesson .quiz-option.correct { border-color:#22c55e; background:#f0fdf4; }
+#exam-io-lesson .quiz-option.wrong { border-color:#ef4444; background:#fff1f2; }
+#exam-io-lesson .step-list { counter-reset:item; padding-left:0; list-style:none; }
+#exam-io-lesson .step-list li {
+  counter-increment:item;
+  margin:10px 0;
+  padding:13px 14px 13px 52px;
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  background:white;
+  position:relative;
+}
+#exam-io-lesson .step-list li:before {
+  content:counter(item);
+  position:absolute;
+  left:14px;
+  top:12px;
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:900;
+  background:#2563eb;
+}
+#exam-io-lesson details {
+  border:1px solid #dbeafe;
+  border-radius:18px;
+  padding:13px 15px;
+  background:#fff;
+  margin:10px 0;
+}
+#exam-io-lesson summary { cursor:pointer; font-weight:900; color:#1d4ed8; }
+#exam-io-lesson .final-note {
+  text-align:center;
+  border-radius:24px;
+  padding:22px;
+  color:#1e3a8a;
+  font-weight:900;
+  background:linear-gradient(135deg,#eff6ff,#ecfeff);
+  border:1px solid #bfdbfe;
+}
+@media (max-width: 768px) {
+  #exam-io-lesson .lesson-hero { padding:24px; }
+  #exam-io-lesson .card-lesson { padding:18px; }
+}
 
-<h2>1. Tại sao phải dùng file?</h2>
-<p>Trong các kỳ thi lập trình, dữ liệu đầu vào / đầu ra thường nằm trong file:
-<br><code>BAI1.INP</code> chứa dữ liệu, <code>BAI1.OUT</code> chứa kết quả.</p>
+#exam-io-lesson .lesson-tab-buttons { overflow-x:auto; scrollbar-width:thin; }
+#exam-io-lesson .lesson-tab-btn { white-space:nowrap; }
+#exam-io-lesson .lesson-tab-pane { display:none; }
+#exam-io-lesson .lesson-tab-pane.active { display:block; }
+#exam-io-lesson .lesson-tab-pane pre, #exam-io-lesson pre { color:#e5e7eb; background:#0f172a; }
+#exam-io-lesson .lesson-tab-pane code, #exam-io-lesson pre code { color:#e5e7eb; background:transparent; }
+</style>
 
-<hr>
+<div id="exam-io-lesson">
+  <section class="lesson-hero animate__animated animate__fadeInDown">
+    <span class="hero-badge"><i class="fa-solid fa-file-code"></i> Chuyên đề thực chiến C++</span>
+    <h1>Kỹ năng làm bài thi lập trình C++: File I/O, freopen, Template & Mẹo thi</h1>
+    <p class="hero-subtitle">Bài học giúp học sinh chuyển từ “code chạy trên bàn phím” sang “code sẵn sàng nộp bài thi”: đọc/ghi file, dùng <code>freopen</code> an toàn, tạo template gọn, dùng <code>define</code> đúng cách và tránh các lỗi thường gặp.</p>
+  </section>
 
-<h2>2. Cách đọc / ghi file trong C++</h2>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+  <div class="lesson-progress"><div class="lesson-progress-inner"></div></div>
+
+  <nav class="lesson-nav" aria-label="Điều hướng bài học">
+    <a href="#goal"><i class="fa-solid fa-bullseye"></i> Mục tiêu</a>
+    <a href="#why"><i class="fa-solid fa-circle-question"></i> Vì sao dùng file?</a>
+    <a href="#fileio"><i class="fa-solid fa-folder-open"></i> Đọc/ghi file</a>
+    <a href="#freopen"><i class="fa-solid fa-shuffle"></i> freopen an toàn</a>
+    <a href="#define"><i class="fa-solid fa-wand-magic-sparkles"></i> define/template</a>
+    <a href="#practice"><i class="fa-solid fa-dumbbell"></i> Bài tập</a>
+  </nav>
+
+  <section id="goal" class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-bullseye"></i></span><h2>Mục tiêu bài học</h2></div>
+    <div class="mini-grid">
+      <div class="mini-card"><strong><i class="fa-solid fa-file-import text-primary"></i> Hiểu File I/O</strong>Biết vì sao đề thi thường dùng <code>.INP</code> và <code>.OUT</code> thay vì nhập tay.</div>
+      <div class="mini-card"><strong><i class="fa-solid fa-code text-success"></i> Viết được code chuẩn</strong>Đọc dữ liệu, xử lý và ghi kết quả ra file bằng C++ và Python.</div>
+      <div class="mini-card"><strong><i class="fa-solid fa-route text-info"></i> Dùng <code>freopen</code></strong>Biết mẫu <code>if(fopen(...)) freopen(...)</code> để chạy được cả ở máy cá nhân và OJ.</div>
+      <div class="mini-card"><strong><i class="fa-solid fa-toolbox text-warning"></i> Có template thi</strong>Nắm một số <code>define</code>, alias, hằng số và mẹo tránh lỗi khi làm bài thi.</div>
+    </div>
+  </section>
+
+  <section id="why" class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-circle-question"></i></span><h2>1. Vì sao phải đọc / ghi file?</h2></div>
+    <p>Trong nhiều kỳ thi lập trình truyền thống, đề bài không yêu cầu nhập từ bàn phím trực tiếp. Thay vào đó:</p>
+    <div class="mini-grid">
+      <div class="io-box"><span class="pill"><i class="fa-solid fa-file-lines"></i> Input file</span><h3><code>BAI1.INP</code></h3><p>Chứa dữ liệu đầu vào, ví dụ: hai số, mảng, ma trận, đồ thị.</p></div>
+      <div class="io-box"><span class="pill"><i class="fa-solid fa-file-export"></i> Output file</span><h3><code>BAI1.OUT</code></h3><p>Chứa kết quả chương trình cần in ra để hệ thống chấm.</p></div>
+    </div>
+    <div class="callout success"><b>Ví dụ đời sống:</b> Giống như giáo viên đưa đề trong một tệp <b>.INP</b>, học sinh làm bài rồi nộp đáp án vào tệp <b>.OUT</b>. Chương trình chấm chỉ cần so sánh file đáp án.</div>
+  </section>
+
+  <section id="fileio" class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-folder-open"></i></span><h2>2. Cách đọc / ghi file cơ bản</h2></div>
+    <p>Bài toán mẫu: File <code>SUM.INP</code> chứa hai số nguyên <code>a, b</code>. Ghi ra <code>SUM.OUT</code> tổng <code>a + b</code>.</p>
+    <div class="lesson-tabs" data-tab-group="basic_io_tabs">
+        <div class="lesson-tab-buttons"><button class="lesson-tab-btn active" type="button" data-tab-target="basic_io_tabs_0" aria-selected="true"><i class="fa-brands fa-cuttlefish"></i> C++ ifstream/ofstream</button><button class="lesson-tab-btn" type="button" data-tab-target="basic_io_tabs_1" aria-selected="false"><i class="fa-brands fa-python"></i> Python open</button></div>
+        <div class="lesson-tab-pane" id="basic_io_tabs_0"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
-    ifstream fin("BAI1.INP");   // mở file để đọc
-    ofstream fout("BAI1.OUT");  // mở file để ghi
+    ifstream fin(&quot;SUM.INP&quot;);   // mở file để đọc
+    ofstream fout(&quot;SUM.OUT&quot;);  // mở file để ghi
 
-    int a, b;
-    fin &gt;&gt; a &gt;&gt; b;              // đọc 2 số
-    fout &lt;&lt; (a + b);             // ghi kết quả
+    long long a, b;
+    fin &gt;&gt; a &gt;&gt; b;
+    fout &lt;&lt; a + b;
 
     return 0;
-}
-</code></pre>
-
-<p><b>Lưu ý:</b> File .INP và .OUT nằm cùng thư mục chạy chương trình.</p>
-
-<hr>
-
-<h2>3. Cách đọc / ghi file trong Python</h2>
-<pre><code>fin = open("BAI1.INP", "r")
-fout = open("BAI1.OUT", "w")
+}</code></pre></div><div class="lesson-tab-pane" id="basic_io_tabs_1" style="display:none"><pre><code class="language-python">fin = open(&quot;SUM.INP&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;)
+fout = open(&quot;SUM.OUT&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;)
 
 a, b = map(int, fin.read().split())
 fout.write(str(a + b))
 
 fin.close()
-fout.close()
-</code></pre>
+fout.close()</code></pre></div>
+    </div>
+    <div class="callout warning"><b>Lưu ý quan trọng:</b> File <code>.INP</code> và <code>.OUT</code> phải nằm cùng thư mục chạy chương trình. Nếu tên file sai một ký tự, chương trình có thể không đọc được dữ liệu.</div>
+  </section>
 
-<hr>
-
-<h2>4. Bài mẫu kiểu đề thi thật</h2>
-<p><b>Đề:</b> <code>SUM.INP</code> chứa hai số a, b. Hãy tạo <code>SUM.OUT</code> ghi tổng a+b.</p>
-
-<details>
-  <summary><b>💻 Lời giải mẫu C++</b></summary>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
+  <section id="freopen" class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-shuffle"></i></span><h2>3. Cách dùng <code>if(fopen(...)) freopen(...)</code> trong C++</h2></div>
+    <p>Trong OJ hiện đại, chương trình thường đọc từ <code>stdin</code> và in ra <code>stdout</code>. Nhưng khi luyện đề file trên máy, ta lại muốn đọc từ <code>SUM.INP</code> và ghi ra <code>SUM.OUT</code>. Mẫu dưới đây giải quyết cả hai trường hợp.</p>
+    <div class="callout success">
+      <b>Cách hiểu:</b> Nếu file <code>SUM.INP</code> tồn tại thì chương trình chuyển <code>cin</code> sang đọc file và chuyển <code>cout</code> sang ghi file. Nếu file không tồn tại, chương trình vẫn dùng nhập/xuất chuẩn như bình thường.
+    </div>
+    <div class="code-shell">
+      <button class="copy-btn" type="button" data-copy="freopenCode"><i class="fa-regular fa-copy"></i> Sao chép</button>
+      <div id="freopenCode"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
-    ifstream fin("SUM.INP");
-    ofstream fout("SUM.OUT");
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    // Nếu file SUM.INP tồn tại thì đọc/ghi bằng file.
+    // Nếu không tồn tại, chương trình vẫn đọc từ bàn phím / stdin như OJ.
+    if (fopen(&quot;SUM.INP&quot;, &quot;r&quot;)) {
+        freopen(&quot;SUM.INP&quot;, &quot;r&quot;, stdin);
+        freopen(&quot;SUM.OUT&quot;, &quot;w&quot;, stdout);
+    }
+
     long long a, b;
-    fin &gt;&gt; a &gt;&gt; b;
-    fout &lt;&lt; (a + b);
+    cin &gt;&gt; a &gt;&gt; b;
+    cout &lt;&lt; a + b;
+
     return 0;
+}</code></pre></div>
+    </div>
+
+    <div class="mini-grid mt-3">
+      <div class="mini-card"><strong><i class="fa-solid fa-check text-success"></i> Khi chạy trên máy cá nhân</strong>Có file <code>SUM.INP</code> → tự động đọc file, ghi <code>SUM.OUT</code>.</div>
+      <div class="mini-card"><strong><i class="fa-solid fa-check text-success"></i> Khi nộp lên OJ</strong>Không có file <code>SUM.INP</code> → vẫn đọc bằng <code>cin</code>, in bằng <code>cout</code>.</div>
+      <div class="mini-card"><strong><i class="fa-solid fa-triangle-exclamation text-warning"></i> Không nên quên</strong>Phải đặt đúng tên file theo đề: <code>SUM</code>, <code>BAI1</code>, <code>PRODUCT</code>,...</div>
+    </div>
+  </section>
+
+  <section class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-play"></i></span><h2>4. Tương tác nhanh: chọn kiểu đọc/ghi phù hợp</h2></div>
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="io-box h-100">
+          <h3><i class="fa-solid fa-sliders"></i> Trình tạo mẫu <code>freopen</code></h3>
+          <label class="fw-bold mb-1">Tên bài / tên file, ví dụ: <code>SUM</code>, <code>BAI1</code>, <code>PRODUCT</code></label>
+          <input id="fileBaseName" value="SUM" maxlength="20">
+          <button class="btn-lesson mt-3" type="button" id="makeTemplateBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Tạo template</button>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="io-box h-100">
+          <h3><i class="fa-solid fa-square-poll-horizontal"></i> Thử dữ liệu</h3>
+          <label class="fw-bold mb-1">Nhập các số cách nhau bởi dấu cách</label>
+          <textarea id="sampleData" rows="3">5
+3 7 -2 10 4</textarea>
+          <select id="sampleTask" class="mt-2">
+            <option value="sum">Tính tổng các số sau dòng n</option>
+            <option value="max">Tìm số lớn nhất sau dòng n</option>
+            <option value="countzero">Đếm số 0 sau dòng n</option>
+          </select>
+          <button class="btn-lesson mt-3" type="button" id="runSampleBtn"><i class="fa-solid fa-rocket"></i> Xem output</button>
+          <div id="sampleOutput" class="callout mt-3 mb-0">Output sẽ hiện tại đây.</div>
+        </div>
+      </div>
+    </div>
+    <h3 class="mt-4">Template tạo ra</h3>
+    <pre><code id="templateOutput" class="language-cpp"></code></pre>
+  </section>
+
+  <section id="define" class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span><h2>5. Một số kỹ thuật <code>define</code>, alias và mẹo thi</h2></div>
+    <p>Các kỹ thuật này giúp code gọn hơn, nhưng cần dùng có kiểm soát để học sinh không bị rối hoặc tạo lỗi khó tìm.</p>
+
+    <div class="table-responsive">
+      <table>
+        <thead><tr><th>Kỹ thuật</th><th>Nên dùng khi nào?</th><th>Lưu ý tránh nhầm</th></tr></thead>
+        <tbody>
+          <tr><td><code>using ll = long long;</code></td><td>Khi bài có số lớn, tổng lớn, tích lớn.</td><td>Rõ nghĩa hơn <code>#define ll long long</code>.</td></tr>
+          <tr><td><code>#define all(x)</code></td><td>Khi dùng <code>sort</code>, <code>reverse</code>, <code>lower_bound</code> với vector.</td><td>Chỉ dùng với container có <code>begin()</code>, <code>end()</code>.</td></tr>
+          <tr><td><code>const int MOD</code></td><td>Bài yêu cầu lấy dư.</td><td>Không tự lấy dư nếu đề không yêu cầu.</td></tr>
+          <tr><td><code>ios::sync_with_stdio(false); cin.tie(nullptr);</code></td><td>Hầu như nên đặt đầu <code>main</code> để nhập/xuất nhanh.</td><td>Không trộn lung tung <code>cin/cout</code> với <code>scanf/printf</code> khi chưa hiểu rõ.</td></tr>
+          <tr><td><code>#define int long long</code></td><td>Chỉ dành cho người đã có kinh nghiệm.</td><td>Học sinh mới học <b>không nên dùng</b>, dễ lỗi kiểu dữ liệu và hàm <code>main</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lesson-tabs" data-tab-group="define_tabs">
+        <div class="lesson-tab-buttons"><button class="lesson-tab-btn active" type="button" data-tab-target="define_tabs_0" aria-selected="true"><i class="fa-brands fa-cuttlefish"></i> Ví dụ define/alias</button><button class="lesson-tab-btn" type="button" data-tab-target="define_tabs_1" aria-selected="false"><i class="fa-solid fa-file-code"></i> Template thi cơ bản</button><button class="lesson-tab-btn" type="button" data-tab-target="define_tabs_2" aria-selected="false"><i class="fa-solid fa-repeat"></i> Nhiều test case</button></div>
+        <div class="lesson-tab-pane" id="define_tabs_0"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+using ll = long long;
+using pii = pair&lt;int, int&gt;;
+using vi = vector&lt;int&gt;;
+
+#define pb push_back
+#define fi first
+#define se second
+#define all(x) (x).begin(), (x).end()
+
+const int INF = 1e9;
+const ll LINF = (ll)4e18;
+const int MOD = 1000000007;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    vector&lt;int&gt; a = {3, 1, 5, 2};
+    sort(all(a));
+
+    for (int x : a) cout &lt;&lt; x &lt;&lt; &#x27; &#x27;;
+    return 0;
+}</code></pre></div><div class="lesson-tab-pane" id="define_tabs_1" style="display:none"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+using ll = long long;
+using pii = pair&lt;int, int&gt;;
+using vi = vector&lt;int&gt;;
+
+#define pb push_back
+#define fi first
+#define se second
+#define all(x) (x).begin(), (x).end()
+
+const int INF = 1e9;
+const ll LINF = (ll)4e18;
+const int MOD = 1000000007;
+
+void solve() {
+    long long a, b;
+    cin &gt;&gt; a &gt;&gt; b;
+    cout &lt;&lt; a + b;
 }
-</code></pre>
-</details>
 
-<details>
-  <summary><b>🐍 Lời giải mẫu Python</b></summary>
-  <pre><code>fin = open("SUM.INP", "r")
-fout = open("SUM.OUT", "w")
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-nums = fin.read().split()
-a = int(nums[0])
-b = int(nums[1])
-fout.write(str(a + b))
+    if (fopen(&quot;BAI.INP&quot;, &quot;r&quot;)) {
+        freopen(&quot;BAI.INP&quot;, &quot;r&quot;, stdin);
+        freopen(&quot;BAI.OUT&quot;, &quot;w&quot;, stdout);
+    }
 
-fin.close()
-fout.close()
-</code></pre>
-</details>
+    solve();
+    return 0;
+}</code></pre></div><div class="lesson-tab-pane" id="define_tabs_2" style="display:none"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+using ll = long long;
 
-<hr>
+void solve() {
+    ll a, b;
+    cin &gt;&gt; a &gt;&gt; b;
+    cout &lt;&lt; a + b &lt;&lt; &#x27;\n&#x27;;
+}
 
-<h2>🧩 Bài tập tự luyện</h2>
-<ol>
-  <li><b>PRODUCT.INP</b> chứa hai số nguyên. Ghi ra <b>PRODUCT.OUT</b> giá trị a*b.</li>
-  <li><b>MAXNUM.INP</b> chứa nhiều số, ghi ra <b>MAXNUM.OUT</b> số lớn nhất.</li>
-  <li><b>COUNTZERO.INP</b> chứa ma trận R×C, ghi ra <b>COUNTZERO.OUT</b> số phần tử bằng 0.</li>
-</ol>
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-<p class="text-center text-info fw-bold mt-3">
-➡ Đây là bước đầu để làm bài thi tự động chấm bằng file.
-</p>
+    int T;
+    cin &gt;&gt; T;
+    while (T--) solve();
+
+    return 0;
+}</code></pre></div>
+    </div>
+
+    <div class="callout danger">
+      <b>Quy tắc an toàn:</b> Template càng ngắn càng tốt. Chỉ thêm thứ mình hiểu. Không copy một template quá dài có nhiều macro lạ, vì khi sai sẽ rất khó debug.
+    </div>
+  </section>
+
+  <section class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-bug"></i></span><h2>6. Các lỗi học sinh hay mắc và cách tránh</h2></div>
+    <ol class="step-list">
+      <li><b>Sai tên file:</b> Đề yêu cầu <code>BAI1.INP</code> nhưng code lại mở <code>bai1.inp</code>. Nhiều hệ thống phân biệt chữ hoa/thường.</li>
+      <li><b>Quên mở file output:</b> Đọc được input nhưng vẫn in ra màn hình, file <code>.OUT</code> rỗng.</li>
+      <li><b>Dùng <code>ifstream</code> nhưng vẫn nhập bằng <code>cin</code>:</b> Nếu đã tạo <code>fin</code>, phải đọc bằng <code>fin >> ...</code>. Nếu dùng <code>freopen</code>, có thể đọc bằng <code>cin</code>.</li>
+      <li><b>Không kiểm tra dữ liệu:</b> Đọc thiếu số, đọc sai định dạng, nhầm dòng đầu là <code>n</code> hay là dữ liệu.</li>
+      <li><b>Lạm dụng macro:</b> Macro quá nhiều làm code ngắn nhưng khó hiểu. Khi học sinh mới học, ưu tiên rõ ràng.</li>
+    </ol>
+  </section>
+
+  <section class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-circle-check"></i></span><h2>7. Quiz kiểm tra nhanh</h2></div>
+    <div class="mini-grid">
+      <div class="io-box" data-quiz>
+        <h3>Câu 1. Trong <code>freopen("SUM.INP", "r", stdin)</code>, chữ <code>r</code> nghĩa là gì?</h3>
+        <button class="quiz-option" data-correct="false">Ghi file</button>
+        <button class="quiz-option" data-correct="true">Đọc file</button>
+        <button class="quiz-option" data-correct="false">Xóa file</button>
+      </div>
+      <div class="io-box" data-quiz>
+        <h3>Câu 2. Muốn <code>cout</code> ghi ra file <code>SUM.OUT</code>, tham số cuối của <code>freopen</code> là gì?</h3>
+        <button class="quiz-option" data-correct="false"><code>stdin</code></button>
+        <button class="quiz-option" data-correct="true"><code>stdout</code></button>
+        <button class="quiz-option" data-correct="false"><code>stderr</code></button>
+      </div>
+      <div class="io-box" data-quiz>
+        <h3>Câu 3. Với học sinh mới học, lựa chọn nào an toàn hơn?</h3>
+        <button class="quiz-option" data-correct="true"><code>using ll = long long;</code></button>
+        <button class="quiz-option" data-correct="false"><code>#define int long long</code></button>
+        <button class="quiz-option" data-correct="false">Không khai báo kiểu dữ liệu</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="practice" class="card-lesson animate__animated animate__fadeInUp">
+    <div class="card-title"><span class="title-icon"><i class="fa-solid fa-dumbbell"></i></span><h2>8. Bài tập tự luyện phân loại rõ ràng</h2></div>
+    <p>Các bài dưới đây giúp học sinh luyện từ đọc/ghi file cơ bản đến viết template thi.</p>
+
+    <div class="mini-grid">
+      <div class="mini-card"><strong>📘 Mức 1 — Đọc/ghi 2 số</strong>
+        <ol>
+          <li><b>SUM.INP</b>: hai số <code>a, b</code>. Ghi <b>SUM.OUT</b>: <code>a+b</code>.</li>
+          <li><b>PRODUCT.INP</b>: hai số <code>a, b</code>. Ghi <b>PRODUCT.OUT</b>: <code>a*b</code>.</li>
+        </ol>
+      </div>
+      <div class="mini-card"><strong>📗 Mức 2 — Dãy số</strong>
+        <ol>
+          <li><b>MAXNUM.INP</b>: dòng 1 là <code>n</code>, dòng 2 có <code>n</code> số. Ghi số lớn nhất.</li>
+          <li><b>EVENCOUNT.INP</b>: đếm số chẵn trong dãy.</li>
+        </ol>
+      </div>
+      <div class="mini-card"><strong>📙 Mức 3 — Ma trận</strong>
+        <ol>
+          <li><b>COUNTZERO.INP</b>: ma trận <code>R x C</code>. Ghi số phần tử bằng 0.</li>
+          <li><b>ROWSUM.INP</b>: ghi tổng từng hàng của ma trận.</li>
+        </ol>
+      </div>
+      <div class="mini-card"><strong>🐉 Mức 4 — Template thi</strong>
+        <ol>
+          <li>Viết lại bài SUM bằng mẫu <code>if(fopen(...)) freopen(...)</code>.</li>
+          <li>Tạo template cá nhân có <code>solve()</code>, <code>using ll</code>, fast I/O.</li>
+        </ol>
+      </div>
+    </div>
+
+    <details class="mt-3">
+      <summary>💻 Lời giải mẫu MAXNUM C++ / Python</summary>
+      <div class="lesson-tabs" data-tab-group="maxnum_tabs">
+        <div class="lesson-tab-buttons"><button class="lesson-tab-btn active" type="button" data-tab-target="maxnum_tabs_0" aria-selected="true"><i class="fa-brands fa-cuttlefish"></i> MAXNUM C++</button><button class="lesson-tab-btn" type="button" data-tab-target="maxnum_tabs_1" aria-selected="false"><i class="fa-brands fa-python"></i> MAXNUM Python</button></div>
+        <div class="lesson-tab-pane" id="maxnum_tabs_0"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    if (fopen(&quot;MAXNUM.INP&quot;, &quot;r&quot;)) {
+        freopen(&quot;MAXNUM.INP&quot;, &quot;r&quot;, stdin);
+        freopen(&quot;MAXNUM.OUT&quot;, &quot;w&quot;, stdout);
+    }
+
+    int n;
+    cin &gt;&gt; n;
+
+    long long x, mx;
+    cin &gt;&gt; mx;
+    for (int i = 2; i &lt;= n; i++) {
+        cin &gt;&gt; x;
+        if (x &gt; mx) mx = x;
+    }
+
+    cout &lt;&lt; mx;
+    return 0;
+}</code></pre></div><div class="lesson-tab-pane" id="maxnum_tabs_1" style="display:none"><pre><code class="language-python">with open(&quot;MAXNUM.INP&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as fin:
+    data = list(map(int, fin.read().split()))
+
+n = data[0]
+a = data[1:]
+ans = max(a)
+
+with open(&quot;MAXNUM.OUT&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as fout:
+    fout.write(str(ans))</code></pre></div>
+    </div>
+    </details>
+    <details class="mt-3">
+      <summary>💻 Lời giải mẫu COUNTZERO C++ / Python</summary>
+      <div class="lesson-tabs" data-tab-group="countzero_tabs">
+        <div class="lesson-tab-buttons"><button class="lesson-tab-btn active" type="button" data-tab-target="countzero_tabs_0" aria-selected="true"><i class="fa-brands fa-cuttlefish"></i> COUNTZERO C++</button><button class="lesson-tab-btn" type="button" data-tab-target="countzero_tabs_1" aria-selected="false"><i class="fa-brands fa-python"></i> COUNTZERO Python</button></div>
+        <div class="lesson-tab-pane" id="countzero_tabs_0"><pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    if (fopen(&quot;COUNTZERO.INP&quot;, &quot;r&quot;)) {
+        freopen(&quot;COUNTZERO.INP&quot;, &quot;r&quot;, stdin);
+        freopen(&quot;COUNTZERO.OUT&quot;, &quot;w&quot;, stdout);
+    }
+
+    int r, c;
+    cin &gt;&gt; r &gt;&gt; c;
+
+    int cnt = 0;
+    for (int i = 0; i &lt; r; i++) {
+        for (int j = 0; j &lt; c; j++) {
+            int x;
+            cin &gt;&gt; x;
+            if (x == 0) cnt++;
+        }
+    }
+
+    cout &lt;&lt; cnt;
+    return 0;
+}</code></pre></div><div class="lesson-tab-pane" id="countzero_tabs_1" style="display:none"><pre><code class="language-python">with open(&quot;COUNTZERO.INP&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;) as fin:
+    nums = list(map(int, fin.read().split()))
+
+r, c = nums[0], nums[1]
+a = nums[2:]
+ans = sum(1 for x in a if x == 0)
+
+with open(&quot;COUNTZERO.OUT&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as fout:
+    fout.write(str(ans))</code></pre></div>
+    </div>
+    </details>
+  </section>
+
+  <div class="final-note animate__animated animate__fadeInUp">
+    <i class="fa-solid fa-graduation-cap"></i>
+    Ghi nhớ: File I/O giúp chương trình khớp đề thi; <code>freopen</code> giúp linh hoạt khi luyện trên máy và nộp OJ; template tốt là template ngắn, rõ, dễ debug.
+    <br>➡ Tiếp theo: áp dụng template này vào các bài mảng, chuỗi, hàm và đồ thị.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(function() {
+  const root = document.getElementById('exam-io-lesson');
+  if (!root) return;
+
+  function updateProgress() {
+    const bar = root.querySelector('.lesson-progress-inner');
+    if (!bar) return;
+    const rect = root.getBoundingClientRect();
+    const total = root.offsetHeight - window.innerHeight;
+    const passed = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+    const percent = Math.round((passed / Math.max(total, 1)) * 100);
+    bar.style.width = percent + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  updateProgress();
+
+  function activateLessonTab(group, btn) {
+    if (!group || !btn) return;
+    const targetId = btn.getAttribute('data-tab-target');
+    group.querySelectorAll('.lesson-tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    group.querySelectorAll('.lesson-tab-pane').forEach(function(pane) {
+      pane.style.display = 'none';
+      pane.classList.remove('active');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    const panes = group.querySelectorAll('.lesson-tab-pane');
+    panes.forEach(function(pane) {
+      if (pane.id === targetId) {
+        pane.style.display = 'block';
+        pane.classList.add('active');
+      }
+    });
+  }
+
+  root.querySelectorAll('[data-tab-group]').forEach(function(group) {
+    const buttons = group.querySelectorAll('.lesson-tab-btn');
+    buttons.forEach(function(btn, index) {
+      btn.addEventListener('click', function(event) {
+        event.preventDefault();
+        activateLessonTab(group, btn);
+      });
+      if (index === 0) activateLessonTab(group, btn);
+    });
+  });
+
+  function highlightOne(el) {
+    if (window.hljs && el) {
+      try { window.hljs.highlightElement(el); } catch (e) {}
+    }
+  }
+  if (window.hljs) {
+    root.querySelectorAll('pre code').forEach(highlightOne);
+  }
+
+  root.querySelectorAll('[data-copy]').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const id = btn.getAttribute('data-copy');
+      const codeEl = root.querySelector('#' + CSS.escape(id) + ' code');
+      if (!codeEl) return;
+      try {
+        await navigator.clipboard.writeText(codeEl.textContent);
+        const old = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã sao chép';
+        setTimeout(function() { btn.innerHTML = old; }, 1200);
+      } catch (e) {
+        alert('Không sao chép tự động được. Hãy bôi đen code và Ctrl+C.');
+      }
+    });
+  });
+
+  const baseInput = root.querySelector('#fileBaseName');
+  const templateOutput = root.querySelector('#templateOutput');
+  function makeTemplate() {
+    let base = (baseInput && baseInput.value ? baseInput.value : 'BAI').toUpperCase();
+    base = base.replace(/[^A-Z0-9_]/g, '');
+    if (!base) base = 'BAI';
+    const lines = [
+      '#include <bits/stdc++.h>',
+      'using namespace std;',
+      '',
+      'using ll = long long;',
+      '#define all(x) (x).begin(), (x).end()',
+      '',
+      'void solve() {',
+      '    // Viết lời giải tại đây',
+      '}',
+      '',
+      'int main() {',
+      '    ios::sync_with_stdio(false);',
+      '    cin.tie(nullptr);',
+      '',
+      '    if (fopen("' + base + '.INP", "r")) {',
+      '        freopen("' + base + '.INP", "r", stdin);',
+      '        freopen("' + base + '.OUT", "w", stdout);',
+      '    }',
+      '',
+      '    solve();',
+      '    return 0;',
+      '}'
+    ];
+    if (templateOutput) {
+      templateOutput.textContent = lines.join('\n').replace(/\{\{/g, '{').replace(/\}\}/g, '}');
+      templateOutput.removeAttribute('data-highlighted');
+      highlightOne(templateOutput);
+    }
+  }
+  const makeTemplateBtn = root.querySelector('#makeTemplateBtn');
+  if (makeTemplateBtn) makeTemplateBtn.addEventListener('click', makeTemplate);
+  makeTemplate();
+
+  const runSampleBtn = root.querySelector('#runSampleBtn');
+  if (runSampleBtn) {
+    runSampleBtn.addEventListener('click', function() {
+      const dataBox = root.querySelector('#sampleData');
+      const taskBox = root.querySelector('#sampleTask');
+      const out = root.querySelector('#sampleOutput');
+      const nums = (dataBox.value || '').trim().split(/\s+/).map(Number).filter(function(x) { return !Number.isNaN(x); });
+      if (nums.length === 0) { out.textContent = 'Chưa có dữ liệu hợp lệ.'; return; }
+      const n = nums[0];
+      const arr = nums.slice(1, 1 + Math.max(0, n));
+      if (arr.length < n) { out.textContent = 'Dữ liệu thiếu: dòng đầu là n = ' + n + ' nhưng chưa đủ ' + n + ' số.'; return; }
+      let ans;
+      if (taskBox.value === 'sum') ans = arr.reduce(function(s, x) { return s + x; }, 0);
+      else if (taskBox.value === 'max') ans = Math.max.apply(null, arr);
+      else ans = arr.filter(function(x) { return x === 0; }).length;
+      out.innerHTML = '<b>Output:</b> <code>' + ans + '</code><br><span class="text-muted">Chương trình đọc n số sau dòng đầu tiên rồi xử lý theo yêu cầu.</span>';
+    });
+  }
+
+  root.querySelectorAll('[data-quiz]').forEach(function(box) {
+    box.querySelectorAll('.quiz-option').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        box.querySelectorAll('.quiz-option').forEach(function(b) { b.classList.remove('correct','wrong'); });
+        const ok = btn.getAttribute('data-correct') === 'true';
+        btn.classList.add(ok ? 'correct' : 'wrong');
+        if (!ok) {
+          const correct = box.querySelector('[data-correct="true"]');
+          if (correct) correct.classList.add('correct');
+        }
+      });
+    });
+  });
+})();
+</script>

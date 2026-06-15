@@ -1,70 +1,1421 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu cách tìm kiếm phần tử trong mảng (Linear Search, Binary Search).</li>
-  <li>Phân biệt khi nào dùng tuyến tính, khi nào nên dùng nhị phân.</li>
-  <li>Thực hành với ví dụ C++ và Python.</li>
-</ul>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tìm kiếm trong mảng - Linear Search, Binary Search</title>
 
-<hr>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 
-<h2>📘 Lý thuyết cơ bản</h2>
-<p><b>Tìm kiếm tuyến tính (Linear Search)</b>: duyệt qua toàn bộ mảng và so sánh từng phần tử.</p>
-<p><b>Tìm kiếm nhị phân (Binary Search)</b>: chỉ dùng được khi mảng đã được sắp xếp, chia đôi để thu hẹp phạm vi tìm kiếm nhanh hơn.</p>
+  <style>
+    :root{
+      --primary:#4f46e5;
+      --primary-2:#2563eb;
+      --accent:#10b981;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --soft:#f8fafc;
+      --card:#ffffff;
+      --line:#e2e8f0;
+      --code:#101827;
+      --shadow: 0 14px 40px rgba(15, 23, 42, .08);
+      --radius: 22px;
+    }
 
-<table class="table table-bordered">
-  <thead class="table-light">
-    <tr><th>Thuật toán</th><th>Độ phức tạp</th><th>Mô tả</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>Linear Search</td><td>O(n)</td><td>Duyệt toàn bộ mảng</td></tr>
-    <tr><td>Binary Search</td><td>O(log n)</td><td>Chia đôi dần khoảng tìm kiếm</td></tr>
-  </tbody>
-</table>
+    *{ box-sizing:border-box; }
 
-<hr>
+    body{
+      margin:0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(79,70,229,.16), transparent 34rem),
+        radial-gradient(circle at top right, rgba(16,185,129,.14), transparent 28rem),
+        linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+      color:var(--ink);
+      line-height:1.75;
+    }
 
-<h2>🧠 Thực hành nhanh</h2>
+    .lesson-shell{
+      max-width:1180px;
+      margin:0 auto;
+      padding:28px 18px 70px;
+    }
 
-<h4>C++</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+    .lesson-hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:30px;
+      color:#fff;
+      background:
+        linear-gradient(135deg, rgba(79,70,229,.96), rgba(37,99,235,.94)),
+        url("data:image/svg+xml,%3Csvg width='900' height='500' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(255,255,255,.22)' stroke-width='2'%3E%3Cpath d='M30 420 L180 260 L330 330 L520 110 L700 250 L860 80'/%3E%3Ccircle cx='180' cy='260' r='12' fill='rgba(255,255,255,.28)'/%3E%3Ccircle cx='520' cy='110' r='12' fill='rgba(255,255,255,.28)'/%3E%3Ccircle cx='700' cy='250' r='12' fill='rgba(255,255,255,.28)'/%3E%3C/g%3E%3C/svg%3E");
+      background-size:cover;
+      box-shadow: var(--shadow);
+      padding:38px;
+    }
+
+    .lesson-hero::after{
+      content:"";
+      position:absolute;
+      width:280px;
+      height:280px;
+      right:-90px;
+      top:-90px;
+      border-radius:50%;
+      background:rgba(255,255,255,.14);
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      backdrop-filter:blur(8px);
+      font-weight:700;
+      margin-bottom:14px;
+    }
+
+    .lesson-hero h1{
+      position:relative;
+      font-size:clamp(30px, 5vw, 52px);
+      font-weight:900;
+      line-height:1.08;
+      letter-spacing:-.04em;
+      margin:0 0 14px;
+      max-width:880px;
+    }
+
+    .lesson-hero p{
+      position:relative;
+      max-width:850px;
+      margin:0;
+      font-size:18px;
+      color:rgba(255,255,255,.88);
+    }
+
+    .lesson-progress-wrap{
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:12px 0 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .lesson-progress{
+      height:10px;
+      border-radius:999px;
+      background:#dbeafe;
+      overflow:hidden;
+      box-shadow: inset 0 1px 3px rgba(15,23,42,.08);
+    }
+
+    .lesson-progress-bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--primary), var(--accent));
+      transition:width .15s linear;
+    }
+
+    .lesson-card{
+      background:rgba(255,255,255,.94);
+      border:1px solid rgba(226,232,240,.95);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding:26px;
+      margin:22px 0;
+      overflow:hidden;
+    }
+
+    .mini-slide{
+      animation: fadeSlide .55s ease both;
+    }
+
+    @keyframes fadeSlide{
+      from{ opacity:0; transform:translateY(18px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+
+    .section-title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin:0 0 16px;
+      font-weight:900;
+      letter-spacing:-.02em;
+      color:#1e293b;
+    }
+
+    .section-title .icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow:0 10px 24px rgba(79,70,229,.24);
+      flex:0 0 auto;
+    }
+
+    .lead-note{
+      color:var(--muted);
+      font-size:17px;
+    }
+
+    .learning-list{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+      padding:0;
+      list-style:none;
+      margin:0;
+    }
+
+    .learning-list li{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 16px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .learning-list i{ color:var(--accent); margin-top:5px; }
+
+    .concept-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:16px;
+    }
+
+    .concept-box{
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:20px;
+      background:linear-gradient(180deg,#fff,#f8fafc);
+    }
+
+    .concept-box h3{
+      font-size:22px;
+      margin:0 0 8px;
+      font-weight:900;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:13px;
+      font-weight:800;
+      margin:4px 6px 4px 0;
+      background:#eef2ff;
+      color:#3730a3;
+    }
+
+    .tag.good{ background:#dcfce7; color:#166534; }
+    .tag.warn{ background:#fef3c7; color:#92400e; }
+    .tag.bad{ background:#fee2e2; color:#991b1b; }
+
+    .compare-table{
+      width:100%;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+    }
+
+    .compare-table table{ margin:0; }
+    .compare-table th{
+      background:#eef2ff;
+      color:#1e1b4b;
+      font-weight:900;
+    }
+    .compare-table td, .compare-table th{
+      vertical-align:middle;
+      padding:14px;
+    }
+
+    .callout{
+      border-radius:18px;
+      padding:16px 18px;
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      border-left:6px solid var(--primary-2);
+      margin:16px 0;
+    }
+
+    .callout.good{
+      background:#ecfdf5;
+      border-color:#a7f3d0;
+      border-left-color:var(--accent);
+    }
+
+    .callout.warn{
+      background:#fffbeb;
+      border-color:#fde68a;
+      border-left-color:var(--warning);
+    }
+
+    .callout.bad{
+      background:#fef2f2;
+      border-color:#fecaca;
+      border-left-color:var(--danger);
+    }
+
+    .code-tabs{
+      border:1px solid var(--line);
+      border-radius:20px;
+      overflow:hidden;
+      background:#fff;
+      margin:16px 0;
+    }
+
+    .lesson-tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:0;
+      background:#edf2ff;
+      border-bottom:1px solid var(--line);
+    }
+
+    .lesson-tab{
+      border:0;
+      background:transparent;
+      color:#334155;
+      padding:12px 18px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .lesson-tab:hover{ background:#e0e7ff; }
+    .lesson-tab.active{
+      color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .tab-panel{ display:none; }
+    .tab-panel.active{ display:block; }
+
+    .code-wrap{
+      position:relative;
+      background:var(--code);
+    }
+
+    pre{
+      margin:0;
+      background:var(--code) !important;
+      color:#e5e7eb !important;
+      padding:22px !important;
+      overflow:auto;
+      max-height:560px;
+      border-radius:0;
+      font-size:15px;
+      line-height:1.7;
+      tab-size:4;
+      white-space:pre;
+    }
+
+    code{
+      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+      color:inherit;
+    }
+
+    :not(pre)>code{
+      color:#db2777;
+      background:#fdf2f8;
+      padding:2px 6px;
+      border-radius:8px;
+      font-weight:700;
+    }
+
+    .copy-btn{
+      position:absolute;
+      top:10px;
+      right:10px;
+      border:0;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      padding:7px 10px;
+      font-weight:800;
+      z-index:5;
+      cursor:pointer;
+    }
+
+    .copy-btn:hover{ background:rgba(255,255,255,.22); }
+
+    .array-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:16px 0;
+      align-items:end;
+    }
+
+    .cell{
+      width:62px;
+      min-height:64px;
+      border:2px solid #bfdbfe;
+      border-radius:16px;
+      background:#fff;
+      color:#0f172a;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      box-shadow:0 10px 20px rgba(37,99,235,.10);
+      transition:.25s;
+    }
+
+    .cell .idx{
+      font-size:12px;
+      color:#64748b;
+      font-weight:800;
+      margin-top:4px;
+    }
+
+    .cell.active{
+      border-color:var(--primary);
+      background:#eef2ff;
+      transform:translateY(-7px) scale(1.04);
+    }
+
+    .cell.found{
+      border-color:var(--accent);
+      background:#dcfce7;
+      color:#166534;
+      transform:translateY(-7px) scale(1.04);
+    }
+
+    .cell.out{
+      opacity:.34;
+      filter:grayscale(.25);
+      transform:scale(.96);
+    }
+
+    .cell.mid{
+      border-color:#f59e0b;
+      background:#fffbeb;
+      color:#92400e;
+      transform:translateY(-8px) scale(1.05);
+    }
+
+    .sim-board{
+      display:grid;
+      grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .panel-soft{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fff;
+      padding:18px;
+    }
+
+    .log-box{
+      min-height:132px;
+      max-height:240px;
+      overflow:auto;
+      border-radius:16px;
+      border:1px dashed #cbd5e1;
+      background:#f8fafc;
+      padding:14px;
+      font-family:"Cascadia Code", Consolas, monospace;
+      font-size:14px;
+      white-space:pre-wrap;
+    }
+
+    .btn-lesson{
+      border:0;
+      border-radius:999px;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff;
+      font-weight:900;
+      padding:10px 16px;
+      box-shadow:0 12px 24px rgba(79,70,229,.22);
+    }
+
+    .btn-lesson:hover{ filter:brightness(1.05); color:#fff; }
+
+    .btn-soft{
+      border:1px solid #cbd5e1;
+      border-radius:999px;
+      background:#fff;
+      color:#334155;
+      font-weight:900;
+      padding:10px 16px;
+    }
+
+    .practice-input{
+      width:100%;
+      border:1px solid #cbd5e1;
+      border-radius:16px;
+      padding:12px 14px;
+      outline:none;
+      transition:.2s;
+    }
+
+    .practice-input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(79,70,229,.12);
+    }
+
+    .result-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 16px;
+      background:#f8fafc;
+      min-height:120px;
+    }
+
+    .quiz-option{
+      display:block;
+      width:100%;
+      text-align:left;
+      border:1px solid #cbd5e1;
+      border-radius:14px;
+      background:#fff;
+      padding:12px 14px;
+      margin:10px 0;
+      font-weight:800;
+      color:#1e293b;
+      transition:.2s;
+    }
+
+    .quiz-option:hover{ border-color:var(--primary); background:#eef2ff; }
+    .quiz-option.correct{ border-color:#22c55e; background:#dcfce7; color:#166534; }
+    .quiz-option.wrong{ border-color:#ef4444; background:#fee2e2; color:#991b1b; }
+
+    .exercise-level{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .level-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:18px;
+    }
+
+    .level-card h3{
+      font-size:19px;
+      font-weight:900;
+      margin:0 0 10px;
+    }
+
+    .floating-top{
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      z-index:30;
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      border:0;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff;
+      box-shadow:0 12px 28px rgba(37,99,235,.35);
+      display:grid;
+      place-items:center;
+    }
+
+    .small-muted{ color:#64748b; font-size:14px; }
+
+    @media (max-width: 900px){
+      .learning-list, .concept-grid, .sim-board, .exercise-level{
+        grid-template-columns:1fr;
+      }
+      .lesson-hero{ padding:28px 22px; }
+      .lesson-card{ padding:20px; }
+      .cell{ width:54px; min-height:58px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="lesson-shell">
+
+    <header class="lesson-hero animate__animated animate__fadeIn">
+      <div class="hero-badge"><i class="fa-solid fa-magnifying-glass"></i> Interactive Lesson Page</div>
+      <h1>Tìm kiếm trong mảng: Linear Search, Binary Search & lỗi hay gặp</h1>
+      <p>
+        Bài học giúp học sinh hiểu bản chất tìm kiếm tuyến tính và tìm kiếm nhị phân,
+        biết chọn đúng thuật toán, tránh nhầm điều kiện “mảng đã sắp xếp”, đồng thời luyện các dạng bài thường gặp trong thi lập trình.
+      </p>
+    </header>
+
+    <div class="lesson-progress-wrap">
+      <div class="lesson-progress" aria-label="Lesson progress">
+        <div class="lesson-progress-bar" id="lessonProgress"></div>
+      </div>
+    </div>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-bullseye"></i></span> Mục tiêu bài học</h2>
+      <ul class="learning-list">
+        <li><i class="fa-solid fa-check"></i><span>Hiểu cách tìm kiếm phần tử trong mảng bằng <b>Linear Search</b> và <b>Binary Search</b>.</span></li>
+        <li><i class="fa-solid fa-check"></i><span>Phân biệt khi nào dùng tìm kiếm tuyến tính, khi nào dùng tìm kiếm nhị phân.</span></li>
+        <li><i class="fa-solid fa-check"></i><span>Biết viết code C++ và Python cho các bài: tìm có/không, tìm vị trí, đếm số lần xuất hiện.</span></li>
+        <li><i class="fa-solid fa-check"></i><span>Tránh các lỗi hay gặp: dùng binary search khi mảng chưa sắp xếp, sai chỉ số, vòng lặp vô hạn.</span></li>
+      </ul>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-route"></i></span> 1. Hai kiểu tìm kiếm cơ bản</h2>
+
+      <div class="concept-grid">
+        <div class="concept-box">
+          <h3><i class="fa-solid fa-person-walking text-primary"></i> Linear Search</h3>
+          <p>Duyệt lần lượt từng phần tử từ trái sang phải. Gặp phần tử cần tìm thì kết luận tìm thấy.</p>
+          <span class="tag good"><i class="fa-solid fa-check"></i> Dùng được với mảng chưa sắp xếp</span>
+          <span class="tag warn"><i class="fa-solid fa-clock"></i> O(n)</span>
+          <div class="callout good mb-0">
+            Ví dụ đời sống: tìm một quyển vở trong chồng sách lộn xộn, ta phải kiểm tra từng quyển.
+          </div>
+        </div>
+
+        <div class="concept-box">
+          <h3><i class="fa-solid fa-scissors text-success"></i> Binary Search</h3>
+          <p>Mỗi bước lấy phần tử giữa, so sánh với giá trị cần tìm rồi bỏ đi một nửa khoảng không cần xét.</p>
+          <span class="tag good"><i class="fa-solid fa-bolt"></i> Rất nhanh O(log n)</span>
+          <span class="tag bad"><i class="fa-solid fa-triangle-exclamation"></i> Chỉ dùng khi mảng đã sắp xếp</span>
+          <div class="callout warn mb-0">
+            Ví dụ đời sống: tìm một từ trong từ điển. Vì từ điển đã sắp xếp, ta mở gần giữa và thu hẹp dần.
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-table mt-3">
+        <table class="table table-bordered align-middle">
+          <thead>
+            <tr>
+              <th>Tiêu chí</th>
+              <th>Linear Search</th>
+              <th>Binary Search</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Điều kiện dùng</td>
+              <td>Mảng bất kỳ</td>
+              <td><b>Bắt buộc</b> mảng đã sắp xếp tăng/giảm rõ ràng</td>
+            </tr>
+            <tr>
+              <td>Độ phức tạp</td>
+              <td>O(n)</td>
+              <td>O(log n)</td>
+            </tr>
+            <tr>
+              <td>Dễ code?</td>
+              <td>Dễ, ít lỗi</td>
+              <td>Nhanh nhưng dễ sai biên <code>l</code>, <code>r</code>, <code>mid</code></td>
+            </tr>
+            <tr>
+              <td>Dạng bài phù hợp</td>
+              <td>Tìm trong dữ liệu nhỏ hoặc chưa sắp xếp</td>
+              <td>Tìm kiếm trong mảng đã sort, tìm first/last, lower_bound</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-person-running"></i></span> 2. Linear Search - tìm kiếm tuyến tính</h2>
+      <p class="lead-note">
+        Ý tưởng: xét từng vị trí <code>i</code>. Nếu <code>a[i] == x</code> thì tìm thấy. Nếu duyệt hết mảng mà không thấy thì kết quả là <code>-1</code>.
+      </p>
+
+      <div class="sim-board">
+        <div class="panel-soft">
+          <h3 class="fw-bold"><i class="fa-solid fa-play text-primary"></i> Mô phỏng Linear Search</h3>
+          <p class="small-muted">Mảng ví dụ: <code>[4, 7, 2, 9, 7, 1]</code>, tìm <code>x = 7</code>.</p>
+          <div class="array-row" id="linearArray"></div>
+          <button class="btn-lesson me-2" id="linearNext"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button>
+          <button class="btn-soft" id="linearReset"><i class="fa-solid fa-rotate-left"></i> Làm lại</button>
+        </div>
+        <div class="panel-soft">
+          <h3 class="fw-bold"><i class="fa-solid fa-terminal text-success"></i> Nhật ký</h3>
+          <div class="log-box" id="linearLog">Sẵn sàng mô phỏng...</div>
+        </div>
+      </div>
+
+      <div class="code-tabs" data-tab-group="linear-code">
+        <div class="lesson-tabs">
+          <button type="button" class="lesson-tab active" data-tab-target="linear-cpp"><i class="fa-brands fa-cuttlefish"></i> C++</button>
+          <button type="button" class="lesson-tab" data-tab-target="linear-py"><i class="fa-brands fa-python"></i> Python</button>
+        </div>
+
+        <div class="tab-panel active" id="linear-cpp">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
     int n, x;
-    cin >> n >> x;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
+    cin &gt;&gt; n &gt;&gt; x;
+
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
     int pos = -1;
-    for (int i = 0; i < n; i++) if (a[i] == x) pos = i;
-    cout << (pos != -1 ? "Tim thay" : "Khong tim thay");
+    for (int i = 0; i &lt; n; i++) {
+        if (a[i] == x) {
+            pos = i;      // vị trí đầu tiên tìm thấy
+            break;        // dừng lại vì đã tìm thấy
+        }
+    }
+
+    if (pos == -1) cout &lt;&lt; "Khong tim thay";
+    else cout &lt;&lt; "Tim thay tai vi tri " &lt;&lt; pos;
+
+    return 0;
 }</code></pre>
+          </div>
+        </div>
 
-<h4>Python</h4>
-<pre><code>n, x = map(int, input().split())
+        <div class="tab-panel" id="linear-py">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-python">n, x = map(int, input().split())
 a = list(map(int, input().split()))
-print("Tim thay" if x in a else "Khong tim thay")</code></pre>
 
-<hr>
+pos = -1
+for i in range(n):
+    if a[i] == x:
+        pos = i
+        break
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Nhập mảng gồm n phần tử, nhập giá trị x, tìm xem x có trong mảng hay không.</li>
-  <li>Nhập mảng tăng dần, tìm vị trí phần tử x bằng <b>tìm kiếm nhị phân</b>.</li>
-  <li>Viết chương trình đếm số lần xuất hiện của x trong mảng.</li>
-</ol>
+if pos == -1:
+    print("Khong tim thay")
+else:
+    print("Tim thay tai vi tri", pos)</code></pre>
+          </div>
+        </div>
+      </div>
 
-<details class="mt-3">
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python: Binary Search
-def binary_search(a, x):
+      <div class="callout">
+        <b>Điểm dễ nhầm:</b> Nếu đề yêu cầu vị trí theo kiểu “phần tử thứ mấy” thì có thể phải in <code>pos + 1</code>.
+        Nếu đề yêu cầu chỉ số trong mảng C++/Python thì in <code>pos</code>.
+      </div>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-divide"></i></span> 3. Binary Search - tìm kiếm nhị phân</h2>
+      <p class="lead-note">
+        Binary Search chỉ đúng khi mảng đã được sắp xếp. Với mảng tăng dần:
+        nếu <code>a[mid] &lt; x</code> thì tìm bên phải; nếu <code>a[mid] &gt; x</code> thì tìm bên trái.
+      </p>
+
+      <div class="callout bad">
+        <b>Cảnh báo quan trọng:</b> Không được dùng tìm kiếm nhị phân cho mảng chưa sắp xếp.
+        Ví dụ <code>[4, 1, 9, 2]</code> không thể binary search trực tiếp.
+      </div>
+
+      <div class="sim-board">
+        <div class="panel-soft">
+          <h3 class="fw-bold"><i class="fa-solid fa-play text-primary"></i> Mô phỏng Binary Search</h3>
+          <p class="small-muted">Mảng ví dụ: <code>[1, 3, 5, 7, 9, 11, 13, 15]</code>, tìm <code>x = 11</code>.</p>
+          <div class="array-row" id="binaryArray"></div>
+          <button class="btn-lesson me-2" id="binaryNext"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button>
+          <button class="btn-soft" id="binaryReset"><i class="fa-solid fa-rotate-left"></i> Làm lại</button>
+        </div>
+        <div class="panel-soft">
+          <h3 class="fw-bold"><i class="fa-solid fa-terminal text-success"></i> Nhật ký</h3>
+          <div class="log-box" id="binaryLog">Sẵn sàng mô phỏng...</div>
+        </div>
+      </div>
+
+      <div class="code-tabs" data-tab-group="binary-code">
+        <div class="lesson-tabs">
+          <button type="button" class="lesson-tab active" data-tab-target="binary-cpp"><i class="fa-brands fa-cuttlefish"></i> C++</button>
+          <button type="button" class="lesson-tab" data-tab-target="binary-py"><i class="fa-brands fa-python"></i> Python</button>
+        </div>
+
+        <div class="tab-panel active" id="binary-cpp">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int binary_search_pos(const vector&lt;int&gt;&amp; a, int x) {
+    int l = 0, r = (int)a.size() - 1;
+
+    while (l &lt;= r) {
+        int mid = l + (r - l) / 2;
+
+        if (a[mid] == x) return mid;
+        if (a[mid] &lt; x) l = mid + 1;
+        else r = mid - 1;
+    }
+
+    return -1;
+}
+
+int main() {
+    int n, x;
+    cin &gt;&gt; n &gt;&gt; x;
+
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    int pos = binary_search_pos(a, x);
+    cout &lt;&lt; pos;
+
+    return 0;
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="binary-py">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-python">def binary_search_pos(a, x):
     l, r = 0, len(a) - 1
-    while l <= r:
-        m = (l + r) // 2
-        if a[m] == x:
-            return m
-        elif a[m] < x:
-            l = m + 1
+
+    while l &lt;= r:
+        mid = (l + r) // 2
+
+        if a[mid] == x:
+            return mid
+        if a[mid] &lt; x:
+            l = mid + 1
         else:
-            r = m - 1
+            r = mid - 1
+
     return -1
-print(binary_search([1,2,3,4,5,6], 4))</code></pre>
-</details>
+
+
+n, x = map(int, input().split())
+a = list(map(int, input().split()))
+
+print(binary_search_pos(a, x))</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout good">
+        <b>Mẹo an toàn trong C++:</b> nên viết <code>mid = l + (r - l) / 2</code> thay vì <code>(l + r) / 2</code>.
+        Với dữ liệu rất lớn, cách này tránh nguy cơ tràn số.
+      </div>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-layer-group"></i></span> 4. Các dạng bài dễ nhầm</h2>
+
+      <div class="compare-table">
+        <table class="table table-bordered align-middle">
+          <thead>
+            <tr>
+              <th>Dạng bài</th>
+              <th>Cách xử lý đúng</th>
+              <th>Lỗi học sinh hay mắc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tìm xem <code>x</code> có xuất hiện không</td>
+              <td>Linear Search hoặc Binary Search nếu mảng đã sort</td>
+              <td>Không dừng vòng lặp hoặc in sai vị trí</td>
+            </tr>
+            <tr>
+              <td>Đếm số lần xuất hiện của <code>x</code></td>
+              <td>Duyệt toàn mảng hoặc dùng <code>lower_bound</code>/<code>upper_bound</code> nếu đã sort</td>
+              <td>Dùng binary search thường chỉ tìm được 1 vị trí, không đếm đủ</td>
+            </tr>
+            <tr>
+              <td>Tìm vị trí đầu tiên / cuối cùng của <code>x</code></td>
+              <td>Dùng biến lưu đáp án rồi tiếp tục thu hẹp trái/phải</td>
+              <td>Thấy <code>a[mid] == x</code> là trả về ngay, nên không chắc là đầu/cuối</td>
+            </tr>
+            <tr>
+              <td>Tìm số nhỏ nhất lớn hơn hoặc bằng <code>x</code></td>
+              <td>Dùng <code>lower_bound</code></td>
+              <td>Nhầm với <code>upper_bound</code></td>
+            </tr>
+            <tr>
+              <td>Tìm số đầu tiên lớn hơn <code>x</code></td>
+              <td>Dùng <code>upper_bound</code></td>
+              <td>Nhầm với <code>lower_bound</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-tabs" data-tab-group="advanced-code">
+        <div class="lesson-tabs">
+          <button type="button" class="lesson-tab active" data-tab-target="count-cpp">Đếm x - C++</button>
+          <button type="button" class="lesson-tab" data-tab-target="count-py">Đếm x - Python</button>
+          <button type="button" class="lesson-tab" data-tab-target="bound-cpp">lower/upper_bound</button>
+          <button type="button" class="lesson-tab" data-tab-target="bound-py">bisect Python</button>
+        </div>
+
+        <div class="tab-panel active" id="count-cpp">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, x;
+    cin &gt;&gt; n &gt;&gt; x;
+
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    int cnt = 0;
+    for (int value : a) {
+        if (value == x) cnt++;
+    }
+
+    cout &lt;&lt; cnt;
+    return 0;
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="count-py">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-python">n, x = map(int, input().split())
+a = list(map(int, input().split()))
+
+cnt = 0
+for value in a:
+    if value == x:
+        cnt += 1
+
+print(cnt)</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="bound-cpp">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, x;
+    cin &gt;&gt; n &gt;&gt; x;
+
+    vector&lt;int&gt; a(n);
+    for (int i = 0; i &lt; n; i++) cin &gt;&gt; a[i];
+
+    sort(a.begin(), a.end());
+
+    auto it1 = lower_bound(a.begin(), a.end(), x); // phần tử đầu tiên &gt;= x
+    auto it2 = upper_bound(a.begin(), a.end(), x); // phần tử đầu tiên &gt; x
+
+    int count_x = it2 - it1;
+    cout &lt;&lt; count_x;
+
+    return 0;
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="bound-py">
+          <div class="code-wrap">
+            <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-python">from bisect import bisect_left, bisect_right
+
+n, x = map(int, input().split())
+a = list(map(int, input().split()))
+
+a.sort()
+
+left = bisect_left(a, x)    # vị trí đầu tiên có giá trị &gt;= x
+right = bisect_right(a, x)  # vị trí đầu tiên có giá trị &gt; x
+
+print(right - left)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-keyboard"></i></span> 5. Thực hành tương tác</h2>
+      <p class="lead-note">
+        Nhập một mảng và giá trị cần tìm. Hệ thống sẽ phân tích: mảng đã sắp xếp chưa, tìm thấy ở đâu,
+        xuất hiện bao nhiêu lần, có thể dùng Binary Search không.
+      </p>
+
+      <div class="row g-3">
+        <div class="col-lg-7">
+          <label class="fw-bold mb-2">Mảng số nguyên</label>
+          <input class="practice-input" id="practiceArray" value="1 3 3 5 7 9 9 9 12" aria-label="Mảng số nguyên">
+        </div>
+        <div class="col-lg-3">
+          <label class="fw-bold mb-2">Giá trị x</label>
+          <input class="practice-input" id="practiceX" value="9" aria-label="Giá trị cần tìm">
+        </div>
+        <div class="col-lg-2 d-flex align-items-end">
+          <button class="btn-lesson w-100" id="analyzeBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Phân tích</button>
+        </div>
+      </div>
+
+      <div class="result-card mt-3" id="practiceResult">Bấm “Phân tích” để xem kết quả.</div>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-circle-exclamation"></i></span> 6. Lỗi thường gặp và cách tránh</h2>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="callout bad h-100">
+            <b>Lỗi 1: Dùng Binary Search khi mảng chưa sắp xếp</b><br>
+            Cách sửa: kiểm tra đề bài có nói “mảng tăng dần”, “đã sắp xếp” không. Nếu không có, phải <code>sort</code> hoặc dùng Linear Search tùy yêu cầu.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="callout bad h-100">
+            <b>Lỗi 2: Sai điều kiện vòng lặp</b><br>
+            Cách sửa: với mẫu cơ bản dùng <code>while (l &lt;= r)</code>. Khi cập nhật phải là <code>l = mid + 1</code> hoặc <code>r = mid - 1</code>.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="callout warn h-100">
+            <b>Lỗi 3: Nhầm chỉ số 0-based và 1-based</b><br>
+            C++/Python dùng chỉ số từ <code>0</code>. Nhưng đề thi đôi khi yêu cầu “vị trí thứ mấy”, khi đó thường cần in <code>i + 1</code>.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="callout warn h-100">
+            <b>Lỗi 4: Tìm thấy một vị trí rồi tưởng là vị trí đầu tiên</b><br>
+            Binary Search thường chỉ trả về một vị trí bất kỳ có <code>x</code>. Nếu cần vị trí đầu/cuối, phải viết biến <code>ans</code> hoặc dùng <code>lower_bound</code>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-list-check"></i></span> 7. Bài tập luyện tập phân loại</h2>
+      <p class="lead-note">Các bài tập được chia theo mức độ để học sinh không nhầm dạng.</p>
+
+      <div class="exercise-level">
+        <div class="level-card">
+          <h3><i class="fa-solid fa-seedling text-success"></i> Mức 1 - Cơ bản</h3>
+          <ol>
+            <li>Nhập mảng gồm <code>n</code> phần tử và giá trị <code>x</code>. In <code>YES</code> nếu x xuất hiện, ngược lại in <code>NO</code>.</li>
+            <li>In vị trí đầu tiên của <code>x</code> trong mảng. Nếu không có, in <code>-1</code>.</li>
+            <li>Đếm số lần xuất hiện của <code>x</code> trong mảng.</li>
+          </ol>
+        </div>
+
+        <div class="level-card">
+          <h3><i class="fa-solid fa-stairs text-primary"></i> Mức 2 - Trung bình</h3>
+          <ol>
+            <li>Mảng tăng dần. Dùng Binary Search để tìm vị trí của <code>x</code>.</li>
+            <li>Mảng tăng dần có phần tử trùng nhau. Tìm vị trí đầu tiên của <code>x</code>.</li>
+            <li>Mảng tăng dần có phần tử trùng nhau. Tìm vị trí cuối cùng của <code>x</code>.</li>
+          </ol>
+        </div>
+
+        <div class="level-card">
+          <h3><i class="fa-solid fa-fire text-warning"></i> Mức 3 - Khá</h3>
+          <ol>
+            <li>Cho mảng chưa sắp xếp. Hãy đếm số lần xuất hiện của <code>x</code> sau khi sắp xếp bằng <code>lower_bound</code> và <code>upper_bound</code>.</li>
+            <li>Cho mảng tăng dần. Tìm số nhỏ nhất lớn hơn hoặc bằng <code>x</code>.</li>
+            <li>Cho mảng tăng dần. Tìm số đầu tiên lớn hơn <code>x</code>.</li>
+          </ol>
+        </div>
+
+        <div class="level-card">
+          <h3><i class="fa-solid fa-trophy text-danger"></i> Mức 4 - Nâng cao</h3>
+          <ol>
+            <li>Cho <code>q</code> truy vấn, mỗi truy vấn hỏi <code>x</code> có trong mảng không. Mảng ban đầu có thể được sắp xếp trước.</li>
+            <li>Đếm số cặp <code>(i, j)</code> sao cho <code>a[i] + a[j] = x</code>.</li>
+            <li>Ứng dụng Binary Search trên đáp án: tìm giá trị nhỏ nhất thỏa mãn điều kiện.</li>
+          </ol>
+        </div>
+      </div>
+
+      <details class="mt-3">
+        <summary class="fw-bold text-primary" style="cursor:pointer;">💡 Gợi ý bài “tìm vị trí đầu tiên của x” bằng Binary Search</summary>
+        <div class="code-wrap mt-3">
+          <button class="copy-btn" type="button">Sao chép</button>
+<pre><code class="language-cpp">int first_pos(const vector&lt;int&gt;&amp; a, int x) {
+    int l = 0, r = (int)a.size() - 1;
+    int ans = -1;
+
+    while (l &lt;= r) {
+        int mid = l + (r - l) / 2;
+
+        if (a[mid] &gt;= x) {
+            if (a[mid] == x) ans = mid;
+            r = mid - 1; // tiếp tục tìm bên trái
+        } else {
+            l = mid + 1;
+        }
+    }
+
+    return ans;
+}</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <section class="lesson-card mini-slide">
+      <h2 class="section-title"><span class="icon"><i class="fa-solid fa-gamepad"></i></span> 8. Quiz kiểm tra nhanh</h2>
+
+      <div class="quiz-item" data-answer="b">
+        <p class="fw-bold">Câu 1. Binary Search dùng được trong trường hợp nào?</p>
+        <button class="quiz-option" data-choice="a">A. Mọi mảng bất kỳ</button>
+        <button class="quiz-option" data-choice="b">B. Mảng đã được sắp xếp</button>
+        <button class="quiz-option" data-choice="c">C. Chỉ mảng có số dương</button>
+        <button class="quiz-option" data-choice="d">D. Chỉ mảng không có phần tử trùng nhau</button>
+      </div>
+
+      <div class="quiz-item mt-4" data-answer="c">
+        <p class="fw-bold">Câu 2. Độ phức tạp của Linear Search là gì?</p>
+        <button class="quiz-option" data-choice="a">A. O(1)</button>
+        <button class="quiz-option" data-choice="b">B. O(log n)</button>
+        <button class="quiz-option" data-choice="c">C. O(n)</button>
+        <button class="quiz-option" data-choice="d">D. O(n log n)</button>
+      </div>
+
+      <div class="quiz-item mt-4" data-answer="a">
+        <p class="fw-bold">Câu 3. Trong C++, hàm nào tìm phần tử đầu tiên lớn hơn hoặc bằng x trong vector đã sort?</p>
+        <button class="quiz-option" data-choice="a">A. lower_bound</button>
+        <button class="quiz-option" data-choice="b">B. upper_bound</button>
+        <button class="quiz-option" data-choice="c">C. find</button>
+        <button class="quiz-option" data-choice="d">D. count</button>
+      </div>
+
+      <div id="quizFeedback" class="callout mt-3">Chọn đáp án để xem phản hồi.</div>
+    </section>
+
+    <section class="lesson-card mini-slide text-center">
+      <h2 class="section-title justify-content-center"><span class="icon"><i class="fa-solid fa-flag-checkered"></i></span> Tổng kết</h2>
+      <p class="lead-note mb-0">
+        Linear Search đơn giản và dùng được với mọi mảng. Binary Search nhanh hơn rất nhiều,
+        nhưng chỉ đúng khi dữ liệu đã sắp xếp. Khi bài có nhiều truy vấn tìm kiếm,
+        hãy nghĩ đến việc sắp xếp trước và dùng <code>binary_search</code>, <code>lower_bound</code>, <code>upper_bound</code>.
+      </p>
+      <p class="mt-4 text-info fw-bold">
+        ➡ Tiếp theo: Sắp xếp và ứng dụng tìm kiếm trong các bài toán thực tế.
+      </p>
+    </section>
+
+  </main>
+
+  <button class="floating-top" id="toTop" title="Lên đầu trang"><i class="fa-solid fa-arrow-up"></i></button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <script>
+    (function(){
+      "use strict";
+
+      function qs(sel, root){ return (root || document).querySelector(sel); }
+      function qsa(sel, root){ return Array.from((root || document).querySelectorAll(sel)); }
+
+      function initProgress(){
+        var bar = qs("#lessonProgress");
+        if(!bar) return;
+        function update(){
+          var doc = document.documentElement;
+          var max = doc.scrollHeight - window.innerHeight;
+          var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+          bar.style.width = Math.max(0, Math.min(100, pct)) + "%";
+        }
+        window.addEventListener("scroll", update, {passive:true});
+        update();
+      }
+
+      function initTabs(){
+        qsa(".lesson-tab").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var group = btn.closest(".code-tabs");
+            if(!group) return;
+            var targetId = btn.getAttribute("data-tab-target");
+            qsa(".lesson-tab", group).forEach(function(b){ b.classList.remove("active"); });
+            qsa(".tab-panel", group).forEach(function(panel){ panel.classList.remove("active"); });
+            btn.classList.add("active");
+            var target = qs("#" + targetId, group) || document.getElementById(targetId);
+            if(target) target.classList.add("active");
+          });
+        });
+      }
+
+      function initCopyButtons(){
+        qsa(".copy-btn").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            var wrap = btn.closest(".code-wrap");
+            var code = wrap ? qs("code", wrap) : null;
+            if(!code) return;
+            var text = code.innerText;
+            function done(){
+              var old = btn.textContent;
+              btn.textContent = "Đã sao chép";
+              setTimeout(function(){ btn.textContent = old; }, 1200);
+            }
+            if(navigator.clipboard && navigator.clipboard.writeText){
+              navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text); done(); });
+            }else{
+              fallbackCopy(text);
+              done();
+            }
+          });
+        });
+
+        function fallbackCopy(text){
+          var area = document.createElement("textarea");
+          area.value = text;
+          area.style.position = "fixed";
+          area.style.left = "-9999px";
+          document.body.appendChild(area);
+          area.focus();
+          area.select();
+          try{ document.execCommand("copy"); }catch(e){}
+          document.body.removeChild(area);
+        }
+      }
+
+      function renderCells(container, arr, options){
+        options = options || {};
+        container.innerHTML = "";
+        arr.forEach(function(value, idx){
+          var cell = document.createElement("div");
+          cell.className = "cell";
+          if(options.active === idx) cell.classList.add("active");
+          if(options.found === idx) cell.classList.add("found");
+          if(options.mid === idx) cell.classList.add("mid");
+          if(options.range && (idx < options.range[0] || idx > options.range[1])) cell.classList.add("out");
+          cell.innerHTML = "<div>" + value + "</div><div class='idx'>i = " + idx + "</div>";
+          container.appendChild(cell);
+        });
+      }
+
+      function initLinearSim(){
+        var arr = [4, 7, 2, 9, 7, 1];
+        var x = 7;
+        var i = -1;
+        var done = false;
+        var box = qs("#linearArray");
+        var log = qs("#linearLog");
+        var next = qs("#linearNext");
+        var reset = qs("#linearReset");
+        if(!box || !log || !next || !reset) return;
+
+        function resetState(){
+          i = -1;
+          done = false;
+          renderCells(box, arr, {});
+          log.textContent = "Bắt đầu: cần tìm x = " + x + ". Bấm “Bước tiếp” để duyệt từng phần tử.";
+        }
+
+        next.addEventListener("click", function(){
+          if(done) return;
+          i++;
+          if(i >= arr.length){
+            done = true;
+            renderCells(box, arr, {});
+            log.textContent += "\nĐã duyệt hết mảng. Không tìm thấy x.";
+            return;
+          }
+          if(arr[i] === x){
+            done = true;
+            renderCells(box, arr, {found:i});
+            log.textContent += "\nXét i = " + i + ": a[" + i + "] = " + arr[i] + " bằng x. Kết luận tìm thấy tại vị trí " + i + ".";
+          }else{
+            renderCells(box, arr, {active:i});
+            log.textContent += "\nXét i = " + i + ": a[" + i + "] = " + arr[i] + " khác x. Tiếp tục.";
+          }
+        });
+
+        reset.addEventListener("click", resetState);
+        resetState();
+      }
+
+      function initBinarySim(){
+        var arr = [1, 3, 5, 7, 9, 11, 13, 15];
+        var x = 11;
+        var l = 0, r = arr.length - 1;
+        var done = false;
+        var box = qs("#binaryArray");
+        var log = qs("#binaryLog");
+        var next = qs("#binaryNext");
+        var reset = qs("#binaryReset");
+        if(!box || !log || !next || !reset) return;
+
+        function resetState(){
+          l = 0;
+          r = arr.length - 1;
+          done = false;
+          renderCells(box, arr, {range:[l,r]});
+          log.textContent = "Bắt đầu: l = 0, r = " + r + ", cần tìm x = " + x + ".";
+        }
+
+        next.addEventListener("click", function(){
+          if(done) return;
+          if(l > r){
+            done = true;
+            renderCells(box, arr, {});
+            log.textContent += "\nKhoảng tìm kiếm rỗng. Không tìm thấy x.";
+            return;
+          }
+
+          var mid = Math.floor((l + r) / 2);
+          renderCells(box, arr, {range:[l,r], mid:mid});
+          log.textContent += "\nXét l = " + l + ", r = " + r + ", mid = " + mid + ", a[mid] = " + arr[mid] + ".";
+
+          if(arr[mid] === x){
+            done = true;
+            renderCells(box, arr, {range:[l,r], found:mid});
+            log.textContent += "\na[mid] bằng x. Kết luận tìm thấy tại vị trí " + mid + ".";
+          }else if(arr[mid] < x){
+            l = mid + 1;
+            log.textContent += "\na[mid] < x nên bỏ nửa trái, cập nhật l = " + l + ".";
+          }else{
+            r = mid - 1;
+            log.textContent += "\na[mid] > x nên bỏ nửa phải, cập nhật r = " + r + ".";
+          }
+        });
+
+        reset.addEventListener("click", resetState);
+        resetState();
+      }
+
+      function lowerBound(arr, x){
+        var l = 0, r = arr.length;
+        while(l < r){
+          var m = Math.floor((l + r) / 2);
+          if(arr[m] < x) l = m + 1;
+          else r = m;
+        }
+        return l;
+      }
+
+      function upperBound(arr, x){
+        var l = 0, r = arr.length;
+        while(l < r){
+          var m = Math.floor((l + r) / 2);
+          if(arr[m] <= x) l = m + 1;
+          else r = m;
+        }
+        return l;
+      }
+
+      function initPractice(){
+        var btn = qs("#analyzeBtn");
+        var arrInput = qs("#practiceArray");
+        var xInput = qs("#practiceX");
+        var result = qs("#practiceResult");
+        if(!btn || !arrInput || !xInput || !result) return;
+
+        btn.addEventListener("click", function(){
+          var arr = arrInput.value.trim().split(/\s+/).filter(Boolean).map(Number);
+          var x = Number(xInput.value.trim());
+
+          if(arr.length === 0 || Number.isNaN(x) || arr.some(Number.isNaN)){
+            result.innerHTML = "<b class='text-danger'>Dữ liệu chưa hợp lệ.</b> Hãy nhập mảng số nguyên và giá trị x.";
+            return;
+          }
+
+          var isSorted = arr.every(function(v, i){ return i === 0 || arr[i - 1] <= v; });
+          var first = arr.indexOf(x);
+          var last = arr.lastIndexOf(x);
+          var cnt = arr.filter(function(v){ return v === x; }).length;
+
+          var html = "";
+          html += "<div><b>Mảng:</b> [" + arr.join(", ") + "]</div>";
+          html += "<div><b>x:</b> " + x + "</div>";
+          html += "<div><b>Mảng đã sắp xếp tăng dần?</b> " + (isSorted ? "<span class='text-success fw-bold'>Có</span>" : "<span class='text-danger fw-bold'>Chưa</span>") + "</div>";
+          html += "<div><b>Linear Search:</b> " + (first === -1 ? "Không tìm thấy" : "Tìm thấy đầu tiên tại chỉ số " + first) + "</div>";
+          html += "<div><b>Số lần xuất hiện:</b> " + cnt + "</div>";
+
+          if(cnt > 0){
+            html += "<div><b>Vị trí đầu/cuối:</b> first = " + first + ", last = " + last + "</div>";
+          }
+
+          if(isSorted){
+            var lb = lowerBound(arr, x);
+            var ub = upperBound(arr, x);
+            html += "<div class='mt-2'><b>Binary Search / lower_bound:</b> lower_bound = " + lb + ", upper_bound = " + ub + ", số lần = " + (ub - lb) + "</div>";
+          }else{
+            html += "<div class='mt-2 text-danger'><b>Không nên Binary Search trực tiếp</b> vì mảng chưa sắp xếp.</div>";
+          }
+
+          result.innerHTML = html;
+        });
+      }
+
+      function initQuiz(){
+        var feedback = qs("#quizFeedback");
+        qsa(".quiz-item").forEach(function(item){
+          var answer = item.getAttribute("data-answer");
+          qsa(".quiz-option", item).forEach(function(btn){
+            btn.addEventListener("click", function(){
+              qsa(".quiz-option", item).forEach(function(x){
+                x.classList.remove("correct", "wrong");
+                x.disabled = false;
+              });
+
+              if(btn.getAttribute("data-choice") === answer){
+                btn.classList.add("correct");
+                if(feedback) feedback.innerHTML = "<b class='text-success'>Chính xác.</b> Em đã chọn đúng.";
+              }else{
+                btn.classList.add("wrong");
+                qsa(".quiz-option", item).forEach(function(x){
+                  if(x.getAttribute("data-choice") === answer) x.classList.add("correct");
+                });
+                if(feedback) feedback.innerHTML = "<b class='text-danger'>Chưa đúng.</b> Hãy xem lại điều kiện sử dụng và độ phức tạp của thuật toán.";
+              }
+            });
+          });
+        });
+      }
+
+      function initTopButton(){
+        var btn = qs("#toTop");
+        if(!btn) return;
+        btn.addEventListener("click", function(){
+          window.scrollTo({top:0, behavior:"smooth"});
+        });
+      }
+
+      function initHighlight(){
+        if(window.hljs){
+          try{ window.hljs.highlightAll(); }catch(e){}
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function(){
+        initProgress();
+        initTabs();
+        initCopyButtons();
+        initLinearSim();
+        initBinarySim();
+        initPractice();
+        initQuiz();
+        initTopButton();
+        initHighlight();
+      });
+    })();
+  </script>
+</body>
+</html>
