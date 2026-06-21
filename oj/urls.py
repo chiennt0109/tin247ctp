@@ -39,6 +39,9 @@ urlpatterns = [
     path("roadmap/stage/<int:stage_id>/topic/<int:topic_index>/",
          roadmap_views.topic_detail, name="topic_detail"),
 
+    # Chủ đề bổ sung trong roadmap
+    path("roadmap/extra/<slug:slug>/", roadmap_views.roadmap_extra_topic, name="roadmap_extra_topic"),
+
     # Trình chạy code thử nghiệm
     path("roadmap/run/", roadmap_views.run_code_for_roadmap, name="run_code_for_roadmap"),
 

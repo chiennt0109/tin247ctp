@@ -13,10 +13,17 @@
     </div>
 
     <div class="text-center mt-10">
+      {% if stage.id == "extra" %}
+      <a href="/#roadmap"
+         class="inline-block px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition">
+         ⬅️ Quay lại Roadmap
+      </a>
+      {% else %}
       <a href="/roadmap/stage/{{ stage.id }}/"
          class="inline-block px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition">
-         ⬅️ Quay lại giai đoạn {{ stage.id }}
+         ⬅️ Quay lại chương {{ stage.id }}
       </a>
+      {% endif %}
     </div>
 
     <!-- Nút lên đầu -->
