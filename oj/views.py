@@ -104,6 +104,7 @@ def build_roadmap_chapters(stages):
                     "summary": topic.get("summary", ""),
                     "type": topic_type,
                     "status_key": f"roadmap-{stage_id}-{lesson_index}",
+                    "slug": "",
                     "url": f"/roadmap/stage/{stage_id}/topic/{lesson_index}/",
                     "source": "lesson",
                 })
@@ -121,6 +122,7 @@ def build_roadmap_chapters(stages):
                 "summary": "",
                 "type": "Bổ sung",
                 "status_key": f"roadmap-extra-{slug}",
+                "slug": slug,
                 "url": f"/roadmap/extra/{slug}/",
                 "source": "extra",
             })
