@@ -42,15 +42,78 @@ STAGES = [
 ]
 
 ROADMAP_TRACKS = [
-    {"name": "Nền tảng C++ và phân tích độ phức tạp", "stage_ids": [1, 3], "goal": "Nắm cú pháp C++ cốt lõi, tư duy thuật toán nhập môn và Big-O theo hướng CLRS/DSA Analysis.", "prerequisites": "Chưa yêu cầu; biết sử dụng máy tính và tư duy logic cơ bản.", "level": "Nhập môn"},
-    {"name": "Cấu trúc dữ liệu cơ bản", "stage_ids": [2, 8], "goal": "Làm chủ mảng, chuỗi, hàm, file và ADT tuyến tính như stack, queue, linked list, hash table.", "prerequisites": "Biến, rẽ nhánh, vòng lặp và thao tác nhập xuất.", "level": "Cơ bản"},
-    {"name": "Sắp xếp, tìm kiếm", "stage_ids": [5], "goal": "Hiểu tìm kiếm, sắp xếp, đệ quy và chia để trị; kết nối với phân tích độ phức tạp.", "prerequisites": "Mảng, hàm, độ phức tạp cơ bản.", "level": "Cơ bản → Trung cấp"},
-    {"name": "Kỹ thuật giải bài", "stage_ids": [4, 7], "goal": "Rèn mô hình hóa bài toán, mô phỏng, quay lui và nhánh cận theo phong cách Competitive Programming.", "prerequisites": "Cấu trúc dữ liệu cơ bản và khả năng cài đặt thuật toán ngắn.", "level": "Trung cấp"},
-    {"name": "Quy hoạch động", "stage_ids": [6], "goal": "Nhận diện trạng thái, công thức chuyển và tối ưu bộ nhớ cho các mẫu DP kinh điển.", "prerequisites": "Đệ quy, mảng, tư duy chia nhỏ bài toán.", "level": "Trung cấp"},
-    {"name": "Cây", "stage_ids": [11], "goal": "Nắm cây tìm kiếm, cây cân bằng và các cấu trúc cây phục vụ truy vấn/phân hoạch dữ liệu.", "prerequisites": "Đệ quy, con trỏ/ADT, stack/queue.", "level": "Trung cấp → Nâng cao"},
-    {"name": "Đồ thị", "stage_ids": [9, 10], "goal": "Biểu diễn đồ thị, duyệt, đường đi ngắn nhất và cây khung nhỏ nhất.", "prerequisites": "Queue, stack, priority queue và phân tích độ phức tạp.", "level": "Trung cấp → Nâng cao"},
-    {"name": "Cấu trúc dữ liệu nâng cao", "stage_ids": [12, 13], "goal": "Bổ sung toán rời rạc, lý thuyết số và thuật toán chuỗi cho bài toán nâng cao.", "prerequisites": "Mảng, hash, cây và kỹ thuật tối ưu cơ bản.", "level": "Nâng cao"},
-    {"name": "Luyện thi", "stage_ids": [14], "goal": "Ghép kỹ thuật DP, Graph, Math; luyện debug, code sạch và chiến thuật làm bài.", "prerequisites": "Hoàn thành các chặng nền tảng, dữ liệu, cây/đồ thị và DP.", "level": "Thi đấu"},
+    {
+        "name": "Nền tảng C++ và phân tích độ phức tạp",
+        "stage_ids": [1, 3],
+        "goal": "Nắm cú pháp C++ cốt lõi, tư duy thuật toán nhập môn, tìm kiếm/sắp xếp và Big-O theo DSA Analysis.",
+        "prerequisites": "Chưa yêu cầu; biết sử dụng máy tính và tư duy logic cơ bản.",
+        "level": "Nhập môn",
+        "supplements": ["C++ I/O", "Biến & kiểu dữ liệu", "Big-O", "Binary Search"],
+    },
+    {
+        "name": "Cấu trúc dữ liệu cơ bản",
+        "stage_ids": [2, 8],
+        "goal": "Làm chủ mảng, chuỗi, hàm, file và các ADT tuyến tính trước khi chuyển sang kỹ thuật thi đấu.",
+        "prerequisites": "Biến, rẽ nhánh, vòng lặp và thao tác nhập xuất.",
+        "level": "Cơ bản",
+        "supplements": ["STL vector/string", "Stack", "Queue/Deque", "Linked List", "Hash Table", "Priority Queue"],
+    },
+    {
+        "name": "Sắp xếp, tìm kiếm",
+        "stage_ids": [5],
+        "goal": "Củng cố đệ quy, chia để trị, Merge Sort, Quick Sort và cách chọn thuật toán theo độ phức tạp.",
+        "prerequisites": "Mảng, hàm, độ phức tạp cơ bản.",
+        "level": "Cơ bản → Trung cấp",
+        "supplements": ["Recursion", "Divide & Conquer", "Merge Sort", "Quick Sort"],
+    },
+    {
+        "name": "Kỹ thuật giải bài",
+        "stage_ids": [4, 7],
+        "goal": "Rèn mô hình hóa bài toán, mô phỏng, quay lui và nhánh cận theo phong cách Competitive Programming 3.",
+        "prerequisites": "Cấu trúc dữ liệu cơ bản và khả năng cài đặt thuật toán ngắn.",
+        "level": "Trung cấp",
+        "supplements": ["Simulation", "Counting", "Backtracking", "Branch & Bound"],
+    },
+    {
+        "name": "Quy hoạch động",
+        "stage_ids": [6],
+        "goal": "Nhận diện trạng thái, công thức chuyển và tối ưu bộ nhớ cho các mẫu DP kinh điển.",
+        "prerequisites": "Đệ quy, mảng, tư duy chia nhỏ bài toán.",
+        "level": "Trung cấp",
+        "supplements": ["Memoization", "Knapsack", "LIS", "State Transition"],
+    },
+    {
+        "name": "Cây",
+        "stage_ids": [11],
+        "goal": "Nắm cây tìm kiếm, cây cân bằng và cấu trúc cây phục vụ truy vấn/phân hoạch dữ liệu.",
+        "prerequisites": "Đệ quy, ADT tuyến tính, priority queue và tư duy truy vấn đoạn.",
+        "level": "Trung cấp → Nâng cao",
+        "supplements": ["BST", "AVL/RB Tree", "Fenwick Tree", "Segment Tree", "RSQ", "RMQ", "Trie", "Union-Find"],
+    },
+    {
+        "name": "Đồ thị",
+        "stage_ids": [9, 10],
+        "goal": "Biểu diễn đồ thị, duyệt, thành phần liên thông, đường đi ngắn nhất và cây khung nhỏ nhất.",
+        "prerequisites": "Queue, stack, priority queue và phân tích độ phức tạp.",
+        "level": "Trung cấp → Nâng cao",
+        "supplements": ["DFS/BFS", "Connected Components", "Dijkstra", "Bellman-Ford", "Floyd-Warshall", "MST"],
+    },
+    {
+        "name": "Cấu trúc dữ liệu nâng cao",
+        "stage_ids": [12, 13],
+        "goal": "Bổ sung toán rời rạc, lý thuyết số, hashing và thuật toán chuỗi cho bài toán nâng cao.",
+        "prerequisites": "Mảng, hash, cây và kỹ thuật tối ưu cơ bản.",
+        "level": "Nâng cao",
+        "supplements": ["Modulo", "Prime", "Combinatorics", "KMP", "Z-algorithm", "Rolling Hash"],
+    },
+    {
+        "name": "Luyện thi",
+        "stage_ids": [14],
+        "goal": "Ghép kỹ thuật DP, Graph, Math; luyện debug, code sạch và chiến thuật làm bài.",
+        "prerequisites": "Hoàn thành các chặng nền tảng, dữ liệu, cây/đồ thị và DP.",
+        "level": "Thi đấu",
+        "supplements": ["Mixed Problems", "Complexity Tuning", "Debug", "Contest Strategy"],
+    },
 ]
 
 def build_roadmap_tracks(stages):
@@ -81,7 +144,15 @@ def build_roadmap_tracks(stages):
 # ==============================
 def home(request):
     leaderboard = LearningLeaderboardService().compute(top_n=10)
-    return render(request, "home.html", {"stages": STAGES, "roadmap_tracks": build_roadmap_tracks(STAGES), "learning_leaderboard": leaderboard})
+    roadmap_tracks = build_roadmap_tracks(STAGES)
+    return render(request, "home.html", {
+        "stages": STAGES,
+        "roadmap_tracks": roadmap_tracks,
+        "roadmap_track_count": len(roadmap_tracks),
+        "roadmap_chapter_count": len(STAGES),
+        "roadmap_lesson_count": sum(len(stage.get("topics", [])) for stage in STAGES),
+        "learning_leaderboard": leaderboard,
+    })
 
 
 # ==============================
