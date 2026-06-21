@@ -1,6 +1,6 @@
 # path: oj/urls.py
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
 from . import views
 from . import scratch as scratch_views
 from problems import views_admin
@@ -28,6 +28,9 @@ urlpatterns = [
 #    path("roadmap/stage/<int:stage_id>/topic/<int:topic_index>/", views.topic_detail, name="topic_detail"),
 #    path("roadmap/run/", views.run_code_for_roadmap, name="run_code_for_roadmap"),
 #    path("roadmap/stage/<int:stage_id>/topic/<int:topic_id>/", views.topic_detail, name="topic_detail"),
+
+    # Chủ đề bổ sung trong roadmap: đặt trước các route roadmap khác để tránh 404 khi truy cập trực tiếp.
+    re_path(r"^roadmap/extra/(?P<slug>[-a-zA-Z0-9_]+)/?$", roadmap_views.roadmap_extra_topic, name="roadmap_extra_topic"),
 
     path("roadmap/detail/", RedirectView.as_view(url="/", permanent=False)),
     path("roadmap/", RedirectView.as_view(url="/", permanent=False)),

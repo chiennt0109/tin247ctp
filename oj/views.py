@@ -2,6 +2,8 @@
 import json
 import os
 import time
+import re
+import unicodedata
 import requests
 
 from django.shortcuts import render
@@ -41,12 +43,137 @@ STAGES = [
     STAGE_8, STAGE_9, STAGE_10, STAGE_11, STAGE_12, STAGE_13, STAGE_14
 ]
 
+ROADMAP_CHAPTERS = [
+    {"title": "Nền tảng C++", "stage_ids": [1], "extras": ["STL cơ bản: vector, pair, tuple", "Iterator, range-based for"]},
+    {"title": "Kiểu dữ liệu trừu tượng và thư viện chuẩn", "stage_ids": [2, 8], "extras": ["STL algorithm: sort, lower_bound, upper_bound", "set, multiset, map, unordered_map"]},
+    {"title": "Phân tích thuật toán, tìm kiếm và sắp xếp", "stage_ids": [3, 5], "extras": ["Amortized analysis", "Counting sort, radix sort, heap sort"]},
+    {"title": "Kỹ thuật giải bài cơ bản", "stage_ids": [4], "extras": ["Prefix sum", "Difference array", "Two pointers", "Sliding window"]},
+    {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [7], "extras": ["Bitmask enumeration", "Meet-in-the-middle"]},
+    {"title": "Quy hoạch động", "stage_ids": [6], "extras": ["DP trên bitmask", "DP trên cây", "DP tối ưu không gian"]},
+    {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": ["RSQ", "RMQ", "Lazy propagation", "Sparse table", "LCA"]},
+    {"title": "Đồ thị", "stage_ids": [9, 10], "extras": ["Topological sort", "Strongly connected components", "Euler tour", "Network flow"]},
+    {"title": "Toán rời rạc và lý thuyết số", "stage_ids": [12], "extras": ["Sieve of Eratosthenes", "Fast exponentiation", "Chinese remainder theorem"]},
+    {"title": "Chuỗi và xử lý văn bản", "stage_ids": [13], "extras": ["Suffix array", "Suffix automaton", "Aho-Corasick"]},
+    {"title": "Cấu trúc dữ liệu nâng cao", "stage_ids": [], "extras": ["Disjoint Sparse Table", "Treap", "Sqrt decomposition", "Heavy-Light Decomposition", "Persistent Segment Tree"]},
+    {"title": "Luyện thi tổng hợp", "stage_ids": [14], "extras": ["Upsolving", "Template cá nhân", "Chiến lược phân bổ thời gian"]},
+]
+
+def roadmap_extra_slug(title):
+    normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", normalized).strip("-").lower()
+    return slug or "extra-topic"
+
+
+def clean_roadmap_title(title):
+    return re.sub(r"^\s*\d+(?:\.\d+)+(?:\.|\))?\s*", "", title or "").strip()
+
+
+def roadmap_title_key(title):
+    cleaned = clean_roadmap_title(title).lower()
+    cleaned = re.sub(r"[^a-z0-9À-ỹ]+", " ", cleaned, flags=re.IGNORECASE).strip()
+    return re.sub(r"\s+", " ", cleaned)
+
+
+def roadmap_extra_file(slug):
+    return os.path.join(settings.BASE_DIR, "oj", "roadmap_data", "topics", "extra", f"{slug}.html")
+
+
+def build_roadmap_chapters(stages):
+    stage_by_id = {stage["id"]: stage for stage in stages}
+    chapters = []
+    topic_total = 0
+    for chapter_index, chapter in enumerate(ROADMAP_CHAPTERS, start=1):
+        lessons = []
+        seen_titles = set()
+        topic_number = 1
+        for stage_id in chapter["stage_ids"]:
+            stage = stage_by_id.get(stage_id)
+            if not stage:
+                continue
+            for lesson_index, topic in enumerate(stage.get("topics", []), start=1):
+                raw_title = topic.get("title", "")
+                title = clean_roadmap_title(raw_title)
+                title_key = roadmap_title_key(title)
+                if title_key in seen_titles:
+                    continue
+                seen_titles.add(title_key)
+                topic_type = "Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết")
+                lessons.append({
+                    "number": f"{chapter_index}.{topic_number}",
+                    "title": title,
+                    "summary": topic.get("summary", ""),
+                    "type": topic_type,
+                    "status_key": f"roadmap-{stage_id}-{lesson_index}",
+                    "slug": "",
+                    "url": f"/roadmap/stage/{stage_id}/topic/{lesson_index}/",
+                    "source": "lesson",
+                })
+                topic_number += 1
+        for extra in chapter.get("extras", []):
+            title = clean_roadmap_title(extra)
+            title_key = roadmap_title_key(title)
+            if title_key in seen_titles:
+                continue
+            seen_titles.add(title_key)
+            slug = roadmap_extra_slug(title)
+            lessons.append({
+                "number": f"{chapter_index}.{topic_number}",
+                "title": title,
+                "summary": "",
+                "type": "Bổ sung",
+                "status_key": f"roadmap-extra-{slug}",
+                "slug": slug,
+                "url": f"/roadmap/extra/{slug}/",
+                "source": "extra",
+            })
+            topic_number += 1
+        topic_total += len(lessons)
+        chapters.append({
+            "index": chapter_index,
+            "title": chapter["title"],
+            "lessons": lessons,
+            "lesson_count": len(lessons),
+        })
+    return chapters, topic_total
+
+
+def roadmap_extra_topic(request, slug):
+    title = None
+    for chapter in ROADMAP_CHAPTERS:
+        for extra in chapter.get("extras", []):
+            if roadmap_extra_slug(extra) == slug:
+                title = extra
+                break
+        if title:
+            break
+    if not title:
+        return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung bổ sung."})
+
+    html_path = roadmap_extra_file(slug)
+    if not os.path.exists(html_path):
+        detail = f"<p class='text-danger'>⚠️ Không tìm thấy file nội dung: <code>{html.escape(html_path)}</code></p>"
+    else:
+        with open(html_path, "r", encoding="utf-8", errors="replace") as f:
+            detail = f.read()
+
+    return render(request, "roadmap_detail.html", {
+        "stage": {"id": "extra", "title": "Nội dung bổ sung"},
+        "topic": {"title": title, "summary": "", "detail": detail},
+    })
+
 # ==============================
 # 🏠 HOME
 # ==============================
 def home(request):
     leaderboard = LearningLeaderboardService().compute(top_n=10)
-    return render(request, "home.html", {"stages": STAGES, "learning_leaderboard": leaderboard})
+    roadmap_chapters, roadmap_topic_count = build_roadmap_chapters(STAGES)
+    return render(request, "home.html", {
+        "stages": STAGES,
+        "roadmap_chapters": roadmap_chapters,
+        "roadmap_chapter_count": len(roadmap_chapters),
+        "roadmap_topic_count": roadmap_topic_count,
+        "learning_leaderboard": leaderboard,
+    })
 
 
 # ==============================
