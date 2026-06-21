@@ -2,95 +2,67 @@
   <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50 z-0" aria-hidden="true"></div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <div class="text-center max-w-4xl mx-auto mb-12">
+    <div class="roadmap-banner text-center max-w-4xl mx-auto mb-12">
       <span class="roadmap-eyebrow">📚 Roadmap học thuật toán</span>
       <h2 class="roadmap-title">Lộ trình học lập trình</h2>
-      <p class="roadmap-subtitle">
-        Tổ chức lại các bài học hiện có theo cấu trúc học thuật của Data Structures and Algorithms,
-        Competitive Programming 3 và Data Structures and Algorithm Analysis in C++ — không đổi bài học, URL hay thứ tự nội dung gốc.
-      </p>
     </div>
 
     <div class="roadmap-overview" aria-label="Tổng quan lộ trình">
-      <div><strong>{{ roadmap_track_count }}</strong><span>Chặng</span></div>
       <div><strong>{{ roadmap_chapter_count }}</strong><span>Chương</span></div>
-      <div><strong>{{ roadmap_lesson_count }}</strong><span>Bài học</span></div>
-      <div><strong>STL · RSQ · RMQ</strong><span>Kiến thức bổ sung hiển thị</span></div>
+      <div><strong>{{ roadmap_topic_count }}</strong><span>Chủ đề</span></div>
+      <div><strong>STL</strong><span>Thư viện C++</span></div>
+      <div><strong>RSQ · RMQ</strong><span>Truy vấn đoạn</span></div>
     </div>
 
     <div class="roadmap-layout">
-      <aside class="roadmap-rail" aria-label="Quan hệ học trước sau">
+      <aside class="roadmap-rail" aria-label="Mục lục chương">
         <div class="rail-card">
-          <span class="rail-label">Trình tự học</span>
+          <span class="rail-label">Mục lục</span>
           <ol>
-            {% for track in roadmap_tracks %}
-              <li><a href="#roadmap-track-{{ track.index }}">{{ track.name }}</a></li>
+            {% for chapter in roadmap_chapters %}
+              <li><a href="#roadmap-chapter-{{ chapter.index }}">{{ chapter.index }}. {{ chapter.title }}</a></li>
             {% endfor %}
           </ol>
         </div>
       </aside>
 
-      <div class="roadmap-timeline">
-        {% for track in roadmap_tracks %}
-        <article class="track-card" id="roadmap-track-{{ track.index }}" data-stage-card>
-          <button class="track-header" type="button" data-toggle-stage aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
-            <span class="track-index">{{ track.index }}</span>
-            <span class="track-heading">
-              <span class="track-kicker">Chặng {{ track.index }} · {{ track.level }}</span>
-              <span class="track-name">{{ track.name }}</span>
+      <div class="chapter-timeline">
+        {% for chapter in roadmap_chapters %}
+        <article class="chapter-panel" id="roadmap-chapter-{{ chapter.index }}" data-chapter-card>
+          <button class="chapter-toggle" type="button" data-toggle-chapter aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+            <span class="chapter-index">{{ chapter.index|stringformat:"02d" }}</span>
+            <span class="chapter-heading">
+              <span class="chapter-kicker">Chương {{ chapter.index }}</span>
+              <span class="chapter-name">{{ chapter.title }}</span>
             </span>
-            <span class="track-actions">
-              <span>{{ track.lesson_count }} bài</span>
-              <span class="chevron">⌄</span>
-            </span>
+            <span class="chapter-count">{{ chapter.lesson_count }} chủ đề <span class="chevron">⌄</span></span>
           </button>
 
-          <div class="track-body {% if not forloop.first %}is-collapsed{% endif %}" data-stage-panel>
-            <div class="track-meta">
-              <div class="meta-box"><b>🎯 Mục tiêu</b><p>{{ track.goal }}</p></div>
-              <div class="meta-box"><b>🧱 Kiến thức tiên quyết</b><p>{{ track.prerequisites }}</p></div>
-              <div class="meta-box">
-                <b>📈 Tiến độ</b>
-                <div class="progress-line"><span style="width: {{ track.progress }}%"></span></div>
-                <p>{{ track.progress }}% theo vị trí trong lộ trình</p>
-              </div>
-            </div>
-
-            <div class="supplement-row" aria-label="Kiến thức bổ sung của chặng">
-              {% for item in track.supplements %}<span>{{ item }}</span>{% endfor %}
-            </div>
-
-            <div class="chapter-stack">
-              {% for chapter in track.chapters %}
-              <section class="chapter-card">
-                <div class="chapter-header">
-                  <div>
-                    <span class="chapter-label">Chương {{ chapter.stage.id }}</span>
-                    <h3>{{ chapter.stage.title }}</h3>
-                    <p>{{ chapter.stage.summary }}</p>
-                  </div>
-                  <a href="/roadmap/stage/{{ chapter.stage.id }}/" class="chapter-link">Mở chương →</a>
-                </div>
-
-                <div class="lesson-list">
-                  {% for item in chapter.topics %}
-                  <a class="lesson-row" href="/roadmap/stage/{{ chapter.stage.id }}/topic/{{ item.index }}/">
-                    <span class="lesson-node"></span>
-                    <span class="lesson-content">
-                      <span class="lesson-topline">
-                        <span>Chủ đề {{ item.index }}</span>
-                        <span class="lesson-status" data-status-key="roadmap-{{ chapter.stage.id }}-{{ item.index }}">Chưa học</span>
+          <div class="chapter-body {% if not forloop.first %}is-collapsed{% endif %}" data-chapter-body>
+            {% for section in chapter.sections %}
+            <section class="topic-section">
+              <h3>{{ section.title }}</h3>
+              <div class="topic-list">
+                {% for item in section.lessons %}
+                  {% if item.url %}
+                  <a class="topic-row" href="{{ item.url }}">
+                  {% else %}
+                  <div class="topic-row topic-row-extra">
+                  {% endif %}
+                    <span class="topic-number">{{ item.number }}</span>
+                    <span class="topic-main">
+                      <strong>{{ item.title }}</strong>
+                      {% if item.summary %}<small>{{ item.summary|truncatechars:120 }}</small>{% endif %}
+                      <span class="topic-tags">
+                        <em>{{ item.type }}</em>
+                        <em class="lesson-status" data-status-key="{{ item.status_key }}">Chưa học</em>
                       </span>
-                      <strong>{{ item.lesson.title }}</strong>
-                      <small>{{ item.lesson.summary|truncatechars:130 }}</small>
-                      <span class="lesson-tags"><em>{{ item.type }}</em><em>{{ item.level }}</em></span>
                     </span>
-                  </a>
-                  {% endfor %}
-                </div>
-              </section>
-              {% endfor %}
-            </div>
+                  {% if item.url %}</a>{% else %}</div>{% endif %}
+                {% endfor %}
+              </div>
+            </section>
+            {% endfor %}
           </div>
         </article>
         {% endfor %}
@@ -100,13 +72,13 @@
 
   <style>
     @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .roadmap-modern{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a}.roadmap-modern .animate-gradient{background-size:200% 200%;animation:gradientMove 18s ease infinite}.roadmap-eyebrow{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #bfdbfe;background:rgba(255,255,255,.78);color:#1d4ed8;border-radius:999px;padding:.6rem 1rem;font-weight:800;box-shadow:0 10px 30px rgba(37,99,235,.08)}.roadmap-title{margin:1rem 0 .75rem;font-size:clamp(2rem,4vw,3.5rem);font-weight:900;letter-spacing:-.04em;color:#111827}.roadmap-subtitle{font-size:1.05rem;line-height:1.8;color:#475569}.roadmap-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-bottom:1.25rem}.roadmap-overview>div{border:1px solid #dbeafe;background:rgba(255,255,255,.86);border-radius:1.25rem;padding:1rem;box-shadow:0 12px 30px rgba(30,64,175,.08)}.roadmap-overview strong{display:block;font-size:1.5rem;color:#1e3a8a}.roadmap-overview span{color:#64748b;font-weight:700}.roadmap-layout{display:grid;grid-template-columns:18rem 1fr;gap:1.25rem;align-items:start}.roadmap-rail{position:sticky;top:1rem}.rail-card{border:1px solid #dbeafe;background:rgba(255,255,255,.9);border-radius:1.5rem;padding:1rem;box-shadow:0 18px 45px rgba(15,23,42,.08)}.rail-label{display:block;margin-bottom:.75rem;color:#2563eb;font-weight:900;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}.rail-card ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.45rem}.rail-card a{color:#334155;text-decoration:none;font-weight:700}.rail-card a:hover{color:#2563eb}.roadmap-timeline{position:relative;display:flex;flex-direction:column;gap:1rem}.roadmap-timeline:before{content:"";position:absolute;left:1.7rem;top:2rem;bottom:2rem;width:3px;background:linear-gradient(#38bdf8,#818cf8,#a78bfa);border-radius:999px}.track-card{position:relative}.track-header{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;border:1px solid #c7d2fe;border-radius:1.5rem;background:rgba(255,255,255,.94);padding:1rem;text-align:left;color:#0f172a;box-shadow:0 16px 40px rgba(30,64,175,.1);transition:.2s ease}.track-header:hover{transform:translateY(-1px);box-shadow:0 20px 48px rgba(30,64,175,.14)}.track-index{display:grid;place-items:center;width:3.4rem;height:3.4rem;border-radius:1rem;background:linear-gradient(135deg,#dbeafe,#e0e7ff);border:1px solid #bfdbfe;color:#1d4ed8;font-weight:900;box-shadow:0 0 0 8px rgba(239,246,255,.9)}.track-kicker{display:block;color:#2563eb;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.track-name{display:block;font-size:1.13rem;font-weight:900}.track-actions{display:flex;align-items:center;gap:.8rem;color:#475569;font-weight:800}.chevron{font-size:1.65rem;transition:.2s ease}.track-header[aria-expanded="true"] .chevron{transform:rotate(180deg)}.track-body{margin:.85rem 0 .85rem 4.5rem;border:1px solid #dbeafe;border-radius:1.5rem;background:rgba(255,255,255,.82);padding:1rem;box-shadow:0 14px 36px rgba(15,23,42,.07)}.track-body.is-collapsed{display:none}.track-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem}.meta-box{border:1px solid #e2e8f0;border-radius:1rem;background:#f8fafc;padding:1rem}.meta-box b{color:#0f172a}.meta-box p{margin:.35rem 0 0;color:#64748b;font-size:.92rem;line-height:1.55}.progress-line{height:.65rem;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-top:.7rem}.progress-line span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#38bdf8,#6366f1)}.supplement-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}.supplement-row span{border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:.4rem .7rem;font-size:.82rem;font-weight:800}.chapter-stack{display:flex;flex-direction:column;gap:.9rem}.chapter-card{border:1px solid #e2e8f0;border-radius:1.25rem;background:white;padding:1rem}.chapter-header{display:flex;justify-content:space-between;gap:1rem;margin-bottom:.8rem}.chapter-label{display:inline-block;color:#4f46e5;font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.chapter-header h3{margin:.2rem 0;color:#111827;font-size:1.1rem;font-weight:900}.chapter-header p{margin:0;color:#64748b}.chapter-link{white-space:nowrap;color:#2563eb;text-decoration:none;font-weight:900}.lesson-list{position:relative;display:flex;flex-direction:column;gap:.65rem}.lesson-list:before{content:"";position:absolute;left:.58rem;top:.8rem;bottom:.8rem;width:2px;background:#dbeafe}.lesson-row{position:relative;display:grid;grid-template-columns:auto 1fr;gap:.75rem;text-decoration:none;color:inherit;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;padding:.85rem;transition:.18s ease}.lesson-row:hover{border-color:#bfdbfe;background:#f8fbff;transform:translateX(2px)}.lesson-node{position:relative;z-index:1;margin-top:.3rem;width:1.2rem;height:1.2rem;border-radius:999px;background:#ffffff;border:4px solid #60a5fa}.lesson-content{display:flex;flex-direction:column;gap:.3rem}.lesson-topline{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.45rem;color:#64748b;font-size:.78rem;font-weight:900}.lesson-status,.lesson-tags em{font-style:normal;border-radius:999px;background:#eef2ff;color:#4338ca;padding:.25rem .55rem}.lesson-content strong{color:#111827}.lesson-content small{color:#64748b;line-height:1.5}.lesson-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.15rem}.lesson-status.is-learning{background:#fef3c7;color:#92400e}.lesson-status.is-done{background:#dcfce7;color:#166534}@media(max-width:1024px){.roadmap-layout{grid-template-columns:1fr}.roadmap-rail{position:static}.rail-card ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.roadmap-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.roadmap-overview,.track-meta,.rail-card ol{grid-template-columns:1fr}.roadmap-timeline:before{display:none}.track-header{grid-template-columns:auto 1fr}.track-actions{grid-column:2}.track-body{margin-left:0}.chapter-header{flex-direction:column}.track-name{font-size:1rem}}
+    .roadmap-modern{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a}.roadmap-modern .animate-gradient{background-size:200% 200%;animation:gradientMove 18s ease infinite}.roadmap-eyebrow{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #bfdbfe;background:rgba(255,255,255,.78);color:#1d4ed8;border-radius:999px;padding:.6rem 1rem;font-weight:800;box-shadow:0 10px 30px rgba(37,99,235,.08)}.roadmap-title{margin:1rem 0 0;font-size:clamp(2.4rem,5vw,4.4rem);font-weight:900;letter-spacing:-.05em;color:#111827}.roadmap-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-bottom:1.25rem}.roadmap-overview>div{border:1px solid #dbeafe;background:rgba(255,255,255,.9);border-radius:1.25rem;padding:1rem 1.2rem;box-shadow:0 12px 30px rgba(30,64,175,.08)}.roadmap-overview strong{display:block;font-size:1.55rem;color:#1e3a8a}.roadmap-overview span{color:#64748b;font-weight:800}.roadmap-layout{display:grid;grid-template-columns:19rem 1fr;gap:1.25rem;align-items:start}.roadmap-rail{position:sticky;top:1rem}.rail-card{border:1px solid #dbeafe;background:rgba(255,255,255,.92);border-radius:1.5rem;padding:1rem;box-shadow:0 18px 45px rgba(15,23,42,.08)}.rail-label{display:block;margin-bottom:.75rem;color:#2563eb;font-weight:900;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}.rail-card ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.48rem}.rail-card a{color:#334155;text-decoration:none;font-weight:750;line-height:1.35}.rail-card a:hover{color:#2563eb}.chapter-timeline{position:relative;display:flex;flex-direction:column;gap:1rem}.chapter-timeline:before{content:"";position:absolute;left:1.7rem;top:2rem;bottom:2rem;width:3px;background:linear-gradient(#38bdf8,#818cf8,#a78bfa);border-radius:999px}.chapter-panel{position:relative}.chapter-toggle{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;border:1px solid #c7d2fe;border-radius:1.5rem;background:rgba(255,255,255,.95);padding:1rem;text-align:left;color:#0f172a;box-shadow:0 16px 40px rgba(30,64,175,.1);transition:.2s ease}.chapter-toggle:hover{transform:translateY(-1px);box-shadow:0 20px 48px rgba(30,64,175,.14)}.chapter-index{display:grid;place-items:center;width:3.4rem;height:3.4rem;border-radius:1rem;background:linear-gradient(135deg,#dbeafe,#e0e7ff);border:1px solid #bfdbfe;color:#1d4ed8;font-weight:900;box-shadow:0 0 0 8px rgba(239,246,255,.9)}.chapter-kicker{display:block;color:#2563eb;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.chapter-name{display:block;font-size:1.13rem;font-weight:900}.chapter-count{display:flex;align-items:center;gap:.8rem;color:#475569;font-weight:800}.chevron{font-size:1.65rem;transition:.2s ease}.chapter-toggle[aria-expanded="true"] .chevron{transform:rotate(180deg)}.chapter-body{margin:.85rem 0 .85rem 4.5rem;border:1px solid #dbeafe;border-radius:1.5rem;background:rgba(255,255,255,.86);padding:1rem;box-shadow:0 14px 36px rgba(15,23,42,.07)}.chapter-body.is-collapsed{display:none}.topic-section{border:1px solid #e2e8f0;border-radius:1.25rem;background:white;padding:1rem}.topic-section+.topic-section{margin-top:.85rem}.topic-section h3{margin:0 0 .75rem;color:#111827;font-size:1rem;font-weight:900}.topic-list{display:flex;flex-direction:column;gap:.6rem}.topic-row{display:grid;grid-template-columns:4.25rem 1fr;gap:.8rem;text-decoration:none;color:inherit;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;padding:.85rem;transition:.18s ease}.topic-row[href]:hover{border-color:#bfdbfe;background:#f8fbff;transform:translateX(2px)}.topic-row-extra{background:#f8fafc}.topic-number{align-self:start;border-radius:.8rem;background:#eff6ff;color:#1d4ed8;padding:.35rem .5rem;text-align:center;font-weight:900}.topic-main{display:flex;flex-direction:column;gap:.32rem}.topic-main strong{color:#111827}.topic-main small{color:#64748b;line-height:1.5}.topic-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.15rem}.topic-tags em{font-style:normal;border-radius:999px;background:#eef2ff;color:#4338ca;padding:.25rem .55rem;font-size:.78rem;font-weight:850}.lesson-status.is-learning{background:#fef3c7;color:#92400e}.lesson-status.is-done{background:#dcfce7;color:#166534}@media(max-width:1024px){.roadmap-layout{grid-template-columns:1fr}.roadmap-rail{position:static}.rail-card ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.roadmap-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.roadmap-overview,.rail-card ol{grid-template-columns:1fr}.chapter-timeline:before{display:none}.chapter-toggle{grid-template-columns:auto 1fr}.chapter-count{grid-column:2}.chapter-body{margin-left:0}.topic-row{grid-template-columns:1fr}.chapter-name{font-size:1rem}}
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('[data-toggle-stage]').forEach((button) => {
+      document.querySelectorAll('[data-toggle-chapter]').forEach((button) => {
         button.addEventListener('click', () => {
-          const panel = button.closest('[data-stage-card]').querySelector('[data-stage-panel]');
+          const panel = button.closest('[data-chapter-card]').querySelector('[data-chapter-body]');
           const expanded = button.getAttribute('aria-expanded') === 'true';
           button.setAttribute('aria-expanded', String(!expanded));
           panel.classList.toggle('is-collapsed', expanded);

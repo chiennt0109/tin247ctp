@@ -41,116 +41,82 @@ STAGES = [
     STAGE_8, STAGE_9, STAGE_10, STAGE_11, STAGE_12, STAGE_13, STAGE_14
 ]
 
-ROADMAP_TRACKS = [
-    {
-        "name": "Nền tảng C++ và phân tích độ phức tạp",
-        "stage_ids": [1, 3],
-        "goal": "Nắm cú pháp C++ cốt lõi, tư duy thuật toán nhập môn, tìm kiếm/sắp xếp và Big-O theo DSA Analysis.",
-        "prerequisites": "Chưa yêu cầu; biết sử dụng máy tính và tư duy logic cơ bản.",
-        "level": "Nhập môn",
-        "supplements": ["C++ I/O", "Biến & kiểu dữ liệu", "Big-O", "Binary Search"],
-    },
-    {
-        "name": "Cấu trúc dữ liệu cơ bản",
-        "stage_ids": [2, 8],
-        "goal": "Làm chủ mảng, chuỗi, hàm, file và các ADT tuyến tính trước khi chuyển sang kỹ thuật thi đấu.",
-        "prerequisites": "Biến, rẽ nhánh, vòng lặp và thao tác nhập xuất.",
-        "level": "Cơ bản",
-        "supplements": ["STL vector/string", "Stack", "Queue/Deque", "Linked List", "Hash Table", "Priority Queue"],
-    },
-    {
-        "name": "Sắp xếp, tìm kiếm",
-        "stage_ids": [5],
-        "goal": "Củng cố đệ quy, chia để trị, Merge Sort, Quick Sort và cách chọn thuật toán theo độ phức tạp.",
-        "prerequisites": "Mảng, hàm, độ phức tạp cơ bản.",
-        "level": "Cơ bản → Trung cấp",
-        "supplements": ["Recursion", "Divide & Conquer", "Merge Sort", "Quick Sort"],
-    },
-    {
-        "name": "Kỹ thuật giải bài",
-        "stage_ids": [4, 7],
-        "goal": "Rèn mô hình hóa bài toán, mô phỏng, quay lui và nhánh cận theo phong cách Competitive Programming 3.",
-        "prerequisites": "Cấu trúc dữ liệu cơ bản và khả năng cài đặt thuật toán ngắn.",
-        "level": "Trung cấp",
-        "supplements": ["Simulation", "Counting", "Backtracking", "Branch & Bound"],
-    },
-    {
-        "name": "Quy hoạch động",
-        "stage_ids": [6],
-        "goal": "Nhận diện trạng thái, công thức chuyển và tối ưu bộ nhớ cho các mẫu DP kinh điển.",
-        "prerequisites": "Đệ quy, mảng, tư duy chia nhỏ bài toán.",
-        "level": "Trung cấp",
-        "supplements": ["Memoization", "Knapsack", "LIS", "State Transition"],
-    },
-    {
-        "name": "Cây",
-        "stage_ids": [11],
-        "goal": "Nắm cây tìm kiếm, cây cân bằng và cấu trúc cây phục vụ truy vấn/phân hoạch dữ liệu.",
-        "prerequisites": "Đệ quy, ADT tuyến tính, priority queue và tư duy truy vấn đoạn.",
-        "level": "Trung cấp → Nâng cao",
-        "supplements": ["BST", "AVL/RB Tree", "Fenwick Tree", "Segment Tree", "RSQ", "RMQ", "Trie", "Union-Find"],
-    },
-    {
-        "name": "Đồ thị",
-        "stage_ids": [9, 10],
-        "goal": "Biểu diễn đồ thị, duyệt, thành phần liên thông, đường đi ngắn nhất và cây khung nhỏ nhất.",
-        "prerequisites": "Queue, stack, priority queue và phân tích độ phức tạp.",
-        "level": "Trung cấp → Nâng cao",
-        "supplements": ["DFS/BFS", "Connected Components", "Dijkstra", "Bellman-Ford", "Floyd-Warshall", "MST"],
-    },
-    {
-        "name": "Cấu trúc dữ liệu nâng cao",
-        "stage_ids": [12, 13],
-        "goal": "Bổ sung toán rời rạc, lý thuyết số, hashing và thuật toán chuỗi cho bài toán nâng cao.",
-        "prerequisites": "Mảng, hash, cây và kỹ thuật tối ưu cơ bản.",
-        "level": "Nâng cao",
-        "supplements": ["Modulo", "Prime", "Combinatorics", "KMP", "Z-algorithm", "Rolling Hash"],
-    },
-    {
-        "name": "Luyện thi",
-        "stage_ids": [14],
-        "goal": "Ghép kỹ thuật DP, Graph, Math; luyện debug, code sạch và chiến thuật làm bài.",
-        "prerequisites": "Hoàn thành các chặng nền tảng, dữ liệu, cây/đồ thị và DP.",
-        "level": "Thi đấu",
-        "supplements": ["Mixed Problems", "Complexity Tuning", "Debug", "Contest Strategy"],
-    },
+ROADMAP_CHAPTERS = [
+    {"title": "Nền tảng C++", "stage_ids": [1], "extras": ["STL cơ bản: vector, pair, tuple", "Iterator, range-based for"]},
+    {"title": "Kiểu dữ liệu trừu tượng và thư viện chuẩn", "stage_ids": [2, 8], "extras": ["STL algorithm: sort, lower_bound, upper_bound", "set, multiset, map, unordered_map"]},
+    {"title": "Phân tích thuật toán, tìm kiếm và sắp xếp", "stage_ids": [3, 5], "extras": ["Amortized analysis", "Counting sort, radix sort, heap sort"]},
+    {"title": "Kỹ thuật giải bài cơ bản", "stage_ids": [4], "extras": ["Prefix sum", "Difference array", "Two pointers", "Sliding window"]},
+    {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [7], "extras": ["Bitmask enumeration", "Meet-in-the-middle"]},
+    {"title": "Quy hoạch động", "stage_ids": [6], "extras": ["DP trên bitmask", "DP trên cây", "DP tối ưu không gian"]},
+    {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": ["RSQ", "RMQ", "Lazy propagation", "Sparse table", "LCA"]},
+    {"title": "Đồ thị", "stage_ids": [9, 10], "extras": ["Topological sort", "Strongly connected components", "Euler tour", "Network flow"]},
+    {"title": "Toán rời rạc và lý thuyết số", "stage_ids": [12], "extras": ["Sieve of Eratosthenes", "Fast exponentiation", "Chinese remainder theorem"]},
+    {"title": "Chuỗi và xử lý văn bản", "stage_ids": [13], "extras": ["Suffix array", "Suffix automaton", "Aho-Corasick"]},
+    {"title": "Cấu trúc dữ liệu nâng cao", "stage_ids": [], "extras": ["Disjoint Sparse Table", "Treap", "Sqrt decomposition", "Heavy-Light Decomposition", "Persistent Segment Tree"]},
+    {"title": "Luyện thi tổng hợp", "stage_ids": [14], "extras": ["Upsolving", "Template cá nhân", "Chiến lược phân bổ thời gian"]},
 ]
 
-def build_roadmap_tracks(stages):
+def build_roadmap_chapters(stages):
     stage_by_id = {stage["id"]: stage for stage in stages}
-    tracks = []
-    completed_before = 0
-    total_lessons = sum(len(stage.get("topics", [])) for stage in stages) or 1
-    for index, track in enumerate(ROADMAP_TRACKS, start=1):
-        chapters = []
-        lesson_count = 0
-        for stage_id in track["stage_ids"]:
+    chapters = []
+    topic_total = 0
+    for chapter_index, chapter in enumerate(ROADMAP_CHAPTERS, start=1):
+        sections = []
+        topic_number = 1
+        for stage_id in chapter["stage_ids"]:
             stage = stage_by_id.get(stage_id)
             if not stage:
                 continue
-            topics = []
-            for topic_index, topic in enumerate(stage.get("topics", []), start=1):
+            lessons = []
+            for lesson_index, topic in enumerate(stage.get("topics", []), start=1):
                 title = topic.get("title", "")
                 topic_type = "Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết")
-                topics.append({"lesson": topic, "index": topic_index, "type": topic_type, "level": track["level"]})
-            lesson_count += len(topics)
-            chapters.append({"stage": stage, "topics": topics})
-        tracks.append({**track, "index": index, "chapters": chapters, "lesson_count": lesson_count, "progress": round((completed_before / total_lessons) * 100)})
-        completed_before += lesson_count
-    return tracks
+                lessons.append({
+                    "number": f"{chapter_index}.{topic_number}",
+                    "title": title,
+                    "summary": topic.get("summary", ""),
+                    "type": topic_type,
+                    "status_key": f"roadmap-{stage_id}-{lesson_index}",
+                    "url": f"/roadmap/stage/{stage_id}/topic/{lesson_index}/",
+                    "source": "lesson",
+                })
+                topic_number += 1
+            sections.append({"title": stage["title"], "lessons": lessons})
+        extra_lessons = []
+        for extra in chapter.get("extras", []):
+            extra_lessons.append({
+                "number": f"{chapter_index}.{topic_number}",
+                "title": extra,
+                "summary": "",
+                "type": "Bổ sung",
+                "status_key": f"roadmap-extra-{chapter_index}-{topic_number}",
+                "url": "",
+                "source": "extra",
+            })
+            topic_number += 1
+        if extra_lessons:
+            sections.append({"title": "Chủ đề bổ sung", "lessons": extra_lessons})
+        lesson_count = sum(len(section["lessons"]) for section in sections)
+        topic_total += lesson_count
+        chapters.append({
+            "index": chapter_index,
+            "title": chapter["title"],
+            "sections": sections,
+            "lesson_count": lesson_count,
+        })
+    return chapters, topic_total
 
 # ==============================
 # 🏠 HOME
 # ==============================
 def home(request):
     leaderboard = LearningLeaderboardService().compute(top_n=10)
-    roadmap_tracks = build_roadmap_tracks(STAGES)
+    roadmap_chapters, roadmap_topic_count = build_roadmap_chapters(STAGES)
     return render(request, "home.html", {
         "stages": STAGES,
-        "roadmap_tracks": roadmap_tracks,
-        "roadmap_track_count": len(roadmap_tracks),
-        "roadmap_chapter_count": len(STAGES),
-        "roadmap_lesson_count": sum(len(stage.get("topics", [])) for stage in STAGES),
+        "roadmap_chapters": roadmap_chapters,
+        "roadmap_chapter_count": len(roadmap_chapters),
+        "roadmap_topic_count": roadmap_topic_count,
         "learning_leaderboard": leaderboard,
     })
 
