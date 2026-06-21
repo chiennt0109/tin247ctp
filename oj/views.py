@@ -64,6 +64,16 @@ def roadmap_extra_slug(title):
     return slug or "extra-topic"
 
 
+def clean_roadmap_title(title):
+    return re.sub(r"^\s*\d+(?:\.\d+)+(?:\.|\))?\s*", "", title or "").strip()
+
+
+def roadmap_title_key(title):
+    cleaned = clean_roadmap_title(title).lower()
+    cleaned = re.sub(r"[^a-z0-9À-ỹ]+", " ", cleaned, flags=re.IGNORECASE).strip()
+    return re.sub(r"\s+", " ", cleaned)
+
+
 def roadmap_extra_file(slug):
     return os.path.join(settings.BASE_DIR, "oj", "roadmap_data", "topics", "extra", f"{slug}.html")
 
@@ -74,13 +84,19 @@ def build_roadmap_chapters(stages):
     topic_total = 0
     for chapter_index, chapter in enumerate(ROADMAP_CHAPTERS, start=1):
         lessons = []
+        seen_titles = set()
         topic_number = 1
         for stage_id in chapter["stage_ids"]:
             stage = stage_by_id.get(stage_id)
             if not stage:
                 continue
             for lesson_index, topic in enumerate(stage.get("topics", []), start=1):
-                title = topic.get("title", "")
+                raw_title = topic.get("title", "")
+                title = clean_roadmap_title(raw_title)
+                title_key = roadmap_title_key(title)
+                if title_key in seen_titles:
+                    continue
+                seen_titles.add(title_key)
                 topic_type = "Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết")
                 lessons.append({
                     "number": f"{chapter_index}.{topic_number}",
@@ -93,10 +109,15 @@ def build_roadmap_chapters(stages):
                 })
                 topic_number += 1
         for extra in chapter.get("extras", []):
-            slug = roadmap_extra_slug(extra)
+            title = clean_roadmap_title(extra)
+            title_key = roadmap_title_key(title)
+            if title_key in seen_titles:
+                continue
+            seen_titles.add(title_key)
+            slug = roadmap_extra_slug(title)
             lessons.append({
                 "number": f"{chapter_index}.{topic_number}",
-                "title": extra,
+                "title": title,
                 "summary": "",
                 "type": "Bổ sung",
                 "status_key": f"roadmap-extra-{slug}",
