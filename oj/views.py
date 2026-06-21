@@ -41,12 +41,84 @@ STAGES = [
     STAGE_8, STAGE_9, STAGE_10, STAGE_11, STAGE_12, STAGE_13, STAGE_14
 ]
 
+ROADMAP_CHAPTERS = [
+    {"title": "Nền tảng C++", "stage_ids": [1], "extras": ["STL cơ bản: vector, pair, tuple", "Iterator, range-based for"]},
+    {"title": "Kiểu dữ liệu trừu tượng và thư viện chuẩn", "stage_ids": [2, 8], "extras": ["STL algorithm: sort, lower_bound, upper_bound", "set, multiset, map, unordered_map"]},
+    {"title": "Phân tích thuật toán, tìm kiếm và sắp xếp", "stage_ids": [3, 5], "extras": ["Amortized analysis", "Counting sort, radix sort, heap sort"]},
+    {"title": "Kỹ thuật giải bài cơ bản", "stage_ids": [4], "extras": ["Prefix sum", "Difference array", "Two pointers", "Sliding window"]},
+    {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [7], "extras": ["Bitmask enumeration", "Meet-in-the-middle"]},
+    {"title": "Quy hoạch động", "stage_ids": [6], "extras": ["DP trên bitmask", "DP trên cây", "DP tối ưu không gian"]},
+    {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": ["RSQ", "RMQ", "Lazy propagation", "Sparse table", "LCA"]},
+    {"title": "Đồ thị", "stage_ids": [9, 10], "extras": ["Topological sort", "Strongly connected components", "Euler tour", "Network flow"]},
+    {"title": "Toán rời rạc và lý thuyết số", "stage_ids": [12], "extras": ["Sieve of Eratosthenes", "Fast exponentiation", "Chinese remainder theorem"]},
+    {"title": "Chuỗi và xử lý văn bản", "stage_ids": [13], "extras": ["Suffix array", "Suffix automaton", "Aho-Corasick"]},
+    {"title": "Cấu trúc dữ liệu nâng cao", "stage_ids": [], "extras": ["Disjoint Sparse Table", "Treap", "Sqrt decomposition", "Heavy-Light Decomposition", "Persistent Segment Tree"]},
+    {"title": "Luyện thi tổng hợp", "stage_ids": [14], "extras": ["Upsolving", "Template cá nhân", "Chiến lược phân bổ thời gian"]},
+]
+
+def build_roadmap_chapters(stages):
+    stage_by_id = {stage["id"]: stage for stage in stages}
+    chapters = []
+    topic_total = 0
+    for chapter_index, chapter in enumerate(ROADMAP_CHAPTERS, start=1):
+        sections = []
+        topic_number = 1
+        for stage_id in chapter["stage_ids"]:
+            stage = stage_by_id.get(stage_id)
+            if not stage:
+                continue
+            lessons = []
+            for lesson_index, topic in enumerate(stage.get("topics", []), start=1):
+                title = topic.get("title", "")
+                topic_type = "Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết")
+                lessons.append({
+                    "number": f"{chapter_index}.{topic_number}",
+                    "title": title,
+                    "summary": topic.get("summary", ""),
+                    "type": topic_type,
+                    "status_key": f"roadmap-{stage_id}-{lesson_index}",
+                    "url": f"/roadmap/stage/{stage_id}/topic/{lesson_index}/",
+                    "source": "lesson",
+                })
+                topic_number += 1
+            sections.append({"title": stage["title"], "lessons": lessons})
+        extra_lessons = []
+        for extra in chapter.get("extras", []):
+            extra_lessons.append({
+                "number": f"{chapter_index}.{topic_number}",
+                "title": extra,
+                "summary": "",
+                "type": "Bổ sung",
+                "status_key": f"roadmap-extra-{chapter_index}-{topic_number}",
+                "url": "",
+                "source": "extra",
+            })
+            topic_number += 1
+        if extra_lessons:
+            sections.append({"title": "Chủ đề bổ sung", "lessons": extra_lessons})
+        lesson_count = sum(len(section["lessons"]) for section in sections)
+        topic_total += lesson_count
+        chapters.append({
+            "index": chapter_index,
+            "title": chapter["title"],
+            "sections": sections,
+            "lesson_count": lesson_count,
+        })
+    return chapters, topic_total
+
 # ==============================
 # 🏠 HOME
 # ==============================
 def home(request):
     leaderboard = LearningLeaderboardService().compute(top_n=10)
-    return render(request, "home.html", {"stages": STAGES, "learning_leaderboard": leaderboard})
+    roadmap_chapters, roadmap_topic_count = build_roadmap_chapters(STAGES)
+    return render(request, "home.html", {
+        "stages": STAGES,
+        "roadmap_chapters": roadmap_chapters,
+        "roadmap_chapter_count": len(roadmap_chapters),
+        "roadmap_topic_count": roadmap_topic_count,
+        "learning_leaderboard": leaderboard,
+    })
 
 
 # ==============================
