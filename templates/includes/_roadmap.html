@@ -39,30 +39,21 @@
           </button>
 
           <div class="chapter-body {% if not forloop.first %}is-collapsed{% endif %}" data-chapter-body>
-            {% for section in chapter.sections %}
-            <section class="topic-section">
-              <h3>{{ section.title }}</h3>
-              <div class="topic-list">
-                {% for item in section.lessons %}
-                  {% if item.url %}
-                  <a class="topic-row" href="{{ item.url }}">
-                  {% else %}
-                  <div class="topic-row topic-row-extra">
-                  {% endif %}
-                    <span class="topic-number">{{ item.number }}</span>
-                    <span class="topic-main">
-                      <strong>{{ item.title }}</strong>
-                      {% if item.summary %}<small>{{ item.summary|truncatechars:120 }}</small>{% endif %}
-                      <span class="topic-tags">
-                        <em>{{ item.type }}</em>
-                        <em class="lesson-status" data-status-key="{{ item.status_key }}">Chưa học</em>
-                      </span>
+            <div class="topic-list">
+              {% for item in chapter.lessons %}
+                <a class="topic-row {% if item.source == 'extra' %}topic-row-extra{% endif %}" href="{{ item.url }}">
+                  <span class="topic-number">{{ item.number }}</span>
+                  <span class="topic-main">
+                    <strong>{{ item.title }}</strong>
+                    {% if item.summary %}<small>{{ item.summary|truncatechars:120 }}</small>{% endif %}
+                    <span class="topic-tags">
+                      <em>{{ item.type }}</em>
+                      <em class="lesson-status" data-status-key="{{ item.status_key }}">Chưa học</em>
                     </span>
-                  {% if item.url %}</a>{% else %}</div>{% endif %}
-                {% endfor %}
-              </div>
-            </section>
-            {% endfor %}
+                  </span>
+                </a>
+              {% endfor %}
+            </div>
           </div>
         </article>
         {% endfor %}

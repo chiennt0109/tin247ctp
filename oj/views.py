@@ -2,6 +2,8 @@
 import json
 import os
 import time
+import re
+import unicodedata
 import requests
 
 from django.shortcuts import render
@@ -56,18 +58,27 @@ ROADMAP_CHAPTERS = [
     {"title": "Luyện thi tổng hợp", "stage_ids": [14], "extras": ["Upsolving", "Template cá nhân", "Chiến lược phân bổ thời gian"]},
 ]
 
+def roadmap_extra_slug(title):
+    normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", normalized).strip("-").lower()
+    return slug or "extra-topic"
+
+
+def roadmap_extra_file(slug):
+    return os.path.join(settings.BASE_DIR, "oj", "roadmap_data", "topics", "extra", f"{slug}.html")
+
+
 def build_roadmap_chapters(stages):
     stage_by_id = {stage["id"]: stage for stage in stages}
     chapters = []
     topic_total = 0
     for chapter_index, chapter in enumerate(ROADMAP_CHAPTERS, start=1):
-        sections = []
+        lessons = []
         topic_number = 1
         for stage_id in chapter["stage_ids"]:
             stage = stage_by_id.get(stage_id)
             if not stage:
                 continue
-            lessons = []
             for lesson_index, topic in enumerate(stage.get("topics", []), start=1):
                 title = topic.get("title", "")
                 topic_type = "Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết")
@@ -81,30 +92,51 @@ def build_roadmap_chapters(stages):
                     "source": "lesson",
                 })
                 topic_number += 1
-            sections.append({"title": stage["title"], "lessons": lessons})
-        extra_lessons = []
         for extra in chapter.get("extras", []):
-            extra_lessons.append({
+            slug = roadmap_extra_slug(extra)
+            lessons.append({
                 "number": f"{chapter_index}.{topic_number}",
                 "title": extra,
                 "summary": "",
                 "type": "Bổ sung",
-                "status_key": f"roadmap-extra-{chapter_index}-{topic_number}",
-                "url": "",
+                "status_key": f"roadmap-extra-{slug}",
+                "url": f"/roadmap/extra/{slug}/",
                 "source": "extra",
             })
             topic_number += 1
-        if extra_lessons:
-            sections.append({"title": "Chủ đề bổ sung", "lessons": extra_lessons})
-        lesson_count = sum(len(section["lessons"]) for section in sections)
-        topic_total += lesson_count
+        topic_total += len(lessons)
         chapters.append({
             "index": chapter_index,
             "title": chapter["title"],
-            "sections": sections,
-            "lesson_count": lesson_count,
+            "lessons": lessons,
+            "lesson_count": len(lessons),
         })
     return chapters, topic_total
+
+
+def roadmap_extra_topic(request, slug):
+    title = None
+    for chapter in ROADMAP_CHAPTERS:
+        for extra in chapter.get("extras", []):
+            if roadmap_extra_slug(extra) == slug:
+                title = extra
+                break
+        if title:
+            break
+    if not title:
+        return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung bổ sung."})
+
+    html_path = roadmap_extra_file(slug)
+    if not os.path.exists(html_path):
+        detail = f"<p class='text-danger'>⚠️ Không tìm thấy file nội dung: <code>{html.escape(html_path)}</code></p>"
+    else:
+        with open(html_path, "r", encoding="utf-8", errors="replace") as f:
+            detail = f.read()
+
+    return render(request, "roadmap_detail.html", {
+        "stage": {"id": "extra", "title": "Nội dung bổ sung"},
+        "topic": {"title": title, "summary": "", "detail": detail},
+    })
 
 # ==============================
 # 🏠 HOME
