@@ -1,90 +1,100 @@
-<section id="roadmap" class="relative py-16 bg-gradient-to-br from-white via-sky-50 to-indigo-50">
-  <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
+<section id="roadmap" class="roadmap-modern relative py-16 bg-gradient-to-br from-white via-sky-50 to-indigo-50 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 animate-gradient opacity-50 z-0" aria-hidden="true"></div>
 
-    <!-- Tiêu đề -->
-    <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
-      📘 Lộ trình học lập trình
-    </h2>
-    <p class="text-gray-700 text-lg mb-12">
-      Từng bước chinh phục các kỹ năng lập trình & thuật toán từ cơ bản đến chuyên sâu ✨
-    </p>
-
-    <!-- Danh sách giai đoạn -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
-      {% for s in stages %}
-      <div class="p-6 rounded-2xl shadow-md bg-gradient-to-br from-white to-{{ s.color|default:'sky' }}-50 
-                  hover:shadow-2xl hover:-translate-y-1 transition-transform duration-300 ease-out 
-                  flex flex-col justify-between h-full">
-
-        <!-- Tiêu đề -->
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2 flex items-center">
-            {{ s.title }}
-          </h3>
-
-          <!-- Mô tả -->
-          <p class="text-gray-700 text-sm mb-3 leading-relaxed">
-            {{ s.summary }}
-          </p>
-
-          <!-- Danh sách nội dung tiêu biểu -->
-          {% if s.topics %}
-          <ul class="text-gray-600 text-sm list-disc ml-5 mb-4 space-y-1">
-            {% for t in s.topics %}
-            <li>{{ t.title }}</li>
-            {% endfor %}
-          </ul>
-          {% elif s.examples %}
-          <ul class="text-gray-600 text-sm list-disc ml-5 mb-4 space-y-1">
-            {% for e in s.examples %}
-            <li>{{ e }}</li>
-            {% endfor %}
-          </ul>
-          {% endif %}
-        </div>
-
-        <!-- Nút truy cập -->
-        <div class="mt-auto text-center pt-4">
-          <a href="/roadmap/stage/{{ s.id }}/"
-             class="inline-block px-4 py-2 bg-gradient-to-r from-{{ s.color|default:'indigo' }}-200 to-{{ s.color|default:'indigo' }}-300 
-                    text-gray-900 font-semibold rounded-lg shadow-sm hover:scale-105 hover:shadow-lg transition-transform duration-200 no-underline">
-             💡 Chi tiết
-          </a>
-        </div>
-
-      </div>
-      {% endfor %}
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="roadmap-banner text-center max-w-4xl mx-auto mb-12">
+      <span class="roadmap-eyebrow">📚 Roadmap học thuật toán</span>
+      <h2 class="roadmap-title">Lộ trình học lập trình</h2>
     </div>
 
-    <!-- Nút xem chi tiết toàn bộ -->
-    <div class="text-center mt-12">
-      <a href="/roadmap/detail/"
-         class="inline-block px-6 py-3 bg-gradient-to-r from-sky-200 to-indigo-200 
-                text-gray-900 font-semibold rounded-lg shadow-md hover:scale-105 hover:shadow-lg transition-transform duration-200 no-underline">
-         🔍 Xem toàn bộ lộ trình
-      </a>
+    <div class="roadmap-overview" aria-label="Tổng quan lộ trình">
+      <div><strong>{{ roadmap_chapter_count }}</strong><span>Chương</span></div>
+      <div><strong>{{ roadmap_topic_count }}</strong><span>Chủ đề</span></div>
+      <div><strong>STL</strong><span>Thư viện C++</span></div>
+      <div><strong>RSQ · RMQ</strong><span>Truy vấn đoạn</span></div>
+    </div>
+
+    <div class="roadmap-content">
+      <div class="roadmap-layout">
+      <aside class="roadmap-rail" aria-label="Mục lục chương">
+        <div class="rail-card">
+          <span class="rail-label">Mục lục</span>
+          <ol>
+            {% for chapter in roadmap_chapters %}
+              <li><a href="#roadmap-chapter-{{ chapter.index }}">{{ chapter.index }}. {{ chapter.title }}</a></li>
+            {% endfor %}
+          </ol>
+        </div>
+      </aside>
+
+      <div class="chapter-timeline">
+        {% for chapter in roadmap_chapters %}
+        <article class="chapter-panel" id="roadmap-chapter-{{ chapter.index }}" data-chapter-card>
+          <button class="chapter-toggle" type="button" data-toggle-chapter aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+            <span class="chapter-index">{{ chapter.index|stringformat:"02d" }}</span>
+            <span class="chapter-heading">
+              <span class="chapter-kicker">Chương {{ chapter.index }}</span>
+              <span class="chapter-name">{{ chapter.title }}</span>
+            </span>
+            <span class="chapter-count">{{ chapter.lesson_count }} chủ đề <span class="chevron">⌄</span></span>
+          </button>
+
+          <div class="chapter-body {% if not forloop.first %}is-collapsed{% endif %}" data-chapter-body>
+            <div class="topic-list">
+              {% for item in chapter.lessons %}
+                <a class="topic-row {% if item.source == 'extra' %}topic-row-extra{% endif %}" href="{{ item.url }}">
+                  <span class="topic-number">{{ item.number }}</span>
+                  <span class="topic-main">
+                    <strong>{{ item.title }}</strong>
+                    {% if item.summary %}<small>{{ item.summary|truncatechars:120 }}</small>{% endif %}
+                    <span class="topic-tags">
+                      <em>{{ item.type }}</em>
+                      <em class="lesson-status" data-status-key="{{ item.status_key }}">Chưa học</em>
+                    </span>
+                  </span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      </div>
+
+      {% include 'includes/_learning_leaderboard.html' %}
     </div>
   </div>
 
-  <!-- Hiệu ứng nền -->
-  <div class="absolute inset-0 bg-gradient-to-r from-sky-50 via-indigo-50 to-purple-50 animate-gradient opacity-40"></div>
-
   <style>
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .animate-gradient {
-      background-size: 200% 200%;
-      animation: gradientMove 18s ease infinite;
-    }
-
-    /* Căn chỉnh và làm mượt các card */
-    .shadow-md { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); }
-    .hover\:shadow-2xl:hover { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); }
-
-    /* Bo tròn và hiển thị thẳng hàng nút */
-    a { text-decoration: none !important; }
+    @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .roadmap-modern{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a}.roadmap-modern .animate-gradient{background-size:200% 200%;animation:gradientMove 18s ease infinite}.roadmap-eyebrow{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #bfdbfe;background:rgba(255,255,255,.78);color:#1d4ed8;border-radius:999px;padding:.6rem 1rem;font-weight:800;box-shadow:0 10px 30px rgba(37,99,235,.08)}.roadmap-title{margin:1rem 0 0;font-size:clamp(2.4rem,5vw,4.4rem);font-weight:900;letter-spacing:-.05em;color:#111827}.roadmap-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-bottom:1.25rem}.roadmap-overview>div{border:1px solid #dbeafe;background:rgba(255,255,255,.9);border-radius:1.25rem;padding:1rem 1.2rem;box-shadow:0 12px 30px rgba(30,64,175,.08)}.roadmap-overview strong{display:block;font-size:1.55rem;color:#1e3a8a}.roadmap-overview span{color:#64748b;font-weight:800}.roadmap-content{display:grid;grid-template-columns:minmax(0,1fr) 20rem;gap:1.25rem;align-items:start}.roadmap-layout{display:grid;grid-template-columns:17rem minmax(0,1fr);gap:1.25rem;align-items:start}.roadmap-rail{position:sticky;top:1rem}.rail-card{border:1px solid #dbeafe;background:rgba(255,255,255,.92);border-radius:1.5rem;padding:1rem;box-shadow:0 18px 45px rgba(15,23,42,.08)}.rail-label{display:block;margin-bottom:.75rem;color:#2563eb;font-weight:900;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}.rail-card ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.48rem}.rail-card a{color:#334155;text-decoration:none;font-weight:750;line-height:1.35}.rail-card a:hover{color:#2563eb}.chapter-timeline{position:relative;display:flex;flex-direction:column;gap:1rem}.chapter-timeline:before{content:"";position:absolute;left:1.7rem;top:2rem;bottom:2rem;width:3px;background:linear-gradient(#38bdf8,#818cf8,#a78bfa);border-radius:999px}.chapter-panel{position:relative}.chapter-toggle{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;border:1px solid #c7d2fe;border-radius:1.5rem;background:rgba(255,255,255,.95);padding:1rem;text-align:left;color:#0f172a;box-shadow:0 16px 40px rgba(30,64,175,.1);transition:.2s ease}.chapter-toggle:hover{transform:translateY(-1px);box-shadow:0 20px 48px rgba(30,64,175,.14)}.chapter-index{display:grid;place-items:center;width:3.4rem;height:3.4rem;border-radius:1rem;background:linear-gradient(135deg,#dbeafe,#e0e7ff);border:1px solid #bfdbfe;color:#1d4ed8;font-weight:900;box-shadow:0 0 0 8px rgba(239,246,255,.9)}.chapter-kicker{display:block;color:#2563eb;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.chapter-name{display:block;font-size:1.13rem;font-weight:900}.chapter-count{display:flex;align-items:center;gap:.8rem;color:#475569;font-weight:800}.chevron{font-size:1.65rem;transition:.2s ease}.chapter-toggle[aria-expanded="true"] .chevron{transform:rotate(180deg)}.chapter-body{margin:.85rem 0 .85rem 4.5rem;border:1px solid #dbeafe;border-radius:1.5rem;background:rgba(255,255,255,.86);padding:1rem;box-shadow:0 14px 36px rgba(15,23,42,.07)}.chapter-body.is-collapsed{display:none}.topic-section{border:1px solid #e2e8f0;border-radius:1.25rem;background:white;padding:1rem}.topic-section+.topic-section{margin-top:.85rem}.topic-section h3{margin:0 0 .75rem;color:#111827;font-size:1rem;font-weight:900}.topic-list{display:flex;flex-direction:column;gap:.6rem}.topic-row{display:grid;grid-template-columns:4.25rem 1fr;gap:.8rem;text-decoration:none;color:inherit;border:1px solid #e5e7eb;border-radius:1rem;background:#fff;padding:.85rem;transition:.18s ease}.topic-row[href]:hover{border-color:#bfdbfe;background:#f8fbff;transform:translateX(2px)}.topic-row-extra{background:#f8fafc}.topic-number{align-self:start;border-radius:.8rem;background:#eff6ff;color:#1d4ed8;padding:.35rem .5rem;text-align:center;font-weight:900}.topic-main{display:flex;flex-direction:column;gap:.32rem}.topic-main strong{color:#111827}.topic-main small{color:#64748b;line-height:1.5}.topic-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.15rem}.topic-tags em{font-style:normal;border-radius:999px;background:#eef2ff;color:#4338ca;padding:.25rem .55rem;font-size:.78rem;font-weight:850}.lesson-status.is-learning{background:#fef3c7;color:#92400e}.lesson-status.is-done{background:#dcfce7;color:#166534}.learning-leaderboard{position:sticky;top:1rem;z-index:1}.leaderboard-shell{border:1px solid #dbeafe;background:rgba(255,255,255,.94);border-radius:1.5rem;box-shadow:0 18px 45px rgba(15,23,42,.08);overflow:hidden}.leaderboard-head{padding:1rem;border-bottom:1px solid #dbeafe;background:linear-gradient(135deg,#ffffff,#eff6ff)}.leaderboard-head h2{margin:0;color:#111827;font-size:1.05rem;font-weight:900}.leaderboard-head p{margin:.25rem 0 0;color:#64748b;font-size:.82rem}.leaderboard-body{display:flex;flex-direction:column;gap:1rem;padding:1rem}.leaderboard-body h3{margin:0 0 .5rem;color:#1e3a8a;font-size:.95rem;font-weight:900}.leaderboard-body ol{margin:0;padding-left:1.25rem;color:#334155;font-size:.9rem}.leaderboard-body li+li{margin-top:.28rem}.leaderboard-body span{color:#64748b}@media(max-width:1280px){.roadmap-content{grid-template-columns:1fr}.learning-leaderboard{position:static}.leaderboard-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:1024px){.roadmap-layout{grid-template-columns:1fr}.roadmap-rail{position:static}.rail-card ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.roadmap-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.roadmap-overview,.rail-card ol,.leaderboard-body{grid-template-columns:1fr}.chapter-timeline:before{display:none}.chapter-toggle{grid-template-columns:auto 1fr}.chapter-count{grid-column:2}.chapter-body{margin-left:0}.topic-row{grid-template-columns:1fr}.chapter-name{font-size:1rem}}
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-toggle-chapter]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const panel = button.closest('[data-chapter-card]').querySelector('[data-chapter-body]');
+          const expanded = button.getAttribute('aria-expanded') === 'true';
+          button.setAttribute('aria-expanded', String(!expanded));
+          panel.classList.toggle('is-collapsed', expanded);
+        });
+      });
+
+      document.querySelectorAll('[data-status-key]').forEach((badge) => {
+        const saved = localStorage.getItem(badge.dataset.statusKey) || 'Chưa học';
+        badge.textContent = saved;
+        badge.classList.toggle('is-learning', saved === 'Đang học');
+        badge.classList.toggle('is-done', saved === 'Hoàn thành');
+        badge.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const next = badge.textContent === 'Chưa học' ? 'Đang học' : (badge.textContent === 'Đang học' ? 'Hoàn thành' : 'Chưa học');
+          localStorage.setItem(badge.dataset.statusKey, next);
+          badge.textContent = next;
+          badge.classList.toggle('is-learning', next === 'Đang học');
+          badge.classList.toggle('is-done', next === 'Hoàn thành');
+        });
+      });
+    });
+  </script>
 </section>
