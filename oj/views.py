@@ -50,13 +50,35 @@ ROADMAP_CHAPTERS = [
     {"title": "Kỹ thuật giải bài cơ bản", "stage_ids": [4], "extras": ["Prefix sum", "Difference array", "Two pointers", "Sliding window"]},
     {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [7], "extras": ["Bitmask enumeration", "Meet-in-the-middle"]},
     {"title": "Quy hoạch động", "stage_ids": [6], "extras": ["DP trên bitmask", "DP trên cây", "DP tối ưu không gian"]},
-    {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": ["RSQ", "RMQ", "Lazy propagation", "Sparse table", "LCA"]},
+    {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": [
+        {"title": "Lazy propagation", "after": "Segment Tree & Fenwick Tree (BIT)"},
+        {"title": "RSQ, RMQ & Sparse table", "slug": "sparse-table", "after": "Segment Tree & Fenwick Tree (BIT)"},
+        "LCA",
+    ]},
     {"title": "Đồ thị", "stage_ids": [9, 10], "extras": ["Topological sort", "Strongly connected components", "Euler tour", "Network flow"]},
     {"title": "Toán rời rạc và lý thuyết số", "stage_ids": [12], "extras": ["Sieve of Eratosthenes", "Fast exponentiation", "Chinese remainder theorem"]},
     {"title": "Chuỗi và xử lý văn bản", "stage_ids": [13], "extras": ["Suffix array", "Suffix automaton", "Aho-Corasick"]},
     {"title": "Cấu trúc dữ liệu nâng cao", "stage_ids": [], "extras": ["Disjoint Sparse Table", "Treap", "Sqrt decomposition", "Heavy-Light Decomposition", "Persistent Segment Tree"]},
     {"title": "Luyện thi tổng hợp", "stage_ids": [14], "extras": ["Upsolving", "Template cá nhân", "Chiến lược phân bổ thời gian"]},
 ]
+
+
+def roadmap_extra_title(extra):
+    if isinstance(extra, dict):
+        return extra.get("title", "")
+    return extra
+
+
+def roadmap_extra_insert_after(extra):
+    if isinstance(extra, dict):
+        return extra.get("after", "")
+    return ""
+
+
+def roadmap_extra_slug_value(extra):
+    if isinstance(extra, dict) and extra.get("slug"):
+        return extra["slug"]
+    return roadmap_extra_slug(roadmap_extra_title(extra))
 
 def roadmap_extra_slug(title):
     normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("ascii")
@@ -109,13 +131,16 @@ def build_roadmap_chapters(stages):
                     "source": "lesson",
                 })
                 topic_number += 1
-        for extra in chapter.get("extras", []):
-            title = clean_roadmap_title(extra)
+        deferred_extras = []
+
+        def append_extra(extra):
+            nonlocal topic_number
+            title = clean_roadmap_title(roadmap_extra_title(extra))
             title_key = roadmap_title_key(title)
             if title_key in seen_titles:
-                continue
+                return
             seen_titles.add(title_key)
-            slug = roadmap_extra_slug(title)
+            slug = roadmap_extra_slug_value(extra)
             lessons.append({
                 "number": f"{chapter_index}.{topic_number}",
                 "title": title,
@@ -127,6 +152,42 @@ def build_roadmap_chapters(stages):
                 "source": "extra",
             })
             topic_number += 1
+
+        insert_offsets = {}
+        for extra in chapter.get("extras", []):
+            after_title = roadmap_extra_insert_after(extra)
+            if after_title:
+                target_key = roadmap_title_key(after_title)
+                insert_index = next((
+                    i for i, lesson in enumerate(lessons)
+                    if roadmap_title_key(lesson["title"]) == target_key
+                ), None)
+                if insert_index is not None:
+                    title = clean_roadmap_title(roadmap_extra_title(extra))
+                    title_key = roadmap_title_key(title)
+                    if title_key not in seen_titles:
+                        seen_titles.add(title_key)
+                        slug = roadmap_extra_slug_value(extra)
+                        insert_at = insert_index + 1 + insert_offsets.get(target_key, 0)
+                        lessons.insert(insert_at, {
+                            "number": "",
+                            "title": title,
+                            "summary": "",
+                            "type": "Bổ sung",
+                            "status_key": f"roadmap-extra-{slug}",
+                            "slug": slug,
+                            "url": f"/roadmap/extra/{slug}/",
+                            "source": "extra",
+                        })
+                        insert_offsets[target_key] = insert_offsets.get(target_key, 0) + 1
+                    continue
+            deferred_extras.append(extra)
+
+        for extra in deferred_extras:
+            append_extra(extra)
+
+        for index, lesson in enumerate(lessons, start=1):
+            lesson["number"] = f"{chapter_index}.{index}"
         topic_total += len(lessons)
         chapters.append({
             "index": chapter_index,
@@ -141,8 +202,8 @@ def roadmap_extra_topic(request, slug):
     title = None
     for chapter in ROADMAP_CHAPTERS:
         for extra in chapter.get("extras", []):
-            if roadmap_extra_slug(extra) == slug:
-                title = extra
+            if roadmap_extra_slug_value(extra) == slug:
+                title = roadmap_extra_title(extra)
                 break
         if title:
             break
