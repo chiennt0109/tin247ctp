@@ -1,0 +1,48 @@
+<article class="roadmap-extra-topic">
+  <h1>Euler Tour on Tree</h1>
+
+  <section>
+    <h2>Mục tiêu</h2>
+    <ul>
+      <li>Biến cấu trúc cây thành một thứ tự tuyến tính bằng thời điểm vào/ra DFS.</li>
+      <li>Áp dụng mảng Euler để xử lý truy vấn trên cây con.</li>
+      <li>Kết hợp với Fenwick Tree hoặc Segment Tree cho các bài toán cập nhật/truy vấn nhanh.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Ý tưởng chính</h2>
+    <p>
+      Khi DFS trên cây, mỗi đỉnh <code>u</code> được gán thời điểm vào <code>tin[u]</code>.
+      Toàn bộ các đỉnh thuộc cây con của <code>u</code> sẽ nằm liên tiếp trong đoạn
+      <code>[tin[u], tout[u]]</code> nếu ta ghi nhận mỗi đỉnh một lần khi đi vào.
+    </p>
+  </section>
+
+  <section>
+    <h2>Mẫu cài đặt C++</h2>
+    <pre><code>int timer = 0;
+vector&lt;vector&lt;int&gt;&gt; g;
+vector&lt;int&gt; tin, tout, order;
+
+void dfs(int u, int parent) {
+    tin[u] = ++timer;
+    order[timer] = u;
+    for (int v : g[u]) {
+        if (v == parent) continue;
+        dfs(v, u);
+    }
+    tout[u] = timer;
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>Bài toán thường gặp</h2>
+    <ul>
+      <li>Tính tổng giá trị trong cây con của một đỉnh.</li>
+      <li>Cập nhật giá trị một đỉnh và truy vấn cây con.</li>
+      <li>Đếm số đỉnh thỏa điều kiện trong subtree.</li>
+      <li>Làm nền tảng cho LCA, HLD hoặc DSU on Tree.</li>
+    </ul>
+  </section>
+</article>
