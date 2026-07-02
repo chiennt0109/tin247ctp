@@ -1,83 +1,334 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu cây bao trùm nhỏ nhất (MST – Minimum Spanning Tree).</li>
-  <li>Phân biệt Kruskal (sắp xếp cạnh) và Prim (mở rộng dần từ 1 đỉnh).</li>
-</ul>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#06b6d4;--g:#16a34a;--o:#f97316;--r:#ef4444;--text:#1e293b;--b:#dbe4ff;--code:#0f172a}
+.lesson-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(79,70,229,.14),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(6,182,212,.16),transparent 28rem),linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border-radius:22px;padding:clamp(18px,2.6vw,34px);line-height:1.75}.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}
+.lesson-hero{position:relative;overflow:hidden;color:#fff;padding:clamp(26px,4vw,46px);border-radius:28px;background:linear-gradient(135deg,rgba(67,56,202,.96),rgba(37,99,235,.92));box-shadow:0 25px 60px rgba(79,70,229,.25);margin-bottom:24px}.lesson-hero:after{content:"";position:absolute;width:260px;height:260px;right:-85px;top:-80px;border-radius:999px;background:rgba(255,255,255,.14)}
+.hero-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#eef2ff;padding:7px 12px;border-radius:999px;font-weight:700;font-size:.92rem;margin-bottom:12px}.lesson-hero h1{margin:0 0 12px;font-size:clamp(1.75rem,4vw,3rem);font-weight:900}.lesson-hero p{color:#e0f2fe;max-width:1000px;font-size:1.05rem;margin:0}.hero-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}.hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px}.hero-stat b{display:block;font-size:1.2rem;color:#fff}.hero-stat span{color:#dbeafe;font-size:.9rem}
+.lesson-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.82);backdrop-filter:blur(10px);padding:10px 0 12px}.lesson-progress{height:10px;border-radius:999px;background:#dbeafe;overflow:hidden}.lesson-progress-bar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--p),var(--a));transition:width .15s linear}.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}.lesson-nav a{text-decoration:none;color:var(--pd);background:#eef2ff;border:1px solid #dbe4ff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:.9rem}
+.lesson-card{background:rgba(255,255,255,.94);border:1px solid var(--b);border-radius:24px;padding:clamp(18px,2.4vw,28px);margin:20px 0;box-shadow:0 16px 42px rgba(30,64,175,.08)}.lesson-card h2{color:var(--pd);margin:0 0 14px;font-weight:900;display:flex;align-items:center;gap:10px}.lesson-card h3{color:#334155;margin-top:20px;font-weight:850}.mini-slide{animation:lessonFadeUp .55s ease both}@keyframes lessonFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.info-box{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0}.callout{border-left:6px solid var(--a);background:#ecfeff;border-radius:16px;padding:14px 16px;margin:14px 0}.warn{border-left-color:var(--o);background:#fff7ed}.danger{border-left-color:var(--r);background:#fff1f2}.success{border-left-color:var(--g);background:#f0fdf4}
+.lesson-table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:18px}.lesson-table{width:100%;border-collapse:collapse;min-width:900px;background:#fff}.lesson-table th,.lesson-table td{border-bottom:1px solid #e2e8f0;padding:13px 14px;text-align:left;vertical-align:top}.lesson-table th{background:#eef2ff;color:#312e81;font-weight:900}.lesson-table tr:last-child td{border-bottom:none}.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:800;font-size:.88rem}.green{background:#dcfce7;color:#166534}.orange{background:#ffedd5;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.cyan{background:#cffafe;color:#155e75}
+.code-tabs{border:1px solid var(--b);border-radius:18px;overflow:hidden;background:var(--code);margin:14px 0}.tab-buttons{display:flex;flex-wrap:wrap;background:#edf2ff;border-bottom:1px solid #dbe4ff}.tab-btn{appearance:none;border:0;background:transparent;padding:12px 16px;font-weight:900;color:#334155;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.tab-panel{display:none;position:relative}.tab-panel.active{display:block}.copy-btn{position:absolute;top:10px;right:10px;z-index:3;border:0;background:rgba(255,255,255,.13);color:#e2e8f0;border-radius:999px;padding:6px 10px;font-size:.8rem;cursor:pointer}.copy-btn:hover{background:rgba(255,255,255,.25)}
+.lesson-page pre{margin:0;max-height:620px;overflow:auto;background:var(--code);color:#f8fafc;padding:22px;font-size:14.5px;line-height:1.7;border-radius:0;white-space:pre;tab-size:4}.lesson-page code{font-family:Consolas,Monaco,"Courier New",monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{background:#fdf2f8;color:#be185d;border-radius:7px;padding:2px 6px;font-weight:800}.textarea-lesson{width:100%;min-height:160px;border:1px solid #cbd5e1;border-radius:14px;padding:11px 13px;font:14px Consolas,monospace;outline:none;background:#fff}.textarea-lesson:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.12)}
+.visual-box{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe4ff;border-radius:22px;padding:18px}.graph-wrap{position:relative;overflow:auto;border-radius:18px;background:#f8fafc;border:1px dashed #bfdbfe;padding:10px}.mst-svg{width:100%;min-width:620px;height:390px}.edge-line{stroke:#94a3b8;stroke-width:4;transition:.25s}.edge-line.consider{stroke:#ef4444;stroke-width:7}.edge-line.chosen{stroke:#16a34a;stroke-width:7}.edge-line.rejected{stroke:#cbd5e1;stroke-width:3;stroke-dasharray:7 7}.edge-label{fill:#0f172a;font-size:15px;font-weight:900}.node-circle{fill:#eef2ff;stroke:#4f46e5;stroke-width:3;transition:.25s}.node-circle.visited{fill:#dcfce7;stroke:#16a34a}.node-circle.active{fill:#fee2e2;stroke:#ef4444;stroke-width:5}.node-text{fill:#312e81;font-size:18px;font-weight:900;text-anchor:middle;dominant-baseline:middle}.edge-list{display:grid;gap:8px;max-height:270px;overflow:auto}.edge-item{display:flex;justify-content:space-between;gap:8px;border:1px solid #e2e8f0;border-radius:14px;padding:8px 10px;background:#fff;font-weight:800}.edge-item.consider{border-color:#ef4444;background:#fff1f2;color:#991b1b}.edge-item.chosen{border-color:#22c55e;background:#f0fdf4;color:#166534}.edge-item.rejected{border-color:#cbd5e1;background:#f8fafc;color:#64748b}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.btn-lesson{border:0;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;background:var(--p);color:white;box-shadow:0 8px 18px rgba(79,70,229,.2)}.btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none}.btn-lesson.green{background:var(--g)}.btn-lesson.orange{background:var(--o)}.log-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:105px;max-height:260px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:14px;color:#334155}.small-stat{display:inline-flex;margin:4px 6px 4px 0;padding:7px 10px;border-radius:999px;background:#eef2ff;color:#312e81;font-weight:900}
+.explain-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.explain-card h3{margin-top:0}.exercise-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.exercise-card h3{margin-top:0}.quiz-item{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 0;background:#fff}.quiz-options{display:grid;gap:8px;margin-top:10px}.quiz-option{text-align:left;border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}.feedback{margin-top:8px;font-weight:800}.checklist{display:grid;gap:10px}.checkitem{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px}.checkitem i{margin-top:5px;color:var(--g)}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4,.hero-grid{grid-template-columns:1fr}.lesson-page{padding:14px;border-radius:16px}.lesson-hero{border-radius:20px}}
+</style>
 
-<hr>
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-network-wired"></i> Chuyên đề đồ thị nâng cao</div>
+    <h1>🌉 Cây bao trùm nhỏ nhất MST: Kruskal & Prim</h1>
+    <p>Bài học này nâng cấp nội dung MST theo hướng trực quan: hiểu cây bao trùm, quan sát đồ thị có trọng số, chạy từng bước Kruskal bằng DSU và Prim bằng hàng đợi ưu tiên.</p>
+    <div class="hero-grid">
+      <div class="hero-stat"><b>MST</b><span>n − 1 cạnh, không chu trình</span></div>
+      <div class="hero-stat"><b>Kruskal</b><span>Sắp xếp cạnh + DSU</span></div>
+      <div class="hero-stat"><b>Prim</b><span>Mở rộng từ một đỉnh</span></div>
+      <div class="hero-stat"><b>Ứng dụng</b><span>Network, road, clustering</span></div>
+    </div>
+  </div>
 
-<h2>📘 Lý thuyết</h2>
-<p>
-Một đồ thị liên thông có thể có nhiều cây bao trùm.  
-<b>MST</b> là cây có tổng trọng số nhỏ nhất.<br>
-<b>Kruskal:</b> chọn cạnh nhỏ nhất, dùng Union-Find tránh chu trình.<br>
-<b>Prim:</b> mở rộng dần bằng cách chọn cạnh nhỏ nhất nối từ tập đã có ra ngoài.
-</p>
+  <div class="lesson-progress-wrap">
+    <div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div>
+    <div class="lesson-nav">
+      <a href="#goals">Mục tiêu</a><a href="#theory">Lý thuyết</a><a href="#kruskal-sim">Kruskal</a><a href="#prim-sim">Prim</a><a href="#code">Code</a><a href="#compare">So sánh</a><a href="#practice">Thực hành</a><a href="#mistakes">Lỗi</a><a href="#quiz">Quiz</a>
+    </div>
+  </div>
 
-<hr>
+  <section class="lesson-card mini-slide" id="goals">
+    <h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2>
+    <div class="grid-2">
+      <div class="info-box"><h3>Học xong cần làm được</h3><ul><li>Hiểu <b>cây bao trùm nhỏ nhất</b> MST.</li><li>Biết MST chỉ tồn tại đầy đủ khi đồ thị vô hướng có trọng số và liên thông.</li><li>Phân biệt Kruskal: chọn cạnh nhỏ nhất; Prim: mở rộng từ tập đỉnh đã chọn.</li><li>Viết được code Kruskal và Prim, biết kiểm tra đồ thị không liên thông.</li></ul></div>
+      <div class="info-box"><h3>Ví dụ đời sống</h3><ul><li>Nối các máy tính bằng dây mạng với chi phí nhỏ nhất.</li><li>Thiết kế đường đi nối các điểm dân cư nhưng tổng chi phí thấp nhất.</li><li>Chọn các kết nối rẻ nhất để toàn bộ hệ thống vẫn liên thông.</li></ul></div>
+    </div>
+  </section>
 
-<h2>💻 Kruskal – C++</h2>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+  <section class="lesson-card mini-slide" id="theory">
+    <h2><i class="fa-solid fa-lightbulb"></i> 1. Lý thuyết MST cần nắm</h2>
+    <p>Một <b>cây bao trùm</b> của đồ thị là tập cạnh nối tất cả các đỉnh, không tạo chu trình. Trong đồ thị có <code>n</code> đỉnh, một cây bao trùm luôn có đúng <code>n - 1</code> cạnh. <b>MST</b> là cây bao trùm có tổng trọng số nhỏ nhất.</p>
+    <div class="grid-4">
+      <div class="info-box"><span class="pill green">Đủ đỉnh</span><p>Phải nối được tất cả <code>n</code> đỉnh.</p></div>
+      <div class="info-box"><span class="pill orange">n − 1 cạnh</span><p>Cây bao trùm không thừa cạnh.</p></div>
+      <div class="info-box"><span class="pill cyan">Không chu trình</span><p>Thêm cạnh tạo cycle thì bỏ.</p></div>
+      <div class="info-box"><span class="pill red">Nhỏ nhất</span><p>Tổng trọng số là nhỏ nhất.</p></div>
+    </div>
+    <div class="callout warn"><b>Lưu ý hiện đại:</b> Nếu đồ thị không liên thông, không có MST đầy đủ. Khi đó có thể nói tới <b>minimum spanning forest</b>, tức cây bao trùm nhỏ nhất cho từng component.</div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="kruskal-sim">
+    <h2><i class="fa-solid fa-route"></i> 2. Mô phỏng Kruskal: sắp xếp cạnh + DSU</h2>
+    <p>Kruskal xét các cạnh từ nhỏ đến lớn. Mỗi cạnh chỉ được chọn nếu nối hai component khác nhau. Nếu hai đầu cạnh đã cùng component, chọn cạnh đó sẽ tạo chu trình nên phải bỏ.</p>
+    <div class="grid-2">
+      <div class="visual-box">
+        <div class="graph-wrap"><svg class="mst-svg" id="kruskalSvg" viewBox="0 0 640 390"></svg></div>
+        <div class="controls"><button class="btn-lesson" id="kruskalNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="kruskalResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div>
+      </div>
+      <div><div><span class="small-stat" id="kruskalTotal">Tổng = 0</span><span class="small-stat" id="kruskalCount">Cạnh chọn = 0</span></div><h3>Danh sách cạnh đã sắp xếp</h3><div class="edge-list" id="kruskalEdges"></div><div class="log-box" id="kruskalLog" style="margin-top:12px">Nhấn “Bước tiếp” để chạy Kruskal.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="prim-sim">
+    <h2><i class="fa-solid fa-seedling"></i> 3. Mô phỏng Prim: mở rộng từ một đỉnh</h2>
+    <p>Prim bắt đầu từ một đỉnh, sau đó liên tục chọn cạnh nhỏ nhất nối từ tập đỉnh đã thăm ra một đỉnh chưa thăm. Cấu trúc thường dùng là <code>priority_queue</code> hoặc heap.</p>
+    <div class="grid-2">
+      <div class="visual-box">
+        <div class="graph-wrap"><svg class="mst-svg" id="primSvg" viewBox="0 0 640 390"></svg></div>
+        <div class="controls"><button class="btn-lesson" id="primNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="primResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div>
+      </div>
+      <div><div><span class="small-stat" id="primTotal">Tổng = 0</span><span class="small-stat" id="primVisited">Đỉnh đã thăm = 0</span></div><h3>Cạnh ứng viên trong heap</h3><div class="edge-list" id="primCandidates"></div><div class="log-box" id="primLog" style="margin-top:12px">Nhấn “Bước tiếp” để chạy Prim.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="code">
+    <h2><i class="fa-solid fa-code"></i> 4. Code mẫu và giải thích</h2>
+    <div class="code-tabs" data-tabs="mst-code">
+      <div class="tab-buttons"><button class="tab-btn active" data-target="kruskal-cpp">Kruskal C++</button><button class="tab-btn" data-target="prim-cpp">Prim C++</button><button class="tab-btn" data-target="prim-py">Prim Python</button></div>
+      <div class="tab-panel active" id="kruskal-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-struct Edge{int u,v,w;};
-struct DSU{
-    vector&lt;int&gt; p;
-    DSU(int n){p.resize(n+1);iota(p.begin(),p.end(),0);}
-    int find(int x){return p[x]==x?x:p[x]=find(p[x]);}
-    bool unite(int a,int b){
-        a=find(a);b=find(b);
-        if(a==b) return false;
-        p[b]=a; return true;
+
+struct Edge {
+    int u, v;
+    long long w;
+};
+
+struct DSU {
+    vector&lt;int&gt; parent, sz;
+
+    DSU(int n) {
+        parent.resize(n + 1);
+        sz.assign(n + 1, 1);
+        iota(parent.begin(), parent.end(), 0);
+    }
+
+    int find(int x) {
+        if (x == parent[x]) return x;
+        return parent[x] = find(parent[x]); // path compression
+    }
+
+    bool unite(int a, int b) {
+        a = find(a);
+        b = find(b);
+        if (a == b) return false;           // thêm cạnh sẽ tạo chu trình
+
+        if (sz[a] &lt; sz[b]) swap(a, b);      // cây nhỏ treo vào cây lớn
+        parent[b] = a;
+        sz[a] += sz[b];
+        return true;
     }
 };
-int main(){
-    int n,m;cin&gt;&gt;n&gt;&gt;m;
-    vector&lt;Edge&gt; e(m);
-    for(auto &x:e) cin&gt;&gt;x.u&gt;&gt;x.v&gt;&gt;x.w;
-    sort(e.begin(),e.end(),[](auto &a,auto &b){return a.w&lt;b.w;});
-    DSU d(n);
-    int total=0;
-    for(auto &x:e)
-        if(d.unite(x.u,x.v)) total+=x.w;
-    cout&lt;&lt;"MST="&lt;&lt;total;
-}</code></pre>
 
-<h2>💻 Prim – Python</h2>
-<pre><code>import heapq
-n,m=map(int,input().split())
-adj=[[] for _ in range(n+1)]
+int main() {
+    int n, m;
+    cin &gt;&gt; n &gt;&gt; m;
+
+    vector&lt;Edge&gt; edges(m);
+    for (auto &e : edges) cin &gt;&gt; e.u &gt;&gt; e.v &gt;&gt; e.w;
+
+    sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) {
+        return a.w &lt; b.w;
+    });
+
+    DSU dsu(n);
+    long long total = 0;
+    vector&lt;Edge&gt; mst;
+
+    for (const Edge &e : edges) {
+        if (dsu.unite(e.u, e.v)) {
+            total += e.w;
+            mst.push_back(e);
+        }
+    }
+
+    if ((int)mst.size() != n - 1) {
+        cout &lt;&lt; "Do thi khong lien thong\n";
+        return 0;
+    }
+
+    cout &lt;&lt; "MST = " &lt;&lt; total &lt;&lt; '\n';
+    for (auto e : mst) cout &lt;&lt; e.u &lt;&lt; ' ' &lt;&lt; e.v &lt;&lt; ' ' &lt;&lt; e.w &lt;&lt; '\n';
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="prim-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, m;
+    cin &gt;&gt; n &gt;&gt; m;
+
+    vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj(n + 1);
+    for (int i = 0; i &lt; m; i++) {
+        int u, v, w;
+        cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;
+        adj[u].push_back({v, w});
+        adj[v].push_back({u, w});
+    }
+
+    vector&lt;bool&gt; visited(n + 1, false);
+    priority_queue&lt;pair&lt;int,int&gt;, vector&lt;pair&lt;int,int&gt;&gt;, greater&lt;pair&lt;int,int&gt;&gt;&gt; pq;
+
+    pq.push({0, 1}); // {trọng số cạnh, đỉnh}
+    long long total = 0;
+    int cnt = 0;
+
+    while (!pq.empty()) {
+        auto [w, u] = pq.top();
+        pq.pop();
+
+        if (visited[u]) continue;
+        visited[u] = true;
+        total += w;
+        cnt++;
+
+        for (auto [v, ww] : adj[u]) {
+            if (!visited[v]) pq.push({ww, v});
+        }
+    }
+
+    if (cnt != n) {
+        cout &lt;&lt; "Do thi khong lien thong\n";
+    } else {
+        cout &lt;&lt; "MST = " &lt;&lt; total;
+    }
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="prim-py"><button class="copy-btn">Sao chép</button><pre><code>import heapq
+
+n, m = map(int, input().split())
+adj = [[] for _ in range(n + 1)]
+
 for _ in range(m):
-    u,v,w=map(int,input().split())
-    adj[u].append((w,v))
-    adj[v].append((w,u))
+    u, v, w = map(int, input().split())
+    adj[u].append((w, v))
+    adj[v].append((w, u))
 
-vis=[False]*(n+1)
-pq=[(0,1)]
-total=0
+visited = [False] * (n + 1)
+pq = [(0, 1)]
+total = 0
+cnt = 0
+
 while pq:
-    w,u=heapq.heappop(pq)
-    if vis[u]: continue
-    vis[u]=True
-    total+=w
-    for ww,v in adj[u]:
-        if not vis[v]:
-            heapq.heappush(pq,(ww,v))
-print("MST=",total)</code></pre>
+    w, u = heapq.heappop(pq)
 
-<hr>
+    if visited[u]:
+        continue
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Tìm MST bằng cả Kruskal và Prim để kiểm chứng kết quả.</li>
-  <li>In ra các cạnh thuộc cây bao trùm nhỏ nhất.</li>
-  <li>Kiểm tra đồ thị có liên thông hay không trước khi chạy MST.</li>
-</ol>
+    visited[u] = True
+    total += w
+    cnt += 1
 
-<details>
-  <summary><b>💡 Gợi ý bài 2</b></summary>
-  <pre><code>edges_in_mst=[]
-for u,v,w in edges:
-    if unite(u,v):
-        edges_in_mst.append((u,v,w))
-print(edges_in_mst)</code></pre>
-</details>
+    for ww, v in adj[u]:
+        if not visited[v]:
+            heapq.heappush(pq, (ww, v))
+
+if cnt != n:
+    print("Do thi khong lien thong")
+else:
+    print("MST =", total)</code></pre></div>
+    </div>
+
+    <div class="grid-3">
+      <div class="explain-card"><h3>Vì sao Kruskal cần DSU?</h3><p>Kruskal xét cạnh theo trọng số tăng dần. Khi gặp cạnh <code>(u, v)</code>, cần biết <code>u</code> và <code>v</code> đã nằm cùng component chưa. DSU trả lời việc này rất nhanh bằng <code>find(u) == find(v)</code>.</p></div>
+      <div class="explain-card"><h3>Vì sao Prim cần heap?</h3><p>Ở mỗi bước Prim cần cạnh nhỏ nhất nối từ tập đã thăm ra ngoài. Heap giúp lấy cạnh nhỏ nhất nhanh, thay vì quét toàn bộ danh sách cạnh nhiều lần.</p></div>
+      <div class="explain-card"><h3>Vì sao phải kiểm tra liên thông?</h3><p>MST đầy đủ phải có đúng <code>n - 1</code> cạnh hoặc Prim phải thăm đủ <code>n</code> đỉnh. Nếu không, đồ thị không liên thông và không có MST đầy đủ.</p></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="compare">
+    <h2><i class="fa-solid fa-scale-balanced"></i> 5. So sánh Kruskal và Prim</h2>
+    <div class="lesson-table-wrap"><table class="lesson-table"><thead><tr><th>Tiêu chí</th><th>Kruskal</th><th>Prim</th><th>Gợi ý chọn</th></tr></thead><tbody>
+      <tr><td>Ý tưởng</td><td>Sắp xếp tất cả cạnh, chọn cạnh nhỏ nhất không tạo chu trình.</td><td>Mở rộng từ một đỉnh bằng cạnh nhỏ nhất ra ngoài.</td><td>Kruskal dễ hiểu nếu đã học DSU; Prim gần với Dijkstra.</td></tr>
+      <tr><td>Cấu trúc dữ liệu</td><td>DSU / Union-Find.</td><td>Priority queue / heap.</td><td>Chọn theo cấu trúc đã quen và dạng input.</td></tr>
+      <tr><td>Độ phức tạp</td><td><code>O(m log m)</code> do sắp xếp cạnh.</td><td><code>O(m log n)</code> với heap.</td><td>Cả hai đều dùng tốt cho bài thi phổ thông/HSG.</td></tr>
+      <tr><td>Đồ thị thưa</td><td>Rất phù hợp.</td><td>Cũng phù hợp.</td><td>Với danh sách cạnh, Kruskal thường tiện.</td></tr>
+      <tr><td>Cần in cạnh MST</td><td>Rất dễ: cạnh nào <code>unite</code> thành công thì lưu lại.</td><td>Cần lưu thêm cha/cạnh khi đưa vào heap.</td><td>Kruskal thường ngắn hơn.</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="practice">
+    <h2><i class="fa-solid fa-keyboard"></i> 6. Thực hành nhanh: tự nhập đồ thị và kiểm tra MST</h2>
+    <div class="grid-2">
+      <div><p>Nhập mỗi dòng một cạnh dạng <code>u v w</code>. Dòng đầu ghi <code>n m</code>.</p><textarea class="textarea-lesson" id="customGraph">6 9
+1 2 4
+1 3 2
+2 3 1
+2 4 5
+3 4 8
+3 5 10
+4 5 2
+4 6 6
+5 6 3</textarea><div class="controls"><button class="btn-lesson" id="runCustomBtn"><i class="fa-solid fa-play"></i> Chạy Kruskal</button></div></div>
+      <div class="log-box" id="customOutput">Kết quả sẽ hiện ở đây.</div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="mistakes">
+    <h2><i class="fa-solid fa-triangle-exclamation"></i> 7. Lỗi học sinh hay nhầm</h2>
+    <div class="checklist">
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Quên kiểm tra đồ thị liên thông.</b><br>Nếu Kruskal chọn được ít hơn <code>n - 1</code> cạnh thì không có MST đầy đủ.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>DSU không tối ưu.</b><br>Nên dùng path compression và union by size/rank để tránh chậm ở test lớn.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Prim cộng nhầm cạnh vào đỉnh đã thăm.</b><br>Khi lấy từ heap, nếu đỉnh đã visited thì phải bỏ qua.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Nhầm MST với đường đi ngắn nhất.</b><br>MST tối ưu tổng chi phí nối toàn bộ đỉnh, không đảm bảo đường giữa hai đỉnh là ngắn nhất.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-dumbbell"></i> 8. Bài tập luyện tập phân loại</h2>
+    <div class="grid-2">
+      <div class="exercise-card"><h3>📘 Cơ bản</h3><ol><li>Tìm tổng trọng số MST bằng Kruskal.</li><li>Tìm tổng trọng số MST bằng Prim.</li><li>Kiểm tra đồ thị có liên thông hay không trước khi in MST.</li></ol></div>
+      <div class="exercise-card"><h3>📗 Trung bình</h3><ol><li>In ra các cạnh thuộc MST.</li><li>Nếu có nhiều MST, in một MST bất kỳ.</li><li>So sánh kết quả Kruskal và Prim trên cùng input.</li></ol></div>
+      <div class="exercise-card"><h3>📙 Nâng cao</h3><ol><li>Tìm MST trong đồ thị có trọng số âm.</li><li>Tính tổng trọng số cây khung lớn nhất.</li><li>Tìm cạnh không thể thuộc bất kỳ MST nào.</li></ol></div>
+      <div class="exercise-card"><h3>🐉 HSG định hướng</h3><ol><li>Kruskal với rollback DSU cho bài offline.</li><li>Second-best MST.</li><li>Dynamic MST ở mức nâng cao.</li></ol></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="quiz">
+    <h2><i class="fa-solid fa-circle-question"></i> 9. Quiz kiểm tra nhanh</h2>
+    <div class="quiz-item" data-answer="b"><b>Câu 1.</b> MST của đồ thị có <code>n</code> đỉnh liên thông có bao nhiêu cạnh?<div class="quiz-options"><button class="quiz-option" data-choice="a"><code>n</code></button><button class="quiz-option" data-choice="b"><code>n - 1</code></button><button class="quiz-option" data-choice="c"><code>m - 1</code></button></div><div class="feedback"></div></div>
+    <div class="quiz-item" data-answer="a"><b>Câu 2.</b> Kruskal dùng DSU để làm gì?<div class="quiz-options"><button class="quiz-option" data-choice="a">Kiểm tra thêm cạnh có tạo chu trình không</button><button class="quiz-option" data-choice="b">Tìm cạnh nhỏ nhất trong heap</button><button class="quiz-option" data-choice="c">Tính đường đi ngắn nhất</button></div><div class="feedback"></div></div>
+    <div class="quiz-item" data-answer="c"><b>Câu 3.</b> Prim thường dùng cấu trúc dữ liệu nào để chọn cạnh nhỏ nhất nhanh?<div class="quiz-options"><button class="quiz-option" data-choice="a">Stack</button><button class="quiz-option" data-choice="b">Queue thường</button><button class="quiz-option" data-choice="c">Priority queue / heap</button></div><div class="feedback"></div></div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2>
+    <div class="callout success">Kruskal và Prim đều tìm MST. Kruskal nhìn theo <b>cạnh</b> và cần DSU để tránh chu trình. Prim nhìn theo <b>đỉnh đã mở rộng</b> và cần heap để lấy cạnh nhỏ nhất ra ngoài. Khi đồ thị không liên thông, không có MST đầy đủ.</div>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
+var nodes={1:[95,70],2:[300,55],3:[185,175],4:[420,185],5:[265,300],6:[540,300]};
+var edges=[{u:1,v:2,w:4,id:'1-2'},{u:1,v:3,w:2,id:'1-3'},{u:2,v:3,w:1,id:'2-3'},{u:2,v:4,w:5,id:'2-4'},{u:3,v:4,w:8,id:'3-4'},{u:3,v:5,w:10,id:'3-5'},{u:4,v:5,w:2,id:'4-5'},{u:4,v:6,w:6,id:'4-6'},{u:5,v:6,w:3,id:'5-6'}];
+function edgeKey(u,v){return Math.min(u,v)+'-'+Math.max(u,v)}
+function initProgress(){var bar=$('#lessonProgressBar');if(!bar)return;function upd(){var d=document.documentElement,st=window.scrollY||d.scrollTop||0,h=Math.max(1,d.scrollHeight-window.innerHeight);bar.style.width=Math.min(100,Math.max(0,st/h*100))+'%'}window.addEventListener('scroll',upd,{passive:true});upd()}
+function initTabs(){$all('.code-tabs').forEach(function(box){$all('.tab-btn',box).forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-target');$all('.tab-btn',box).forEach(function(b){b.classList.remove('active')});$all('.tab-panel',box).forEach(function(p){p.classList.remove('active')});btn.classList.add('active');var t=document.getElementById(id);if(t)t.classList.add('active')})})})}
+function initCopy(){$all('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=btn.closest('.tab-panel')||btn.parentElement,c=p?p.querySelector('code'):null,txt=c?c.textContent:'';function ok(){var o=btn.textContent;btn.textContent='Đã chép';setTimeout(function(){btn.textContent=o},1200)}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(function(){fallback(txt);ok()})}else{fallback(txt);ok()}})});function fallback(txt){var a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a)}}
+function drawGraph(svgId,state){var svg=$(svgId);if(!svg)return;var chosen=state.chosen||{},rejected=state.rejected||{},consider=state.consider||'',visited=state.visited||{};var html='';edges.forEach(function(e){var a=nodes[e.u],b=nodes[e.v],k=edgeKey(e.u,e.v),cls='edge-line';if(chosen[k])cls+=' chosen';else if(rejected[k])cls+=' rejected';if(consider===k)cls+=' consider';var mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;html+='<line class="'+cls+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"></line>';html+='<rect x="'+(mx-14)+'" y="'+(my-14)+'" width="28" height="24" rx="8" fill="#fff" stroke="#cbd5e1"></rect><text class="edge-label" x="'+mx+'" y="'+(my+4)+'" text-anchor="middle">'+e.w+'</text>'});Object.keys(nodes).forEach(function(id){var p=nodes[id],cls='node-circle';if(visited[id])cls+=' visited';if(state.activeNode==id)cls+=' active';html+='<circle class="'+cls+'" cx="'+p[0]+'" cy="'+p[1]+'" r="24"></circle><text class="node-text" x="'+p[0]+'" y="'+p[1]+'">'+id+'</text>'});svg.innerHTML=html}
+function DSU(n){this.p=[];this.sz=[];for(var i=0;i<=n;i++){this.p[i]=i;this.sz[i]=1}}DSU.prototype.find=function(x){while(this.p[x]!==x)x=this.p[x];return x};DSU.prototype.unite=function(a,b){var ra=this.find(a),rb=this.find(b);if(ra===rb)return false;if(this.sz[ra]<this.sz[rb]){var t=ra;ra=rb;rb=t}this.p[rb]=ra;this.sz[ra]+=this.sz[rb];return true};
+var kr={idx:0,total:0,count:0,chosen:{},rejected:{},sorted:[],dsu:null,consider:''};
+function resetKruskal(){kr.sorted=edges.slice().sort(function(a,b){return a.w-b.w});kr.idx=0;kr.total=0;kr.count=0;kr.chosen={};kr.rejected={};kr.consider='';kr.dsu=new DSU(6);renderKruskal('Bắt đầu: sắp xếp cạnh theo trọng số tăng dần. Mỗi đỉnh là một component riêng.')} 
+function renderEdgeList(){var box=$('#kruskalEdges');if(!box)return;box.innerHTML=kr.sorted.map(function(e,i){var k=edgeKey(e.u,e.v),cls='edge-item';if(kr.chosen[k])cls+=' chosen';else if(kr.rejected[k])cls+=' rejected';if(kr.consider===k)cls+=' consider';return'<div class="'+cls+'"><span>'+(i+1)+'. '+e.u+'-'+e.v+'</span><span>w='+e.w+'</span></div>'}).join('')}
+function renderKruskal(msg){drawGraph('#kruskalSvg',{chosen:kr.chosen,rejected:kr.rejected,consider:kr.consider});renderEdgeList();$('#kruskalTotal').textContent='Tổng = '+kr.total;$('#kruskalCount').textContent='Cạnh chọn = '+kr.count+'/5';$('#kruskalLog').innerHTML=esc(msg)}
+function nextKruskal(){if(kr.count===5){renderKruskal('MST đã đủ 5 cạnh = n - 1. Tổng trọng số = '+kr.total+'.');return}if(kr.idx>=kr.sorted.length){renderKruskal('Đã xét hết cạnh. Nếu chưa đủ n - 1 cạnh thì đồ thị không liên thông.');return}var e=kr.sorted[kr.idx++],k=edgeKey(e.u,e.v),ru=kr.dsu.find(e.u),rv=kr.dsu.find(e.v);kr.consider=k;if(kr.dsu.unite(e.u,e.v)){kr.chosen[k]=true;kr.total+=e.w;kr.count++;renderKruskal('Xét cạnh '+e.u+'-'+e.v+' trọng số '+e.w+'. find('+e.u+')='+ru+', find('+e.v+')='+rv+'. Hai component khác nhau nên CHỌN cạnh này.')}else{kr.rejected[k]=true;renderKruskal('Xét cạnh '+e.u+'-'+e.v+' trọng số '+e.w+'. Hai đầu đã cùng component nên nếu chọn sẽ tạo chu trình. BỎ cạnh này.')}}
+var prim={visited:{},chosen:{},rejected:{},pq:[],total:0,count:0,consider:'',activeNode:1};
+function resetPrim(){prim={visited:{},chosen:{},rejected:{},pq:[],total:0,count:0,consider:'',activeNode:1};prim.pq.push({w:0,u:1,v:1,id:'start'});renderPrim('Bắt đầu từ đỉnh 1. Đưa cạnh giả trọng số 0 vào heap.')} 
+function pushNeighbors(u){edges.forEach(function(e){var v=0;if(e.u===u)v=e.v;else if(e.v===u)v=e.u;if(v&&!prim.visited[v])prim.pq.push({w:e.w,u:u,v:v,id:edgeKey(e.u,e.v)})})}
+function renderCandidates(){var box=$('#primCandidates');if(!box)return;var arr=prim.pq.slice().sort(function(a,b){return a.w-b.w});box.innerHTML=arr.length?arr.map(function(e){return'<div class="edge-item '+(e.id===prim.consider?'consider':'')+'"><span>'+e.u+' → '+e.v+'</span><span>w='+e.w+'</span></div>'}).join(''):'<div class="edge-item">Heap rỗng</div>'}
+function renderPrim(msg){drawGraph('#primSvg',{chosen:prim.chosen,rejected:prim.rejected,consider:prim.consider,visited:prim.visited,activeNode:prim.activeNode});renderCandidates();$('#primTotal').textContent='Tổng = '+prim.total;$('#primVisited').textContent='Đỉnh đã thăm = '+prim.count+'/6';$('#primLog').innerHTML=esc(msg)}
+function nextPrim(){if(prim.count===6){renderPrim('Prim hoàn tất. Tổng trọng số MST = '+prim.total+'.');return}if(!prim.pq.length){renderPrim('Heap rỗng nhưng chưa thăm hết đỉnh. Đồ thị không liên thông.');return}prim.pq.sort(function(a,b){return a.w-b.w});var cur=prim.pq.shift();prim.consider=cur.id==='start'?'':cur.id;prim.activeNode=cur.v;if(prim.visited[cur.v]){if(cur.id!=='start')prim.rejected[cur.id]=true;renderPrim('Lấy cạnh '+cur.u+'-'+cur.v+' nhưng đỉnh '+cur.v+' đã thăm, bỏ qua.');return}prim.visited[cur.v]=true;prim.count++;prim.total+=cur.w;if(cur.id!=='start')prim.chosen[cur.id]=true;pushNeighbors(cur.v);renderPrim('Chọn đỉnh '+cur.v+' với chi phí '+cur.w+'. Thêm các cạnh đi ra từ đỉnh '+cur.v+' vào heap.')} 
+function initMstSims(){$('#kruskalNextBtn')&&$('#kruskalNextBtn').addEventListener('click',nextKruskal);$('#kruskalResetBtn')&&$('#kruskalResetBtn').addEventListener('click',resetKruskal);$('#primNextBtn')&&$('#primNextBtn').addEventListener('click',nextPrim);$('#primResetBtn')&&$('#primResetBtn').addEventListener('click',resetPrim);resetKruskal();resetPrim()}
+function runCustom(){var txt=$('#customGraph').value.trim().split(/\n+/).map(function(s){return s.trim()}).filter(Boolean);var out=$('#customOutput');if(!txt.length){out.textContent='Chưa có dữ liệu.';return}var first=txt[0].split(/\s+/).map(Number),n=first[0],m=first[1],es=[];for(var i=1;i<txt.length;i++){var a=txt[i].split(/\s+/).map(Number);if(a.length>=3)es.push({u:a[0],v:a[1],w:a[2]})}es.sort(function(a,b){return a.w-b.w});var d=new DSU(n),total=0,chosen=[];es.forEach(function(e){if(d.unite(e.u,e.v)){total+=e.w;chosen.push(e)}});if(chosen.length!==n-1){out.innerHTML='<b style="color:#991b1b">Đồ thị không liên thông hoặc dữ liệu thiếu.</b><br>Chỉ chọn được '+chosen.length+'/'+(n-1)+' cạnh.';return}out.innerHTML='<b>MST = '+total+'</b><br><br><b>Cạnh được chọn:</b><br>'+chosen.map(function(e){return e.u+' '+e.v+' '+e.w}).join('<br>')}
+function initCustom(){$('#runCustomBtn')&&$('#runCustomBtn').addEventListener('click',runCustom);runCustom()}
+function initQuiz(){$all('.quiz-item').forEach(function(item){var ans=item.getAttribute('data-answer'),fb=item.querySelector('.feedback');$all('.quiz-option',item).forEach(function(btn){btn.addEventListener('click',function(){$all('.quiz-option',item).forEach(function(b){b.classList.remove('correct','wrong')});if(btn.getAttribute('data-choice')===ans){btn.classList.add('correct');if(fb)fb.textContent='Đúng rồi!'}else{btn.classList.add('wrong');var right=item.querySelector('.quiz-option[data-choice="'+ans+'"]');if(right)right.classList.add('correct');if(fb)fb.textContent='Chưa đúng. Em xem lại phần lý thuyết phía trên.'}})})})}
+function initHighlightSafe(){if(window.hljs&&typeof window.hljs.highlightAll==='function'){try{window.hljs.highlightAll()}catch(e){}}}
+document.addEventListener('DOMContentLoaded',function(){initProgress();initTabs();initCopy();initMstSims();initCustom();initQuiz();initHighlightSafe()});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
