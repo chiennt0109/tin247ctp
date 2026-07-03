@@ -1,68 +1,565 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu cách tìm đường đi ngắn nhất trong đồ thị có trọng số.</li>
-  <li>Phân biệt Dijkstra (chỉ trọng số dương) và Bellman-Ford (có thể có âm).</li>
-</ul>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#06b6d4;--g:#16a34a;--o:#f97316;--r:#ef4444;--text:#1e293b;--b:#dbe4ff;--code:#0f172a}
+.lesson-page{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:radial-gradient(circle at top left,rgba(79,70,229,.14),transparent 32rem),radial-gradient(circle at 90% 10%,rgba(6,182,212,.16),transparent 28rem),linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);border-radius:22px;padding:clamp(18px,2.6vw,34px);line-height:1.75}
+.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}
+.lesson-hero{position:relative;overflow:hidden;color:#fff;padding:clamp(26px,4vw,46px);border-radius:28px;background:linear-gradient(135deg,rgba(67,56,202,.96),rgba(37,99,235,.92));box-shadow:0 25px 60px rgba(79,70,229,.25);margin-bottom:24px}
+.lesson-hero:after{content:"";position:absolute;width:260px;height:260px;right:-85px;top:-80px;border-radius:999px;background:rgba(255,255,255,.14)}
+.hero-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#eef2ff;padding:7px 12px;border-radius:999px;font-weight:700;font-size:.92rem;margin-bottom:12px}
+.lesson-hero h1{margin:0 0 12px;font-size:clamp(1.75rem,4vw,3rem);font-weight:900}.lesson-hero p{color:#e0f2fe;max-width:1000px;font-size:1.05rem;margin:0}
+.hero-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}.hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px}.hero-stat b{display:block;font-size:1.2rem;color:#fff}.hero-stat span{color:#dbeafe;font-size:.9rem}
+.lesson-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.82);backdrop-filter:blur(10px);padding:10px 0 12px}.lesson-progress{height:10px;border-radius:999px;background:#dbeafe;overflow:hidden}.lesson-progress-bar{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--p),var(--a));transition:width .15s linear}.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}.lesson-nav a{text-decoration:none;color:var(--pd);background:#eef2ff;border:1px solid #dbe4ff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:.9rem}
+.lesson-card{background:rgba(255,255,255,.94);border:1px solid var(--b);border-radius:24px;padding:clamp(18px,2.4vw,28px);margin:20px 0;box-shadow:0 16px 42px rgba(30,64,175,.08)}.lesson-card h2{color:var(--pd);margin:0 0 14px;font-weight:900;display:flex;align-items:center;gap:10px}.lesson-card h3{color:#334155;margin-top:20px;font-weight:850}.mini-slide{animation:lessonFadeUp .55s ease both}@keyframes lessonFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.info-box{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0}.callout{border-left:6px solid var(--a);background:#ecfeff;border-radius:16px;padding:14px 16px;margin:14px 0}.warn{border-left-color:var(--o);background:#fff7ed}.danger{border-left-color:var(--r);background:#fff1f2}.success{border-left-color:var(--g);background:#f0fdf4}
+.lesson-table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:18px}.lesson-table{width:100%;border-collapse:collapse;min-width:900px;background:#fff}.lesson-table th,.lesson-table td{border-bottom:1px solid #e2e8f0;padding:13px 14px;text-align:left;vertical-align:top}.lesson-table th{background:#eef2ff;color:#312e81;font-weight:900}.lesson-table tr:last-child td{border-bottom:none}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:800;font-size:.88rem}.green{background:#dcfce7;color:#166534}.orange{background:#ffedd5;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.cyan{background:#cffafe;color:#155e75}
+.code-tabs{border:1px solid var(--b);border-radius:18px;overflow:hidden;background:var(--code);margin:14px 0}.tab-buttons{display:flex;flex-wrap:wrap;background:#edf2ff;border-bottom:1px solid #dbe4ff}.tab-btn{appearance:none;border:0;background:transparent;padding:12px 16px;font-weight:900;color:#334155;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.tab-panel{display:none;position:relative}.tab-panel.active{display:block}.copy-btn{position:absolute;top:10px;right:10px;z-index:3;border:0;background:rgba(255,255,255,.13);color:#e2e8f0;border-radius:999px;padding:6px 10px;font-size:.8rem;cursor:pointer}.copy-btn:hover{background:rgba(255,255,255,.25)}
+.lesson-page pre{margin:0;max-height:580px;overflow:auto;background:var(--code);color:#f8fafc;padding:22px;font-size:14.5px;line-height:1.7;border-radius:0;white-space:pre;tab-size:4}.lesson-page code{font-family:Consolas,Monaco,"Courier New",monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{background:#fdf2f8;color:#be185d;border-radius:7px;padding:2px 6px;font-weight:800}
+.visual-box{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe4ff;border-radius:22px;padding:18px}.graph-wrap{position:relative;width:100%;min-height:390px;background:#f8fafc;border:1px dashed #bfdbfe;border-radius:18px;overflow:hidden}.graph-svg{position:absolute;inset:0;width:100%;height:100%}.node{position:absolute;width:52px;height:52px;border-radius:999px;background:#eef2ff;border:3px solid #c7d2fe;color:#312e81;display:flex;align-items:center;justify-content:center;font-weight:900;z-index:2;box-shadow:0 8px 18px rgba(79,70,229,.1);transition:.25s}.node.source{background:#dcfce7;border-color:#22c55e;color:#166534}.node.done{background:#cffafe;border-color:#06b6d4;color:#155e75}.node.active{background:#fee2e2;border-color:#ef4444;color:#991b1b;transform:scale(1.08)}.node .dist{position:absolute;bottom:-23px;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:1px 7px;font-size:.75rem;color:#334155}
+.edge-line{stroke:#94a3b8;stroke-width:3}.edge-line.relax{stroke:#f97316;stroke-width:5}.edge-line.used{stroke:#16a34a;stroke-width:5}.edge-line.bad{stroke:#ef4444;stroke-width:5;stroke-dasharray:6 4}.edge-label{font-size:13px;font-weight:900;fill:#334155}.dist-table{display:grid;grid-template-columns:repeat(6,minmax(48px,1fr));gap:8px;margin-top:12px}.dist-cell{border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;text-align:center;padding:8px;font-weight:900}.dist-cell b{display:block;color:#64748b;font-size:.78rem}.dist-cell.changed{background:#dcfce7;color:#166534;border-color:#22c55e}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.btn-lesson{border:0;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;background:var(--p);color:white;box-shadow:0 8px 18px rgba(79,70,229,.2)}.btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1;box-shadow:none}.btn-lesson.orange{background:var(--o)}.input-lesson,.textarea-lesson{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:11px 13px;font:inherit;outline:none;background:#fff}.textarea-lesson{min-height:145px;font-family:Consolas,monospace}.input-lesson:focus,.textarea-lesson:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.12)}
+.log-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:105px;max-height:260px;overflow:auto;font-family:Consolas,Monaco,monospace;font-size:14px;color:#334155}.heap-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.heap-item{padding:7px 10px;border-radius:999px;background:#eef2ff;color:#312e81;border:1px solid #c7d2fe;font-weight:900}.heap-item.top{background:#fee2e2;color:#991b1b;border-color:#ef4444}
+.exercise-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.exercise-card h3{margin-top:0}.quiz-item{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 0;background:#fff}.quiz-options{display:grid;gap:8px;margin-top:10px}.quiz-option{text-align:left;border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}.feedback{margin-top:8px;font-weight:800}.checklist{display:grid;gap:10px}.checkitem{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px}.checkitem i{margin-top:5px;color:var(--g)}
+@media(max-width:900px){.grid-2,.grid-3,.hero-grid{grid-template-columns:1fr}.lesson-page{padding:14px;border-radius:16px}.lesson-hero{border-radius:20px}.dist-table{grid-template-columns:repeat(3,1fr)}}
+</style>
 
-<hr>
+<div class="lesson-page" id="lessonTop">
+  <div class="lesson-hero mini-slide">
+    <div class="hero-badge"><i class="fa-solid fa-route"></i> Chuyên đề đồ thị có trọng số</div>
+    <h1>🛣️ Đường đi ngắn nhất: Dijkstra & Bellman-Ford</h1>
+    <p>Bài học giúp học sinh hiểu cách tìm đường đi ngắn nhất từ một đỉnh nguồn đến các đỉnh còn lại. Trọng tâm là phân biệt <b>Dijkstra</b> cho trọng số không âm và <b>Bellman-Ford</b> khi có cạnh âm hoặc cần phát hiện chu trình âm.</p>
+    <div class="hero-grid">
+      <div class="hero-stat"><b>Dijkstra</b><span>Chọn đỉnh có dist nhỏ nhất</span></div>
+      <div class="hero-stat"><b>Bellman-Ford</b><span>Relax tất cả cạnh n−1 lần</span></div>
+      <div class="hero-stat"><b>Trực quan</b><span>Đồ thị, heap, bảng dist</span></div>
+      <div class="hero-stat"><b>Ứng dụng</b><span>Đường đi, chi phí, mạng lưới</span></div>
+    </div>
+  </div>
 
-<h2>📘 Lý thuyết</h2>
-<ul>
-  <li><b>Dijkstra</b>: Duyệt dần từ đỉnh xuất phát, luôn chọn đỉnh có khoảng cách nhỏ nhất chưa xét.</li>
-  <li><b>Bellman-Ford</b>: Lặp qua tất cả cạnh n−1 lần, cập nhật d[u]+w &lt; d[v] → giảm d[v].</li>
-</ul>
+  <div class="lesson-progress-wrap">
+    <div class="lesson-progress"><div class="lesson-progress-bar" id="lessonProgressBar"></div></div>
+    <div class="lesson-nav">
+      <a href="#goals">Mục tiêu</a><a href="#theory">Lý thuyết</a><a href="#dijkstra">Dijkstra</a><a href="#bellman">Bellman-Ford</a><a href="#code">Code mẫu</a><a href="#code-explain">Giải thích code</a><a href="#practice">Thực hành</a><a href="#mistakes">Lỗi hay nhầm</a><a href="#quiz">Quiz</a>
+    </div>
+  </div>
 
-<hr>
+  <section class="lesson-card mini-slide" id="goals">
+    <h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2>
+    <div class="grid-2">
+      <div class="info-box"><h3>Học xong cần làm được</h3><ul><li>Hiểu bài toán đường đi ngắn nhất từ một nguồn.</li><li>Biết dùng Dijkstra cho đồ thị có trọng số không âm.</li><li>Biết dùng Bellman-Ford khi có cạnh âm.</li><li>Biết phát hiện chu trình âm bằng Bellman-Ford.</li><li>Biết lưu <code>parent[]</code> để truy vết đường đi.</li></ul></div>
+      <div class="info-box"><h3>Ví dụ đời sống</h3><ul><li>Tìm tuyến đường rẻ nhất giữa các thành phố.</li><li>Tìm thời gian truyền tin nhỏ nhất trong mạng.</li><li>Tối ưu chi phí chuyển hàng qua nhiều trạm.</li><li>Phát hiện mô hình chi phí bất thường có vòng âm.</li></ul></div>
+    </div>
+  </section>
 
-<h2>💻 Dijkstra – C++</h2>
-<pre><code>#include &lt;bits/stdc++.h&gt;
+  <section class="lesson-card mini-slide" id="theory">
+    <h2><i class="fa-solid fa-book-open"></i> 1. Lý thuyết cốt lõi</h2>
+    <div class="lesson-table-wrap">
+      <table class="lesson-table">
+        <thead><tr><th>Thuật toán</th><th>Ý tưởng</th><th>Dùng khi nào?</th><th>Độ phức tạp thường gặp</th><th>Điểm cần nhớ</th></tr></thead>
+        <tbody>
+          <tr><td><b>Dijkstra</b></td><td>Luôn lấy đỉnh chưa xử lý có khoảng cách nhỏ nhất, rồi relax các cạnh đi ra.</td><td>Trọng số cạnh <b>không âm</b>.</td><td><span class="pill cyan">O((n+m)log n)</span> với heap.</td><td>Nếu có cạnh âm, Dijkstra có thể sai.</td></tr>
+          <tr><td><b>Bellman-Ford</b></td><td>Lặp qua tất cả cạnh <code>n-1</code> lần để relax.</td><td>Có thể có cạnh âm, cần phát hiện chu trình âm.</td><td><span class="pill orange">O(nm)</span></td><td>Chạy chậm hơn Dijkstra nhưng tổng quát hơn.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout"><b>Relax cạnh là gì?</b> Với cạnh <code>u → v</code> trọng số <code>w</code>, nếu <code>dist[u] + w &lt; dist[v]</code> thì cập nhật <code>dist[v] = dist[u] + w</code>.</div>
+    <div class="callout danger"><b>Chu trình âm:</b> nếu sau <code>n-1</code> vòng Bellman-Ford vẫn còn cập nhật được khoảng cách, tồn tại chu trình âm có thể đi tới từ nguồn. Khi đó không có đường đi ngắn nhất hữu hạn.</div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="dijkstra">
+    <h2><i class="fa-solid fa-gauge-high"></i> 2. Mô phỏng Dijkstra</h2>
+    <p>Đồ thị mẫu có trọng số dương. Dijkstra bắt đầu từ đỉnh 1, dùng heap để chọn đỉnh có <code>dist</code> nhỏ nhất.</p>
+    <div class="grid-2">
+      <div class="visual-box">
+        <div class="graph-wrap" id="dijkstraGraph"></div>
+        <div class="dist-table" id="dijkstraDist"></div>
+        <div class="heap-box" id="dijkstraHeap"></div>
+        <div class="controls"><button class="btn-lesson" id="dijNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="dijResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div>
+      </div>
+      <div class="log-box" id="dijkstraLog">Nhấn “Bước tiếp” để chạy Dijkstra.</div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="bellman">
+    <h2><i class="fa-solid fa-arrows-spin"></i> 3. Mô phỏng Bellman-Ford</h2>
+    <p>Bellman-Ford xét toàn bộ cạnh nhiều vòng. Mô phỏng dưới đây có một cạnh âm nhưng không có chu trình âm.</p>
+    <div class="grid-2">
+      <div class="visual-box">
+        <div class="graph-wrap" id="bellmanGraph"></div>
+        <div class="dist-table" id="bellmanDist"></div>
+        <div class="controls"><button class="btn-lesson" id="bfNextBtn"><i class="fa-solid fa-forward-step"></i> Bước tiếp</button><button class="btn-lesson secondary" id="bfResetBtn"><i class="fa-solid fa-rotate-left"></i> Làm lại</button></div>
+      </div>
+      <div class="log-box" id="bellmanLog">Nhấn “Bước tiếp” để chạy Bellman-Ford.</div>
+    </div>
+  </section>
+
+  
+
+  <section class="lesson-card mini-slide" id="code">
+    <h2><i class="fa-solid fa-code"></i> 4. Code mẫu</h2>
+    <h3>4.1. Dijkstra – C++</h3>
+    <div class="code-tabs" data-tabs="dij-code">
+      <div class="tab-buttons"><button class="tab-btn active" data-target="dij-cpp">C++</button><button class="tab-btn" data-target="dij-py">Python</button></div>
+      <div class="tab-panel active" id="dij-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int main(){
-    int n,m; cin&gt;&gt;n&gt;&gt;m;
-    vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj(n+1);
-    for(int i=0;i&lt;m;i++){
-        int u,v,w;cin&gt;&gt;u&gt;&gt;v&gt;&gt;w;
-        adj[u].push_back({v,w});
+
+const long long INF = 4e18;
+
+int main() {
+    int n, m, s;
+    cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;
+
+    vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj(n + 1);
+    for (int i = 0; i &lt; m; i++) {
+        int u, v, w;
+        cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;
+        adj[u].push_back({v, w});
     }
-    vector&lt;int&gt; dist(n+1,1e9); dist[1]=0;
-    priority_queue&lt;pair&lt;int,int&gt;,vector&lt;pair&lt;int,int&gt;&gt;,greater&lt;&gt;&gt; pq;
-    pq.push({0,1});
-    while(!pq.empty()){
-        auto [d,u]=pq.top(); pq.pop();
-        if(d!=dist[u]) continue;
-        for(auto [v,w]:adj[u])
-            if(dist[v]&gt;d+w){
-                dist[v]=d+w;
-                pq.push({dist[v],v});
+
+    vector&lt;long long&gt; dist(n + 1, INF);
+    vector&lt;int&gt; parent(n + 1, -1);
+
+    priority_queue&lt;
+        pair&lt;long long,int&gt;,
+        vector&lt;pair&lt;long long,int&gt;&gt;,
+        greater&lt;pair&lt;long long,int&gt;&gt;
+    &gt; pq;
+
+    dist[s] = 0;
+    pq.push({0, s});
+
+    while (!pq.empty()) {
+        auto [d, u] = pq.top();
+        pq.pop();
+
+        if (d != dist[u]) continue; // bỏ trạng thái cũ trong heap
+
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] &gt; dist[u] + w) {
+                dist[v] = dist[u] + w;
+                parent[v] = u;
+                pq.push({dist[v], v});
             }
+        }
     }
-    for(int i=1;i&lt;=n;i++) cout&lt;&lt;dist[i]&lt;&lt;" ";
-}</code></pre>
 
-<h2>💻 Bellman-Ford – Python</h2>
-<pre><code>n,m=map(int,input().split())
-edges=[tuple(map(int,input().split())) for _ in range(m)]
-INF=10**9
-dist=[INF]*(n+1)
-dist[1]=0
-for _ in range(n-1):
-    for u,v,w in edges:
-        if dist[u]+w&lt;dist[v]:
-            dist[v]=dist[u]+w
-print(dist[1:])</code></pre>
+    for (int i = 1; i &lt;= n; i++) {
+        if (dist[i] == INF) cout &lt;&lt; "INF ";
+        else cout &lt;&lt; dist[i] &lt;&lt; ' ';
+    }
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="dij-py"><button class="copy-btn">Sao chép</button><pre><code>import heapq
 
-<hr>
+INF = 10**18
+n, m, s = map(int, input().split())
 
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Tính đường đi ngắn nhất từ 1 đến mọi đỉnh bằng Dijkstra.</li>
-  <li>Phát hiện chu trình âm bằng Bellman-Ford.</li>
-  <li>In đường đi cụ thể từ 1 đến n.</li>
-</ol>
+adj = [[] for _ in range(n + 1)]
+for _ in range(m):
+    u, v, w = map(int, input().split())
+    adj[u].append((v, w))
 
-<details>
-  <summary><b>💡 Gợi ý phát hiện chu trình âm</b></summary>
-  <pre><code>for u,v,w in edges:
-    if dist[u]+w&lt;dist[v]:
-        print("Có chu trình âm")</code></pre>
-</details>
+dist = [INF] * (n + 1)
+parent = [-1] * (n + 1)
+
+dist[s] = 0
+pq = [(0, s)]
+
+while pq:
+    d, u = heapq.heappop(pq)
+
+    if d != dist[u]:
+        continue
+
+    for v, w in adj[u]:
+        if dist[v] &gt; dist[u] + w:
+            dist[v] = dist[u] + w
+            parent[v] = u
+            heapq.heappush(pq, (dist[v], v))
+
+print(*["INF" if x == INF else x for x in dist[1:]])</code></pre></div>
+    </div>
+
+    <h3>4.2. Bellman-Ford – phát hiện chu trình âm</h3>
+    <div class="code-tabs" data-tabs="bf-code">
+      <div class="tab-buttons"><button class="tab-btn active" data-target="bf-cpp">C++</button><button class="tab-btn" data-target="bf-py">Python</button></div>
+      <div class="tab-panel active" id="bf-cpp"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+struct Edge {
+    int u, v;
+    long long w;
+};
+
+const long long INF = 4e18;
+
+int main() {
+    int n, m, s;
+    cin &gt;&gt; n &gt;&gt; m &gt;&gt; s;
+
+    vector&lt;Edge&gt; edges(m);
+    for (auto &amp;e : edges) cin &gt;&gt; e.u &gt;&gt; e.v &gt;&gt; e.w;
+
+    vector&lt;long long&gt; dist(n + 1, INF);
+    dist[s] = 0;
+
+    for (int i = 1; i &lt;= n - 1; i++) {
+        bool changed = false;
+
+        for (auto e : edges) {
+            if (dist[e.u] == INF) continue;
+
+            if (dist[e.v] &gt; dist[e.u] + e.w) {
+                dist[e.v] = dist[e.u] + e.w;
+                changed = true;
+            }
+        }
+
+        if (!changed) break;
+    }
+
+    bool negativeCycle = false;
+    for (auto e : edges) {
+        if (dist[e.u] != INF &amp;&amp; dist[e.v] &gt; dist[e.u] + e.w) {
+            negativeCycle = true;
+        }
+    }
+
+    if (negativeCycle) {
+        cout &lt;&lt; "Co chu trinh am";
+    } else {
+        for (int i = 1; i &lt;= n; i++) {
+            if (dist[i] == INF) cout &lt;&lt; "INF ";
+            else cout &lt;&lt; dist[i] &lt;&lt; ' ';
+        }
+    }
+    return 0;
+}</code></pre></div>
+      <div class="tab-panel" id="bf-py"><button class="copy-btn">Sao chép</button><pre><code>INF = 10**18
+n, m, s = map(int, input().split())
+
+edges = []
+for _ in range(m):
+    u, v, w = map(int, input().split())
+    edges.append((u, v, w))
+
+dist = [INF] * (n + 1)
+dist[s] = 0
+
+for _ in range(n - 1):
+    changed = False
+
+    for u, v, w in edges:
+        if dist[u] == INF:
+            continue
+
+        if dist[v] &gt; dist[u] + w:
+            dist[v] = dist[u] + w
+            changed = True
+
+    if not changed:
+        break
+
+negative_cycle = False
+for u, v, w in edges:
+    if dist[u] != INF and dist[v] &gt; dist[u] + w:
+        negative_cycle = True
+
+if negative_cycle:
+    print("Co chu trinh am")
+else:
+    print(*["INF" if x == INF else x for x in dist[1:]])</code></pre></div>
+    </div>
+  </section>
+
+<section class="lesson-card mini-slide" id="code-explain">
+    <h2><i class="fa-solid fa-magnifying-glass-code"></i> 5. Giải thích chi tiết code Dijkstra</h2>
+    <p>
+      Dijkstra dùng <b>priority_queue</b> để luôn lấy ra trạng thái có khoảng cách nhỏ nhất.
+      Điểm dễ nhầm nhất là trong heap có thể tồn tại <b>nhiều bản ghi của cùng một đỉnh</b>.
+      Vì vậy dòng <code>if (d != dist[u]) continue;</code> là cực kỳ quan trọng.
+    </p>
+
+    <div class="grid-2">
+      <div class="info-box">
+        <h3>5.1. Các biến chính</h3>
+        <ul>
+          <li><code>adj[u]</code>: danh sách các cạnh đi ra từ đỉnh <code>u</code>.</li>
+          <li><code>dist[v]</code>: khoảng cách tốt nhất hiện biết từ nguồn đến <code>v</code>.</li>
+          <li><code>parent[v]</code>: đỉnh đứng trước <code>v</code> trên đường đi ngắn nhất hiện tại.</li>
+          <li><code>pq</code>: heap nhỏ, lưu các cặp <code>{khoảng_cách, đỉnh}</code>.</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h3>5.2. Luồng chạy chuẩn</h3>
+        <ol>
+          <li>Khởi tạo <code>dist[s] = 0</code>, các đỉnh khác là vô cực.</li>
+          <li>Đưa <code>{0, s}</code> vào heap.</li>
+          <li>Lặp: lấy trạng thái có khoảng cách nhỏ nhất ra.</li>
+          <li>Nếu trạng thái đó đã cũ thì bỏ qua.</li>
+          <li>Relax tất cả cạnh đi ra từ đỉnh đang xét.</li>
+        </ol>
+      </div>
+    </div>
+
+    <h3>5.3. Vì sao heap có “trạng thái cũ”?</h3>
+    <div class="callout warn">
+      Trong C++ <code>priority_queue</code> không có thao tác giảm khóa trực tiếp như “decrease-key”.
+      Khi tìm được khoảng cách tốt hơn cho một đỉnh, ta thường <b>đẩy thêm bản ghi mới</b> vào heap,
+      chứ không xóa được bản ghi cũ ngay lập tức.
+    </div>
+
+    <div class="lesson-table-wrap">
+      <table class="lesson-table">
+        <thead>
+          <tr><th>Bước</th><th>Thao tác</th><th>Heap / dist thay đổi</th><th>Ý nghĩa</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Từ đỉnh 1 relax cạnh <code>1→2</code> trọng số 4</td>
+            <td>Đưa <code>(4,2)</code> vào heap, <code>dist[2] = 4</code></td>
+            <td>Tạm thời biết đường tốt nhất đến 2 là 4.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Từ đỉnh 1 relax cạnh <code>1→3</code> trọng số 2</td>
+            <td>Đưa <code>(2,3)</code> vào heap, <code>dist[3] = 2</code></td>
+            <td>Bước tiếp theo phải lấy đỉnh 3 vì 2 nhỏ hơn 4.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Từ đỉnh 3 relax cạnh <code>3→2</code> trọng số 1</td>
+            <td>Cập nhật <code>dist[2] = 3</code>, đưa thêm <code>(3,2)</code> vào heap</td>
+            <td>Đỉnh 2 có đường mới tốt hơn: 1→3→2.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Heap vẫn còn bản ghi cũ <code>(4,2)</code></td>
+            <td>Nhưng <code>dist[2]</code> hiện tại đã là 3</td>
+            <td><code>(4,2)</code> là trạng thái cũ, không còn đúng nữa.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>5.4. Dòng quan trọng: bỏ trạng thái cũ trong heap</h3>
+    <div class="code-tabs" data-tabs="stale-explain">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-target="stale-cpp">Dòng code</button>
+        <button class="tab-btn" data-target="stale-bad">Nếu bỏ dòng này?</button>
+      </div>
+      <div class="tab-panel active" id="stale-cpp"><button class="copy-btn">Sao chép</button><pre><code>auto [d, u] = pq.top();
+pq.pop();
+
+if (d != dist[u]) continue; // bỏ trạng thái cũ trong heap</code></pre></div>
+      <div class="tab-panel" id="stale-bad"><button class="copy-btn">Sao chép</button><pre><code>// Ví dụ heap có cả:
+// (3, 2)  ← trạng thái mới, đúng
+// (4, 2)  ← trạng thái cũ
+
+// Khi pop ra (4, 2):
+d = 4
+u = 2
+
+// Nhưng khoảng cách tốt nhất hiện tại là:
+dist[2] = 3
+
+// Vì 4 != 3 nên bỏ qua.
+// Không cần relax cạnh đi ra từ đỉnh 2 bằng trạng thái cũ.</code></pre></div>
+    </div>
+
+    <div class="callout danger">
+      <b>Không có dòng này thì sao?</b>
+      Chương trình có thể vẫn ra đúng trong một số phiên bản nếu phần relax luôn dùng <code>dist[u]</code>,
+      nhưng sẽ xử lý thừa rất nhiều trạng thái cũ, dễ bị chậm hoặc TLE. Nếu học sinh viết relax theo kiểu
+      dùng trực tiếp <code>d + w</code>, việc xử lý trạng thái cũ còn dễ gây sai logic mô phỏng và truy vết đường đi.
+    </div>
+
+    <h3>5.5. Giải thích từng khối trong code C++</h3>
+    <div class="lesson-table-wrap">
+      <table class="lesson-table">
+        <thead><tr><th>Đoạn code</th><th>Ý nghĩa</th><th>Lưu ý</th></tr></thead>
+        <tbody>
+          <tr><td><code>const long long INF = 4e18;</code></td><td>Đặt giá trị rất lớn để biểu diễn “chưa đi tới được”.</td><td>Dùng <code>long long</code> vì tổng trọng số có thể lớn.</td></tr>
+          <tr><td><code>vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj</code></td><td>Lưu đồ thị dạng danh sách kề: từ <code>u</code> đi tới <code>v</code> với trọng số <code>w</code>.</td><td>Nếu đồ thị vô hướng, phải thêm cả hai chiều.</td></tr>
+          <tr><td><code>priority_queue&lt;..., greater&lt;...&gt;&gt; pq;</code></td><td>Tạo heap nhỏ để lấy trạng thái có khoảng cách nhỏ nhất.</td><td>Mặc định C++ là heap lớn, nên cần <code>greater</code>.</td></tr>
+          <tr><td><code>if (d != dist[u]) continue;</code></td><td>Bỏ bản ghi cũ trong heap.</td><td>Đây là dòng học sinh rất hay quên.</td></tr>
+          <tr><td><code>if (dist[v] &gt; dist[u] + w)</code></td><td>Relax cạnh <code>u→v</code>.</td><td>Nếu tìm được đường tốt hơn thì cập nhật.</td></tr>
+          <tr><td><code>parent[v] = u;</code></td><td>Lưu lại đường đi: trước khi đến <code>v</code> là <code>u</code>.</td><td>Dùng để in đường đi cụ thể từ nguồn đến đích.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <b>Kết luận:</b> Dòng <code>if (d != dist[u]) continue;</code> không phải là “trang trí”.
+      Nó là cơ chế lọc rác trong heap, giúp Dijkstra chỉ xử lý trạng thái mới nhất và tốt nhất của mỗi đỉnh.
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="practice">
+    <h2><i class="fa-solid fa-keyboard"></i> 6. Thực hành nhanh với Dijkstra</h2>
+    <div class="grid-2">
+      <div>
+        <label><b>Nhập n, m, s và danh sách cạnh có hướng u v w</b></label>
+        <textarea class="textarea-lesson" id="practiceInput">5 7 1
+1 2 4
+1 3 2
+3 2 1
+2 4 5
+3 4 8
+3 5 10
+4 5 2</textarea>
+        <div class="controls"><button class="btn-lesson" id="runPracticeBtn"><i class="fa-solid fa-play"></i> Chạy Dijkstra</button></div>
+      </div>
+      <div class="log-box" id="practiceOutput">Kết quả sẽ hiện ở đây.</div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="mistakes">
+    <h2><i class="fa-solid fa-triangle-exclamation"></i> 7. Lỗi học sinh hay nhầm</h2>
+    <div class="checklist">
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Dùng Dijkstra khi có cạnh âm.</b><br>Dijkstra chỉ đảm bảo đúng khi trọng số không âm.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Không bỏ trạng thái cũ trong heap.</b><br>Dòng <code>if (d != dist[u]) continue;</code> giúp bỏ bản ghi cũ khi đỉnh đã có khoảng cách tốt hơn.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Dùng int cho khoảng cách lớn.</b><br>Nên dùng <code>long long</code> và <code>INF</code> đủ lớn.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Quên kiểm tra <code>dist[u] == INF</code> trong Bellman-Ford.</b><br>Nếu u chưa tới được thì không nên relax cạnh đi ra từ u.</div></div>
+      <div class="checkitem"><i class="fa-solid fa-circle-check"></i><div><b>Nhầm đồ thị có hướng và vô hướng.</b><br>Nếu vô hướng, phải thêm cả <code>u → v</code> và <code>v → u</code>.</div></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-dumbbell"></i> 8. Bài tập luyện tập phân loại</h2>
+    <div class="grid-2">
+      <div class="exercise-card"><h3>📘 Cơ bản</h3><ol><li>Tính đường đi ngắn nhất từ 1 đến mọi đỉnh bằng Dijkstra.</li><li>In khoảng cách từ s đến t.</li><li>Đồ thị vô hướng: thêm cạnh hai chiều rồi chạy Dijkstra.</li></ol></div>
+      <div class="exercise-card"><h3>📗 Trung bình</h3><ol><li>In đường đi cụ thể từ 1 đến n bằng mảng parent.</li><li>Bellman-Ford phát hiện chu trình âm.</li><li>So sánh kết quả Dijkstra và Bellman-Ford trên đồ thị không có cạnh âm.</li></ol></div>
+      <div class="exercise-card"><h3>📙 Nâng cao</h3><ol><li>Đếm số đường đi ngắn nhất modulo M.</li><li>Dijkstra nhiều nguồn.</li><li>Đường đi ngắn nhất với ràng buộc số cạnh không quá k.</li></ol></div>
+      <div class="exercise-card"><h3>🐉 HSG định hướng</h3><ol><li>0-1 BFS khi trọng số chỉ là 0 hoặc 1.</li><li>Floyd-Warshall cho mọi cặp đỉnh khi n nhỏ.</li><li>Johnson’s algorithm khi cần all-pairs với cạnh âm nhưng không có chu trình âm.</li></ol></div>
+    </div>
+  </section>
+
+  <section class="lesson-card mini-slide" id="quiz">
+    <h2><i class="fa-solid fa-circle-question"></i> 9. Quiz kiểm tra nhanh</h2>
+    <div class="quiz-item" data-answer="b"><b>Câu 1.</b> Dijkstra dùng được khi nào?<div class="quiz-options"><button class="quiz-option" data-choice="a">Có chu trình âm</button><button class="quiz-option" data-choice="b">Tất cả trọng số cạnh không âm</button><button class="quiz-option" data-choice="c">Chỉ đồ thị không trọng số</button></div><div class="feedback"></div></div>
+    <div class="quiz-item" data-answer="a"><b>Câu 2.</b> Bellman-Ford lặp relax tất cả cạnh tối đa bao nhiêu lần trước khi kiểm tra chu trình âm?<div class="quiz-options"><button class="quiz-option" data-choice="a">n - 1 lần</button><button class="quiz-option" data-choice="b">m - 1 lần</button><button class="quiz-option" data-choice="c">1 lần</button></div><div class="feedback"></div></div>
+    <div class="quiz-item" data-answer="c"><b>Câu 3.</b> Vì sao cần <code>if (d != dist[u]) continue;</code> trong Dijkstra dùng heap?<div class="quiz-options"><button class="quiz-option" data-choice="a">Để đổi đồ thị có hướng thành vô hướng</button><button class="quiz-option" data-choice="b">Để phát hiện chu trình âm</button><button class="quiz-option" data-choice="c">Để bỏ trạng thái cũ trong heap</button></div><div class="feedback"></div></div>
+  </section>
+
+  <section class="lesson-card mini-slide">
+    <h2><i class="fa-solid fa-flag-checkered"></i> Tổng kết</h2>
+    <div class="callout success"><b>Dijkstra</b> nhanh và dùng nhiều nhất khi trọng số không âm. <b>Bellman-Ford</b> chậm hơn nhưng xử lý được cạnh âm và phát hiện chu trình âm. Khi làm bài thi, hãy đọc kỹ ràng buộc trọng số trước khi chọn thuật toán.</div>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
+var INF=1e15;
+var pos={1:[10,45],2:[40,15],3:[38,68],4:[68,35],5:[84,68]};
+var dijEdges=[[1,2,4],[1,3,2],[3,2,1],[2,4,5],[3,4,8],[3,5,10],[4,5,2]];
+var bfEdges=[[1,2,4],[1,3,5],[2,3,-2],[3,4,3],[2,4,6]];
+function initProgress(){var bar=$('#lessonProgressBar');if(!bar)return;function upd(){var d=document.documentElement,st=window.scrollY||d.scrollTop||0,h=Math.max(1,d.scrollHeight-window.innerHeight);bar.style.width=Math.min(100,Math.max(0,st/h*100))+'%'}window.addEventListener('scroll',upd,{passive:true});upd()}
+function initTabs(){$all('.code-tabs').forEach(function(box){$all('.tab-btn',box).forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-target');$all('.tab-btn',box).forEach(function(b){b.classList.remove('active')});$all('.tab-panel',box).forEach(function(p){p.classList.remove('active')});btn.classList.add('active');var t=document.getElementById(id);if(t)t.classList.add('active')})})})}
+function initCopy(){$all('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=btn.closest('.tab-panel')||btn.parentElement,c=p?p.querySelector('code'):null,txt=c?c.textContent:'';function ok(){var o=btn.textContent;btn.textContent='Đã chép';setTimeout(function(){btn.textContent=o},1200)}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(function(){fallback(txt);ok()})}else{fallback(txt);ok()}})});function fallback(txt){var a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a)}}
+function fmt(x){return x>=INF/2?'∞':String(x)}
+function drawGraph(boxId,edges,dist,activeNode,usedEdges,badEdge,relaxEdge){var box=$(boxId);if(!box)return;var svg='<svg class="graph-svg" viewBox="0 0 100 100" preserveAspectRatio="none">';edges.forEach(function(e,idx){var a=pos[e[0]],b=pos[e[1]],cls='edge-line';if(usedEdges&&usedEdges.indexOf(idx)>=0)cls+=' used';if(badEdge===idx)cls+=' bad';if(relaxEdge===idx)cls+=' relax';svg+='<line class="'+cls+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"></line>';var mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;svg+='<text class="edge-label" x="'+mx+'" y="'+my+'">'+e[2]+'</text>'});svg+='</svg>';var nodes='';for(var i=1;i<=5;i++){var p=pos[i],cls='node';if(i===1)cls+=' source';if(activeNode===i)cls+=' active';if(dist&&dist[i]<INF/2&&activeNode!==i&&i!==1)cls+=' done';nodes+='<div class="'+cls+'" style="left:calc('+p[0]+'% - 26px);top:calc('+p[1]+'% - 26px)">'+i+'<span class="dist">d='+fmt(dist?dist[i]:INF)+'</span></div>'}box.innerHTML=svg+nodes}
+function renderDist(id,dist,changed){var box=$(id);if(!box)return;var s='';for(var i=1;i<=5;i++){var cls='dist-cell'+(changed===i?' changed':'');s+='<div class="'+cls+'"><b>dist['+i+']</b>'+fmt(dist[i])+'</div>'}box.innerHTML=s}
+var dij={dist:[],done:[],pq:[],parentEdge:[],lastRelaxEdges:[],active:null};
+function resetDij(){
+  dij.dist=[INF,0,INF,INF,INF,INF];
+  dij.done=[false,false,false,false,false,false];
+  dij.pq=[[0,1]];
+  dij.parentEdge=[null,null,null,null,null,null];
+  dij.lastRelaxEdges=[];
+  dij.active=null;
+  renderDij('Bắt đầu: dist[1] = 0, các đỉnh khác là vô cực. Heap có (0,1).');
+}
+function usedDijEdges(){
+  var a=[];
+  for(var i=1;i<dij.parentEdge.length;i++){
+    if(dij.parentEdge[i]!==null && a.indexOf(dij.parentEdge[i])<0) a.push(dij.parentEdge[i]);
+  }
+  return a;
+}
+function renderHeap(){
+  var box=$('#dijkstraHeap');
+  if(!box)return;
+  var arr=dij.pq.slice().sort(function(a,b){return a[0]===b[0]?a[1]-b[1]:a[0]-b[0]});
+  box.innerHTML=arr.map(function(x,i){return'<span class="heap-item '+(i===0?'top':'')+'">('+x[0]+','+x[1]+')</span>'}).join('');
+}
+function renderDij(msg,changed){
+  var relax = dij.lastRelaxEdges.length ? dij.lastRelaxEdges[dij.lastRelaxEdges.length-1] : null;
+  drawGraph('#dijkstraGraph',dijEdges,dij.dist,dij.active,usedDijEdges(),null,relax);
+  renderDist('#dijkstraDist',dij.dist,changed);
+  renderHeap();
+  var log=$('#dijkstraLog');
+  if(log)log.innerHTML=msg;
+}
+function nextDij(){
+  if(!dij.pq.length){
+    renderDij('Hoàn tất Dijkstra. Không còn trạng thái trong heap. Các cạnh xanh là cạnh đang tạo ra cây đường đi ngắn nhất từ đỉnh 1.');
+    return;
+  }
+
+  dij.pq.sort(function(a,b){return a[0]===b[0]?a[1]-b[1]:a[0]-b[0]});
+  var cur=dij.pq.shift(), d=cur[0], u=cur[1];
+  dij.lastRelaxEdges=[];
+
+  if(d!==dij.dist[u]){
+    renderDij('Bỏ trạng thái cũ ('+d+','+u+') vì dist['+u+'] hiện tại là '+dij.dist[u]+'.');
+    return;
+  }
+  if(dij.done[u]){
+    renderDij('Đỉnh '+u+' đã được kết nạp trước đó nên bỏ qua trạng thái này.');
+    return;
+  }
+
+  dij.done[u]=true;
+  dij.active=u;
+
+  var msg='<b>Kết nạp đỉnh '+u+'</b> vì đây là đỉnh có dist nhỏ nhất trong heap: d = '+d+'.<br>';
+  msg+='Sau đó relax <b>tất cả</b> cạnh đi ra từ đỉnh '+u+'.<br>';
+  var changedList=[];
+
+  for(var i=0;i<dijEdges.length;i++){
+    var e=dijEdges[i];
+    if(e[0]===u){
+      var v=e[1], w=e[2], cand=dij.dist[u]+w;
+      if(dij.dist[v]>cand){
+        dij.dist[v]=cand;
+        dij.parentEdge[v]=i;
+        dij.pq.push([dij.dist[v],v]);
+        dij.lastRelaxEdges.push(i);
+        changedList.push(v);
+        msg+='✓ Cạnh '+u+'→'+v+' trọng số '+w+': cập nhật dist['+v+'] = '+cand+', đưa ('+cand+','+v+') vào heap.<br>';
+      }else{
+        msg+='• Cạnh '+u+'→'+v+' trọng số '+w+': không cải thiện vì dist['+v+'] đang là '+fmt(dij.dist[v])+'.<br>';
+      }
+    }
+  }
+
+  if(u===1){
+    msg+='<br><b>Điểm cần chú ý:</b> Sau khi xử lý đỉnh 1, heap có (2,3) và (4,2), nên bước tiếp theo Dijkstra phải chọn <b>đỉnh 3</b>, không phải đỉnh 2.';
+  }
+
+  renderDij(msg,changedList.length ? changedList[changedList.length-1] : null);
+}
+function initDij(){$('#dijNextBtn')&&$('#dijNextBtn').addEventListener('click',nextDij);$('#dijResetBtn')&&$('#dijResetBtn').addEventListener('click',resetDij);resetDij()}
+var bf={dist:[],idx:0,round:1,used:[],relax:null};
+function resetBf(){bf.dist=[INF,0,INF,INF,INF,INF];bf.idx=0;bf.round=1;bf.used=[];bf.relax=null;renderBf('Bắt đầu Bellman-Ford: dist[1] = 0. Mỗi vòng sẽ xét tất cả cạnh.')}
+function renderBf(msg,changed){drawGraph('#bellmanGraph',bfEdges,bf.dist,null,bf.used,null,bf.relax);renderDist('#bellmanDist',bf.dist,changed);var log=$('#bellmanLog');if(log)log.innerHTML=msg}
+function nextBf(){if(bf.round>4){renderBf('Đã xét n−1 vòng. Bước tiếp theo trong code thật là kiểm tra còn relax được không để phát hiện chu trình âm.');return}var e=bfEdges[bf.idx],u=e[0],v=e[1],w=e[2];bf.relax=bf.idx;var msg='<b>Vòng '+bf.round+', xét cạnh '+u+'→'+v+' trọng số '+w+'.</b><br>';var changed=null;if(bf.dist[u]<INF/2&&bf.dist[v]>bf.dist[u]+w){bf.dist[v]=bf.dist[u]+w;bf.used.push(bf.idx);changed=v;msg+='Cập nhật: dist['+v+'] = dist['+u+'] + '+w+' = '+bf.dist[v]+'.'}else{msg+='Không cập nhật vì không cải thiện khoảng cách.'}bf.idx++;if(bf.idx>=bfEdges.length){bf.idx=0;bf.round++;msg+='<br>Hết một vòng xét tất cả cạnh.'}renderBf(msg,changed)}
+function initBf(){$('#bfNextBtn')&&$('#bfNextBtn').addEventListener('click',nextBf);$('#bfResetBtn')&&$('#bfResetBtn').addEventListener('click',resetBf);resetBf()}
+function runPractice(){var out=$('#practiceOutput'),txt=$('#practiceInput')?$('#practiceInput').value:'';if(!out)return;var lines=txt.trim().split(/\n+/).map(function(s){return s.trim()}).filter(Boolean);if(!lines.length){out.textContent='Thiếu dữ liệu.';return}var first=lines[0].split(/\s+/).map(Number),n=first[0],m=first[1],s=first[2];var adj=Array.from({length:n+1},function(){return[]});for(var i=1;i<=m&&i<lines.length;i++){var a=lines[i].split(/\s+/).map(Number);adj[a[0]].push([a[1],a[2]])}var dist=Array(n+1).fill(INF),pq=[[0,s]];dist[s]=0;while(pq.length){pq.sort(function(a,b){return a[0]-b[0]});var cur=pq.shift(),d=cur[0],u=cur[1];if(d!==dist[u])continue;adj[u].forEach(function(ed){var v=ed[0],w=ed[1];if(dist[v]>dist[u]+w){dist[v]=dist[u]+w;pq.push([dist[v],v])}})}out.innerHTML='<b>Kết quả dist từ nguồn '+s+':</b><br>'+dist.slice(1).map(fmt).join(' ')}
+function initPractice(){$('#runPracticeBtn')&&$('#runPracticeBtn').addEventListener('click',runPractice)}
+function initQuiz(){$all('.quiz-item').forEach(function(item){var ans=item.getAttribute('data-answer'),fb=item.querySelector('.feedback');$all('.quiz-option',item).forEach(function(btn){btn.addEventListener('click',function(){$all('.quiz-option',item).forEach(function(b){b.classList.remove('correct','wrong')});if(btn.getAttribute('data-choice')===ans){btn.classList.add('correct');if(fb)fb.textContent='Đúng rồi!'}else{btn.classList.add('wrong');var right=item.querySelector('.quiz-option[data-choice="'+ans+'"]');if(right)right.classList.add('correct');if(fb)fb.textContent='Chưa đúng. Em xem lại phần lý thuyết phía trên.'}})})})}
+function initHighlightSafe(){if(window.hljs&&typeof window.hljs.highlightAll==='function'){try{window.hljs.highlightAll()}catch(e){}}}
+document.addEventListener('DOMContentLoaded',function(){initProgress();initTabs();initCopy();initDij();initBf();initPractice();initQuiz();initHighlightSafe()});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
