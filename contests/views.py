@@ -126,11 +126,89 @@ def contest_detail(request, contest_id):
     else:
         contest_state = "running"
 
+    freeze_minutes = 30
+    freeze_time = contest.end_time - timedelta(minutes=freeze_minutes)
+    is_frozen = freeze_time <= timezone.now() < contest.end_time
+
+    participants = Participation.objects.annotate(
+        has_sub=Exists(
+            Submission.objects.filter(
+                user=OuterRef("user"),
+                contest=contest,
+            )
+        )
+    ).filter(
+        contest=contest,
+        has_sub=True,
+    ).select_related("user")
+
+    problem_stats = {}
+    for part in participants:
+        uid = part.user.id
+        problem_stats[uid] = {}
+
+        for prob in problems:
+            subs = Submission.objects.filter(
+                user=part.user,
+                problem=prob,
+                contest=contest,
+            )
+            if is_frozen:
+                subs = subs.filter(created_at__lte=freeze_time)
+            subs = subs.order_by("created_at")
+
+            tries = subs.count()
+            best_score = 0
+            best_sub = None
+            for sub in subs:
+                if sub.total_tests > 0:
+                    score = round((sub.passed_tests / sub.total_tests) * 100)
+                else:
+                    score = 100 if sub.verdict == "Accepted" else 0
+                if score > best_score:
+                    best_score = score
+                    best_sub = sub
+
+            if best_sub and best_score > 0:
+                minutes = int((best_sub.created_at - contest.start_time).total_seconds() // 60)
+                problem_stats[uid][prob.id] = {
+                    "is_ac": best_score == 100,
+                    "tries": tries - (1 if best_score == 100 else 0),
+                    "score": best_score,
+                    "time_from_start": minutes,
+                }
+            else:
+                problem_stats[uid][prob.id] = {
+                    "is_ac": False,
+                    "tries": tries,
+                    "score": 0,
+                    "time_from_start": None,
+                }
+
+        part.score = sum(item["score"] for item in problem_stats[uid].values())
+        part.penalty = sum(
+            item["time_from_start"] + item["tries"] * 10
+            for item in problem_stats[uid].values() if item["is_ac"]
+        )
+        last = Submission.objects.filter(
+            created_at__range=(contest.start_time, contest.end_time),
+            user=part.user,
+            problem__in=problems,
+            contest=contest,
+        ).aggregate(t=Max("created_at"))["t"]
+        part.last_submit = last
+
+    rankings = sorted(participants, key=lambda part: (-(part.score or 0), part.penalty or 0, part.last_submit or (timezone.now() + timedelta(days=36500))))
+
     return render(request, "contests/detail.html", {
         "contest": contest,
         "problems": problems,
         "problems_with_letters": problems_with_letters,
+        "problem_letters": problem_letters,
         "contest_state": contest_state,
+        "rankings": rankings,
+        "problem_stats": problem_stats,
+        "is_frozen": is_frozen,
     })
 
 
