@@ -1,0 +1,31 @@
+<article class="roadmap-extra-topic">
+  <h1>Prefix Max</h1>
+  <section>
+    <h2>Mục tiêu</h2>
+    <ul>
+      <li>Xây dựng mảng cực đại tiền tố để trả lời nhanh giá trị lớn nhất trên đoạn bắt đầu từ đầu dãy.</li>
+      <li>Nhận biết khi nào Prefix Max đủ dùng thay vì Segment Tree hoặc Sparse Table.</li>
+      <li>Áp dụng vào các bài toán tối ưu dãy, kiểm tra điều kiện và tiền xử lý một chiều.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Công thức</h2>
+    <p>Với mảng <code>a</code>, đặt <code>prefMax[i] = max(prefMax[i - 1], a[i])</code>.</p>
+  </section>
+  <section>
+    <h2>Mẫu C++</h2>
+    <pre><code>vector&lt;int&gt; prefMax(n);
+prefMax[0] = a[0];
+for (int i = 1; i &lt; n; ++i) {
+    prefMax[i] = max(prefMax[i - 1], a[i]);
+}</code></pre>
+  </section>
+  <section>
+    <h2>Bài toán thường gặp</h2>
+    <ul>
+      <li>Tìm phần tử lớn nhất trong đoạn <code>[0..i]</code>.</li>
+      <li>Kiểm tra một phần tử có vượt mọi giá trị trước nó hay không.</li>
+      <li>Kết hợp Prefix Max/Suffix Max để xử lý bài toán chia dãy.</li>
+    </ul>
+  </section>
+</article>
