@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load dict_filters %}
 {% block content %}
 <div class="container py-4">
 
@@ -84,36 +85,58 @@
       </div>
 
       <div class="tab-pane fade" id="rank-pane" role="tabpanel" aria-labelledby="rank-tab" tabindex="0">
+        {% if is_frozen %}
+          <div class="alert alert-warning rounded-0 mb-0">❄ Bảng xếp hạng đang freeze.</div>
+        {% endif %}
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0 contest-table">
-            <thead class="table-light">
+          <table class="table table-bordered table-hover align-middle text-center mb-0">
+            <thead class="table-dark">
               <tr>
-                <th style="width: 80px;">Hạng</th>
-                <th>Thí sinh</th>
-                <th class="text-center" style="width: 140px;">Điểm</th>
-                <th class="text-center" style="width: 160px;">Penalty</th>
-                <th class="text-center" style="width: 200px;">Lần nộp cuối</th>
+                <th style="width: 70px;">Rank</th>
+                <th class="text-start" style="min-width: 220px;">Username</th>
+                <th style="width: 110px;">Points</th>
+                <th style="width: 110px;">Penalty</th>
+                {% for letter in problem_letters %}
+                  <th style="min-width: 82px;">{{ forloop.counter }}<br><small>100</small></th>
+                {% endfor %}
               </tr>
             </thead>
             <tbody>
               {% for part in rankings %}
               <tr>
-                <td class="fw-bold text-primary">{{ forloop.counter }}</td>
-                <td class="fw-semibold">{{ part.user.username }}</td>
-                <td class="text-center fw-bold text-success">{{ part.score }}</td>
-                <td class="text-center">{{ part.penalty }}</td>
-                <td class="text-center text-muted">{{ part.last_submit|date:"d/m/Y H:i"|default:"—" }}</td>
+                <td>{{ forloop.counter }}</td>
+                <td class="text-start fw-semibold">{{ part.user.username }}</td>
+                <td class="fw-bold">{{ part.score }}</td>
+                <td class="text-muted">{{ part.penalty }}</td>
+                {% for prob in problems %}
+                  {% with sub=problem_stats|dict_key:part.user.id|dict_key:prob.id %}
+                    {% if is_frozen and not sub.is_ac and sub.tries > 0 %}
+                      <td class="text-muted">?</td>
+                    {% elif sub.is_ac %}
+                      <td class="table-success">
+                        <span class="fw-bold text-success">{{ sub.score }}</span><br>
+                        <small class="text-muted">{{ sub.time_from_start }}′</small>
+                      </td>
+                    {% elif sub.score > 0 %}
+                      <td>
+                        <span class="fw-bold text-danger">{{ sub.score }}</span><br>
+                        <small class="text-muted">{{ sub.tries }} tries</small>
+                      </td>
+                    {% elif sub.tries > 0 %}
+                      <td><span class="text-danger">0</span></td>
+                    {% else %}
+                      <td></td>
+                    {% endif %}
+                  {% endwith %}
+                {% endfor %}
               </tr>
               {% empty %}
               <tr>
-                <td colspan="5" class="text-center text-muted py-4">Chưa có dữ liệu bảng xếp hạng.</td>
+                <td colspan="{{ problems|length|add:4 }}" class="text-center text-muted py-4">Chưa có dữ liệu bảng xếp hạng.</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
-        </div>
-        <div class="p-3 text-end">
-          <a href="{% url 'contests:contest_rank' contest.id %}" class="btn btn-outline-success rounded-pill px-4">Mở bảng xếp hạng đầy đủ</a>
         </div>
       </div>
     </div>
@@ -134,11 +157,6 @@
 }
 .btn-sm { font-size:0.82rem; }
 .card-header { font-size: 1rem; }
-.contest-tabs-card { overflow: hidden; }
-.contest-tabs { border-bottom: 1px solid #e5e7eb; gap: .35rem; }
-.contest-tabs .nav-link { border: 0; border-radius: 999px; color: #475569; font-weight: 700; padding: .65rem 1rem; }
-.contest-tabs .nav-link.active { background: #eef2ff; color: #315bff; }
-.contest-table thead th { font-weight: 800; }
 .contest-table a { text-decoration: none; }
 </style>
 
