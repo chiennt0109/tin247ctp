@@ -126,11 +126,14 @@ def contest_detail(request, contest_id):
     else:
         contest_state = "running"
 
+    rankings = Participation.objects.filter(contest=contest).select_related("user").order_by("-score", "penalty", "last_submit")
+
     return render(request, "contests/detail.html", {
         "contest": contest,
         "problems": problems,
         "problems_with_letters": problems_with_letters,
         "contest_state": contest_state,
+        "rankings": rankings,
     })
 
 
