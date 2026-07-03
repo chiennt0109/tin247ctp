@@ -11,6 +11,9 @@
       ⏳ <b>Kết thúc:</b> {{ contest.end_time|date:"d/m/Y H:i" }} <br>
       📘 <b>Số bài:</b> {{ problems|length }}
     </p>
+    <a href="{% url 'contests:contest_list' %}" class="btn btn-outline-secondary btn-sm px-3 mb-2">
+      ← Danh sách contest
+    </a>
 
     {% if contest.description %}
       <div class="border-top pt-3">{{ contest.description|safe }}</div>
@@ -143,12 +146,6 @@
   </div>
 </div>
 
-<!-- 🌐 Điều hướng -->
-<div class="d-flex justify-content-between align-items-center mt-4 container">
-  <a href="{% url 'contests:contest_list' %}" class="btn btn-outline-secondary rounded-pill">
-    ← Danh sách contest
-  </a>
-</div>
 
 <style>
 .table-hover tbody tr:hover { 
