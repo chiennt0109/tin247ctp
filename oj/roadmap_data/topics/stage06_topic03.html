@@ -1,66 +1,40 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu khái niệm dãy con tăng dài nhất.</li>
-  <li>Biết cách sử dụng DP để giải bài toán LIS.</li>
-</ul>
+<article class="space-y-6">
+  <nav aria-label="Breadcrumb" class="text-sm text-gray-500">
+    <a class="text-indigo-600 font-semibold hover:underline" href="/#roadmap">Roadmap</a>
+    <span class="mx-2">/</span>
+    <a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/6/">Chương 6</a>
+    <span class="mx-2">/</span>
+    <span>6.3</span>
+  </nav>
 
-<hr>
+  <header>
+    <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Mục 6.3</p>
+    <h1 class="text-3xl font-bold text-gray-900 mt-2">DP một chiều và DP theo tiền tố</h1>
+    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 mt-4">Đang biên soạn</span>
+  </header>
 
-<h2>📘 Mô tả bài toán</h2>
-<p>Cho dãy a₁, a₂, …, aₙ.  
-Tìm độ dài lớn nhất của dãy con tăng dần.</p>
+  <section class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-gray-700">
+    <p>Nội dung bài học đang được biên soạn. Trang này được tạo tạm để bảo đảm liên kết trong lộ trình hoạt động.</p>
+  </section>
 
-<h3>📐 Công thức DP</h3>
-<pre><code>dp[i] = 1 + max(dp[j]) với mọi j &lt; i và a[j] &lt; a[i]</code></pre>
+  <section>
+    <h2 class="text-xl font-semibold text-gray-800 mb-3">Nội dung dự kiến</h2>
+    <ul class="list-disc pl-6 space-y-2 text-gray-700">
+      <li>Climbing Stairs</li>
+      <li>Min Cost</li>
+      <li>House Robber</li>
+      <li>Kadane</li>
+      <li>Đếm cách</li>
+      <li>Prefix DP</li>
+      <li>Rolling variables</li>
+    </ul>
+    <h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Nội dung liên quan đã có</h2>
+    <ul class="list-disc pl-6 space-y-2 text-gray-700">
+      <li><a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/extra/dp-toi-uu-khong-gian/">DP tối ưu không gian</a></li>
+    </ul>
+  </section>
 
-<hr>
-
-<h2>💻 Thực hành</h2>
-
-<h4>Python</h4>
-<pre><code>n=int(input())
-a=list(map(int,input().split()))
-dp=[1]*n
-for i in range(1,n):
-    for j in range(i):
-        if a[i]&gt;a[j]:
-            dp[i]=max(dp[i],dp[j]+1)
-print(max(dp))</code></pre>
-
-<h4>C++</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int main(){
-    int n;cin&gt;&gt;n;
-    vector&lt;int&gt; a(n);
-    for(int i=0;i&lt;n;i++)cin&gt;&gt;a[i];
-    vector&lt;int&gt; dp(n,1);
-    for(int i=1;i&lt;n;i++)
-        for(int j=0;j&lt;i;j++)
-            if(a[i]&gt;a[j])
-                dp[i]=max(dp[i],dp[j]+1);
-    cout&lt;&lt;*max_element(dp.begin(),dp.end());
-}</code></pre>
-
-<hr>
-
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Tính độ dài LIS cho mảng bất kỳ.</li>
-  <li>In ra toàn bộ dãy con tăng dài nhất.</li>
-  <li>Tối ưu thuật toán LIS bằng tìm kiếm nhị phân để đạt O(n log n).</li>
-</ol>
-
-<details>
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python (O(n log n))
-import bisect
-n=int(input())
-a=list(map(int,input().split()))
-lis=[]
-for x in a:
-    i=bisect.bisect_left(lis,x)
-    if i==len(lis): lis.append(x)
-    else: lis[i]=x
-print(len(lis))</code></pre>
-</details>
+  <p>
+    <a class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700" href="/roadmap/stage/6/">⬅️ Quay lại Chương 6</a>
+  </p>
+</article>

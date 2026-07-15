@@ -31,6 +31,7 @@ urlpatterns = [
 
     # Chủ đề bổ sung trong roadmap: đặt trước các route roadmap khác để tránh 404 khi truy cập trực tiếp.
     re_path(r"^roadmap/extra/(?P<slug>[-a-zA-Z0-9_]+)/?$", roadmap_views.roadmap_extra_topic, name="roadmap_extra_topic"),
+    re_path(r"^roadmap/legacy/(?P<slug>[-a-zA-Z0-9_/]+)/?$", roadmap_views.roadmap_legacy_topic, name="roadmap_legacy_topic"),
 
     path("roadmap/detail/", RedirectView.as_view(url="/", permanent=False)),
     path("roadmap/", RedirectView.as_view(url="/", permanent=False)),

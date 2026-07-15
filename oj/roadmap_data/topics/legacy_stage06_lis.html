@@ -1,0 +1,66 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu khái niệm dãy con tăng dài nhất.</li>
+  <li>Biết cách sử dụng DP để giải bài toán LIS.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Mô tả bài toán</h2>
+<p>Cho dãy a₁, a₂, …, aₙ.  
+Tìm độ dài lớn nhất của dãy con tăng dần.</p>
+
+<h3>📐 Công thức DP</h3>
+<pre><code>dp[i] = 1 + max(dp[j]) với mọi j &lt; i và a[j] &lt; a[i]</code></pre>
+
+<hr>
+
+<h2>💻 Thực hành</h2>
+
+<h4>Python</h4>
+<pre><code>n=int(input())
+a=list(map(int,input().split()))
+dp=[1]*n
+for i in range(1,n):
+    for j in range(i):
+        if a[i]&gt;a[j]:
+            dp[i]=max(dp[i],dp[j]+1)
+print(max(dp))</code></pre>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    int n;cin&gt;&gt;n;
+    vector&lt;int&gt; a(n);
+    for(int i=0;i&lt;n;i++)cin&gt;&gt;a[i];
+    vector&lt;int&gt; dp(n,1);
+    for(int i=1;i&lt;n;i++)
+        for(int j=0;j&lt;i;j++)
+            if(a[i]&gt;a[j])
+                dp[i]=max(dp[i],dp[j]+1);
+    cout&lt;&lt;*max_element(dp.begin(),dp.end());
+}</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Tính độ dài LIS cho mảng bất kỳ.</li>
+  <li>In ra toàn bộ dãy con tăng dài nhất.</li>
+  <li>Tối ưu thuật toán LIS bằng tìm kiếm nhị phân để đạt O(n log n).</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python (O(n log n))
+import bisect
+n=int(input())
+a=list(map(int,input().split()))
+lis=[]
+for x in a:
+    i=bisect.bisect_left(lis,x)
+    if i==len(lis): lis.append(x)
+    else: lis[i]=x
+print(len(lis))</code></pre>
+</details>
