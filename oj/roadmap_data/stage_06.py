@@ -2,96 +2,96 @@
 
 STAGE_6 = {
     "id": 6,
-    "title": "📈 Giai đoạn 6: Quy hoạch động (Dynamic Programming)",
-    "summary": "Tối ưu hóa bài toán bằng cách ghi nhớ trạng thái và kết quả trung gian.",
+    "title": "📈 Giai đoạn 6: Quy hoạch động",
+    "summary": "Tối ưu hóa bài toán bằng cách thiết kế trạng thái, công thức chuyển và thứ tự tính phù hợp.",
     "topics": [
         {
-            "title": "6.1. Fibonacci tối ưu (Memoization)",
-            "summary": "Hiểu cách giảm số lần tính toán lặp bằng cách lưu kết quả trung gian.",
+            "title": "6.1. Từ đệ quy đến quy hoạch động",
+            "summary": "Nhận biết bài toán con trùng lặp và chuyển lời giải đệ quy thành memoization.",
+            "type": "Nhập môn",
             "lang_support": ["C++", "Python"],
             "more_url": "/stages/6/topic/1/",
             "html_file": "roadmap_data/topics/stage06_topic01.html",
-            "sample_cpp": """#include <bits/stdc++.h>
-using namespace std;
-vector<long long> f(100, -1);
-long long fib(int n) {
-    if (n <= 1) return n;
-    if (f[n] != -1) return f[n];
-    return f[n] = fib(n - 1) + fib(n - 2);
-}
-int main() {
-    int n; cin >> n;
-    cout << fib(n);
-}""",
-            "sample_py": """from functools import lru_cache
-@lru_cache(maxsize=None)
-def fib(n):
-    if n <= 1:
-        return n
-    return fib(n-1) + fib(n-2)
-print(fib(int(input())))"""
         },
         {
-            "title": "6.2. Bài toán Balo (Knapsack)",
-            "summary": "Giải bài toán chọn vật phẩm tối ưu bằng kỹ thuật DP 2 chiều.",
+            "title": "6.2. Thiết kế trạng thái và công thức chuyển",
+            "summary": "Xác định state, transition, base case, thứ tự tính và cách truy vết nghiệm.",
+            "type": "Cốt lõi",
             "lang_support": ["C++", "Python"],
             "more_url": "/stages/6/topic/2/",
             "html_file": "roadmap_data/topics/stage06_topic02.html",
-            "sample_cpp": """#include <bits/stdc++.h>
-using namespace std;
-int main() {
-    int n, W; cin >> n >> W;
-    vector<int> w(n+1), v(n+1);
-    for (int i = 1; i <= n; i++) cin >> w[i] >> v[i];
-    vector<vector<int>> dp(n+1, vector<int>(W+1, 0));
-    for (int i = 1; i <= n; i++)
-        for (int j = 0; j <= W; j++)
-            if (j >= w[i])
-                dp[i][j] = max(dp[i-1][j], dp[i-1][j-w[i]] + v[i]);
-            else dp[i][j] = dp[i-1][j];
-    cout << dp[n][W];
-}""",
-            "sample_py": """n, W = map(int, input().split())
-w, v = [0], [0]
-for _ in range(n):
-    wi, vi = map(int, input().split())
-    w.append(wi); v.append(vi)
-dp = [[0]*(W+1) for _ in range(n+1)]
-for i in range(1, n+1):
-    for j in range(W+1):
-        if j >= w[i]:
-            dp[i][j] = max(dp[i-1][j], dp[i-1][j-w[i]] + v[i])
-        else:
-            dp[i][j] = dp[i-1][j]
-print(dp[n][W])"""
         },
         {
-            "title": "6.3. Dãy con tăng dài nhất (LIS)",
-            "summary": "Xây dựng lời giải quy hoạch động để tìm dãy con tăng dài nhất.",
+            "title": "6.3. DP một chiều và DP theo tiền tố",
+            "summary": "Làm quen với các trạng thái tuyến tính trước khi xây dựng bảng DP nhiều chiều.",
+            "type": "Cốt lõi",
             "lang_support": ["C++", "Python"],
             "more_url": "/stages/6/topic/3/",
             "html_file": "roadmap_data/topics/stage06_topic03.html",
-            "sample_cpp": """#include <bits/stdc++.h>
-using namespace std;
-int main() {
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    vector<int> dp(n, 1);
-    for (int i = 1; i < n; i++)
-        for (int j = 0; j < i; j++)
-            if (a[i] > a[j])
-                dp[i] = max(dp[i], dp[j] + 1);
-    cout << *max_element(dp.begin(), dp.end());
-}""",
-            "sample_py": """n = int(input())
-a = list(map(int, input().split()))
-dp = [1]*n
-for i in range(1,n):
-    for j in range(i):
-        if a[i]>a[j]:
-            dp[i] = max(dp[i], dp[j]+1)
-print(max(dp))"""
+        },
+        {
+            "title": "6.4. Knapsack, Subset Sum và Coin Change",
+            "summary": "Làm chủ mô hình chọn hoặc không chọn và thứ tự cập nhật trạng thái.",
+            "type": "Cốt lõi",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/4/",
+            "html_file": "roadmap_data/topics/stage06_topic04.html",
+        },
+        {
+            "title": "6.5. DP trên dãy con",
+            "summary": "Giải các bài toán có trạng thái phụ thuộc vào phần tử cuối hoặc độ dài tiền tố.",
+            "type": "Trung cấp",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/5/",
+            "html_file": "roadmap_data/topics/stage06_topic05.html",
+        },
+        {
+            "title": "6.6. DP trên xâu",
+            "summary": "Thiết kế trạng thái trên một hoặc hai tiền tố của xâu.",
+            "type": "Trung cấp",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/6/",
+            "html_file": "roadmap_data/topics/stage06_topic06.html",
+        },
+        {
+            "title": "6.7. Interval DP và Partition DP",
+            "summary": "Xử lý bài toán trên đoạn bằng cách tăng dần độ dài và thử các điểm chia.",
+            "type": "Trung cấp",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/7/",
+            "html_file": "roadmap_data/topics/stage06_topic07.html",
+        },
+        {
+            "title": "6.8. DP trên DAG",
+            "summary": "Tính trạng thái theo thứ tự topo trên đồ thị phụ thuộc không có chu trình.",
+            "type": "Bổ sung",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/8/",
+            "html_file": "roadmap_data/topics/stage06_topic08.html",
+        },
+        {
+            "title": "6.9. DP trên cây",
+            "summary": "Tổng hợp kết quả từ các cây con và chuyển trạng thái giữa cha với con.",
+            "type": "Nâng cao",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/9/",
+            "html_file": "roadmap_data/topics/stage06_topic09.html",
+        },
+        {
+            "title": "6.10. Digit DP",
+            "summary": "Đếm các số trong một đoạn bằng trạng thái theo vị trí chữ số và giới hạn tiền tố.",
+            "type": "Nâng cao",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/10/",
+            "html_file": "roadmap_data/topics/stage06_topic10.html",
+        },
+        {
+            "title": "6.11. Bitmask DP và tối ưu DP",
+            "summary": "Nén tập lựa chọn bằng bitmask và áp dụng các kỹ thuật giảm thời gian hoặc bộ nhớ.",
+            "type": "Chuyên sâu",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/6/topic/11/",
+            "html_file": "roadmap_data/topics/stage06_topic11.html",
         },
     ],
 }

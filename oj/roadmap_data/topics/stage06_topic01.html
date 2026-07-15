@@ -1,61 +1,39 @@
-<h2>🎯 Mục tiêu bài học</h2>
-<ul>
-  <li>Hiểu tư tưởng ghi nhớ kết quả (memoization) trong quy hoạch động.</li>
-  <li>So sánh tốc độ giữa Fibonacci thường và có nhớ kết quả.</li>
-</ul>
+<article class="space-y-6">
+  <nav aria-label="Breadcrumb" class="text-sm text-gray-500">
+    <a class="text-indigo-600 font-semibold hover:underline" href="/#roadmap">Roadmap</a>
+    <span class="mx-2">/</span>
+    <a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/6/">Chương 6</a>
+    <span class="mx-2">/</span>
+    <span>6.1</span>
+  </nav>
 
-<hr>
+  <header>
+    <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Mục 6.1</p>
+    <h1 class="text-3xl font-bold text-gray-900 mt-2">Từ đệ quy đến quy hoạch động</h1>
+    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 mt-4">Đang biên soạn</span>
+  </header>
 
-<h2>📘 Lý thuyết</h2>
-<p>Bài toán Fibonacci là ví dụ kinh điển của đệ quy lặp lại nhiều lần:</p>
-<pre><code>F(n) = F(n-1) + F(n-2), với F(0)=0, F(1)=1</code></pre>
+  <section class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-gray-700">
+    <p>Nội dung bài học đang được biên soạn. Trang này được tạo tạm để bảo đảm liên kết trong lộ trình hoạt động.</p>
+  </section>
 
-<p>Khi không nhớ kết quả, các lời gọi trùng lặp sẽ khiến chương trình cực kỳ chậm.  
-👉 Giải pháp: lưu các giá trị đã tính để dùng lại.</p>
+  <section>
+    <h2 class="text-xl font-semibold text-gray-800 mb-3">Nội dung dự kiến</h2>
+    <ul class="list-disc pl-6 space-y-2 text-gray-700">
+      <li>Cây lời gọi đệ quy</li>
+      <li>Overlapping subproblems</li>
+      <li>Fibonacci</li>
+      <li>Memoization</li>
+      <li>Số trạng thái</li>
+      <li>So sánh DP và quay lui</li>
+    </ul>
+    <h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Nội dung liên quan đã có</h2>
+    <ul class="list-disc pl-6 space-y-2 text-gray-700">
+      <li><a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/legacy/stage6/fibonacci/">Case study Fibonacci cũ</a></li>
+    </ul>
+  </section>
 
-<hr>
-
-<h2>💻 Thực hành</h2>
-
-<h4>C++</h4>
-<pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-vector&lt;long long&gt; f(100, -1);
-long long fib(int n){
-    if(n&lt;=1) return n;
-    if(f[n]!=-1) return f[n];
-    return f[n]=fib(n-1)+fib(n-2);
-}
-int main(){
-    int n;cin&gt;&gt;n;
-    cout&lt;&lt;fib(n);
-}</code></pre>
-
-<h4>Python</h4>
-<pre><code>from functools import lru_cache
-@lru_cache(None)
-def fib(n):
-    if n&lt;=1: return n
-    return fib(n-1)+fib(n-2)
-print(fib(int(input())))</code></pre>
-
-<hr>
-
-<h2>🧩 Bài tập luyện tập</h2>
-<ol>
-  <li>Tính Fibonacci bằng đệ quy không nhớ.</li>
-  <li>Tính Fibonacci bằng memoization.</li>
-  <li>Đếm số lần gọi hàm trong hai cách trên để so sánh tốc độ.</li>
-</ol>
-
-<details>
-  <summary><b>💡 Xem lời giải mẫu</b></summary>
-  <pre><code># Python
-cnt=0
-def fib(n):
-    global cnt
-    cnt+=1
-    if n&lt;=1: return n
-    return fib(n-1)+fib(n-2)
-print(fib(10),"calls=",cnt)</code></pre>
-</details>
+  <p>
+    <a class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700" href="/roadmap/stage/6/">⬅️ Quay lại Chương 6</a>
+  </p>
+</article>

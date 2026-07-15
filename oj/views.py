@@ -49,7 +49,7 @@ ROADMAP_CHAPTERS = [
     {"title": "Phân tích thuật toán, tìm kiếm và sắp xếp", "stage_ids": [3], "extras": ["Amortized analysis", "Counting sort, radix sort, heap sort"]},
     {"title": "Kỹ thuật giải bài cơ bản", "stage_ids": [4], "extras": ["Prefix sum", "Prefix Max", "Difference array", "Two pointers", "Sliding window"]},
     {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [5], "extras": []},
-    {"title": "Quy hoạch động", "stage_ids": [6], "extras": ["DP trên bitmask", "DP trên cây", "DP tối ưu không gian"]},
+    {"title": "Quy hoạch động", "stage_ids": [6], "extras": []},
     {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": ["RSQ", "RMQ", "Lazy propagation", "Sparse table", "LCA", "Euler Tour on Tree"]},
     {"title": "Đồ thị", "stage_ids": [9, 10], "extras": ["Topological sort", "Strongly connected components", "Euler tour", "Network flow"]},
     {"title": "Toán rời rạc và lý thuyết số", "stage_ids": [12], "extras": ["Sieve of Eratosthenes", "Fast exponentiation", "Chinese remainder theorem"]},
@@ -57,6 +57,22 @@ ROADMAP_CHAPTERS = [
     {"title": "Cấu trúc dữ liệu nâng cao", "stage_ids": [], "extras": ["Disjoint Sparse Table", "Treap", "Sqrt decomposition", "Heavy-Light Decomposition", "Persistent Segment Tree"]},
     {"title": "Luyện thi tổng hợp", "stage_ids": [14], "extras": ["Upsolving", "Template cá nhân", "Chiến lược phân bổ thời gian"]},
 ]
+
+
+LEGACY_ROADMAP_TOPICS = {
+    "stage6/fibonacci": {
+        "title": "Fibonacci tối ưu (Memoization)",
+        "html_file": "roadmap_data/topics/legacy_stage06_fibonacci.html",
+    },
+    "stage6/knapsack": {
+        "title": "Bài toán Balo (Knapsack)",
+        "html_file": "roadmap_data/topics/legacy_stage06_knapsack.html",
+    },
+    "stage6/lis": {
+        "title": "Dãy con tăng dài nhất (LIS)",
+        "html_file": "roadmap_data/topics/legacy_stage06_lis.html",
+    },
+}
 
 def roadmap_extra_slug(title):
     normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("ascii")
@@ -146,10 +162,12 @@ def roadmap_extra_topic(request, slug):
                 break
         if title:
             break
-    if not title:
-        return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung bổ sung."})
-
     html_path = roadmap_extra_file(slug)
+    if not title:
+        if not os.path.exists(html_path):
+            return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung bổ sung."})
+        title = slug.replace("-", " ").title()
+
     if not os.path.exists(html_path):
         detail = f"<p class='text-danger'>⚠️ Không tìm thấy file nội dung: <code>{html.escape(html_path)}</code></p>"
     else:
@@ -160,6 +178,24 @@ def roadmap_extra_topic(request, slug):
         "stage": {"id": "extra", "title": "Nội dung bổ sung"},
         "topic": {"title": title, "summary": "", "detail": detail},
     })
+
+def roadmap_legacy_topic(request, slug):
+    legacy = LEGACY_ROADMAP_TOPICS.get(slug)
+    if not legacy:
+        return render(request, "oj/not_found.html", {"message": "Không tìm thấy nội dung cũ."})
+
+    html_path = os.path.join(settings.BASE_DIR, "oj", legacy["html_file"])
+    if not os.path.exists(html_path):
+        detail = f"<p class='text-danger'>⚠️ Không tìm thấy file nội dung: <code>{html.escape(legacy['html_file'])}</code></p>"
+    else:
+        with open(html_path, "r", encoding="utf-8", errors="replace") as f:
+            detail = f.read()
+
+    return render(request, "roadmap_detail.html", {
+        "stage": {"id": 6, "title": "Quy hoạch động"},
+        "topic": {"title": legacy["title"], "summary": "Nội dung cũ được giữ lại để không phá vỡ liên kết.", "detail": detail},
+    })
+
 
 # ==============================
 # 🏠 HOME

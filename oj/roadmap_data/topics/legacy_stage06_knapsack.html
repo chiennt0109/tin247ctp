@@ -1,0 +1,70 @@
+<h2>🎯 Mục tiêu bài học</h2>
+<ul>
+  <li>Hiểu cách sử dụng DP 2 chiều để chọn vật phẩm tối ưu.</li>
+  <li>Nắm được công thức chuyển trạng thái của bài toán Balo.</li>
+</ul>
+
+<hr>
+
+<h2>📘 Mô tả bài toán</h2>
+<p>Có n vật, vật i có trọng lượng <code>w[i]</code> và giá trị <code>v[i]</code>.  
+Balo chịu tải tối đa W.  
+Tìm tổng giá trị lớn nhất có thể mang được mà không vượt quá W.</p>
+
+<h3>📐 Công thức DP</h3>
+<pre><code>dp[i][j] = max(dp[i-1][j], dp[i-1][j-w[i]] + v[i]) nếu j ≥ w[i]</code></pre>
+
+<hr>
+
+<h2>💻 Thực hành</h2>
+
+<h4>C++</h4>
+<pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    int n,W;cin&gt;&gt;n&gt;&gt;W;
+    vector&lt;int&gt; w(n+1),v(n+1);
+    for(int i=1;i&lt;=n;i++)cin&gt;&gt;w[i]&gt;&gt;v[i];
+    vector&lt;vector&lt;int&gt;&gt; dp(n+1,vector&lt;int&gt;(W+1,0));
+    for(int i=1;i&lt;=n;i++)
+        for(int j=0;j&lt;=W;j++)
+            dp[i][j]= (j&lt;w[i])? dp[i-1][j] : max(dp[i-1][j],dp[i-1][j-w[i]]+v[i]);
+    cout&lt;&lt;dp[n][W];
+}</code></pre>
+
+<h4>Python</h4>
+<pre><code>n,W=map(int,input().split())
+w,v=[0],[0]
+for _ in range(n):
+    wi,vi=map(int,input().split())
+    w.append(wi);v.append(vi)
+dp=[[0]*(W+1) for _ in range(n+1)]
+for i in range(1,n+1):
+    for j in range(W+1):
+        if j&lt;w[i]: dp[i][j]=dp[i-1][j]
+        else: dp[i][j]=max(dp[i-1][j],dp[i-1][j-w[i]]+v[i])
+print(dp[n][W])</code></pre>
+
+<hr>
+
+<h2>🧩 Bài tập luyện tập</h2>
+<ol>
+  <li>Thử thay đổi dữ liệu đầu vào và quan sát cách DP thay đổi.</li>
+  <li>In ra danh sách các vật được chọn.</li>
+  <li>Tối ưu bộ nhớ bằng cách dùng mảng 1 chiều <code>dp[j]</code>.</li>
+</ol>
+
+<details>
+  <summary><b>💡 Xem lời giải mẫu</b></summary>
+  <pre><code># Python (1D DP)
+n,W=map(int,input().split())
+w,v=[],[]
+for _ in range(n):
+    wi,vi=map(int,input().split())
+    w.append(wi);v.append(vi)
+dp=[0]*(W+1)
+for i in range(n):
+    for j in range(W,w[i]-1,-1):
+        dp[j]=max(dp[j],dp[j-w[i]]+v[i])
+print(dp[W])</code></pre>
+</details>
