@@ -2,117 +2,48 @@
 
 STAGE_5 = {
     "id": 5,
-    "title": "🔁 Giai đoạn 5: Đệ quy & chia để trị",
-    "summary": "Hiểu cách chia nhỏ bài toán và sử dụng lời gọi đệ quy để giải quyết hiệu quả hơn.",
+    "title": "🔁 Giai đoạn 5: Đệ quy, quay lui và nhánh cận",
+    "summary": "Nắm vững đệ quy, sinh cấu hình, quay lui, nhánh cận và các kỹ thuật chia nhỏ không gian tìm kiếm.",
     "topics": [
         {
-            "title": "5.1. Đệ quy cơ bản",
-            "summary": "Hiểu cơ chế gọi hàm lặp lại chính nó và cách dừng điều kiện cơ sở.",
+            "title": "5.1. Đệ quy và cây tìm kiếm",
+            "summary": "Nắm vững lời gọi đệ quy, trạng thái, trường hợp cơ sở và cách phân tích cây tìm kiếm.",
+            "type": "Cốt lõi",
             "lang_support": ["C++", "Python"],
             "more_url": "/stages/5/topic/1/",
             "html_file": "roadmap_data/topics/stage05_topic01.html",
-            "sample_cpp": """#include <bits/stdc++.h>
-using namespace std;
-
-int factorial(int n) {
-    if (n == 0 || n == 1) return 1; // Điều kiện dừng
-    return n * factorial(n - 1);    // Gọi lại chính nó
-}
-
-int main() {
-    int n; cin >> n;
-    cout << factorial(n);
-}""",
-            "sample_py": """def factorial(n):
-    if n == 0 or n == 1:
-        return 1
-    return n * factorial(n - 1)
-
-n = int(input())
-print(factorial(n))"""
         },
         {
-            "title": "5.2. Chia để trị (Divide and Conquer)",
-            "summary": "Phân tách bài toán thành các phần nhỏ hơn rồi kết hợp kết quả để tạo thành lời giải hoàn chỉnh.",
+            "title": "5.2. Sinh cấu hình và Bitmask Enumeration",
+            "summary": "Sinh tập con, tổ hợp, hoán vị và duyệt trạng thái hiệu quả bằng bitmask.",
+            "type": "Cốt lõi",
             "lang_support": ["C++", "Python"],
             "more_url": "/stages/5/topic/2/",
             "html_file": "roadmap_data/topics/stage05_topic02.html",
-            "sample_cpp": """#include <bits/stdc++.h>
-using namespace std;
-
-int sumRange(vector<int>& a, int l, int r) {
-    if (l == r) return a[l];
-    int mid = (l + r) / 2;
-    return sumRange(a, l, mid) + sumRange(a, mid + 1, r);
-}
-
-int main() {
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    cout << sumRange(a, 0, n - 1);
-}""",
-            "sample_py": """def sum_range(a, l, r):
-    if l == r:
-        return a[l]
-    m = (l + r) // 2
-    return sum_range(a, l, m) + sum_range(a, m + 1, r)
-
-n = int(input())
-a = list(map(int, input().split()))
-print(sum_range(a, 0, n - 1))"""
         },
         {
-            "title": "5.3. Merge Sort & Quick Sort",
-            "summary": "Hai ví dụ kinh điển của chia để trị – sắp xếp hiệu quả với độ phức tạp O(n log n).",
+            "title": "5.3. Quay lui, cắt nhánh và CSP",
+            "summary": "Xây dựng quay lui theo mô hình chọn – kiểm tra – đệ quy – hoàn tác, kết hợp pruning và heuristic.",
+            "type": "Cốt lõi",
             "lang_support": ["C++", "Python"],
             "more_url": "/stages/5/topic/3/",
             "html_file": "roadmap_data/topics/stage05_topic03.html",
-            "sample_cpp": """#include <bits/stdc++.h>
-using namespace std;
-
-void merge(vector<int>& a, int l, int m, int r) {
-    vector<int> L(a.begin() + l, a.begin() + m + 1);
-    vector<int> R(a.begin() + m + 1, a.begin() + r + 1);
-    int i = 0, j = 0, k = l;
-    while (i < L.size() && j < R.size())
-        a[k++] = (L[i] <= R[j]) ? L[i++] : R[j++];
-    while (i < L.size()) a[k++] = L[i++];
-    while (j < R.size()) a[k++] = R[j++];
-}
-
-void mergeSort(vector<int>& a, int l, int r) {
-    if (l >= r) return;
-    int m = (l + r) / 2;
-    mergeSort(a, l, m);
-    mergeSort(a, m + 1, r);
-    merge(a, l, m, r);
-}
-
-int main() {
-    int n; cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++) cin >> a[i];
-    mergeSort(a, 0, n - 1);
-    for (int x : a) cout << x << " ";
-}""",
-            "sample_py": """def merge_sort(a):
-    if len(a) <= 1:
-        return a
-    mid = len(a) // 2
-    left = merge_sort(a[:mid])
-    right = merge_sort(a[mid:])
-    result = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            result.append(left[i]); i += 1
-        else:
-            result.append(right[j]); j += 1
-    result += left[i:] + right[j:]
-    return result
-
-print(*merge_sort(list(map(int, input().split()))))"""
+        },
+        {
+            "title": "5.4. Branch-and-Bound và tìm kiếm tăng dần",
+            "summary": "Tối ưu không gian tìm kiếm bằng cận trên, cận dưới, branch ordering, IDDFS và IDA*.",
+            "type": "Nâng cao",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/5/topic/4/",
+            "html_file": "roadmap_data/topics/stage05_topic04.html",
+        },
+        {
+            "title": "5.5. Meet-in-the-Middle và tìm kiếm hai phía",
+            "summary": "Chia không gian trạng thái thành hai nửa để giảm độ phức tạp và ghép kết quả hiệu quả.",
+            "type": "Bổ sung",
+            "lang_support": ["C++", "Python"],
+            "more_url": "/stages/5/topic/5/",
+            "html_file": "roadmap_data/topics/stage05_topic05.html",
         },
     ],
 }
