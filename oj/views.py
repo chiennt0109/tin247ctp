@@ -46,9 +46,9 @@ STAGES = [
 ROADMAP_CHAPTERS = [
     {"title": "Nền tảng C++", "stage_ids": [1], "extras": ["STL cơ bản: vector, pair, tuple", "Iterator, range-based for"]},
     {"title": "Kiểu dữ liệu trừu tượng và thư viện chuẩn", "stage_ids": [2, 8], "extras": ["STL algorithm: sort, lower_bound, upper_bound", "set, multiset, map, unordered_map"]},
-    {"title": "Phân tích thuật toán, tìm kiếm và sắp xếp", "stage_ids": [3, 5], "extras": ["Amortized analysis", "Counting sort, radix sort, heap sort"]},
+    {"title": "Phân tích thuật toán, tìm kiếm và sắp xếp", "stage_ids": [3], "extras": ["Amortized analysis", "Counting sort, radix sort, heap sort"]},
     {"title": "Kỹ thuật giải bài cơ bản", "stage_ids": [4], "extras": ["Prefix sum", "Prefix Max", "Difference array", "Two pointers", "Sliding window"]},
-    {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [7], "extras": ["Bitmask enumeration", "Meet-in-the-middle"]},
+    {"title": "Đệ quy, quay lui và nhánh cận", "stage_ids": [5], "extras": []},
     {"title": "Quy hoạch động", "stage_ids": [6], "extras": ["DP trên bitmask", "DP trên cây", "DP tối ưu không gian"]},
     {"title": "Cây và truy vấn đoạn", "stage_ids": [11], "extras": ["RSQ", "RMQ", "Lazy propagation", "Sparse table", "LCA", "Euler Tour on Tree"]},
     {"title": "Đồ thị", "stage_ids": [9, 10], "extras": ["Topological sort", "Strongly connected components", "Euler tour", "Network flow"]},
@@ -97,7 +97,7 @@ def build_roadmap_chapters(stages):
                 if title_key in seen_titles:
                     continue
                 seen_titles.add(title_key)
-                topic_type = "Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết")
+                topic_type = topic.get("type") or ("Bài tập" if any(k in title.lower() for k in ["solver", "bài", "n-queens", "sudoku"]) else ("Ví dụ" if topic.get("sample_cpp") or topic.get("sample_py") else "Lý thuyết"))
                 lessons.append({
                     "number": f"{chapter_index}.{topic_number}",
                     "title": title,
