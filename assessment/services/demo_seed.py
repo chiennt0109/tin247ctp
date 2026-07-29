@@ -82,7 +82,11 @@ class AssessmentDemoSeeder:
         )
         report.schemes_existing = len(self.BLUEPRINTS) - report.schemes_created
         session_slugs = self._session_definitions().keys()
-        report.sessions_created = sum(not ExamSession.objects.filter(slug=slug).exists() for slug in session_slugs)
+        report.sessions_created = sum(
+            not ExamSession.objects.filter(demo_key=slug).exists()
+            and not ExamSession.objects.filter(slug=slug, is_demo=True).exists()
+            for slug in session_slugs
+        )
         report.sessions_existing = len(self._session_definitions()) - report.sessions_created
         return report
 
@@ -109,14 +113,24 @@ class AssessmentDemoSeeder:
         for slug, definition in self._session_definitions().items():
             artifact_key = definition.pop("artifact")
             blueprint, scheme, validation = artifacts[artifact_key]
-            session, created = ExamSession.objects.get_or_create(
-                slug=slug,
-                defaults={
-                    **definition, "blueprint_version": blueprint.versions.get(version=1),
-                    "scoring_version": scheme.versions.get(version=1), "created_by": teacher,
-                    "is_demo": True,
-                },
-            )
+            session = ExamSession.objects.filter(demo_key=slug).first()
+            created = False
+            if session is None:
+                # Adopt demo rows created before ExamSession gained demo_key. The
+                # is_demo guard prevents a real session with the same slug from
+                # ever being claimed by the seeder.
+                session = ExamSession.objects.filter(slug=slug, is_demo=True).first()
+                if session is not None:
+                    session.demo_key = slug
+                    session.save(update_fields=("demo_key",))
+            if session is None:
+                session = ExamSession.objects.create(
+                    slug=slug, demo_key=slug,
+                    **definition, blueprint_version=blueprint.versions.get(version=1),
+                    scoring_version=scheme.versions.get(version=1), created_by=teacher,
+                    is_demo=True,
+                )
+                created = True
             sessions[slug] = (session, validation)
             report.sessions_created += int(created)
             report.sessions_existing += int(not created)

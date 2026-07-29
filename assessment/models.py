@@ -207,7 +207,13 @@ class ExamBlueprint(models.Model):
         LOCKED = "LOCKED", "Đã khóa"
 
     name = models.CharField(max_length=255)
-    demo_key = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    demo_key = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+    )
     is_demo = models.BooleanField(default=False, db_index=True)
     exam_type = models.CharField(max_length=64, db_index=True)
     grade = models.PositiveSmallIntegerField(db_index=True)
@@ -325,7 +331,13 @@ class BlueprintSlot(models.Model):
 
 class ScoringScheme(models.Model):
     name = models.CharField(max_length=255)
-    demo_key = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    demo_key = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+    )
     is_demo = models.BooleanField(default=False, db_index=True)
     description = models.TextField(blank=True)
     is_default = models.BooleanField(default=False)
@@ -426,6 +438,13 @@ class ExamSession(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     slug = models.SlugField(max_length=180, unique=True)
     name = models.CharField(max_length=255)
+    demo_key = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+    )
     is_demo = models.BooleanField(default=False, db_index=True)
     exam_type = models.CharField(max_length=32, choices=ExamType.choices)
     blueprint_version = models.ForeignKey(BlueprintVersion, on_delete=models.PROTECT, related_name="exam_sessions")

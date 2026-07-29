@@ -56,6 +56,7 @@ class AssessmentDemoSeedTests(TestCase):
         self.assertEqual(ExamBlueprint.objects.filter(is_demo=True).count(), 3)
         self.assertEqual(ScoringScheme.objects.filter(is_demo=True).count(), 3)
         self.assertEqual(ExamSession.objects.filter(is_demo=True).count(), 4)
+        self.assertEqual(ExamSession.objects.filter(demo_key__isnull=False).count(), 4)
         self.assertEqual(ExamParticipant.objects.filter(user=self.student).count(), 4)
         access = ExamParticipant.objects.get(session__slug="assessment-demo-access", user=self.student)
         self.assertTrue(access.can_download_exam)
@@ -110,3 +111,15 @@ class AssessmentDemoSeedTests(TestCase):
         self.seed("--dry-run")
         self.assertFalse(ExamBlueprint.objects.filter(is_demo=True).exists())
         self.assertFalse(ExamSession.objects.filter(is_demo=True).exists())
+
+    def test_apply_adopts_legacy_demo_session_without_duplicate(self):
+        self.seed("--apply")
+        session = ExamSession.objects.get(slug="assessment-demo-practice")
+        session.demo_key = None
+        session.save(update_fields=("demo_key",))
+
+        self.seed("--apply")
+
+        self.assertEqual(ExamSession.objects.filter(slug=session.slug).count(), 1)
+        session.refresh_from_db()
+        self.assertEqual(session.demo_key, session.slug)
