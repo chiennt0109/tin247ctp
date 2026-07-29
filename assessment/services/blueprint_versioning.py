@@ -32,6 +32,7 @@ def clone_blueprint_version(source, *, actor=None):
                 score_per_item=slot.score_per_item, required_tags=slot.required_tags,
                 excluded_tags=slot.excluded_tags,
                 requires_graduation_eligibility=slot.requires_graduation_eligibility,
+                required_process_status=slot.required_process_status,
                 allow_previously_used=slot.allow_previously_used,
                 max_usage_count=slot.max_usage_count,
                 reuse_cooldown_days=slot.reuse_cooldown_days,

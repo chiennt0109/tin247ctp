@@ -83,6 +83,8 @@ class BlueprintValidator:
             queryset = queryset.filter(competency=slot.competency)
         if slot.requires_graduation_eligibility:
             queryset = queryset.filter(process_status="READY_FOR_GRADUATION")
+        elif slot.required_process_status:
+            queryset = queryset.filter(process_status=slot.required_process_status)
         return queryset
 
     @staticmethod

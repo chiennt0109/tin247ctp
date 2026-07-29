@@ -207,6 +207,8 @@ class ExamBlueprint(models.Model):
         LOCKED = "LOCKED", "Đã khóa"
 
     name = models.CharField(max_length=255)
+    demo_key = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    is_demo = models.BooleanField(default=False, db_index=True)
     exam_type = models.CharField(max_length=64, db_index=True)
     grade = models.PositiveSmallIntegerField(db_index=True)
     subject = models.CharField(max_length=100, default="Tin học")
@@ -303,6 +305,7 @@ class BlueprintSlot(models.Model):
     required_tags = models.JSONField(default=list, blank=True)
     excluded_tags = models.JSONField(default=list, blank=True)
     requires_graduation_eligibility = models.BooleanField(default=False)
+    required_process_status = models.CharField(max_length=64, blank=True)
     allow_previously_used = models.BooleanField(default=True)
     max_usage_count = models.PositiveIntegerField(null=True, blank=True)
     reuse_cooldown_days = models.PositiveIntegerField(default=0)
@@ -322,6 +325,8 @@ class BlueprintSlot(models.Model):
 
 class ScoringScheme(models.Model):
     name = models.CharField(max_length=255)
+    demo_key = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    is_demo = models.BooleanField(default=False, db_index=True)
     description = models.TextField(blank=True)
     is_default = models.BooleanField(default=False)
     created_by = models.ForeignKey(
@@ -421,6 +426,7 @@ class ExamSession(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     slug = models.SlugField(max_length=180, unique=True)
     name = models.CharField(max_length=255)
+    is_demo = models.BooleanField(default=False, db_index=True)
     exam_type = models.CharField(max_length=32, choices=ExamType.choices)
     blueprint_version = models.ForeignKey(BlueprintVersion, on_delete=models.PROTECT, related_name="exam_sessions")
     scoring_version = models.ForeignKey(
@@ -536,6 +542,11 @@ class ExamParticipant(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="assessment_participations"
     )
     is_enabled = models.BooleanField(default=True)
+    can_access = models.BooleanField(default=True)
+    can_view_answers = models.BooleanField(default=False)
+    can_view_solutions = models.BooleanField(default=False)
+    can_download_exam = models.BooleanField(default=False)
+    can_download_blueprint = models.BooleanField(default=False)
     make_up_allowed = models.BooleanField(default=False)
     allow_after_deadline = models.BooleanField(default=False)
     extra_time_minutes = models.PositiveIntegerField(default=0)

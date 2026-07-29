@@ -65,6 +65,7 @@ class BlueprintSlotInline(admin.TabularInline):
     fields = (
         "order", "curriculum", "outcome", "question_type", "cognitive_level", "difficulty",
         "quantity", "score_per_item", "requires_graduation_eligibility",
+        "required_process_status",
     )
 
     def has_change_permission(self, request, obj=None):
