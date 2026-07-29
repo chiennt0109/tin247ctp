@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Tin học đại trà{% endblock %}
+
+{% block content %}
+<section class="container py-4" aria-labelledby="assessment-title">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <p class="text-primary fw-semibold mb-1">📝 Kiểm tra và luyện tập</p>
+      <h1 id="assessment-title" class="h2 fw-bold mb-1">Tin học đại trà</h1>
+      <p class="text-muted mb-0">Các kỳ kiểm tra được phân công cho tài khoản của bạn.</p>
+    </div>
+  </div>
+
+  {% if participations %}
+    <div class="row g-3">
+      {% for participation in participations %}
+        {% with exam=participation.session %}
+          <div class="col-12 col-lg-6">
+            <article class="card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                  <div>
+                    <span class="badge text-bg-primary mb-2">{{ exam.get_exam_type_display }}</span>
+                    <h2 class="h5 card-title fw-bold">{{ exam.name }}</h2>
+                  </div>
+                  <span class="badge text-bg-light border">{{ exam.get_status_display }}</span>
+                </div>
+                <dl class="row small mb-0 mt-3">
+                  <dt class="col-5">Thời lượng</dt>
+                  <dd class="col-7">{{ exam.duration_minutes }} phút</dd>
+                  <dt class="col-5">Số lần làm</dt>
+                  <dd class="col-7">{{ participation.max_attempts_override|default:exam.max_attempts }}</dd>
+                  <dt class="col-5">Thời gian mở</dt>
+                  <dd class="col-7">{{ exam.opens_at|date:"H:i d/m/Y" }}</dd>
+                  <dt class="col-5">Thời gian đóng</dt>
+                  <dd class="col-7 mb-0">{{ exam.closes_at|date:"H:i d/m/Y" }}</dd>
+                </dl>
+              </div>
+            </article>
+          </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info border-0 shadow-sm" role="status">
+      <h2 class="h5 alert-heading">Chưa có kỳ kiểm tra</h2>
+      <p class="mb-0">Tài khoản của bạn chưa được phân công kỳ kiểm tra Tin học đại trà nào.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
