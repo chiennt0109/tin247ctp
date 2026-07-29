@@ -25,19 +25,35 @@ REQUIRED_HEADERS = {
 
 class WorkbookFactory:
     @staticmethod
-    def create(*, missing_answer=False, duplicate_question=False, duplicate_source=False):
+    def create(
+        *, missing_answer=False, duplicate_question=False, duplicate_source=False,
+        estimated_time=60, reorder_question_headers=False,
+    ):
         workbook = Workbook()
         workbook.remove(workbook.active)
         for name, headers in REQUIRED_HEADERS.items():
             sheet = workbook.create_sheet(name)
-            sheet.append(headers)
+            actual_headers = list(headers)
+            if name == "QUESTIONS" and reorder_question_headers:
+                estimated_index = actual_headers.index("ESTIMATED_TIME_SEC")
+                purpose_index = actual_headers.index("USE_PURPOSE")
+                actual_headers[estimated_index], actual_headers[purpose_index] = (
+                    actual_headers[purpose_index], actual_headers[estimated_index]
+                )
+            sheet.append(actual_headers)
         workbook["FILES"].append(["F1", "source.pdf", "application/pdf", "https://example.com/f", "/source", "", "PARSED"])
         workbook["CURRICULUM"].append(["C1", 12, "Tin học", "GDPT2018", "A", "Topic", 1, "REVIEW", ""])
         workbook["CURRICULUM_OUTCOMES"].append(["O1", "C1", "YCCD_01", "Outcome", "BIET", "REVIEW", ""])
-        question = ["Q1", "Q1", "MCQ_SINGLE", "BIET", "Stem", None if missing_answer else "A", "", "ACTIVE", 1, "vi", "", "", "", 1, "NLa", 60, "PRACTICE", True, "FAM1", "READY_FOR_PRACTICE", "YCCD"]
-        workbook["QUESTIONS"].append(question)
+        question = dict(zip(REQUIRED_HEADERS["QUESTIONS"], [
+            "Q1", "Q1", "MCQ_SINGLE", "BIET", "Stem", None if missing_answer else "A",
+            "", "ACTIVE", 1, "vi", "", "", "", 1, "NLa", estimated_time, "PRACTICE",
+            True, "FAM1", "READY_FOR_PRACTICE", "YCCD",
+        ]))
+        question_headers = [cell.value for cell in workbook["QUESTIONS"][1]]
+        question_row = [question[header] for header in question_headers]
+        workbook["QUESTIONS"].append(question_row)
         if duplicate_question:
-            workbook["QUESTIONS"].append(question)
+            workbook["QUESTIONS"].append(question_row)
         for index, label in enumerate("ABCD", 1):
             workbook["OPTIONS"].append([f"OP{index}", "Q1", label, label, label == "A", index, "APPROVED"])
         workbook["QUESTION_CURRICULUM"].append(["QC1", "Q1", "C1", "O1", 1, "APPROVED", ""])
@@ -89,3 +105,44 @@ class WorkbookBankImporterTests(SimpleTestCase):
         self.assertFalse(parsed.errors)
         self.assertEqual(len(parsed.questions[0]["sources"]), 1)
         self.assertEqual(parsed.questions[0]["sources"][0]["SOURCE_PAGE"], "2")
+
+    def test_estimated_time_accepts_integer(self):
+        path = WorkbookFactory.create(estimated_time=75)
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 75)
+
+    def test_estimated_time_blank_becomes_none(self):
+        path = WorkbookFactory.create(estimated_time="")
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        self.assertIsNone(parsed.questions[0]["estimated_time_seconds"])
+
+    def test_estimated_time_accepts_numeric_string(self):
+        path = WorkbookFactory.create(estimated_time="90")
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 90)
+
+    def test_estimated_time_rejects_purpose_value_during_dry_run(self):
+        path = WorkbookFactory.create(estimated_time="PRACTICE")
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertTrue(parsed.has_fatal_errors)
+        self.assertTrue(any(
+            error.get("code") == "INVALID_FIELD_TYPE"
+            and error.get("field") == "ESTIMATED_TIME_SEC"
+            and error.get("value") == "PRACTICE"
+            for error in parsed.errors
+        ))
+
+    def test_question_columns_are_mapped_by_normalized_header(self):
+        path = WorkbookFactory.create(estimated_time="120", reorder_question_headers=True)
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 120)
+        self.assertEqual(parsed.questions[0]["use_purpose"], "PRACTICE")

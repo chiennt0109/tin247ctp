@@ -138,7 +138,9 @@ class BankSyncService:
                 "source_status": str(row.get("STATUS") or ""), "process_status": str(item["process_status"]),
                 "use_purpose": str(item.get("use_purpose") or ""), "shuffle_allowed": item["shuffle_allowed"],
                 "duplicate_family_id": str(item.get("family_id") or ""),
-                "estimated_time_seconds": int(row["ESTIMATED_TIME_SEC"]) if row.get("ESTIMATED_TIME_SEC") else None,
+                # Already typed and validated by WorkbookBankImporter. Apply must
+                # never reinterpret raw spreadsheet values differently from dry-run.
+                "estimated_time_seconds": item["estimated_time_seconds"],
                 "content_hash": item["content_hash"],
                 "is_available": item["process_status"] in AVAILABLE_PROCESS_STATUSES,
                 "curriculum": curriculum.get(str(mapping.get("CURRICULUM_ID"))),

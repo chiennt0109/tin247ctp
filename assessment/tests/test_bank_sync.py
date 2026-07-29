@@ -29,6 +29,15 @@ class BankSyncServiceTests(TestCase):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
         self.assertEqual(BankQuestionRevision.objects.filter(question=question).count(), 1)
 
+    def test_apply_uses_the_integer_normalized_by_dry_run_pipeline(self):
+        numeric_string_path = WorkbookFactory.create(estimated_time="135")
+        self.addCleanup(numeric_string_path.unlink)
+        parsed = WorkbookBankImporter().parse(numeric_string_path)
+        self.assertFalse(parsed.errors)
+        self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 135)
+        BankSyncService().apply(parsed)
+        self.assertEqual(BankQuestion.objects.get().estimated_time_seconds, 135)
+
     def test_changed_content_creates_revision_and_preserves_old_revision(self):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
         workbook = load_workbook(self.path)

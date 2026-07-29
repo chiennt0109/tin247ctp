@@ -1,7 +1,11 @@
 import hashlib
 import json
+import math
+import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass
+from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -9,10 +13,33 @@ from openpyxl import load_workbook
 
 QUESTION_TYPES = {"MCQ_SINGLE", "TRUE_FALSE_GROUP", "SHORT_ANSWER", "ESSAY", "PRACTICAL"}
 COGNITIVE_LEVELS = {"BIET", "HIEU", "VANDUNG"}
+COMPETENCIES = {"NLa", "NLb", "NLc", "NLd", "NLe"}
 PROCESS_STATUSES = {
     "RAW", "NORMALIZED", "CURRICULUM_MAPPED", "CLASSIFIED", "DUPLICATE_CHECKED",
     "ANSWER_CHECKED", "CONTENT_REVIEWED", "READY_FOR_PRACTICE", "READY_FOR_PERIODIC",
     "READY_FOR_GRADUATION", "NEEDS_REVIEW", "OUTDATED", "RETIRED",
+}
+STATUS_VALUES = {"DRAFT", "PENDING", "REVIEW", "APPROVED", "ACTIVE", "INACTIVE", "REJECTED", "ARCHIVED"}
+USE_PURPOSES = {"PRACTICE", "PERIODIC", "GRADUATION", "NONE", "REVIEW_ONLY"}
+
+# Types used by either validation or persistence. Normalization happens once in
+# the importer, so dry-run and apply consume the exact same typed values.
+INTEGER_FIELDS = {
+    "CURRICULUM": ("GRADE", "ORDER_NO"),
+    "QUESTIONS": ("VERSION", "DIFFICULTY", "ESTIMATED_TIME_SEC"),
+    "OPTIONS": ("ORDER_NO",),
+    "STATEMENTS": ("ORDER_NO", "DIFFICULTY"),
+}
+DECIMAL_FIELDS = {
+    "QUESTION_CURRICULUM": ("WEIGHT",),
+}
+BOOLEAN_FIELDS = {
+    "QUESTIONS": ("SHUFFLE_ALLOWED",),
+    "OPTIONS": ("IS_CORRECT",),
+    "STATEMENTS": ("TRUTH_VALUE",),
+}
+DATE_FIELDS = {
+    "QUESTIONS": ("CREATED_AT", "UPDATED_AT"),
 }
 REQUIRED_SHEETS = {
     "FILES", "CURRICULUM", "CURRICULUM_OUTCOMES", "QUESTIONS", "OPTIONS", "STATEMENTS",
@@ -46,10 +73,70 @@ def _boolean(value):
     raise BankValidationError(f"Invalid boolean value: {value!r}")
 
 
+def _optional_integer(value):
+    """Parse an optional integer without accepting lossy or boolean values."""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return None
+    if isinstance(value, bool):
+        raise BankValidationError(f"Expected integer, got boolean {value!r}")
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        if math.isfinite(value) and value.is_integer():
+            return int(value)
+        raise BankValidationError(f"Expected integer, got {value!r}")
+    if isinstance(value, str):
+        text = value.strip()
+        try:
+            decimal = Decimal(text)
+        except InvalidOperation as exc:
+            raise BankValidationError(f"Expected integer, got {value!r}") from exc
+        if decimal.is_finite() and decimal == decimal.to_integral_value():
+            return int(decimal)
+    raise BankValidationError(f"Expected integer, got {value!r}")
+
+
+def _optional_decimal(value):
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return None
+    if isinstance(value, bool):
+        raise BankValidationError(f"Expected decimal, got boolean {value!r}")
+    try:
+        decimal = Decimal(str(value).strip())
+    except (InvalidOperation, ValueError) as exc:
+        raise BankValidationError(f"Expected decimal, got {value!r}") from exc
+    if not decimal.is_finite():
+        raise BankValidationError(f"Expected finite decimal, got {value!r}")
+    return decimal
+
+
+def _optional_datetime(value):
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return None
+    if isinstance(value, (datetime, date)):
+        return value
+    if isinstance(value, str):
+        try:
+            return datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise BankValidationError(f"Expected ISO date/datetime, got {value!r}") from exc
+    raise BankValidationError(f"Expected date/datetime, got {value!r}")
+
+
+def _normalize_header(value):
+    if value is None:
+        return ""
+    normalized = unicodedata.normalize("NFKC", str(value)).lstrip("\ufeff").strip().upper()
+    return "_".join(normalized.split())
+
+
 def _sheet_rows(workbook, name):
     sheet = workbook[name]
     iterator = sheet.iter_rows(values_only=True)
-    headers = [str(value).strip() if value is not None else "" for value in next(iterator)]
+    headers = [_normalize_header(value) for value in next(iterator)]
+    populated_headers = [header for header in headers if header]
+    if len(populated_headers) != len(set(populated_headers)):
+        raise BankValidationError(f"Sheet {name} contains duplicate normalized headers")
     rows = []
     for row_number, values in enumerate(iterator, start=2):
         record = {header: _canonical(value) for header, value in zip(headers, values) if header}
@@ -89,6 +176,7 @@ class WorkbookBankImporter:
         raw_rows = {name: _sheet_rows(raw, name) for name in ("QUESTIONS",)}
         errors, warnings = [], []
         self._validate_unique_keys(rows, errors)
+        self._normalize_and_validate_types(rows, errors)
         questions = self._build_questions(rows, raw_rows, errors, warnings)
         return ParsedBank(
             source_path=source_path,
@@ -109,6 +197,55 @@ class WorkbookBankImporter:
             for value, count in counts.items():
                 if count > 1:
                     errors.append({"code": "DUPLICATE_KEY", "sheet": sheet, "key": value, "count": count})
+
+    @staticmethod
+    def _normalize_and_validate_types(rows, errors):
+        specs = (
+            (INTEGER_FIELDS, _optional_integer, "integer"),
+            (DECIMAL_FIELDS, _optional_decimal, "decimal"),
+            (BOOLEAN_FIELDS, _boolean, "boolean"),
+            (DATE_FIELDS, _optional_datetime, "date/datetime"),
+        )
+        for sheet_fields, converter, expected in specs:
+            for sheet, fields in sheet_fields.items():
+                for row in rows.get(sheet, ()):
+                    for field in fields:
+                        if field not in row:
+                            continue
+                        original = row.get(field)
+                        try:
+                            row[field] = converter(original)
+                        except BankValidationError:
+                            row[field] = None
+                            row.setdefault("__invalid_fields__", []).append(field)
+                            error = {
+                                "code": "INVALID_FIELD_TYPE", "sheet": sheet,
+                                "row": row.get("__row__"), "field": field,
+                                "value": str(original), "expected": expected,
+                            }
+                            if sheet == "QUESTIONS":
+                                error["question_id"] = str(row.get("QUESTION_ID"))
+                            errors.append(error)
+
+        enum_specs = {
+            "QUESTIONS": {
+                "QUESTION_TYPE": QUESTION_TYPES, "COGNITIVE_LEVEL": COGNITIVE_LEVELS,
+                "PROCESS_STATUS": PROCESS_STATUSES, "USE_PURPOSE": USE_PURPOSES,
+                "STATUS": STATUS_VALUES, "COMPETENCY": COMPETENCIES,
+            },
+            "OPTIONS": {"STATUS": STATUS_VALUES},
+            "STATEMENTS": {"COGNITIVE_LEVEL": COGNITIVE_LEVELS, "STATUS": STATUS_VALUES},
+            "CURRICULUM_OUTCOMES": {"LEVEL": COGNITIVE_LEVELS},
+        }
+        for sheet, fields in enum_specs.items():
+            for row in rows.get(sheet, ()):
+                for field, allowed in fields.items():
+                    value = row.get(field)
+                    if value not in (None, "") and str(value) not in allowed:
+                        errors.append({
+                            "code": "INVALID_ENUM", "sheet": sheet, "row": row.get("__row__"),
+                            "field": field, "value": str(value), "allowed": sorted(allowed),
+                        })
 
     def _build_questions(self, rows, raw_rows, errors, warnings):
         curriculum_ids = {str(row.get("CURRICULUM_ID")) for row in rows["CURRICULUM"]}
@@ -137,6 +274,10 @@ class WorkbookBankImporter:
         result = []
         for row in rows["QUESTIONS"]:
             qid = str(row.get("QUESTION_ID"))
+            # Detailed type errors were already emitted by the shared typed-row
+            # pipeline. Do not count an invalid row as a valid question.
+            if row.get("__invalid_fields__"):
+                continue
             qerrors = []
             qtype = str(row.get("QUESTION_TYPE") or "")
             if qtype not in QUESTION_TYPES:
@@ -149,16 +290,11 @@ class WorkbookBankImporter:
                 qerrors.append("MISSING_ANSWER")
             if str(row.get("PROCESS_STATUS") or "") not in PROCESS_STATUSES:
                 qerrors.append("INVALID_PROCESS_STATUS")
-            try:
-                difficulty = int(row.get("DIFFICULTY"))
-                if difficulty not in range(1, 6):
-                    raise ValueError
-            except (TypeError, ValueError):
+            difficulty = row.get("DIFFICULTY")
+            if difficulty not in range(1, 6):
                 qerrors.append("INVALID_DIFFICULTY")
-                difficulty = None
-            try:
-                shuffle_allowed = _boolean(row.get("SHUFFLE_ALLOWED"))
-            except BankValidationError:
+            shuffle_allowed = row.get("SHUFFLE_ALLOWED")
+            if not isinstance(shuffle_allowed, bool):
                 qerrors.append("INVALID_SHUFFLE_ALLOWED")
                 shuffle_allowed = False
             if qtype == "MCQ_SINGLE":
@@ -212,6 +348,7 @@ class WorkbookBankImporter:
                 "options": normalized_options, "statements": normalized_statements,
                 "curriculum_id": mapping.get("CURRICULUM_ID"), "outcome_id": mapping.get("OUTCOME_ID"),
                 "difficulty": difficulty, "competency": row.get("COMPETENCY"),
+                "estimated_time_seconds": row.get("ESTIMATED_TIME_SEC"),
                 "process_status": row.get("PROCESS_STATUS"), "use_purpose": row.get("USE_PURPOSE"),
                 "shuffle_allowed": shuffle_allowed, "family_id": row.get("FAMILY_ID"),
             }

@@ -50,7 +50,7 @@ không đăng ký trong admin detail và không được dùng trong student API
 Mỗi apply thành công tạo `QuestionSyncLog` và `AssessmentAuditLog`; report/audit không chứa
 toàn bộ đáp án. Audit không cho sửa/xóa qua model/admin. Lỗi apply rollback toàn bộ.
 
-## Kết quả dry-run master ngày 2026-07-29
+## Kết quả dry-run snapshot master ban đầu ngày 2026-07-29
 
 Parser nhận 608 câu hợp lệ và phát hiện 13 lỗi nghiêm trọng:
 
@@ -59,7 +59,32 @@ Parser nhận 608 câu hợp lệ và phát hiện 13 lỗi nghiêm trọng:
 
 Vì master quy định khóa đầu tiên unique và provenance là bắt buộc, hệ thống **đúng chủ ý
 không apply** bản nguồn này. Chủ sở hữu cần sửa master rồi chạy lại dry-run; không nới
-validator hay nhập một phần để né lỗi nguồn.
+validator hay nhập một phần để né lỗi nguồn. Bản export được kiểm tra lại sau đó đã sửa
+nhóm lỗi provenance này; kết quả mới nhất được ghi ở mục kế tiếp.
+
+## Kiểm tra lỗi `ESTIMATED_TIME_SEC` ngày 2026-07-29
+
+File vận hành được kiểm tra trực tiếp tại
+`assessment/data/INDEX_NGAN_HANG_DE_TIN_HOC_TOT_NGHIEP_MASTER.xlsx` (file được ignore,
+không commit đáp án). `ESTIMATED_TIME_SEC` nằm trong sheet `QUESTIONS`, cột P (header thứ
+16); `USE_PURPOSE` nằm ở cột Q (header thứ 17). Header thực tế của `QUESTIONS` có 21 cột,
+đúng thứ tự đã ghi trong tài liệu mapping.
+
+Nguồn lỗi không phải do cột `PRACTICE` hợp lệ bị dịch vị trí trong parser. Trong bản XLSX
+được kiểm tra, 31 ô thuộc chính cột P/`ESTIMATED_TIME_SEC` chứa literal `PRACTICE`; cùng
+hàng, cột Q/`USE_PURPOSE` cũng có cached value `PRACTICE`. Ví dụ đầu tiên là hàng 109,
+`QUESTION_ID=Q_TNT_F0001_D03_020`: raw value cột P là literal `PRACTICE`, trong khi raw
+value cột Q là công thức xác định purpose. Không sửa workbook trong repository để che lỗi
+nguồn này.
+
+Lỗi phần mềm là dry-run trước đây chỉ ép kiểu `DIFFICULTY` và boolean, còn
+`ESTIMATED_TIME_SEC` được giữ raw rồi mới gọi `int()` trong apply. Vì vậy dry-run báo 620
+câu hợp lệ nhưng apply mới crash. Parser mới chuẩn hóa header (Unicode/case/whitespace),
+ánh xạ bằng tên header, parse/validate integer, decimal, boolean, enum và date/datetime
+trước khi tạo `ParsedBank`. Apply chỉ dùng `estimated_time_seconds` đã chuẩn hóa, không ép
+kiểu lại. Với bản file được kiểm tra, dry-run nay quét đủ 620 dòng câu hỏi, chỉ tính 589 câu
+hợp lệ, trả 31 `INVALID_FIELD_TYPE` và chặn apply nguyên tử cho đến khi master được sửa tại
+nguồn.
 
 ## Rollback
 
