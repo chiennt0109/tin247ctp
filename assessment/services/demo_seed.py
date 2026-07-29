@@ -114,7 +114,6 @@ class AssessmentDemoSeeder:
             artifact_key = definition.pop("artifact")
             blueprint, scheme, validation = artifacts[artifact_key]
             session = ExamSession.objects.filter(demo_key=slug).first()
-            created = False
             if session is None:
                 # Adopt demo rows created before ExamSession gained demo_key. The
                 # is_demo guard prevents a real session with the same slug from
@@ -123,14 +122,15 @@ class AssessmentDemoSeeder:
                 if session is not None:
                     session.demo_key = slug
                     session.save(update_fields=("demo_key",))
-            if session is None:
-                session = ExamSession.objects.create(
-                    slug=slug, demo_key=slug,
-                    **definition, blueprint_version=blueprint.versions.get(version=1),
-                    scoring_version=scheme.versions.get(version=1), created_by=teacher,
-                    is_demo=True,
-                )
-                created = True
+            session, created = ExamSession.objects.get_or_create(
+                demo_key=slug,
+                defaults={
+                    "slug": slug, **definition,
+                    "blueprint_version": blueprint.versions.get(version=1),
+                    "scoring_version": scheme.versions.get(version=1),
+                    "created_by": teacher, "is_demo": True,
+                },
+            )
             sessions[slug] = (session, validation)
             report.sessions_created += int(created)
             report.sessions_existing += int(not created)

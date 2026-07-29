@@ -1,5 +1,7 @@
 from itertools import cycle
+from importlib import import_module
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
@@ -112,6 +114,15 @@ class AssessmentDemoSeedTests(TestCase):
         self.assertFalse(ExamBlueprint.objects.filter(is_demo=True).exists())
         self.assertFalse(ExamSession.objects.filter(is_demo=True).exists())
 
+    def test_demo_key_allows_multiple_nulls_and_real_rows_default_false(self):
+        first = ExamBlueprint.objects.create(name="Real A", exam_type="PERIODIC", grade=12)
+        second = ExamBlueprint.objects.create(name="Real B", exam_type="PERIODIC", grade=12)
+
+        self.assertIsNone(first.demo_key)
+        self.assertIsNone(second.demo_key)
+        self.assertFalse(first.is_demo)
+        self.assertFalse(second.is_demo)
+
     def test_apply_adopts_legacy_demo_session_without_duplicate(self):
         self.seed("--apply")
         session = ExamSession.objects.get(slug="assessment-demo-practice")
@@ -123,3 +134,23 @@ class AssessmentDemoSeedTests(TestCase):
         self.assertEqual(ExamSession.objects.filter(slug=session.slug).count(), 1)
         session.refresh_from_db()
         self.assertEqual(session.demo_key, session.slug)
+
+    def test_restore_migration_backfills_only_known_demo_sessions(self):
+        self.seed("--apply")
+        demo_session = ExamSession.objects.get(slug="assessment-demo-practice")
+        demo_session.demo_key = None
+        demo_session.save(update_fields=("demo_key",))
+        real_session = ExamSession.objects.get(slug="assessment-demo-periodic")
+        real_session.demo_key = None
+        real_session.is_demo = False
+        real_session.save(update_fields=("demo_key", "is_demo"))
+
+        migration = import_module(
+            "assessment.migrations.0006_restore_assessment_demo_and_access_fields"
+        )
+        migration.backfill_demo_session_keys(apps, None)
+
+        demo_session.refresh_from_db()
+        real_session.refresh_from_db()
+        self.assertEqual(demo_session.demo_key, demo_session.slug)
+        self.assertIsNone(real_session.demo_key)
