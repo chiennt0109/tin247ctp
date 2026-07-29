@@ -124,6 +124,15 @@ class WorkbookBankImporter:
         sources = defaultdict(list)
         for row in rows["QUESTION_SOURCES"]:
             sources[str(row.get("QUESTION_ID"))].append(row)
+        # QUESTION_SOURCES has its own row key, but the operational relation is
+        # unique per (question, source file). Normalize duplicate source rows
+        # before handing them to the persistence service. The last row wins so
+        # corrected metadata from a later master row is applied deterministically.
+        for question_id, question_sources in tuple(sources.items()):
+            deduplicated = {}
+            for source in question_sources:
+                deduplicated[str(source.get("FILE_ID"))] = source
+            sources[question_id] = list(deduplicated.values())
         raw_by_id = {str(row.get("QUESTION_ID")): row for row in raw_rows["QUESTIONS"]}
         result = []
         for row in rows["QUESTIONS"]:

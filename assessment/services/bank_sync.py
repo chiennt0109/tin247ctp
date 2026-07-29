@@ -159,15 +159,24 @@ class BankSyncService:
         if question.current_revision_id != revision.id:
             question.current_revision = revision
             question.save(update_fields=("current_revision",))
-        QuestionAsset.objects.filter(question=question).delete()
+        retained_source_file_ids = set()
         for source in item["sources"]:
             source_file = files.get(str(source.get("FILE_ID")))
             if source_file:
-                QuestionAsset.objects.create(
-                    question=question, source_file=source_file,
-                    source_page=str(source.get("SOURCE_PAGE") or ""),
-                    source_section=str(source.get("SOURCE_SECTION") or ""),
-                    source_ref=str(source.get("SOURCE_REF") or ""),
-                    license_note=str(source.get("LICENSE_NOTE") or ""),
-                    source_status=str(source.get("STATUS") or ""),
+                retained_source_file_ids.add(source_file.pk)
+                QuestionAsset.objects.update_or_create(
+                    question=question,
+                    source_file=source_file,
+                    defaults={
+                        "source_page": str(source.get("SOURCE_PAGE") or ""),
+                        "source_section": str(source.get("SOURCE_SECTION") or ""),
+                        "source_ref": str(source.get("SOURCE_REF") or ""),
+                        "license_note": str(source.get("LICENSE_NOTE") or ""),
+                        "source_status": str(source.get("STATUS") or ""),
+                    },
                 )
+        # Remove only relations no longer present in the canonical source. Existing
+        # relations above are updated in place, preserving idempotency and identity.
+        QuestionAsset.objects.filter(question=question).exclude(
+            source_file_id__in=retained_source_file_ids
+        ).delete()

@@ -1,7 +1,8 @@
-from django.test import TestCase
+from django.core.management import call_command
+from django.test import TestCase, override_settings
 from openpyxl import load_workbook
 
-from assessment.models import BankQuestion, BankQuestionRevision, QuestionSyncLog
+from assessment.models import BankQuestion, BankQuestionRevision, QuestionAsset, QuestionSyncLog
 from assessment.services.bank_importer import WorkbookBankImporter
 from assessment.services.bank_sync import BankSyncService
 from assessment.tests.test_bank_importer import WorkbookFactory
@@ -47,3 +48,28 @@ class BankSyncServiceTests(TestCase):
             BankSyncService().apply(parsed)
         self.assertEqual(BankQuestion.objects.count(), 0)
         self.assertEqual(QuestionSyncLog.objects.count(), 0)
+
+    @override_settings(QUESTION_BANK_SYNC_ENABLED=True)
+    def test_command_apply_twice_deduplicates_source_and_updates_asset(self):
+        duplicate_path = WorkbookFactory.create(duplicate_source=True)
+        self.addCleanup(duplicate_path.unlink)
+
+        call_command("sync_exam_bank", "--source", str(duplicate_path), "--apply", verbosity=0)
+        asset = QuestionAsset.objects.get()
+        original_pk = asset.pk
+        self.assertEqual(asset.source_page, "2")
+        self.assertEqual(QuestionAsset.objects.count(), 1)
+
+        # A subsequent master update for the same (question, source_file) must
+        # update the existing relation rather than attempting another INSERT.
+        workbook = load_workbook(duplicate_path)
+        workbook["QUESTION_SOURCES"]["D3"] = "3"
+        workbook["QUESTION_SOURCES"]["E3"] = "newest-section"
+        workbook.save(duplicate_path)
+        call_command("sync_exam_bank", "--source", str(duplicate_path), "--apply", verbosity=0)
+
+        asset.refresh_from_db()
+        self.assertEqual(asset.pk, original_pk)
+        self.assertEqual(asset.source_page, "3")
+        self.assertEqual(asset.source_section, "newest-section")
+        self.assertEqual(QuestionAsset.objects.count(), 1)

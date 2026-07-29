@@ -25,7 +25,7 @@ REQUIRED_HEADERS = {
 
 class WorkbookFactory:
     @staticmethod
-    def create(*, missing_answer=False, duplicate_question=False):
+    def create(*, missing_answer=False, duplicate_question=False, duplicate_source=False):
         workbook = Workbook()
         workbook.remove(workbook.active)
         for name, headers in REQUIRED_HEADERS.items():
@@ -42,6 +42,10 @@ class WorkbookFactory:
             workbook["OPTIONS"].append([f"OP{index}", "Q1", label, label, label == "A", index, "APPROVED"])
         workbook["QUESTION_CURRICULUM"].append(["QC1", "Q1", "C1", "O1", 1, "APPROVED", ""])
         workbook["QUESTION_SOURCES"].append(["QS1", "Q1", "F1", "1", "", "", "", "APPROVED"])
+        if duplicate_source:
+            workbook["QUESTION_SOURCES"].append(
+                ["QS2", "Q1", "F1", "2", "updated-section", "updated-ref", "updated-license", "APPROVED"]
+            )
         handle = tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False)
         handle.close()
         workbook.save(handle.name)
@@ -77,3 +81,11 @@ class WorkbookBankImporterTests(SimpleTestCase):
         self.addCleanup(path.unlink)
         with self.assertRaises(BankValidationError):
             WorkbookBankImporter().parse(path)
+
+    def test_deduplicates_question_sources_by_question_and_file(self):
+        path = WorkbookFactory.create(duplicate_source=True)
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        self.assertEqual(len(parsed.questions[0]["sources"]), 1)
+        self.assertEqual(parsed.questions[0]["sources"][0]["SOURCE_PAGE"], "2")
