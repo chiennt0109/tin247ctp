@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -378,3 +380,170 @@ class ScoringRule(models.Model):
     def clean(self):
         if self.version_id and self.version.is_locked:
             raise ValidationError("Không thể sửa quy tắc thuộc phiên bản đã khóa.")
+
+
+class ExamSession(models.Model):
+    class ExamType(models.TextChoices):
+        PRACTICE = "PRACTICE", "Luyện tập"
+        REGULAR = "REGULAR", "Kiểm tra thường xuyên"
+        PERIODIC = "PERIODIC", "Kiểm tra định kỳ"
+        GRADUATION = "GRADUATION", "Thi thử tốt nghiệp"
+        CUSTOM = "CUSTOM", "Tùy chỉnh"
+
+    class GenerationMode(models.TextChoices):
+        COMMON = "COMMON_EXAM", "Đề chung"
+        MULTIPLE = "MULTIPLE_EQUIVALENT_CODES", "Nhiều mã tương đương"
+        INDIVIDUAL = "INDIVIDUAL_EXAM", "Đề cá nhân"
+
+    class Status(models.TextChoices):
+        DRAFT = "DRAFT", "Nháp"
+        SCHEDULED = "SCHEDULED", "Đã lên lịch"
+        OPEN = "OPEN", "Đang mở"
+        CLOSED = "CLOSED", "Đã đóng"
+        PUBLISHED = "PUBLISHED", "Đã công bố"
+        CANCELLED = "CANCELLED", "Đã hủy"
+
+    class ReleaseMode(models.TextChoices):
+        NEVER = "NEVER", "Không bao giờ"
+        AFTER_SUBMIT = "IMMEDIATELY_AFTER_SUBMIT", "Ngay sau khi nộp"
+        AFTER_ALL = "AFTER_USER_FINISHES_ALL_ATTEMPTS", "Sau khi hết lượt"
+        AFTER_CLOSE = "AFTER_EXAM_CLOSES", "Sau khi đóng kỳ thi"
+        AT_TIME = "AT_SPECIFIC_TIME", "Tại thời điểm cấu hình"
+        MANUAL = "MANUAL_RELEASE", "Công bố thủ công"
+
+    class AttemptResultMode(models.TextChoices):
+        FIRST = "FIRST", "Lần đầu"
+        LAST = "LAST", "Lần cuối"
+        HIGHEST = "HIGHEST", "Cao nhất"
+        AVERAGE = "AVERAGE", "Trung bình"
+        TEACHER = "TEACHER_SELECTED", "Giáo viên chọn"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    slug = models.SlugField(max_length=180, unique=True)
+    name = models.CharField(max_length=255)
+    exam_type = models.CharField(max_length=32, choices=ExamType.choices)
+    blueprint_version = models.ForeignKey(BlueprintVersion, on_delete=models.PROTECT, related_name="exam_sessions")
+    scoring_version = models.ForeignKey(
+        ScoringSchemeVersion, on_delete=models.PROTECT, related_name="exam_sessions"
+    )
+    opens_at = models.DateTimeField(db_index=True)
+    closes_at = models.DateTimeField(db_index=True)
+    duration_minutes = models.PositiveIntegerField()
+    max_attempts = models.PositiveIntegerField(default=1)
+    attempt_result_mode = models.CharField(
+        max_length=32, choices=AttemptResultMode.choices, default=AttemptResultMode.HIGHEST
+    )
+    next_attempt_delay_minutes = models.PositiveIntegerField(default=0)
+    shuffle_questions = models.BooleanField(default=True)
+    shuffle_options = models.BooleanField(default=True)
+    code_count = models.PositiveIntegerField(default=1)
+    generation_mode = models.CharField(max_length=40, choices=GenerationMode.choices)
+    score_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.MANUAL)
+    answer_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.NEVER)
+    answer_release_at = models.DateTimeField(null=True, blank=True)
+    release_solutions = models.BooleanField(default=False)
+    allow_exam_download = models.BooleanField(default=False)
+    allow_blueprint_download = models.BooleanField(default=False)
+    allow_review = models.BooleanField(default=False)
+    allow_retry_after_answers = models.BooleanField(default=False)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT, db_index=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="created_exam_sessions",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [models.Index(fields=("status", "opens_at", "closes_at"), name="assessment_session_window_idx")]
+
+    def clean(self):
+        if self.closes_at <= self.opens_at:
+            raise ValidationError({"closes_at": "Thời gian đóng phải sau thời gian mở."})
+        if self.generation_mode == self.GenerationMode.COMMON and self.code_count != 1:
+            raise ValidationError({"code_count": "Đề chung chỉ có một mã đề."})
+        if self.generation_mode == self.GenerationMode.MULTIPLE and self.code_count < 2:
+            raise ValidationError({"code_count": "Chế độ nhiều mã cần ít nhất hai mã đề."})
+        if self.answer_release_mode == self.ReleaseMode.AT_TIME and not self.answer_release_at:
+            raise ValidationError({"answer_release_at": "Phải cấu hình thời điểm công bố đáp án."})
+
+    def __str__(self):
+        return self.name
+
+
+class GeneratedExam(models.Model):
+    session = models.ForeignKey(ExamSession, on_delete=models.PROTECT, related_name="generated_exams")
+    code = models.CharField(max_length=64)
+    seed = models.CharField(max_length=128)
+    blueprint_version = models.ForeignKey(BlueprintVersion, on_delete=models.PROTECT)
+    scoring_version = models.ForeignKey(ScoringSchemeVersion, on_delete=models.PROTECT)
+    total_score = models.DecimalField(max_digits=8, decimal_places=3)
+    validation_report = models.JSONField(default=dict)
+    exam_hash = models.CharField(max_length=64, db_index=True)
+    generated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="generated_assessment_exams",
+    )
+    generated_at = models.DateTimeField(auto_now_add=True)
+    is_locked = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("session", "code"), name="assessment_unique_exam_code")
+        ]
+        ordering = ("session", "code")
+
+
+class GeneratedExamQuestion(models.Model):
+    exam = models.ForeignKey(GeneratedExam, on_delete=models.PROTECT, related_name="questions")
+    bank_question = models.ForeignKey(BankQuestion, on_delete=models.PROTECT)
+    bank_revision = models.ForeignKey(BankQuestionRevision, on_delete=models.PROTECT)
+    blueprint_slot = models.ForeignKey(BlueprintSlot, on_delete=models.PROTECT)
+    order = models.PositiveIntegerField()
+    question_id_snapshot = models.CharField(max_length=160)
+    source_version_snapshot = models.CharField(max_length=64)
+    stem_snapshot = models.TextField()
+    options_snapshot = models.JSONField(default=list, blank=True)
+    statements_snapshot = models.JSONField(default=list, blank=True)
+    protected_answer_snapshot = models.TextField()
+    option_order = models.JSONField(default=list, blank=True)
+    score = models.DecimalField(max_digits=8, decimal_places=3)
+    content_hash_snapshot = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("exam", "order"), name="assessment_unique_exam_question_order"),
+            models.UniqueConstraint(fields=("exam", "bank_question"), name="assessment_unique_exam_question"),
+        ]
+        ordering = ("order",)
+
+
+class GeneratedExamAsset(models.Model):
+    exam_question = models.ForeignKey(
+        GeneratedExamQuestion, on_delete=models.PROTECT, related_name="assets"
+    )
+    source_file_id_snapshot = models.CharField(max_length=160)
+    name_snapshot = models.CharField(max_length=500)
+    mime_type_snapshot = models.CharField(max_length=255, blank=True)
+    source_page_snapshot = models.CharField(max_length=128, blank=True)
+    checksum_snapshot = models.CharField(max_length=128, blank=True)
+
+
+class ExamParticipant(models.Model):
+    session = models.ForeignKey(ExamSession, on_delete=models.CASCADE, related_name="participants")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="assessment_participations"
+    )
+    is_enabled = models.BooleanField(default=True)
+    make_up_allowed = models.BooleanField(default=False)
+    allow_after_deadline = models.BooleanField(default=False)
+    extra_time_minutes = models.PositiveIntegerField(default=0)
+    max_attempts_override = models.PositiveIntegerField(null=True, blank=True)
+    available_from = models.DateTimeField(null=True, blank=True)
+    available_until = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("session", "user"), name="assessment_unique_exam_participant")
+        ]

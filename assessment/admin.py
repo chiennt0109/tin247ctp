@@ -3,8 +3,8 @@ from django.contrib import admin
 from assessment.models import (
     AssessmentAuditLog, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamBlueprint, QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme,
-    ScoringSchemeVersion,
+    ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamQuestion,
+    QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 
 
@@ -127,3 +127,43 @@ class ScoringSchemeAdmin(admin.ModelAdmin):
     list_display = ("name", "is_default", "created_by", "created_at")
     search_fields = ("name",)
     list_select_related = ("created_by",)
+
+
+class ExamParticipantInline(admin.TabularInline):
+    model = ExamParticipant
+    extra = 0
+    autocomplete_fields = ("user",)
+
+
+@admin.register(ExamSession)
+class ExamSessionAdmin(admin.ModelAdmin):
+    list_display = (
+        "name", "exam_type", "generation_mode", "opens_at", "closes_at", "status",
+    )
+    list_filter = ("status", "exam_type", "generation_mode", "score_release_mode", "answer_release_mode")
+    search_fields = ("name", "slug")
+    list_select_related = ("blueprint_version", "scoring_version", "created_by")
+    inlines = (ExamParticipantInline,)
+
+    def has_change_permission(self, request, obj=None):
+        return not (obj and obj.status != ExamSession.Status.DRAFT) and super().has_change_permission(request, obj)
+
+
+class GeneratedExamQuestionInline(admin.TabularInline):
+    model = GeneratedExamQuestion
+    extra = 0
+    can_delete = False
+    fields = ("order", "question_id_snapshot", "source_version_snapshot", "score", "content_hash_snapshot")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(GeneratedExam)
+class GeneratedExamAdmin(ReadOnlyProjectionAdmin):
+    list_display = ("code", "session", "total_score", "exam_hash", "is_locked", "generated_at")
+    search_fields = ("code", "session__name", "exam_hash")
+    list_filter = ("is_locked", "session__exam_type")
+    list_select_related = ("session", "blueprint_version", "scoring_version", "generated_by")
+    inlines = (GeneratedExamQuestionInline,)
