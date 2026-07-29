@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -195,3 +196,185 @@ class AssessmentAuditLog(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValueError("Assessment audit entries are immutable")
+
+
+class ExamBlueprint(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "DRAFT", "Nháp"
+        APPROVED = "APPROVED", "Đã duyệt"
+        LOCKED = "LOCKED", "Đã khóa"
+
+    name = models.CharField(max_length=255)
+    exam_type = models.CharField(max_length=64, db_index=True)
+    grade = models.PositiveSmallIntegerField(db_index=True)
+    subject = models.CharField(max_length=100, default="Tin học")
+    semester = models.CharField(max_length=32, blank=True)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT, db_index=True)
+    notes = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="created_assessment_blueprints",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="approved_assessment_blueprints",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class BlueprintVersion(models.Model):
+    blueprint = models.ForeignKey(ExamBlueprint, on_delete=models.PROTECT, related_name="versions")
+    version = models.PositiveIntegerField()
+    duration_minutes = models.PositiveIntegerField()
+    expected_question_count = models.PositiveIntegerField()
+    expected_total_score = models.DecimalField(max_digits=8, decimal_places=3)
+    is_locked = models.BooleanField(default=False, db_index=True)
+    source_blueprint_id = models.CharField(max_length=160, blank=True)
+    source_snapshot = models.JSONField(default=dict, blank=True)
+    validation_report = models.JSONField(default=dict, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="created_blueprint_versions",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="approved_blueprint_versions",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("blueprint", "version"), name="assessment_unique_blueprint_version")
+        ]
+        ordering = ("blueprint", "-version")
+
+    def __str__(self):
+        return f"{self.blueprint} v{self.version}"
+
+    def save(self, *args, **kwargs):
+        if self.pk and type(self).objects.filter(pk=self.pk, is_locked=True).exists():
+            raise ValidationError("Phiên bản ma trận đã khóa; hãy tạo phiên bản mới.")
+        return super().save(*args, **kwargs)
+
+
+class BlueprintSection(models.Model):
+    version = models.ForeignKey(BlueprintVersion, on_delete=models.CASCADE, related_name="sections")
+    code = models.CharField(max_length=64)
+    name = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0)
+    instructions = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("version", "code"), name="assessment_unique_section_code")
+        ]
+        ordering = ("order", "id")
+
+    def clean(self):
+        if self.version_id and self.version.is_locked:
+            raise ValidationError("Không thể sửa phần thi thuộc ma trận đã khóa.")
+
+    def __str__(self):
+        return f"{self.version}: {self.name}"
+
+
+class BlueprintSlot(models.Model):
+    section = models.ForeignKey(BlueprintSection, on_delete=models.CASCADE, related_name="slots")
+    order = models.PositiveIntegerField(default=0)
+    curriculum = models.ForeignKey(
+        CurriculumNode, null=True, blank=True, on_delete=models.PROTECT, related_name="blueprint_slots"
+    )
+    outcome = models.ForeignKey(
+        CurriculumOutcome, null=True, blank=True, on_delete=models.PROTECT, related_name="blueprint_slots"
+    )
+    question_type = models.CharField(max_length=32)
+    cognitive_level = models.CharField(max_length=32, blank=True)
+    difficulty = models.PositiveSmallIntegerField(null=True, blank=True)
+    competency = models.CharField(max_length=16, blank=True)
+    quantity = models.PositiveIntegerField()
+    score_per_item = models.DecimalField(max_digits=8, decimal_places=3)
+    required_tags = models.JSONField(default=list, blank=True)
+    excluded_tags = models.JSONField(default=list, blank=True)
+    requires_graduation_eligibility = models.BooleanField(default=False)
+    allow_previously_used = models.BooleanField(default=True)
+    max_usage_count = models.PositiveIntegerField(null=True, blank=True)
+    reuse_cooldown_days = models.PositiveIntegerField(default=0)
+    shortage_priority = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ("section__order", "order", "id")
+
+    def clean(self):
+        if self.section_id and self.section.version.is_locked:
+            raise ValidationError("Không thể sửa slot thuộc ma trận đã khóa.")
+        if self.outcome_id and self.curriculum_id and self.outcome.curriculum_id != self.curriculum_id:
+            raise ValidationError({"outcome": "YCCD không thuộc chủ đề đã chọn."})
+        if self.difficulty is not None and self.difficulty not in range(1, 6):
+            raise ValidationError({"difficulty": "Độ khó phải nằm trong khoảng 1–5."})
+
+
+class ScoringScheme(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    is_default = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="created_scoring_schemes",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ScoringSchemeVersion(models.Model):
+    scheme = models.ForeignKey(ScoringScheme, on_delete=models.PROTECT, related_name="versions")
+    version = models.PositiveIntegerField()
+    total_score = models.DecimalField(max_digits=8, decimal_places=3)
+    rounding_digits = models.PositiveSmallIntegerField(default=2)
+    is_locked = models.BooleanField(default=False, db_index=True)
+    source_policy_id = models.CharField(max_length=160, blank=True)
+    source_snapshot = models.JSONField(default=dict, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="created_scoring_versions",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("scheme", "version"), name="assessment_unique_scoring_version")
+        ]
+        ordering = ("scheme", "-version")
+
+    def save(self, *args, **kwargs):
+        if self.pk and type(self).objects.filter(pk=self.pk, is_locked=True).exists():
+            raise ValidationError("Phiên bản chấm điểm đã khóa; hãy tạo phiên bản mới.")
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.scheme} v{self.version}"
+
+
+class ScoringRule(models.Model):
+    version = models.ForeignKey(ScoringSchemeVersion, on_delete=models.CASCADE, related_name="rules")
+    question_type = models.CharField(max_length=32)
+    rule_code = models.CharField(max_length=100)
+    max_score = models.DecimalField(max_digits=8, decimal_places=3)
+    configuration = models.JSONField(default=dict)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("version", "question_type"), name="assessment_unique_scoring_type")
+        ]
+        ordering = ("order", "id")
+
+    def clean(self):
+        if self.version_id and self.version.is_locked:
+            raise ValidationError("Không thể sửa quy tắc thuộc phiên bản đã khóa.")

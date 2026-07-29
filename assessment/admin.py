@@ -2,7 +2,9 @@ from django.contrib import admin
 
 from assessment.models import (
     AssessmentAuditLog, BankQuestion, BankQuestionRevision, BankSourceFile,
-    CurriculumNode, CurriculumOutcome, QuestionAsset, QuestionSyncLog,
+    BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
+    ExamBlueprint, QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme,
+    ScoringSchemeVersion,
 )
 
 
@@ -55,3 +57,73 @@ admin.site.register(CurriculumNode, ReadOnlyProjectionAdmin)
 admin.site.register(CurriculumOutcome, ReadOnlyProjectionAdmin)
 admin.site.register(BankSourceFile, ReadOnlyProjectionAdmin)
 admin.site.register(QuestionAsset, ReadOnlyProjectionAdmin)
+
+
+class BlueprintSlotInline(admin.TabularInline):
+    model = BlueprintSlot
+    extra = 0
+    fields = (
+        "order", "curriculum", "outcome", "question_type", "cognitive_level", "difficulty",
+        "quantity", "score_per_item", "requires_graduation_eligibility",
+    )
+
+    def has_change_permission(self, request, obj=None):
+        return not (obj and obj.version.is_locked) and super().has_change_permission(request, obj)
+
+
+@admin.register(BlueprintSection)
+class BlueprintSectionAdmin(admin.ModelAdmin):
+    list_display = ("name", "version", "order")
+    list_select_related = ("version", "version__blueprint")
+    inlines = (BlueprintSlotInline,)
+
+    def has_change_permission(self, request, obj=None):
+        return not (obj and obj.version.is_locked) and super().has_change_permission(request, obj)
+
+
+@admin.register(BlueprintVersion)
+class BlueprintVersionAdmin(admin.ModelAdmin):
+    list_display = (
+        "blueprint", "version", "expected_question_count", "expected_total_score",
+        "duration_minutes", "is_locked", "created_at",
+    )
+    list_filter = ("is_locked", "blueprint__exam_type", "blueprint__grade")
+    list_select_related = ("blueprint", "created_by", "approved_by")
+    readonly_fields = ("validation_report", "approved_at", "created_at")
+
+    def has_change_permission(self, request, obj=None):
+        return not (obj and obj.is_locked) and super().has_change_permission(request, obj)
+
+
+@admin.register(ExamBlueprint)
+class ExamBlueprintAdmin(admin.ModelAdmin):
+    list_display = ("name", "exam_type", "grade", "semester", "status", "updated_at")
+    list_filter = ("status", "exam_type", "grade", "semester")
+    search_fields = ("name", "subject")
+    list_select_related = ("created_by", "approved_by")
+
+
+class ScoringRuleInline(admin.TabularInline):
+    model = ScoringRule
+    extra = 0
+
+    def has_change_permission(self, request, obj=None):
+        return not (obj and obj.is_locked) and super().has_change_permission(request, obj)
+
+
+@admin.register(ScoringSchemeVersion)
+class ScoringSchemeVersionAdmin(admin.ModelAdmin):
+    list_display = ("scheme", "version", "total_score", "rounding_digits", "is_locked")
+    list_filter = ("is_locked",)
+    list_select_related = ("scheme", "created_by")
+    inlines = (ScoringRuleInline,)
+
+    def has_change_permission(self, request, obj=None):
+        return not (obj and obj.is_locked) and super().has_change_permission(request, obj)
+
+
+@admin.register(ScoringScheme)
+class ScoringSchemeAdmin(admin.ModelAdmin):
+    list_display = ("name", "is_default", "created_by", "created_at")
+    search_fields = ("name",)
+    list_select_related = ("created_by",)
