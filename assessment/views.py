@@ -1,0 +1,153 @@
+import json
+
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.cache import cache
+from django.db.models import Count, Q
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods, require_POST
+
+from assessment.models import ExamAttempt, ExamParticipant, ExamSession
+from assessment.services.attempt_service import (
+    AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
+)
+from assessment.services.start_attempt import StartAttemptError, start_attempt, user_can_access_session
+
+
+def exam_list_redirect(request):
+    return redirect("assessment:exam_list")
+
+
+def _rate_limited(key, *, limit, window):
+    cache_key = f"assessment:rate:{key}"
+    if cache.add(cache_key, 1, timeout=window):
+        return False
+    try:
+        return cache.incr(cache_key) > limit
+    except ValueError:
+        cache.set(cache_key, 1, timeout=window)
+        return False
+
+
+@login_required
+def exam_list(request):
+    """Show sessions allowed by session policy plus per-user overrides."""
+    sessions = (
+        ExamSession.objects.exclude(status__in=(ExamSession.Status.DRAFT, ExamSession.Status.CANCELLED))
+        .select_related("blueprint_version")
+        .prefetch_related("access_groups")
+        .annotate(
+            attempts_used=Count("attempts", filter=Q(attempts__user=request.user) & ~Q(attempts__status="INVALIDATED"))
+        )
+        .order_by("opens_at", "name")
+    )
+    participants = {
+        item.session_id: item for item in ExamParticipant.objects.filter(
+            user=request.user, session__in=sessions
+        )
+    }
+    cards = []
+    for session in sessions:
+        participant = participants.get(session.pk)
+        if not user_can_access_session(request.user, session, participant):
+            continue
+        maximum = participant.max_attempts_override if participant and participant.max_attempts_override else session.max_attempts
+        active = ExamAttempt.objects.filter(
+            user=request.user, session=session, status=ExamAttempt.Status.IN_PROGRESS
+        ).first()
+        cards.append({
+            "session": session, "participant": participant, "attempts_used": session.attempts_used,
+            "attempts_remaining": max(maximum - session.attempts_used, 0), "active_attempt": active,
+        })
+    return render(
+        request,
+        "assessment/exam_list.html",
+        {"exam_cards": cards},
+    )
+
+
+@login_required
+@require_POST
+def start_exam(request, slug):
+    session = get_object_or_404(ExamSession, slug=slug)
+    try:
+        attempt = start_attempt(request.user, session)
+    except StartAttemptError as exc:
+        messages.error(request, str(exc))
+        return redirect("assessment:exam_list")
+    return redirect("assessment:attempt_detail", attempt_id=attempt.pk)
+
+
+@login_required
+def attempt_detail(request, attempt_id):
+    attempt = get_object_or_404(
+        ExamAttempt.objects.select_related("session", "generated_exam"), pk=attempt_id
+    )
+    if attempt.user_id != request.user.pk and not request.user.is_staff:
+        raise Http404
+    questions = list(attempt.generated_exam.questions.only(
+        "order", "stem_snapshot", "options_snapshot", "statements_snapshot"
+    ).order_by("order"))
+    saved = {answer.exam_question_id: answer for answer in attempt.answers.all()}
+    question_rows = [{"question": question, "saved": saved.get(question.pk)} for question in questions]
+    return render(request, "assessment/attempt.html", {
+        "attempt": attempt, "question_rows": question_rows,
+        "server_now_ms": int(timezone.now().timestamp() * 1000),
+        "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
+    })
+
+
+@login_required
+@require_http_methods(["PATCH"])
+def autosave_answers(request, attempt_id):
+    if _rate_limited(f"save:{request.user.pk}:{attempt_id}", limit=30, window=10):
+        return JsonResponse({"error": "Quá nhiều yêu cầu lưu."}, status=429)
+    if len(request.body) > 64 * 1024:
+        return JsonResponse({"error": "Payload quá lớn."}, status=413)
+    try:
+        payload = json.loads(request.body or b"{}")
+        version = int(payload["version"])
+        answers = payload.get("answers", [])
+        if not isinstance(answers, list) or len(answers) > 100:
+            raise ValueError
+        attempt = save_answers(
+            attempt_id=attempt_id, user=request.user,
+            expected_version=version, answers=answers,
+        )
+    except ExamAttempt.DoesNotExist:
+        raise Http404
+    except StaleAttemptVersion as exc:
+        current = ExamAttempt.objects.only("data_version").get(pk=attempt_id, user=request.user)
+        return JsonResponse({"error": str(exc), "version": current.data_version}, status=409)
+    except (AttemptStateError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        return JsonResponse({"error": str(exc) or "Dữ liệu không hợp lệ."}, status=400)
+    return JsonResponse({"saved": True, "version": attempt.data_version})
+
+
+@login_required
+@require_POST
+def submit_attempt_view(request, attempt_id):
+    if _rate_limited(f"submit:{request.user.pk}:{attempt_id}", limit=5, window=60):
+        return JsonResponse({"error": "Quá nhiều yêu cầu nộp bài."}, status=429)
+    try:
+        attempt = submit_attempt(attempt_id=attempt_id, user=request.user)
+    except ExamAttempt.DoesNotExist:
+        raise Http404
+    except AttemptStateError as exc:
+        return JsonResponse({"error": str(exc)}, status=400)
+    return JsonResponse({
+        "submitted": True, "status": attempt.status,
+        "submitted_at": attempt.submitted_at.isoformat() if attempt.submitted_at else None,
+    })
+
+
+@login_required
+def attempt_state(request, attempt_id):
+    attempt = get_object_or_404(ExamAttempt, pk=attempt_id, user=request.user)
+    return JsonResponse({
+        "status": attempt.status, "version": attempt.data_version,
+        "server_now_ms": int(timezone.now().timestamp() * 1000),
+        "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
+    })
