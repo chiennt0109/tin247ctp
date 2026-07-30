@@ -44,10 +44,12 @@ Attempt `IN_PROGRESS` thiếu đề được chuyển `INVALIDATED` để không
 
 1. Backup PostgreSQL.
 2. Deploy code và dừng worker ghi assessment.
-3. Chạy `python manage.py migrate --plan` và kiểm tra chỉ migration dự kiến.
-4. Chạy `python manage.py migrate` (không được agent chạy tự động trên production). Bước này
+3. Chạy cleanup `--dry-run` trước migration. Command tự nhận diện `PRE_0007_READ_ONLY`, chỉ
+   đếm trực tiếp các bảng legacy và tuyệt đối không join bảng attempt chưa tồn tại.
+4. Chạy `python manage.py migrate --plan` và kiểm tra chỉ migration dự kiến.
+5. Chạy `python manage.py migrate` (không được agent chạy tự động trên production). Bước này
    chỉ phân loại pre-generated exam thành preview hết hạn, chưa xóa chúng.
-5. Chạy cleanup `--dry-run`, lưu và duyệt báo cáo.
-6. Sau phê duyệt riêng, chạy cleanup `--apply`.
-7. Chạy lại cleanup `--dry-run`, xác nhận orphan/broken/legacy đều bằng 0.
-8. Chạy `python manage.py check` và smoke test Start bằng tài khoản thử.
+6. Chạy cleanup `--dry-run` lần hai trên schema mới, lưu và duyệt báo cáo chi tiết.
+7. Sau phê duyệt riêng, chạy cleanup `--apply`.
+8. Chạy lại cleanup `--dry-run`, xác nhận orphan/broken/legacy đều bằng 0.
+9. Chạy `python manage.py check` và smoke test Start bằng tài khoản thử.

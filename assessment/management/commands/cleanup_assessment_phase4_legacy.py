@@ -1,8 +1,8 @@
 import json
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
-from assessment.services.phase4_cleanup import Phase4LegacyCleanup
+from assessment.services.phase4_cleanup import Phase4CleanupSchemaError, Phase4LegacyCleanup
 
 
 class Command(BaseCommand):
@@ -18,13 +18,21 @@ class Command(BaseCommand):
         if options["dry_run"]:
             self._print(cleanup.inspect(), "DRY-RUN")
             return
-        before, after = cleanup.apply()
+        try:
+            before, after = cleanup.apply()
+        except Phase4CleanupSchemaError as exc:
+            raise CommandError(str(exc)) from exc
         self._print(before, "BEFORE APPLY")
         self._print(after, "AFTER APPLY")
 
     def _print(self, report, heading):
         data = report.as_dict()
         self.stdout.write(self.style.MIGRATE_HEADING(f"ASSESSMENT PHASE 4 CLEANUP — {heading}"))
+        self.stdout.write(f"Schema state: {data['schema_state']}")
+        if data["schema_state"] != "CURRENT":
+            self.stdout.write(self.style.WARNING(
+                "Pre-0007 inspection mode: counts are read-only; run migration 0007 before --apply."
+            ))
         labels = (
             ("Legacy GeneratedExam", "legacy_generated_exams"),
             ("Legacy GeneratedExamQuestion", "legacy_generated_exam_questions"),

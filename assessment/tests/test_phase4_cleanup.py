@@ -1,6 +1,10 @@
 from datetime import timedelta
+from io import StringIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -60,3 +64,20 @@ class Phase4CleanupTests(TestCase):
         self.assertFalse(GeneratedExam.objects.exists())
         self.assertEqual(after.legacy_generated_exams, 0)
         self.assertEqual(BankQuestion.objects.count(), bank_count)
+
+    def test_pre_0007_dry_run_uses_legacy_tables_without_attempt_join(self):
+        self.create_expired_preview()
+        output = StringIO()
+
+        with patch.object(Phase4LegacyCleanup, "schema_is_current", return_value=False):
+            call_command("cleanup_assessment_phase4_legacy", "--dry-run", stdout=output)
+
+        report = output.getvalue()
+        self.assertIn("Schema state: PRE_0007_READ_ONLY", report)
+        self.assertIn("Legacy GeneratedExam: 1", report)
+        self.assertIn("Legacy GeneratedExamQuestion: 2", report)
+
+    def test_pre_0007_apply_is_refused_until_migration_and_new_dry_run(self):
+        with patch.object(Phase4LegacyCleanup, "schema_is_current", return_value=False):
+            with self.assertRaisesMessage(CommandError, "0007_on_demand_attempts"):
+                call_command("cleanup_assessment_phase4_legacy", "--apply")
