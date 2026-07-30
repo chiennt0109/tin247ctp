@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Bài làm {{ attempt.attempt_number }}{% endblock %}
+{% block content %}
+<main class="container py-4">
+  <div class="alert alert-warning">Trang kiểm tra tạm thời của Phase 4. Đáp án và metadata chấm điểm không được hiển thị.</div>
+  <h1 class="h3">{{ attempt.session.name }} — Lần {{ attempt.attempt_number }}</h1>
+  <p>Bắt đầu: {{ attempt.started_at|date:"H:i:s d/m/Y" }} · Hết hạn: {{ attempt.expires_at|date:"H:i:s d/m/Y" }}</p>
+  <p>Số câu: {{ questions|length }}</p>
+  {% for question in questions %}
+    <article class="card mb-3"><div class="card-body">
+      <h2 class="h5">Câu {{ question.order }}</h2>
+      <div>{{ question.stem_snapshot|linebreaks }}</div>
+      {% if question.options_snapshot %}<ol type="A">{% for option in question.options_snapshot %}<li>{{ option.text|default:option }}</li>{% endfor %}</ol>{% endif %}
+      {% if question.statements_snapshot %}<ul>{% for statement in question.statements_snapshot %}<li>{{ statement.text|default:statement }}</li>{% endfor %}</ul>{% endif %}
+    </div></article>
+  {% endfor %}
+</main>
+{% endblock %}

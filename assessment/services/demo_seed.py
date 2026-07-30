@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from assessment.models import (
     AssessmentAuditLog, BankQuestion, BlueprintSection, BlueprintSlot, BlueprintVersion,
-    ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamAsset,
+    ExamAttempt, ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamAsset,
     GeneratedExamQuestion, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 from assessment.services.bank_importer import WorkbookBankImporter
@@ -146,18 +146,17 @@ class AssessmentDemoSeeder:
                 report.participants.append(f"{student.username} -> {session.name}")
 
         for slug, (session, validation) in sessions.items():
-            if session.status != ExamSession.Status.DRAFT or session.generated_exams.exists():
-                report.generated.extend(self._exam_report(session.generated_exams.all()))
+            if session.status != ExamSession.Status.DRAFT:
                 continue
             if not validation["valid"]:
                 report.warnings.append(f"{session.name} remains DRAFT because its blueprint is not valid.")
                 continue
             try:
-                session, exams = publish_exam_session(session, actor=teacher, base_seed=f"demo:{slug}")
+                publish_exam_session(session, actor=teacher)
             except ValueError as exc:
                 report.warnings.append(f"{session.name} remains DRAFT: {exc}")
                 continue
-            report.generated.extend(self._exam_report(exams))
+            report.warnings.append(f"{session.name} opened without pre-generating student exams.")
 
         AssessmentAuditLog.objects.create(
             action="SEED_ASSESSMENT_DEMO", actor=teacher, object_type="AssessmentDemo",
@@ -172,15 +171,18 @@ class AssessmentDemoSeeder:
     def reset(self):
         sessions = ExamSession.objects.filter(is_demo=True)
         exams = GeneratedExam.objects.filter(session__in=sessions)
+        attempts = ExamAttempt.objects.filter(session__in=sessions)
         exam_questions = GeneratedExamQuestion.objects.filter(exam__in=exams)
         blueprints = ExamBlueprint.objects.filter(is_demo=True)
         schemes = ScoringScheme.objects.filter(is_demo=True)
         counts = {
             "generated_exam_assets": GeneratedExamAsset.objects.filter(exam_question__in=exam_questions).count(),
             "generated_exam_questions": exam_questions.count(), "generated_exams": exams.count(),
+            "attempts": attempts.count(),
             "participants": ExamParticipant.objects.filter(session__in=sessions).count(),
             "sessions": sessions.count(), "blueprints": blueprints.count(), "scoring_schemes": schemes.count(),
         }
+        attempts.delete()
         GeneratedExamAsset.objects.filter(exam_question__in=exam_questions).delete()
         exam_questions.delete()
         exams.delete()
@@ -428,7 +430,7 @@ class AssessmentDemoSeeder:
                 **common, "artifact": "practice", "name": "[DEMO] Luyện tập tự do",
                 "exam_type": ExamSession.ExamType.PRACTICE, "max_attempts": 3,
                 "attempt_result_mode": ExamSession.AttemptResultMode.HIGHEST,
-                "generation_mode": ExamSession.GenerationMode.COMMON, "code_count": 1,
+                "generation_mode": ExamSession.GenerationMode.ON_DEMAND_INDIVIDUAL, "code_count": 1,
                 "score_release_mode": ExamSession.ReleaseMode.AFTER_SUBMIT,
                 "answer_release_mode": ExamSession.ReleaseMode.AFTER_SUBMIT,
                 "release_solutions": True, "allow_review": True,
@@ -436,21 +438,21 @@ class AssessmentDemoSeeder:
             "assessment-demo-periodic": {
                 **common, "artifact": "periodic", "name": "[DEMO] Kiểm tra định kỳ",
                 "exam_type": ExamSession.ExamType.PERIODIC, "max_attempts": 1,
-                "generation_mode": ExamSession.GenerationMode.MULTIPLE, "code_count": 4,
+                "generation_mode": ExamSession.GenerationMode.ON_DEMAND_CODE_POOL, "code_count": 4,
                 "score_release_mode": ExamSession.ReleaseMode.AFTER_CLOSE,
                 "answer_release_mode": ExamSession.ReleaseMode.NEVER,
             },
             "assessment-demo-graduation": {
                 **common, "artifact": "graduation", "name": "[DEMO] Thi thử tốt nghiệp",
                 "exam_type": ExamSession.ExamType.GRADUATION, "max_attempts": 1,
-                "duration_minutes": 50, "generation_mode": ExamSession.GenerationMode.MULTIPLE,
+                "duration_minutes": 50, "generation_mode": ExamSession.GenerationMode.ON_DEMAND_CODE_POOL,
                 "code_count": 4, "score_release_mode": ExamSession.ReleaseMode.MANUAL,
                 "answer_release_mode": ExamSession.ReleaseMode.NEVER,
             },
             "assessment-demo-access": {
                 **common, "artifact": "practice", "name": "[DEMO] Kiểm tra quyền truy cập",
                 "exam_type": ExamSession.ExamType.CUSTOM, "max_attempts": 2,
-                "generation_mode": ExamSession.GenerationMode.COMMON, "code_count": 1,
+                "generation_mode": ExamSession.GenerationMode.ON_DEMAND_INDIVIDUAL, "code_count": 1,
                 "score_release_mode": ExamSession.ReleaseMode.MANUAL,
                 "answer_release_mode": ExamSession.ReleaseMode.MANUAL,
                 "allow_exam_download": True, "allow_blueprint_download": True,

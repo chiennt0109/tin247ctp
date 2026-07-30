@@ -87,4 +87,4 @@ class Command(BaseCommand):
         self.stdout.write("\n".join(f"- {warning}" for warning in report.warnings) or "- None")
         self.stdout.write("\nURLs:")
         self.stdout.write("- Admin: /admin/assessment/")
-        self.stdout.write("- Student exam list: /assessment/exams/ (available in Phase 5)")
+        self.stdout.write("- Student exam list: /assessment/exams/")

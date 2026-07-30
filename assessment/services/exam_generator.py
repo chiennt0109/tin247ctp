@@ -17,11 +17,13 @@ class ExamGenerationError(ValueError):
 
 class ExamGenerator:
     @transaction.atomic
-    def generate(self, session, *, code, seed, actor=None):
+    def _generate(self, session, *, code, seed, purpose, actor=None, expires_at=None):
         if not session.blueprint_version.is_locked or not session.scoring_version.is_locked:
             raise ExamGenerationError("Blueprint and scoring versions must be locked before generation")
-        if GeneratedExam.objects.filter(session=session, code=code).exists():
-            raise ExamGenerationError(f"Exam code {code!r} already exists")
+        if purpose not in GeneratedExam.Purpose.values:
+            raise ExamGenerationError("Generated exam purpose must be ATTEMPT or PREVIEW")
+        if purpose == GeneratedExam.Purpose.PREVIEW and expires_at is None:
+            raise ExamGenerationError("A persisted preview must have expires_at")
 
         rng = random.Random(str(seed))
         selected = []
@@ -92,6 +94,7 @@ class ExamGenerator:
             scoring_version=session.scoring_version,
             total_score=session.blueprint_version.expected_total_score,
             validation_report=report, exam_hash=exam_hash, generated_by=actor,
+            purpose=purpose, expires_at=expires_at,
         )
         for slot, question, revision, order, ordered_options, option_order in prepared:
             exam_question = GeneratedExamQuestion.objects.create(
@@ -118,19 +121,15 @@ class ExamGenerator:
         )
         return exam
 
-    def generate_codes(self, session, *, base_seed, actor=None):
-        if session.generation_mode == session.GenerationMode.INDIVIDUAL:
-            return []
-        count = 1 if session.generation_mode == session.GenerationMode.COMMON else session.code_count
-        return [
-            self.generate(
-                session, code=f"{index:03d}", seed=f"{base_seed}:{index}", actor=actor,
-            )
-            for index in range(1, count + 1)
-        ]
+    def generate_preview(self, session, *, code, seed, actor=None, expires_at):
+        return self._generate(
+            session, code=code, seed=seed, purpose=GeneratedExam.Purpose.PREVIEW,
+            actor=actor, expires_at=expires_at,
+        )
 
-    def generate_for_user(self, session, user, *, actor=None):
-        if session.generation_mode != session.GenerationMode.INDIVIDUAL:
-            raise ExamGenerationError("Session is not configured for individual exams")
-        seed = f"{session.pk}:{user.pk}"
-        return self.generate(session, code=f"U{user.pk}", seed=seed, actor=actor)
+    def _generate_attempt(self, session, *, code, seed, actor):
+        """Internal entry point; ATTEMPT exams are created only by start_attempt()."""
+        return self._generate(
+            session, code=code, seed=seed, purpose=GeneratedExam.Purpose.ATTEMPT,
+            actor=actor,
+        )

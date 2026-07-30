@@ -1,13 +1,12 @@
 from django.db import transaction
 from django.utils import timezone
 
-from assessment.models import AssessmentAuditLog, ExamSession, GeneratedExam
+from assessment.models import AssessmentAuditLog, ExamSession
 from assessment.services.blueprint_versioning import lock_blueprint_version
-from assessment.services.exam_generator import ExamGenerator
 
 
 @transaction.atomic
-def publish_exam_session(session, *, actor=None, base_seed="assessment"):
+def publish_exam_session(session, *, actor=None):
     session = ExamSession.objects.select_for_update().select_related(
         "blueprint_version", "scoring_version"
     ).get(pk=session.pk)
@@ -23,14 +22,12 @@ def publish_exam_session(session, *, actor=None, base_seed="assessment"):
     if not session.scoring_version.is_locked:
         session.scoring_version.is_locked = True
         session.scoring_version.save(update_fields=("is_locked",))
-    exams = ExamGenerator().generate_codes(session, base_seed=base_seed, actor=actor)
     now = timezone.now()
     session.status = ExamSession.Status.OPEN if session.opens_at <= now < session.closes_at else ExamSession.Status.SCHEDULED
     session.published_at = now
     session.save(update_fields=("status", "published_at", "updated_at"))
-    GeneratedExam.objects.filter(session=session).update(is_locked=True)
     AssessmentAuditLog.objects.create(
         action="PUBLISH_EXAM_SESSION", actor=actor, object_type="ExamSession",
-        object_id=str(session.pk), details={"generated_exam_ids": [exam.pk for exam in exams]},
+        object_id=str(session.pk), details={"generation": "ON_DEMAND"},
     )
-    return session, exams
+    return session

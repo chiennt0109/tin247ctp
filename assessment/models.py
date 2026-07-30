@@ -408,9 +408,15 @@ class ExamSession(models.Model):
         CUSTOM = "CUSTOM", "Tùy chỉnh"
 
     class GenerationMode(models.TextChoices):
-        COMMON = "COMMON_EXAM", "Đề chung"
-        MULTIPLE = "MULTIPLE_EQUIVALENT_CODES", "Nhiều mã tương đương"
-        INDIVIDUAL = "INDIVIDUAL_EXAM", "Đề cá nhân"
+        ON_DEMAND_INDIVIDUAL = "ON_DEMAND_INDIVIDUAL", "Sinh riêng khi bắt đầu"
+        ON_DEMAND_CODE_POOL = "ON_DEMAND_CODE_POOL", "Cấp mã từ nhóm khi bắt đầu"
+        FIXED_EXAM = "FIXED_EXAM", "Đề cố định"
+
+    class AccessMode(models.TextChoices):
+        ALL_USERS = "ALL_USERS", "Mọi tài khoản"
+        SELECTED_GROUPS = "SELECTED_GROUPS", "Nhóm được chọn"
+        SELECTED_GRADES = "SELECTED_GRADES", "Khối được chọn"
+        SELECTED_USERS = "SELECTED_USERS", "Tài khoản được chọn"
 
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Nháp"
@@ -462,7 +468,13 @@ class ExamSession(models.Model):
     shuffle_questions = models.BooleanField(default=True)
     shuffle_options = models.BooleanField(default=True)
     code_count = models.PositiveIntegerField(default=1)
-    generation_mode = models.CharField(max_length=40, choices=GenerationMode.choices)
+    generation_mode = models.CharField(
+        max_length=40, choices=GenerationMode.choices,
+        default=GenerationMode.ON_DEMAND_INDIVIDUAL,
+    )
+    access_mode = models.CharField(max_length=32, choices=AccessMode.choices, default=AccessMode.ALL_USERS)
+    access_groups = models.ManyToManyField("auth.Group", blank=True, related_name="assessment_sessions")
+    access_grades = models.JSONField(default=list, blank=True)
     score_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.MANUAL)
     answer_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.NEVER)
     answer_release_at = models.DateTimeField(null=True, blank=True)
@@ -486,10 +498,8 @@ class ExamSession(models.Model):
     def clean(self):
         if self.closes_at <= self.opens_at:
             raise ValidationError({"closes_at": "Thời gian đóng phải sau thời gian mở."})
-        if self.generation_mode == self.GenerationMode.COMMON and self.code_count != 1:
-            raise ValidationError({"code_count": "Đề chung chỉ có một mã đề."})
-        if self.generation_mode == self.GenerationMode.MULTIPLE and self.code_count < 2:
-            raise ValidationError({"code_count": "Chế độ nhiều mã cần ít nhất hai mã đề."})
+        if self.generation_mode == self.GenerationMode.ON_DEMAND_CODE_POOL and self.code_count < 2:
+            raise ValidationError({"code_count": "Nhóm mã đề cần ít nhất hai mã."})
         if self.answer_release_mode == self.ReleaseMode.AT_TIME and not self.answer_release_at:
             raise ValidationError({"answer_release_at": "Phải cấu hình thời điểm công bố đáp án."})
 
@@ -498,6 +508,10 @@ class ExamSession(models.Model):
 
 
 class GeneratedExam(models.Model):
+    class Purpose(models.TextChoices):
+        ATTEMPT = "ATTEMPT", "Attempt"
+        PREVIEW = "PREVIEW", "Preview"
+
     session = models.ForeignKey(ExamSession, on_delete=models.PROTECT, related_name="generated_exams")
     code = models.CharField(max_length=64)
     seed = models.CharField(max_length=128)
@@ -511,17 +525,22 @@ class GeneratedExam(models.Model):
         related_name="generated_assessment_exams",
     )
     generated_at = models.DateTimeField(auto_now_add=True)
+    purpose = models.CharField(max_length=16, choices=Purpose.choices)
+    expires_at = models.DateTimeField(null=True, blank=True)
     is_locked = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=("session", "code"), name="assessment_unique_exam_code")
+            models.CheckConstraint(
+                condition=models.Q(purpose__in=("ATTEMPT", "PREVIEW")),
+                name="assessment_generated_exam_valid_purpose",
+            ),
         ]
         ordering = ("session", "code")
 
 
 class GeneratedExamQuestion(models.Model):
-    exam = models.ForeignKey(GeneratedExam, on_delete=models.PROTECT, related_name="questions")
+    exam = models.ForeignKey(GeneratedExam, on_delete=models.CASCADE, related_name="questions")
     bank_question = models.ForeignKey(BankQuestion, on_delete=models.PROTECT)
     bank_revision = models.ForeignKey(BankQuestionRevision, on_delete=models.PROTECT)
     blueprint_slot = models.ForeignKey(BlueprintSlot, on_delete=models.PROTECT)
@@ -546,7 +565,7 @@ class GeneratedExamQuestion(models.Model):
 
 class GeneratedExamAsset(models.Model):
     exam_question = models.ForeignKey(
-        GeneratedExamQuestion, on_delete=models.PROTECT, related_name="assets"
+        GeneratedExamQuestion, on_delete=models.CASCADE, related_name="assets"
     )
     source_file_id_snapshot = models.CharField(max_length=160)
     name_snapshot = models.CharField(max_length=500)
@@ -577,3 +596,42 @@ class ExamParticipant(models.Model):
         constraints = [
             models.UniqueConstraint(fields=("session", "user"), name="assessment_unique_exam_participant")
         ]
+
+
+class ExamAttempt(models.Model):
+    class Status(models.TextChoices):
+        IN_PROGRESS = "IN_PROGRESS", "Đang làm"
+        SUBMITTED = "SUBMITTED", "Đã nộp"
+        AUTO_SUBMITTED = "AUTO_SUBMITTED", "Tự động nộp"
+        GRADED = "GRADED", "Đã chấm"
+        INVALIDATED = "INVALIDATED", "Vô hiệu hóa"
+        EXPIRED = "EXPIRED", "Hết hạn"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="assessment_attempts"
+    )
+    session = models.ForeignKey(ExamSession, on_delete=models.PROTECT, related_name="attempts")
+    attempt_number = models.PositiveIntegerField()
+    generated_exam = models.OneToOneField(
+        GeneratedExam, null=True, blank=True, on_delete=models.PROTECT, related_name="attempt"
+    )
+    started_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(db_index=True)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.IN_PROGRESS, db_index=True
+    )
+    invalidation_reason = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user", "session", "attempt_number"),
+                name="assessment_unique_attempt_number",
+            ),
+            models.UniqueConstraint(
+                fields=("user", "session"), condition=models.Q(status="IN_PROGRESS"),
+                name="assessment_one_in_progress_attempt",
+            ),
+        ]
+        ordering = ("-started_at",)

@@ -67,19 +67,12 @@ class AssessmentDemoSeedTests(TestCase):
         self.assertTrue(practice.can_view_answers)
         self.assertEqual(practice.max_attempts_override, 3)
 
-    def test_generated_exams_use_snapshots_and_correct_eligibility(self):
+    def test_seed_does_not_pre_generate_student_exams(self):
         self.seed("--apply")
         practice = ExamSession.objects.get(slug="assessment-demo-practice")
         periodic = ExamSession.objects.get(slug="assessment-demo-periodic")
-        self.assertEqual(practice.generated_exams.count(), 1)
-        self.assertEqual(periodic.generated_exams.count(), 4)
-        self.assertTrue(practice.generated_exams.first().questions.exists())
-        periodic_statuses = set(
-            BankQuestion.objects.filter(
-                generatedexamquestion__exam__session=periodic
-            ).values_list("process_status", flat=True)
-        )
-        self.assertEqual(periodic_statuses, {"READY_FOR_PERIODIC"})
+        self.assertEqual(practice.generated_exams.count(), 0)
+        self.assertEqual(periodic.generated_exams.count(), 0)
         graduation = ExamSession.objects.get(slug="assessment-demo-graduation")
         # Fixture has no master BLUEPRINTS/BLUEPRINT_CELLS rows, so graduation
         # remains safely in draft rather than filling with practice questions.

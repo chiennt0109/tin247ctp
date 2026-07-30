@@ -57,7 +57,7 @@ class ExamGenerationTests(TestCase):
         question.save(update_fields=("current_revision",))
         return question
 
-    def create_session(self, slug="exam", mode=ExamSession.GenerationMode.COMMON, code_count=1):
+    def create_session(self, slug="exam", mode=ExamSession.GenerationMode.ON_DEMAND_INDIVIDUAL, code_count=1):
         now = timezone.now()
         return ExamSession.objects.create(
             slug=slug, name=slug, exam_type=ExamSession.ExamType.GRADUATION,
@@ -74,8 +74,8 @@ class ExamGenerationTests(TestCase):
 
     def test_seed_reproduces_selection_and_snapshots_hide_plain_answer(self):
         self.lock_versions()
-        first = ExamGenerator().generate(self.create_session("one"), code="001", seed="stable")
-        second = ExamGenerator().generate(self.create_session("two"), code="001", seed="stable")
+        first = ExamGenerator().generate_preview(self.create_session("one"), code="001", seed="stable", expires_at=timezone.now() + timedelta(minutes=5))
+        second = ExamGenerator().generate_preview(self.create_session("two"), code="001", seed="stable", expires_at=timezone.now() + timedelta(minutes=5))
         first_ids = list(first.questions.values_list("question_id_snapshot", flat=True))
         second_ids = list(second.questions.values_list("question_id_snapshot", flat=True))
         self.assertEqual(first_ids, second_ids)
@@ -85,7 +85,7 @@ class ExamGenerationTests(TestCase):
 
     def test_snapshot_does_not_change_when_bank_revision_changes(self):
         self.lock_versions()
-        exam = ExamGenerator().generate(self.create_session(), code="001", seed="snapshot")
+        exam = ExamGenerator().generate_preview(self.create_session(), code="001", seed="snapshot", expires_at=timezone.now() + timedelta(minutes=5))
         item = exam.questions.first()
         original_stem = item.stem_snapshot
         revision = item.bank_question.current_revision
@@ -98,18 +98,14 @@ class ExamGenerationTests(TestCase):
         BankQuestion.objects.update(duplicate_family_id="ONE-FAMILY")
         self.lock_versions()
         with self.assertRaises(ExamGenerationError):
-            ExamGenerator().generate(self.create_session(), code="001", seed="family")
+            ExamGenerator().generate_preview(self.create_session(), code="001", seed="family", expires_at=timezone.now() + timedelta(minutes=5))
         self.assertEqual(GeneratedExam.objects.count(), 0)
 
-    def test_publish_multiple_codes_locks_versions_and_exams(self):
-        session = self.create_session(
-            "multiple", mode=ExamSession.GenerationMode.MULTIPLE, code_count=2,
-        )
-        published, exams = publish_exam_session(session, base_seed="batch")
+    def test_publish_locks_versions_without_pre_generating_exams(self):
+        session = self.create_session("publish")
+        published = publish_exam_session(session)
         self.assertEqual(published.status, ExamSession.Status.SCHEDULED)
-        self.assertEqual(len(exams), 2)
-        self.assertEqual({exam.code for exam in exams}, {"001", "002"})
-        self.assertTrue(all(exam.is_locked for exam in GeneratedExam.objects.filter(session=session)))
+        self.assertFalse(GeneratedExam.objects.filter(session=session).exists())
         self.blueprint_version.refresh_from_db()
         self.scoring_version.refresh_from_db()
         self.assertTrue(self.blueprint_version.is_locked)

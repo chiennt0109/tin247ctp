@@ -3,7 +3,7 @@ from django.contrib import admin
 from assessment.models import (
     AssessmentAuditLog, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamQuestion,
+    ExamAttempt, ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamQuestion,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 
@@ -136,6 +136,17 @@ class ExamParticipantInline(admin.TabularInline):
     autocomplete_fields = ("user",)
 
 
+class ExamAttemptInline(admin.TabularInline):
+    model = ExamAttempt
+    extra = 0
+    can_delete = False
+    fields = ("user", "attempt_number", "status", "generated_exam", "started_at", "expires_at")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(ExamSession)
 class ExamSessionAdmin(admin.ModelAdmin):
     list_display = (
@@ -144,7 +155,8 @@ class ExamSessionAdmin(admin.ModelAdmin):
     list_filter = ("status", "exam_type", "generation_mode", "score_release_mode", "answer_release_mode")
     search_fields = ("name", "slug")
     list_select_related = ("blueprint_version", "scoring_version", "created_by")
-    inlines = (ExamParticipantInline,)
+    filter_horizontal = ("access_groups",)
+    inlines = (ExamParticipantInline, ExamAttemptInline)
 
     def has_change_permission(self, request, obj=None):
         return not (obj and obj.status != ExamSession.Status.DRAFT) and super().has_change_permission(request, obj)
@@ -163,8 +175,19 @@ class GeneratedExamQuestionInline(admin.TabularInline):
 
 @admin.register(GeneratedExam)
 class GeneratedExamAdmin(ReadOnlyProjectionAdmin):
-    list_display = ("code", "session", "total_score", "exam_hash", "is_locked", "generated_at")
+    list_display = ("code", "purpose", "session", "total_score", "exam_hash", "is_locked", "generated_at")
     search_fields = ("code", "session__name", "exam_hash")
-    list_filter = ("is_locked", "session__exam_type")
+    list_filter = ("purpose", "is_locked", "session__exam_type")
     list_select_related = ("session", "blueprint_version", "scoring_version", "generated_by")
     inlines = (GeneratedExamQuestionInline,)
+
+
+@admin.register(ExamAttempt)
+class ExamAttemptAdmin(ReadOnlyProjectionAdmin):
+    list_display = (
+        "id", "user", "session", "attempt_number", "status", "generated_exam",
+        "started_at", "expires_at",
+    )
+    list_filter = ("status", "session__exam_type")
+    search_fields = ("user__username", "session__name", "generated_exam__code")
+    list_select_related = ("user", "session", "generated_exam")
