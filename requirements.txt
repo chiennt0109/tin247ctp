@@ -4,6 +4,7 @@ gunicorn>=22.0.0
 psycopg2-binary>=2.9.9
 whitenoise>=6.6.0
 requests>=2.31.0
+python-dotenv>=1.0
 
 # Authentication (Allauth + Google OAuth)
 django-allauth>=0.63.3
@@ -16,3 +17,6 @@ django-crispy-forms>=2.3
 crispy-bootstrap5>=0.7
 
 redis>=5.0.0
+django-rq>=3.0
+django-redis>=5.4
+openpyxl>=3.1.5
