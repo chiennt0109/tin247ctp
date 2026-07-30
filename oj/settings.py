@@ -52,7 +52,13 @@ INSTALLED_APPS = [
     "contests",
     "arena.apps.ArenaConfig",
     "learning_analytics",
+    "assessment.apps.AssessmentConfig",
 ]
+
+# Assessment question-bank projection. Credentials remain environment-only.
+QUESTION_BANK_SOURCE = os.environ.get("QUESTION_BANK_SOURCE", "")
+QUESTION_BANK_FILE_ID = os.environ.get("QUESTION_BANK_FILE_ID", "")
+QUESTION_BANK_SYNC_ENABLED = os.environ.get("QUESTION_BANK_SYNC_ENABLED", "False").lower() == "true"
 
 SITE_ID = 2
 
@@ -242,7 +248,7 @@ LOGGING = {
     "handlers": {
         "file_throttle": {
             "class": "logging.FileHandler",
-            "filename": "/var/www/tin247ctp/throttle.log",
+            "filename": os.environ.get("THROTTLE_LOG_PATH", str(BASE_DIR / "throttle.log")),
             "formatter": "verbose",
         },
     },
@@ -278,4 +284,3 @@ RQ_QUEUES = {
     },
 }
 RQ_PREFIX = ""
-

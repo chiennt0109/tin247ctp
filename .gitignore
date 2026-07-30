@@ -8,3 +8,5 @@ staticfiles/
 __pycache__/
 media/
 backup/
+# Canonical bank data is operational input and may contain protected answers.
+assessment/data/*.xlsx
