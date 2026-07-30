@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from assessment.models import (
-    AssessmentAuditLog, BankQuestion, BankQuestionRevision, BankSourceFile,
+    AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
     ExamAttempt, ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamQuestion,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
@@ -191,3 +191,10 @@ class ExamAttemptAdmin(ReadOnlyProjectionAdmin):
     list_filter = ("status", "session__exam_type")
     search_fields = ("user__username", "session__name", "generated_exam__code")
     list_select_related = ("user", "session", "generated_exam")
+
+
+@admin.register(AttemptAnswer)
+class AttemptAnswerAdmin(ReadOnlyProjectionAdmin):
+    list_display = ("attempt", "exam_question", "flagged_for_review", "saved_at")
+    search_fields = ("attempt__user__username", "attempt__session__name")
+    list_select_related = ("attempt", "attempt__user", "exam_question")

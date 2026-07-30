@@ -618,6 +618,8 @@ class ExamAttempt(models.Model):
     )
     started_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(db_index=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    data_version = models.PositiveIntegerField(default=0)
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.IN_PROGRESS, db_index=True
     )
@@ -635,3 +637,20 @@ class ExamAttempt(models.Model):
             ),
         ]
         ordering = ("-started_at",)
+
+
+class AttemptAnswer(models.Model):
+    attempt = models.ForeignKey(ExamAttempt, on_delete=models.CASCADE, related_name="answers")
+    exam_question = models.ForeignKey(
+        GeneratedExamQuestion, on_delete=models.PROTECT, related_name="attempt_answers"
+    )
+    answer = models.JSONField(default=dict, blank=True)
+    flagged_for_review = models.BooleanField(default=False)
+    saved_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("attempt", "exam_question"), name="assessment_unique_attempt_answer"
+            )
+        ]

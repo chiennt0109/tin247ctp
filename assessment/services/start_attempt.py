@@ -78,6 +78,11 @@ def start_attempt(user, exam_session):
                     user=user, session=session, status=ExamAttempt.Status.IN_PROGRESS
                 ).first()
                 if existing:
+                    if timezone.now() >= existing.expires_at:
+                        existing.status = ExamAttempt.Status.EXPIRED
+                        existing.save(update_fields=("status",))
+                        existing = None
+                if existing:
                     if existing.generated_exam_id is None:
                         raise StartAttemptError("Bài làm đang mở không có đề; quản trị viên cần kiểm tra.")
                     return existing

@@ -96,12 +96,12 @@ class StartAttemptTests(TestCase):
         self.assertFalse(ExamAttempt.objects.exists())
         self.assertFalse(GeneratedExam.objects.exists())
 
-    def test_student_debug_page_never_exposes_protected_answers(self):
+    def test_student_attempt_page_never_exposes_protected_answers(self):
         user = get_user_model().objects.create_user("debug")
         attempt = start_attempt(user, self.open_session())
         self.client.force_login(user)
 
-        response = self.client.get(reverse("assessment:attempt_debug", args=(attempt.pk,)))
+        response = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "answer_key")
