@@ -58,6 +58,11 @@ urlpatterns = [
     path("scratch/<slug:lesson_slug>/<slug:sub_slug>/", scratch_views.scratch_sub_lesson, name="scratch_sub_lesson"),
     path("scratch/<slug:lesson_slug>/", scratch_views.scratch_lesson, name="scratch_lesson"),
 
+    # ==========================
+    # 📝 Tin học đại trà / Assessment
+    # ==========================
+    path("assessment/", include(("assessment.urls", "assessment"), namespace="assessment")),
+
 
     # ==========================
     # ⚙️ Demo Run Code Online

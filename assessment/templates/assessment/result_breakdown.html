@@ -1,0 +1,1 @@
+<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Nội dung</th><th>Điểm</th><th>Số câu</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.name }}</td><td>{{ row.score }} / {{ row.max_score }}</td><td>{{ row.questions }}</td></tr>{% endfor %}</tbody></table></div>
