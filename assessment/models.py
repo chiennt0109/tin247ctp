@@ -207,6 +207,9 @@ class ExamBlueprint(models.Model):
         LOCKED = "LOCKED", "Đã khóa"
 
     name = models.CharField(max_length=255)
+    source_blueprint_id = models.CharField(
+        max_length=160, null=True, blank=True, unique=True, db_index=True,
+    )
     demo_key = models.CharField(
         max_length=100,
         null=True,
@@ -479,6 +482,10 @@ class ExamSession(models.Model):
     score_release_at = models.DateTimeField(null=True, blank=True)
     answer_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.NEVER)
     answer_release_at = models.DateTimeField(null=True, blank=True)
+    solution_release_mode = models.CharField(
+        max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.NEVER,
+    )
+    solution_release_at = models.DateTimeField(null=True, blank=True)
     release_solutions = models.BooleanField(default=False)
     allow_exam_download = models.BooleanField(default=False)
     allow_blueprint_download = models.BooleanField(default=False)
@@ -494,6 +501,7 @@ class ExamSession(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)
     results_released_at = models.DateTimeField(null=True, blank=True)
     answers_released_at = models.DateTimeField(null=True, blank=True)
+    solutions_released_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         indexes = [models.Index(fields=("status", "opens_at", "closes_at"), name="assessment_session_window_idx")]
@@ -507,6 +515,8 @@ class ExamSession(models.Model):
             raise ValidationError({"answer_release_at": "Phải cấu hình thời điểm công bố đáp án."})
         if self.score_release_mode == self.ReleaseMode.AT_TIME and not self.score_release_at:
             raise ValidationError({"score_release_at": "Phải cấu hình thời điểm công bố điểm."})
+        if self.solution_release_mode == self.ReleaseMode.AT_TIME and not self.solution_release_at:
+            raise ValidationError({"solution_release_at": "Phải cấu hình thời điểm công bố lời giải."})
 
     def __str__(self):
         return self.name

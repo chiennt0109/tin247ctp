@@ -31,6 +31,29 @@ không xóa lịch sử. `ExamAttempt.score`, `graded_at` chỉ là bản tóm t
 thời điểm cấu hình và công bố thủ công đều được kiểm tra ở backend. Trang kết quả không
 giải mã hoặc gửi đáp án chuẩn xuống trình duyệt.
 
+## Trang kết quả và phân tích
+
+- Học sinh dùng `/assessment/results/` và `/assessment/results/<attempt_id>/`. Kết quả có
+  điểm theo phần, chủ đề, YCCD, mức nhận thức, lịch sử các lần làm và đánh dấu lần được
+  tính chính thức theo policy của kỳ kiểm tra.
+- Giáo viên có quyền `view_results` dùng `/assessment/manage/exams/<id>/results/` để xem
+  trạng thái tham gia, thống kê điểm, phân tích từng `QUESTION_ID`, lựa chọn phương án,
+  độ khó thực nghiệm, độ phân hóa và cảnh báo chất lượng câu.
+- Các nút công bố/thu hồi điểm, đáp án và lời giải đều là POST, kiểm tra permission phía
+  server và ghi `AssessmentAuditLog`.
+
+## Đồng bộ cấu hình thật, loại bỏ demo
+
+`sync_exam_bank --apply` hiện đồng bộ cùng transaction cả câu hỏi lẫn `BLUEPRINTS`,
+`BLUEPRINT_CELLS` và `SCORE_RULES` đã duyệt. Ma trận được nhận dạng bằng
+`source_blueprint_id`, giữ nguyên khối 10/11/12, loại kỳ, taxonomy, YCCD, mức nhận thức,
+số lượng và điểm từ master; không sinh cấu hình `[DEMO]` và không tự bù câu sai điều kiện.
+
+Sau khi kiểm tra backup, quản trị viên có thể loại bỏ riêng dữ liệu demo cũ bằng
+`python manage.py seed_assessment_demo --purge`. Lệnh chỉ lọc các object `is_demo=True`,
+không xóa ngân hàng câu hỏi hoặc tài khoản. Không chạy lệnh này trước khi kiểm tra dữ liệu
+production.
+
 ## Validation trước khi khóa
 
 `BlueprintValidator` kiểm tra:

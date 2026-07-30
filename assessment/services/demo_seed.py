@@ -12,6 +12,7 @@ from assessment.models import (
     AssessmentAuditLog, BankQuestion, BlueprintSection, BlueprintSlot, BlueprintVersion,
     ExamAttempt, ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamAsset,
     GeneratedExamQuestion, ScoringRule, ScoringScheme, ScoringSchemeVersion,
+    GradingResult,
 )
 from assessment.services.bank_importer import WorkbookBankImporter
 from assessment.services.blueprint_validator import BlueprintValidator
@@ -167,8 +168,9 @@ class AssessmentDemoSeeder:
         )
         return report
 
+    @staticmethod
     @transaction.atomic
-    def reset(self):
+    def reset():
         sessions = ExamSession.objects.filter(is_demo=True)
         exams = GeneratedExam.objects.filter(session__in=sessions)
         attempts = ExamAttempt.objects.filter(session__in=sessions)
@@ -182,6 +184,7 @@ class AssessmentDemoSeeder:
             "participants": ExamParticipant.objects.filter(session__in=sessions).count(),
             "sessions": sessions.count(), "blueprints": blueprints.count(), "scoring_schemes": schemes.count(),
         }
+        GradingResult.objects.filter(attempt__in=attempts).delete()
         attempts.delete()
         GeneratedExamAsset.objects.filter(exam_question__in=exam_questions).delete()
         exam_questions.delete()

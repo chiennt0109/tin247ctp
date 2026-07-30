@@ -42,11 +42,16 @@ def result_visibility(attempt, *, now=None, participant=None):
     )
     if participant and participant.can_view_answers:
         answers = True
+    solutions = is_released(
+        session.solution_release_mode, session, attempt, now=now,
+        manual_at=session.solutions_released_at, specific_at=session.solution_release_at,
+        max_attempts=maximum,
+    )
+    if participant and participant.can_view_solutions:
+        solutions = True
     return {
         "score": score,
         "answers": answers,
-        "solutions": answers and session.release_solutions and bool(
-            not participant or participant.can_view_solutions
-        ),
+        "solutions": answers and session.release_solutions and solutions,
         "review": session.allow_review,
     }

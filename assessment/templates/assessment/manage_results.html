@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Phân tích — {{ session.name }}{% endblock %}
+{% block content %}<main class="container-fluid px-4 py-4">
+<h1 class="h3">Kết quả: {{ session.name }}</h1>
+<div class="d-flex flex-wrap gap-2 my-3">
+  <form method="post" action="{% url 'assessment:manage_result_release' session.pk 'score' 'release' %}">{% csrf_token %}<button class="btn btn-success">Công bố điểm</button></form>
+  <form method="post" action="{% url 'assessment:manage_result_release' session.pk 'score' 'revoke' %}">{% csrf_token %}<button class="btn btn-outline-danger">Thu hồi điểm</button></form>
+  <form method="post" action="{% url 'assessment:manage_result_release' session.pk 'answers' 'release' %}">{% csrf_token %}<button class="btn btn-success">Công bố đáp án</button></form>
+  <form method="post" action="{% url 'assessment:manage_result_release' session.pk 'answers' 'revoke' %}">{% csrf_token %}<button class="btn btn-outline-danger">Thu hồi đáp án</button></form>
+  <form method="post" action="{% url 'assessment:manage_result_release' session.pk 'solutions' 'release' %}">{% csrf_token %}<button class="btn btn-success">Công bố lời giải</button></form>
+  <form method="post" action="{% url 'assessment:manage_result_release' session.pk 'solutions' 'revoke' %}">{% csrf_token %}<button class="btn btn-outline-danger">Thu hồi lời giải</button></form>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col"><div class="card"><div class="card-body"><small>Được phép</small><h2>{{ dashboard.eligible|default:"Theo chính sách" }}</h2></div></div></div>
+  <div class="col"><div class="card"><div class="card-body"><small>Chưa làm</small><h2>{{ dashboard.not_started }}</h2></div></div></div>
+  <div class="col"><div class="card"><div class="card-body"><small>Điểm TB</small><h2>{{ dashboard.average|floatformat:2|default:"-" }}</h2></div></div></div>
+  <div class="col"><div class="card"><div class="card-body"><small>Trung vị</small><h2>{{ dashboard.median|floatformat:2|default:"-" }}</h2></div></div></div>
+  <div class="col"><div class="card"><div class="card-body"><small>Cao / thấp</small><h2>{{ dashboard.highest|default:"-" }} / {{ dashboard.lowest|default:"-" }}</h2></div></div></div>
+</div>
+<section class="card"><div class="card-body"><h2 class="h5">Phân tích câu hỏi theo QUESTION_ID</h2><div class="table-responsive"><table class="table">
+<thead><tr><th>QUESTION_ID</th><th>Lượt dùng</th><th>Đúng</th><th>Bỏ trống</th><th>Độ khó</th><th>Phân hóa</th><th>Cảnh báo</th></tr></thead><tbody>
+{% for item in dashboard.questions %}<tr><td>{{ item.question_id }}</td><td>{{ item.uses }}</td><td>{{ item.correct_rate|floatformat:2 }}</td><td>{{ item.blank_rate|floatformat:2 }}</td><td>{{ item.difficulty_observed|floatformat:2 }}</td><td>{{ item.discrimination_index|floatformat:2 }}</td><td>{{ item.warnings|join:", " }}</td></tr>{% empty %}<tr><td colspan="7">Chưa đủ dữ liệu.</td></tr>{% endfor %}
+</tbody></table></div></div></section>
+<div class="row g-3 mt-1"><section class="col-lg-4"><div class="card"><div class="card-body"><h2 class="h6">Theo chủ đề</h2>{% include "assessment/result_breakdown.html" with rows=dashboard.topics %}</div></div></section>
+<section class="col-lg-4"><div class="card"><div class="card-body"><h2 class="h6">Theo YCCD</h2>{% include "assessment/result_breakdown.html" with rows=dashboard.outcomes %}</div></div></section>
+<section class="col-lg-4"><div class="card"><div class="card-body"><h2 class="h6">Theo mức nhận thức</h2>{% include "assessment/result_breakdown.html" with rows=dashboard.cognitive_levels %}</div></div></section></div>
+</main>{% endblock %}

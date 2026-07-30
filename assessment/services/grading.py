@@ -124,7 +124,9 @@ def grade_attempt(attempt_id, *, actor=None, reason="Nộp bài", allow_regrade=
     answers = {answer.exam_question_id: answer for answer in attempt.answers.all()}
     details, total = [], Decimal("0")
     counts = {"CORRECT": 0, "INCORRECT": 0, "BLANK": 0}
-    questions = exam.questions.select_related("bank_question").order_by("order")
+    questions = exam.questions.select_related(
+        "bank_question__curriculum", "bank_question__outcome", "blueprint_slot__section",
+    ).order_by("order")
     for question in questions:
         rule = rules.get(question.bank_question.question_type)
         if not rule:
@@ -132,9 +134,27 @@ def grade_attempt(attempt_id, *, actor=None, reason="Nộp bài", allow_regrade=
         score, outcome, submitted = _grade_question(question, answers.get(question.pk), rule)
         total += score
         counts[outcome] += 1
+        selected_option = None
+        if question.bank_question.question_type == "MCQ_SINGLE" and str(submitted).isdigit():
+            index = int(submitted)
+            if index < len(question.options_snapshot):
+                option = question.options_snapshot[index]
+                selected_option = option.get("label") if isinstance(option, dict) else str(index)
         details.append({
             "exam_question_id": question.pk, "order": question.order,
+            "question_id": question.question_id_snapshot,
+            "section": question.blueprint_slot.section.name,
+            "topic": (
+                question.bank_question.curriculum.topic_name
+                if question.bank_question.curriculum_id else "Chưa phân loại"
+            ),
+            "learning_outcome": (
+                question.bank_question.outcome.code
+                if question.bank_question.outcome_id else "Chưa phân loại"
+            ),
+            "cognitive_level": question.bank_question.cognitive_level or "Chưa phân loại",
             "submitted_answer": submitted, "outcome": outcome, "score": str(score),
+            "selected_option": selected_option,
             "max_score": str(question.score), "rule_code": rule.rule_code,
         })
 

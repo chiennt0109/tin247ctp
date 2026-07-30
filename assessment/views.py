@@ -11,6 +11,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
 from assessment.models import ExamAttempt, ExamParticipant, ExamSession, GradingResult
+from assessment.models import AssessmentAuditLog
+from assessment.services.analytics import exam_results_dashboard, official_attempts, student_result_summary
 from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
@@ -37,7 +39,9 @@ def _rate_limited(key, *, limit, window):
 def exam_list(request):
     """Show sessions allowed by session policy plus per-user overrides."""
     sessions = (
-        ExamSession.objects.exclude(status__in=(ExamSession.Status.DRAFT, ExamSession.Status.CANCELLED))
+        ExamSession.objects.filter(is_demo=False).exclude(
+            status__in=(ExamSession.Status.DRAFT, ExamSession.Status.CANCELLED),
+        )
         .select_related("blueprint_version")
         .prefetch_related("access_groups")
         .annotate(
@@ -184,6 +188,68 @@ def attempt_result(request, attempt_id):
     visibility = result_visibility(attempt, participant=participant)
     if request.user.has_perm("assessment.view_results"):
         visibility = {"score": True, "answers": True, "solutions": True, "review": True}
+    summary = student_result_summary(attempt)
+    attempts = list(ExamAttempt.objects.filter(
+        user=attempt.user, session=attempt.session, status=ExamAttempt.Status.GRADED,
+    ).order_by("attempt_number"))
+    official = official_attempts(attempts, attempt.session.attempt_result_mode)
     return render(request, "assessment/result.html", {
         "attempt": attempt, "result": result, "visibility": visibility,
+        "summary": summary, "attempts": attempts, "official_attempt_ids": official,
     })
+
+
+@login_required
+def result_list(request):
+    attempts = list(ExamAttempt.objects.filter(
+        user=request.user, status=ExamAttempt.Status.GRADED, session__is_demo=False,
+    ).select_related("session").prefetch_related("grading_results").order_by("-submitted_at"))
+    by_session = {}
+    for attempt in attempts:
+        by_session.setdefault(attempt.session_id, []).append(attempt)
+    official = set()
+    for rows in by_session.values():
+        official |= official_attempts(rows, rows[0].session.attempt_result_mode)
+    rows = []
+    for attempt in attempts:
+        participant = ExamParticipant.objects.filter(session=attempt.session, user=request.user).first()
+        rows.append({
+            "attempt": attempt, "visibility": result_visibility(attempt, participant=participant),
+            "official": attempt.pk in official,
+        })
+    return render(request, "assessment/result_list.html", {"result_rows": rows})
+
+
+@login_required
+def manage_exam_results(request, session_id):
+    if not request.user.has_perm("assessment.view_results"):
+        raise Http404
+    session = get_object_or_404(ExamSession, pk=session_id)
+    return render(request, "assessment/manage_results.html", {
+        "session": session, "dashboard": exam_results_dashboard(session),
+    })
+
+
+@login_required
+@require_POST
+def manage_result_release(request, session_id, target, action):
+    permission = "assessment.release_results" if target == "score" else "assessment.release_answers"
+    if not request.user.has_perm(permission):
+        raise Http404
+    fields = {
+        "score": "results_released_at", "answers": "answers_released_at",
+        "solutions": "solutions_released_at",
+    }
+    field = fields.get(target)
+    if not field or action not in {"release", "revoke"}:
+        raise Http404
+    session = get_object_or_404(ExamSession, pk=session_id)
+    setattr(session, field, timezone.now() if action == "release" else None)
+    session.save(update_fields=(field,))
+    AssessmentAuditLog.objects.create(
+        action=f"{action.upper()}_{target.upper()}", actor=request.user,
+        object_type="ExamSession", object_id=str(session.pk),
+        details={"field": field},
+    )
+    messages.success(request, "Đã cập nhật trạng thái công bố.")
+    return redirect("assessment:manage_exam_results", session_id=session.pk)

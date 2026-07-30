@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from assessment.models import ExamAttempt, ExamSession, GradingResult
+from assessment.models import AssessmentAuditLog, ExamAttempt, ExamSession, GradingResult
 from assessment.services.attempt_service import save_answers, submit_attempt
 from assessment.services.grading import grade_attempt
 from assessment.services.result_release import result_visibility
@@ -80,3 +80,49 @@ class GradingTests(TestCase):
         self.assertContains(visible, str(attempt.score))
         self.assertContains(visible, "chưa được công bố")
         self.assertFalse(result_visibility(attempt)["answers"])
+
+    def test_teacher_dashboard_and_release_actions_are_permission_protected_and_audited(self):
+        student = get_user_model().objects.create_user("dashboard-student")
+        attempt = start_attempt(student, self.open_session())
+        submit_attempt(attempt_id=attempt.pk, user=student)
+        teacher = get_user_model().objects.create_superuser("results-admin", "r@example.com", "test")
+        self.client.force_login(teacher)
+
+        dashboard = self.client.get(reverse("assessment:manage_exam_results", args=(attempt.session_id,)))
+        self.assertEqual(dashboard.status_code, 200)
+        self.assertContains(dashboard, "Phân tích câu hỏi")
+        release = self.client.post(reverse(
+            "assessment:manage_result_release", args=(attempt.session_id, "score", "release"),
+        ))
+        self.assertEqual(release.status_code, 302)
+        attempt.session.refresh_from_db()
+        self.assertIsNotNone(attempt.session.results_released_at)
+        self.assertTrue(AssessmentAuditLog.objects.filter(action="RELEASE_SCORE").exists())
+
+    def test_student_results_index_lists_attempt_and_official_result(self):
+        user = get_user_model().objects.create_user("result-list-student")
+        session = self.open_session()
+        session.score_release_mode = ExamSession.ReleaseMode.AFTER_SUBMIT
+        session.save(update_fields=("score_release_mode",))
+        attempt = start_attempt(user, session)
+        submit_attempt(attempt_id=attempt.pk, user=user)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:result_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, session.name)
+        self.assertContains(response, "Kết quả chính thức")
+
+    def test_student_can_start_next_attempt_after_grading_when_quota_remains(self):
+        user = get_user_model().objects.create_user("retry-after-grade")
+        session = self.open_session()
+        session.max_attempts = 2
+        session.save(update_fields=("max_attempts",))
+        first = start_attempt(user, session)
+        submit_attempt(attempt_id=first.pk, user=user)
+
+        second = start_attempt(user, session)
+
+        self.assertEqual(second.attempt_number, 2)
+        self.assertNotEqual(second.generated_exam_id, first.generated_exam_id)

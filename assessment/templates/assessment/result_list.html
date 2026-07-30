@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Kết quả kiểm tra{% endblock %}
+{% block content %}<main class="container py-4">
+<h1 class="h2">Kết quả của tôi</h1>
+{% if result_rows %}<div class="list-group mt-3">{% for row in result_rows %}
+  <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="{% url 'assessment:result_detail' row.attempt.pk %}">
+    <span><strong>{{ row.attempt.session.name }}</strong><br><small>Lần {{ row.attempt.attempt_number }}{% if row.official %} · Kết quả chính thức{% endif %}</small></span>
+    {% if row.visibility.score %}<strong>{{ row.attempt.score }}</strong>{% else %}<span class="badge text-bg-secondary">Chờ công bố</span>{% endif %}
+  </a>{% endfor %}</div>
+{% else %}<div class="alert alert-info mt-3">Bạn chưa có bài làm đã chấm.</div>{% endif %}
+</main>{% endblock %}

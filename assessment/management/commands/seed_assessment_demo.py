@@ -15,6 +15,7 @@ class Command(BaseCommand):
         mode.add_argument("--dry-run", action="store_true")
         mode.add_argument("--apply", action="store_true")
         mode.add_argument("--reset", action="store_true", help="Delete demo-only data, then recreate it")
+        mode.add_argument("--purge", action="store_true", help="Delete demo-only data without recreating it")
         parser.add_argument("--source", help="Canonical master XLSX path")
         parser.add_argument("--student", help="Existing student username to assign")
         parser.add_argument("--teacher", help="Existing teacher/admin username for audit ownership")
@@ -23,6 +24,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options["with_sample_attempts"]:
             raise CommandError("Sample attempts are unavailable until the Phase 5 attempt/grading service exists")
+        if options["purge"]:
+            with transaction.atomic():
+                counts = AssessmentDemoSeeder.reset()
+                if options.get("dry_run"):
+                    transaction.set_rollback(True)
+            self.stdout.write(self.style.SUCCESS("ASSESSMENT DEMO PURGE"))
+            for key, value in counts.items():
+                self.stdout.write(f"- {key}: {value}")
+            return
         source = options.get("source") or getattr(settings, "QUESTION_BANK_SOURCE", "")
         if not source:
             source = settings.BASE_DIR / "assessment/data/INDEX_NGAN_HANG_DE_TIN_HOC_TOT_NGHIEP_MASTER.xlsx"
