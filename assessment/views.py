@@ -87,6 +87,13 @@ def attempt_detail(request, attempt_id):
     )
     if attempt.user_id != request.user.pk and not request.user.is_staff:
         raise Http404
+    if attempt.status != ExamAttempt.Status.IN_PROGRESS:
+        messages.info(request, "Bài làm này đã kết thúc.")
+        return redirect("assessment:exam_list")
+    if timezone.now() >= attempt.expires_at:
+        submit_attempt(attempt_id=attempt.pk, user=attempt.user)
+        messages.info(request, "Bài làm đã hết giờ và được tự động nộp.")
+        return redirect("assessment:exam_list")
     questions = list(attempt.generated_exam.questions.only(
         "order", "stem_snapshot", "options_snapshot", "statements_snapshot"
     ).order_by("order"))

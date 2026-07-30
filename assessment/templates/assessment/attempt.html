@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load l10n %}
 {% block title %}{{ attempt.session.name }} — Lần {{ attempt.attempt_number }}{% endblock %}
 {% block content %}
 <style>
   .assessment-shell{max-width:1180px;margin:auto}.assessment-head{position:sticky;top:64px;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 0}.question-layout{display:grid;grid-template-columns:1fr 260px;gap:20px}.question-card{scroll-margin-top:150px}.question-nav{position:sticky;top:145px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.question-nav a{display:grid;place-items:center;min-height:38px;border:1px solid #cbd5e1;border-radius:8px;text-decoration:none}.question-nav a.answered{background:#dcfce7;border-color:#22c55e}.save-state{min-width:120px}@media(max-width:900px){.question-layout{grid-template-columns:1fr}.question-aside{order:-1}.question-nav{position:static;grid-template-columns:repeat(10,1fr)}}
 </style>
-<main class="assessment-shell px-3 py-3" data-attempt-id="{{ attempt.pk }}" data-version="{{ attempt.data_version }}" data-server-now="{{ server_now_ms }}" data-expires-at="{{ expires_at_ms }}">
+<main class="assessment-shell px-3 py-3" data-attempt-id="{{ attempt.pk }}" data-version="{{ attempt.data_version|unlocalize }}" data-server-now="{{ server_now_ms|unlocalize }}" data-expires-at="{{ expires_at_ms|unlocalize }}">
   <header class="assessment-head d-flex flex-wrap justify-content-between align-items-center gap-2">
     <div><strong>{{ attempt.session.name }}</strong><div class="small text-muted">Lần {{ attempt.attempt_number }}</div></div>
     <div class="d-flex align-items-center gap-3"><span id="save-state" class="save-state text-muted" role="status">Đã tải</span><strong id="countdown" aria-live="polite">--:--</strong><button id="submit-attempt" class="btn btn-danger">Nộp bài</button></div>
@@ -30,7 +30,7 @@
 <script>
 (() => {
   const root=document.querySelector('.assessment-shell'), attemptId=root.dataset.attemptId;
-  let version=Number(root.dataset.version), timer=null, saving=false;
+  let version=Number(root.dataset.version), timer=null, saving=false, submitting=false, autoSubmitStarted=false;
   const saveUrl=`/assessment/api/attempts/${attemptId}/answers/`, submitUrl=`/assessment/api/attempts/${attemptId}/submit/`;
   const csrf=document.querySelector('[name=csrfmiddlewaretoken]').value, state=document.getElementById('save-state');
   const storageKey=`assessment-attempt-${attemptId}`;
@@ -40,8 +40,8 @@
   async function save(){if(saving)return false;saving=true;state.textContent='Đang lưu…';const answers=[...document.querySelectorAll('.question-card')].map(collect);localStorage.setItem(storageKey,JSON.stringify({version,answers}));try{const r=await fetch(saveUrl,{method:'PATCH',headers:{'Content-Type':'application/json','X-CSRFToken':csrf},body:JSON.stringify({version,answers})});const data=await r.json();if(!r.ok)throw Object.assign(new Error(data.error||'Không thể lưu'),{status:r.status,serverVersion:data.version});version=data.version;root.dataset.version=version;localStorage.removeItem(storageKey);state.textContent='Đã lưu';document.getElementById('connection-warning').classList.add('d-none');return true;}catch(e){state.textContent=e.status===409?'Dữ liệu đã thay đổi':'Chưa lưu';document.getElementById('connection-warning').classList.remove('d-none');return false;}finally{saving=false;}}
   function schedule(){clearTimeout(timer);state.textContent='Có thay đổi';timer=setTimeout(save,700);paint();}
   document.querySelectorAll('.answer-control,.review-flag').forEach(x=>x.addEventListener('change',schedule));document.querySelectorAll('input[type=text]').forEach(x=>x.addEventListener('input',schedule));window.addEventListener('online',save);restoreLocal();paint();
-  const offset=Number(root.dataset.serverNow)-Date.now(), expiry=Number(root.dataset.expiresAt);function tick(){const left=Math.max(0,expiry-(Date.now()+offset)),sec=Math.ceil(left/1000);document.getElementById('countdown').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;if(left<=0)submit(true);}setInterval(tick,1000);tick();
-  async function submit(auto=false){clearTimeout(timer);const saved=await save();if(!saved&&!auto){alert('Câu trả lời chưa lưu được. Hãy kiểm tra kết nối trước khi nộp.');return;}if(!auto&&!confirm('Bạn chắc chắn muốn nộp bài?'))return;const r=await fetch(submitUrl,{method:'POST',headers:{'X-CSRFToken':csrf}}),data=await r.json();if(r.ok){localStorage.removeItem(storageKey);alert(auto?'Đã hết giờ. Bài đã được tự động nộp.':'Nộp bài thành công.');location.href='/assessment/exams/';}else alert(data.error||'Không thể nộp bài.');}
+  const offset=Number(root.dataset.serverNow)-Date.now(), expiry=Number(root.dataset.expiresAt);function tick(){const left=Math.max(0,expiry-(Date.now()+offset)),sec=Math.ceil(left/1000);document.getElementById('countdown').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;if(left<=0&&!autoSubmitStarted){autoSubmitStarted=true;submit(true);}}setInterval(tick,1000);tick();
+  async function submit(auto=false){if(submitting)return;submitting=true;document.getElementById('submit-attempt').disabled=true;clearTimeout(timer);const saved=await save();if(!saved&&!auto){alert('Câu trả lời chưa lưu được. Hãy kiểm tra kết nối trước khi nộp.');submitting=false;document.getElementById('submit-attempt').disabled=false;return;}if(!auto&&!confirm('Bạn chắc chắn muốn nộp bài?')){submitting=false;document.getElementById('submit-attempt').disabled=false;return;}try{const r=await fetch(submitUrl,{method:'POST',headers:{'X-CSRFToken':csrf}}),data=await r.json();if(r.ok){localStorage.removeItem(storageKey);alert(auto?'Đã hết giờ. Bài đã được tự động nộp.':'Nộp bài thành công.');location.href='/assessment/exams/';return;}alert(data.error||'Không thể nộp bài.');}catch(e){alert('Không thể kết nối máy chủ để nộp bài.');}submitting=false;document.getElementById('submit-attempt').disabled=false;}
   document.getElementById('submit-attempt').addEventListener('click',()=>submit(false));
 })();
 </script>

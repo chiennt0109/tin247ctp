@@ -96,3 +96,18 @@ class AttemptServiceTests(TestCase):
         self.assertNotIn("answer_key", body)
         self.assertNotIn("protected_answer", body)
         self.assertNotIn("question_id_snapshot", body)
+        self.assertIn("autoSubmitStarted", body)
+        self.assertIn("if(submitting)return", body)
+
+    def test_expired_attempt_page_auto_submits_once_and_redirects(self):
+        user, attempt = self.create_attempt("expired-page")
+        attempt.expires_at = timezone.now() - timedelta(seconds=1)
+        attempt.save(update_fields=("expires_at",))
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
+
+        self.assertRedirects(response, reverse("assessment:exam_list"))
+        attempt.refresh_from_db()
+        self.assertEqual(attempt.status, ExamAttempt.Status.AUTO_SUBMITTED)
+        self.assertIsNotNone(attempt.submitted_at)
