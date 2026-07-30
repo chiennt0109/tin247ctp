@@ -4,6 +4,7 @@ from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
     ExamAttempt, ExamBlueprint, ExamParticipant, ExamSession, GeneratedExam, GeneratedExamQuestion,
+    GradingResult,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 
@@ -30,6 +31,7 @@ ASSESSMENT_ADMIN_MENU = {
     "ExamAttempt": (400, "Bài làm của học sinh"),
     "GeneratedExam": (410, "Đề đã sinh theo bài làm"),
     "AttemptAnswer": (420, "Câu trả lời đã lưu"),
+    "GradingResult": (430, "Kết quả chấm điểm"),
     "AssessmentAuditLog": (500, "Nhật ký thao tác kiểm tra"),
 }
 
@@ -253,6 +255,16 @@ class AttemptAnswerAdmin(ReadOnlyProjectionAdmin):
     list_display = ("attempt", "exam_question", "flagged_for_review", "saved_at")
     search_fields = ("attempt__user__username", "attempt__session__name")
     list_select_related = ("attempt", "attempt__user", "exam_question")
+
+
+@admin.register(GradingResult)
+class GradingResultAdmin(ReadOnlyProjectionAdmin):
+    list_display = (
+        "attempt", "sequence", "total_score", "max_score", "is_current", "created_at",
+    )
+    list_filter = ("is_current", "scoring_version")
+    search_fields = ("attempt__user__username", "attempt__session__name")
+    list_select_related = ("attempt", "attempt__user", "attempt__session", "scoring_version")
 
 
 _install_assessment_admin_menu()

@@ -476,6 +476,7 @@ class ExamSession(models.Model):
     access_groups = models.ManyToManyField("auth.Group", blank=True, related_name="assessment_sessions")
     access_grades = models.JSONField(default=list, blank=True)
     score_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.MANUAL)
+    score_release_at = models.DateTimeField(null=True, blank=True)
     answer_release_mode = models.CharField(max_length=40, choices=ReleaseMode.choices, default=ReleaseMode.NEVER)
     answer_release_at = models.DateTimeField(null=True, blank=True)
     release_solutions = models.BooleanField(default=False)
@@ -491,6 +492,8 @@ class ExamSession(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True)
+    results_released_at = models.DateTimeField(null=True, blank=True)
+    answers_released_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         indexes = [models.Index(fields=("status", "opens_at", "closes_at"), name="assessment_session_window_idx")]
@@ -502,6 +505,8 @@ class ExamSession(models.Model):
             raise ValidationError({"code_count": "Nhóm mã đề cần ít nhất hai mã."})
         if self.answer_release_mode == self.ReleaseMode.AT_TIME and not self.answer_release_at:
             raise ValidationError({"answer_release_at": "Phải cấu hình thời điểm công bố đáp án."})
+        if self.score_release_mode == self.ReleaseMode.AT_TIME and not self.score_release_at:
+            raise ValidationError({"score_release_at": "Phải cấu hình thời điểm công bố điểm."})
 
     def __str__(self):
         return self.name
@@ -624,6 +629,8 @@ class ExamAttempt(models.Model):
         max_length=20, choices=Status.choices, default=Status.IN_PROGRESS, db_index=True
     )
     invalidation_reason = models.TextField(blank=True)
+    score = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
+    graded_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         constraints = [
@@ -654,3 +661,34 @@ class AttemptAnswer(models.Model):
                 fields=("attempt", "exam_question"), name="assessment_unique_attempt_answer"
             )
         ]
+
+
+class GradingResult(models.Model):
+    attempt = models.ForeignKey(ExamAttempt, on_delete=models.PROTECT, related_name="grading_results")
+    sequence = models.PositiveIntegerField()
+    scoring_version = models.ForeignKey(ScoringSchemeVersion, on_delete=models.PROTECT)
+    total_score = models.DecimalField(max_digits=8, decimal_places=3)
+    max_score = models.DecimalField(max_digits=8, decimal_places=3)
+    correct_count = models.PositiveIntegerField(default=0)
+    incorrect_count = models.PositiveIntegerField(default=0)
+    blank_count = models.PositiveIntegerField(default=0)
+    detail = models.JSONField(default=list)
+    is_current = models.BooleanField(default=True, db_index=True)
+    graded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="assessment_grading_results",
+    )
+    reason = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("attempt", "sequence"), name="assessment_unique_grading_sequence",
+            ),
+            models.UniqueConstraint(
+                fields=("attempt",), condition=models.Q(is_current=True),
+                name="assessment_one_current_grading_result",
+            ),
+        ]
+        ordering = ("-sequence",)

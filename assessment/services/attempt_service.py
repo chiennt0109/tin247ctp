@@ -86,15 +86,22 @@ def submit_attempt(*, attempt_id, user):
                 ExamAttempt.Status.AUTO_SUBMITTED,
                 ExamAttempt.Status.GRADED,
             }:
-                return attempt
-            if attempt.status != ExamAttempt.Status.IN_PROGRESS:
-                raise AttemptStateError("Bài làm không thể nộp ở trạng thái hiện tại.")
-            now = timezone.now()
-            attempt.status = (
-                ExamAttempt.Status.AUTO_SUBMITTED
-                if now >= attempt.expires_at
-                else ExamAttempt.Status.SUBMITTED
-            )
-            attempt.submitted_at = now
-            attempt.save(update_fields=("status", "submitted_at"))
-            return attempt
+                submitted = attempt
+            else:
+                if attempt.status != ExamAttempt.Status.IN_PROGRESS:
+                    raise AttemptStateError("Bài làm không thể nộp ở trạng thái hiện tại.")
+                now = timezone.now()
+                attempt.status = (
+                    ExamAttempt.Status.AUTO_SUBMITTED
+                    if now >= attempt.expires_at
+                    else ExamAttempt.Status.SUBMITTED
+                )
+                attempt.submitted_at = now
+                attempt.save(update_fields=("status", "submitted_at"))
+                submitted = attempt
+        if submitted.status != ExamAttempt.Status.GRADED:
+            from assessment.services.grading import grade_attempt
+
+            grade_attempt(submitted.pk)
+            submitted.refresh_from_db()
+        return submitted

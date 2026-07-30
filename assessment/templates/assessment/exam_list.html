@@ -47,6 +47,9 @@
                 {% else %}
                   <button class="btn btn-secondary mt-3" disabled>Đã hết lượt</button>
                 {% endif %}
+                {% if card.latest_result %}
+                  <a class="btn btn-outline-primary mt-3" href="{% url 'assessment:attempt_result' card.latest_result.pk %}">Xem kết quả</a>
+                {% endif %}
               </div>
             </article>
           </div>

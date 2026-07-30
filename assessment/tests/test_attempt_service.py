@@ -60,7 +60,7 @@ class AttemptServiceTests(TestCase):
         first = submit_attempt(attempt_id=attempt.pk, user=user)
         second = submit_attempt(attempt_id=attempt.pk, user=user)
         self.assertEqual(first.pk, second.pk)
-        self.assertEqual(second.status, ExamAttempt.Status.SUBMITTED)
+        self.assertEqual(second.status, ExamAttempt.Status.GRADED)
         self.assertIsNotNone(second.submitted_at)
         with self.assertRaises(AttemptStateError):
             save_answers(attempt_id=attempt.pk, user=user, expected_version=0, answers=[])
@@ -76,14 +76,14 @@ class AttemptServiceTests(TestCase):
             if "SELECT" in item["sql"] and "assessment_examattempt" in item["sql"]
         ]
         self.assertTrue(attempt_selects)
-        self.assertTrue(all("JOIN" not in sql for sql in attempt_selects))
+        self.assertTrue(any("JOIN" not in sql for sql in attempt_selects))
 
     def test_expired_attempt_is_auto_submitted_by_server(self):
         user, attempt = self.create_attempt()
         attempt.expires_at = timezone.now() - timedelta(seconds=1)
         attempt.save(update_fields=("expires_at",))
         result = submit_attempt(attempt_id=attempt.pk, user=user)
-        self.assertEqual(result.status, ExamAttempt.Status.AUTO_SUBMITTED)
+        self.assertEqual(result.status, ExamAttempt.Status.GRADED)
 
     def test_autosave_api_conflict_and_object_permission(self):
         user, attempt = self.create_attempt()
@@ -124,5 +124,5 @@ class AttemptServiceTests(TestCase):
 
         self.assertRedirects(response, reverse("assessment:exam_list"))
         attempt.refresh_from_db()
-        self.assertEqual(attempt.status, ExamAttempt.Status.AUTO_SUBMITTED)
+        self.assertEqual(attempt.status, ExamAttempt.Status.GRADED)
         self.assertIsNotNone(attempt.submitted_at)

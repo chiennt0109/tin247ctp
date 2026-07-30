@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Kết quả — {{ attempt.session.name }}{% endblock %}
+{% block content %}
+<main class="container py-4" style="max-width:900px">
+  <a href="{% url 'assessment:exam_list' %}" class="text-decoration-none">← Các kỳ kiểm tra</a>
+  <h1 class="h3 mt-3">{{ attempt.session.name }}</h1>
+  <p class="text-muted">Lần {{ attempt.attempt_number }} · Nộp lúc {{ attempt.submitted_at|date:"H:i d/m/Y" }}</p>
+  {% if visibility.score %}
+    <section class="card border-0 shadow-sm mb-3"><div class="card-body">
+      <p class="text-muted mb-1">Điểm</p><strong class="display-5">{{ result.total_score }} / {{ result.max_score }}</strong>
+      {% if visibility.answers %}<div class="row mt-3 text-center">
+        <div class="col"><strong>{{ result.correct_count }}</strong><br><span class="text-success">Đúng</span></div>
+        <div class="col"><strong>{{ result.incorrect_count }}</strong><br><span class="text-danger">Sai</span></div>
+        <div class="col"><strong>{{ result.blank_count }}</strong><br><span class="text-muted">Bỏ trống</span></div>
+      </div>{% endif %}
+    </div></section>
+  {% else %}
+    <div class="alert alert-info">Điểm đã được ghi nhận và đang chờ công bố.</div>
+  {% endif %}
+  {% if visibility.answers %}
+    <section class="card border-0 shadow-sm"><div class="card-body"><h2 class="h5">Chi tiết</h2>
+      <ol class="list-group list-group-numbered">{% for item in result.detail %}
+        <li class="list-group-item d-flex justify-content-between"><span>{% if item.outcome == 'CORRECT' %}Đúng{% elif item.outcome == 'BLANK' %}Bỏ trống{% else %}Sai{% endif %}</span><strong>{{ item.score }} / {{ item.max_score }}</strong></li>
+      {% endfor %}</ol>
+    </div></section>
+  {% elif visibility.score %}<p class="text-muted">Đáp án và kết quả từng câu chưa được công bố.</p>{% endif %}
+</main>
+{% endblock %}

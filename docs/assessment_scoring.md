@@ -1,4 +1,4 @@
-# Ma trận và quy tắc chấm điểm Assessment — Giai đoạn 3
+# Ma trận, chấm điểm và công bố kết quả Assessment
 
 ## Mô hình phiên bản
 
@@ -10,8 +10,26 @@ thức tốt nghiệp hard-code trong model/validator.
 
 `ScoringScheme` là danh tính bộ quy tắc; `ScoringSchemeVersion` giữ tổng điểm, số chữ số làm
 tròn và snapshot policy nguồn. `ScoringRule.configuration` là JSON backend cho từng loại câu
-và unique theo `(version, question_type)`. Giai đoạn grading sẽ diễn giải configuration từ
-snapshot thay vì JavaScript/template.
+và unique theo `(version, question_type)`. Backend diễn giải configuration từ snapshot;
+template và JavaScript không chứa công thức hoặc đáp án đúng.
+
+## Chấm bài — Giai đoạn 6
+
+Khi nộp, `grade_attempt()` khóa bài làm, đọc `GeneratedExamQuestion` và
+`ScoringSchemeVersion` đã snapshot, chuẩn hóa câu trả lời rồi chấm hoàn toàn ở backend.
+Hiện bộ chấm hỗ trợ `MCQ_SINGLE`, `TRUE_FALSE_GROUP` và `SHORT_ANSWER`; điểm từng câu bị
+chặn trong khoảng `0..score` của snapshot và tổng điểm được làm tròn theo
+`rounding_digits`. Nếu thiếu rule hoặc gặp loại chưa hỗ trợ, service từ chối chấm thay vì
+âm thầm cho điểm.
+
+`GradingResult` lưu chi tiết giải thích theo câu, số đúng/sai/bỏ trống, rule code, tổng điểm
+và phiên bản quy tắc. Chấm lại tạo sequence mới, đánh dấu kết quả cũ không còn current và
+không xóa lịch sử. `ExamAttempt.score`, `graded_at` chỉ là bản tóm tắt của kết quả current.
+
+Điểm và kết quả từng câu được công bố độc lập qua `score_release_mode` và
+`answer_release_mode`. Các chế độ `NEVER`, ngay sau nộp, sau hết lượt, sau khi đóng, tại
+thời điểm cấu hình và công bố thủ công đều được kiểm tra ở backend. Trang kết quả không
+giải mã hoặc gửi đáp án chuẩn xuống trình duyệt.
 
 ## Validation trước khi khóa
 

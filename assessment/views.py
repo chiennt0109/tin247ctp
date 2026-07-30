@@ -6,14 +6,16 @@ from django.core.cache import cache
 from django.db.models import Count, Q
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
-from assessment.models import ExamAttempt, ExamParticipant, ExamSession
+from assessment.models import ExamAttempt, ExamParticipant, ExamSession, GradingResult
 from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
 from assessment.services.start_attempt import StartAttemptError, start_attempt, user_can_access_session
+from assessment.services.result_release import result_visibility
 
 
 def exam_list_redirect(request):
@@ -57,9 +59,13 @@ def exam_list(request):
         active = ExamAttempt.objects.filter(
             user=request.user, session=session, status=ExamAttempt.Status.IN_PROGRESS
         ).first()
+        latest_result = ExamAttempt.objects.filter(
+            user=request.user, session=session, status=ExamAttempt.Status.GRADED,
+        ).order_by("-attempt_number").first()
         cards.append({
             "session": session, "participant": participant, "attempts_used": session.attempts_used,
             "attempts_remaining": max(maximum - session.attempts_used, 0), "active_attempt": active,
+            "latest_result": latest_result,
         })
     return render(
         request,
@@ -147,6 +153,7 @@ def submit_attempt_view(request, attempt_id):
     return JsonResponse({
         "submitted": True, "status": attempt.status,
         "submitted_at": attempt.submitted_at.isoformat() if attempt.submitted_at else None,
+        "result_url": reverse("assessment:attempt_result", args=(attempt.pk,)),
     })
 
 
@@ -157,4 +164,26 @@ def attempt_state(request, attempt_id):
         "status": attempt.status, "version": attempt.data_version,
         "server_now_ms": int(timezone.now().timestamp() * 1000),
         "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
+    })
+
+
+@login_required
+def attempt_result(request, attempt_id):
+    attempt = get_object_or_404(
+        ExamAttempt.objects.select_related("session", "user"), pk=attempt_id,
+    )
+    if attempt.user_id != request.user.pk and not request.user.has_perm("assessment.view_results"):
+        raise Http404
+    if attempt.status != ExamAttempt.Status.GRADED:
+        messages.info(request, "Bài làm chưa có kết quả chấm.")
+        return redirect("assessment:exam_list")
+    result = get_object_or_404(
+        GradingResult, attempt=attempt, is_current=True,
+    )
+    participant = ExamParticipant.objects.filter(session=attempt.session, user=attempt.user).first()
+    visibility = result_visibility(attempt, participant=participant)
+    if request.user.has_perm("assessment.view_results"):
+        visibility = {"score": True, "answers": True, "solutions": True, "review": True}
+    return render(request, "assessment/result.html", {
+        "attempt": attempt, "result": result, "visibility": visibility,
     })
