@@ -8,6 +8,61 @@ from assessment.models import (
 )
 
 
+# Django normally orders models alphabetically using their model-level
+# ``verbose_name``.  The assessment workflow is easier to operate when the
+# admin dashboard follows the actual business sequence instead.  Keep these
+# presentation labels in the admin layer so changing the menu does not create
+# schema migrations for the canonical projection models.
+ASSESSMENT_ADMIN_MENU = {
+    "BankQuestion": (10, "Ngân hàng câu hỏi"),
+    "BankQuestionRevision": (20, "Phiên bản câu hỏi"),
+    "QuestionAsset": (30, "Tài nguyên câu hỏi"),
+    "BankSourceFile": (40, "Tệp nguồn ngân hàng"),
+    "CurriculumNode": (50, "Chủ đề / mạch kiến thức"),
+    "CurriculumOutcome": (60, "Yêu cầu cần đạt"),
+    "QuestionSyncLog": (70, "Nhật ký đồng bộ ngân hàng"),
+    "ExamBlueprint": (100, "Ma trận đề"),
+    "BlueprintVersion": (110, "Phiên bản ma trận"),
+    "BlueprintSection": (120, "Phần thi của ma trận"),
+    "ScoringScheme": (200, "Quy tắc chấm điểm"),
+    "ScoringSchemeVersion": (210, "Phiên bản quy tắc chấm"),
+    "ExamSession": (300, "Kỳ kiểm tra"),
+    "ExamAttempt": (400, "Bài làm của học sinh"),
+    "GeneratedExam": (410, "Đề đã sinh theo bài làm"),
+    "AttemptAnswer": (420, "Câu trả lời đã lưu"),
+    "AssessmentAuditLog": (500, "Nhật ký thao tác kiểm tra"),
+}
+
+
+def _install_assessment_admin_menu():
+    """Apply Vietnamese labels and workflow ordering to this admin site only."""
+    if getattr(admin.site, "_assessment_menu_installed", False):
+        return
+
+    original_get_app_list = admin.site.get_app_list
+
+    def get_app_list(request, app_label=None):
+        app_list = original_get_app_list(request, app_label)
+        for app in app_list:
+            if app["app_label"] != "assessment":
+                continue
+
+            app["name"] = "Quản lý kiểm tra"
+            for model in app["models"]:
+                order, label = ASSESSMENT_ADMIN_MENU.get(
+                    model["object_name"], (1000, model["name"]),
+                )
+                model["name"] = label
+                model["assessment_order"] = order
+            app["models"].sort(
+                key=lambda model: (model["assessment_order"], model["name"]),
+            )
+        return app_list
+
+    admin.site.get_app_list = get_app_list
+    admin.site._assessment_menu_installed = True
+
+
 class ReadOnlyProjectionAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
@@ -198,3 +253,6 @@ class AttemptAnswerAdmin(ReadOnlyProjectionAdmin):
     list_display = ("attempt", "exam_question", "flagged_for_review", "saved_at")
     search_fields = ("attempt__user__username", "attempt__session__name")
     list_select_related = ("attempt", "attempt__user", "exam_question")
+
+
+_install_assessment_admin_menu()
