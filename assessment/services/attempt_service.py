@@ -17,9 +17,12 @@ class StaleAttemptVersion(AttemptStateError):
 
 
 def _owned_attempt(attempt_id, user):
-    return ExamAttempt.objects.select_for_update().select_related("generated_exam").get(
-        pk=attempt_id, user=user
-    )
+    # Do not select_related() the nullable generated_exam while locking. On
+    # PostgreSQL that becomes a LEFT OUTER JOIN and SELECT ... FOR UPDATE then
+    # fails with: "FOR UPDATE cannot be applied to the nullable side of an
+    # outer join". The services only need generated_exam_id, which is already
+    # stored on the attempt row being locked.
+    return ExamAttempt.objects.select_for_update().get(pk=attempt_id, user=user)
 
 
 @transaction.atomic
@@ -39,7 +42,7 @@ def save_answers(*, attempt_id, user, expected_version, answers):
     question_ids = {item.get("question_id") for item in answers}
     questions = {
         question.pk: question for question in GeneratedExamQuestion.objects.filter(
-            exam=attempt.generated_exam, pk__in=question_ids
+            exam_id=attempt.generated_exam_id, pk__in=question_ids
         )
     }
     if None in question_ids or len(questions) != len(question_ids):

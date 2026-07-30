@@ -3,6 +3,8 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
+from django.db import connection
 from django.urls import reverse
 from django.utils import timezone
 
@@ -62,6 +64,19 @@ class AttemptServiceTests(TestCase):
         self.assertIsNotNone(second.submitted_at)
         with self.assertRaises(AttemptStateError):
             save_answers(attempt_id=attempt.pk, user=user, expected_version=0, answers=[])
+
+    def test_attempt_row_lock_does_not_join_nullable_generated_exam(self):
+        user, attempt = self.create_attempt("postgres-lock")
+
+        with CaptureQueriesContext(connection) as queries:
+            submit_attempt(attempt_id=attempt.pk, user=user)
+
+        attempt_selects = [
+            item["sql"] for item in queries.captured_queries
+            if "SELECT" in item["sql"] and "assessment_examattempt" in item["sql"]
+        ]
+        self.assertTrue(attempt_selects)
+        self.assertTrue(all("JOIN" not in sql for sql in attempt_selects))
 
     def test_expired_attempt_is_auto_submitted_by_server(self):
         user, attempt = self.create_attempt()
