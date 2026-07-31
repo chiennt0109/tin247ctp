@@ -17,13 +17,9 @@ class ExamGenerationError(ValueError):
 
 class ExamGenerator:
     @transaction.atomic
-    def _generate(self, session, *, code, seed, purpose, actor=None, expires_at=None):
+    def generate_for_attempt(self, session, *, code, seed, actor=None):
         if not session.blueprint_version.is_locked or not session.scoring_version.is_locked:
             raise ExamGenerationError("Blueprint and scoring versions must be locked before generation")
-        if purpose not in GeneratedExam.Purpose.values:
-            raise ExamGenerationError("Generated exam purpose must be ATTEMPT or PREVIEW")
-        if purpose == GeneratedExam.Purpose.PREVIEW and expires_at is None:
-            raise ExamGenerationError("A persisted preview must have expires_at")
 
         rng = random.Random(str(seed))
         selected = []
@@ -40,7 +36,6 @@ class ExamGenerator:
                     .prefetch_related("assets__source_file")
                     .order_by("source_question_id")
                 )
-                rng.shuffle(candidates)
                 slot_selected = []
                 for question in candidates:
                     family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
@@ -94,7 +89,6 @@ class ExamGenerator:
             scoring_version=session.scoring_version,
             total_score=session.blueprint_version.expected_total_score,
             validation_report=report, exam_hash=exam_hash, generated_by=actor,
-            purpose=purpose, expires_at=expires_at,
         )
         for slot, question, revision, order, ordered_options, option_order in prepared:
             exam_question = GeneratedExamQuestion.objects.create(
@@ -120,16 +114,3 @@ class ExamGenerator:
             object_id=str(exam.pk), details={"code": code, "seed": str(seed), "exam_hash": exam_hash},
         )
         return exam
-
-    def generate_preview(self, session, *, code, seed, actor=None, expires_at):
-        return self._generate(
-            session, code=code, seed=seed, purpose=GeneratedExam.Purpose.PREVIEW,
-            actor=actor, expires_at=expires_at,
-        )
-
-    def _generate_attempt(self, session, *, code, seed, actor):
-        """Internal entry point; ATTEMPT exams are created only by start_attempt()."""
-        return self._generate(
-            session, code=code, seed=seed, purpose=GeneratedExam.Purpose.ATTEMPT,
-            actor=actor,
-        )

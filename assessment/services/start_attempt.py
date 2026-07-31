@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-from assessment.models import AssessmentAuditLog, ExamAttempt, ExamParticipant, ExamSession
+from assessment.models import AssessmentAuditLog, ExamAttempt, ExamSession
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.exam_generator import ExamGenerationError, ExamGenerator
 
@@ -36,13 +36,9 @@ def _user_grade(user):
     return None
 
 
-def user_can_access_session(user, session, participant=None):
-    if participant is not None and (not participant.is_enabled or not participant.can_access):
-        return False
+def user_can_access_session(user, session):
     if session.access_mode == ExamSession.AccessMode.ALL_USERS:
         return True
-    if session.access_mode == ExamSession.AccessMode.SELECTED_USERS:
-        return participant is not None and participant.is_enabled and participant.can_access
     if session.access_mode == ExamSession.AccessMode.SELECTED_GROUPS:
         return session.access_groups.filter(pk__in=user.groups.values("pk")).exists()
     if session.access_mode == ExamSession.AccessMode.SELECTED_GRADES:
@@ -51,15 +47,6 @@ def user_can_access_session(user, session, participant=None):
 
 
 def _generation_identity(session, user, attempt_number):
-    if session.generation_mode == ExamSession.GenerationMode.FIXED_EXAM:
-        seed = hashlib.sha256(f"fixed:{session.pk}".encode()).hexdigest()
-        return seed, f"FIXED-U{user.pk}-A{attempt_number}"
-    if session.generation_mode == ExamSession.GenerationMode.ON_DEMAND_CODE_POOL:
-        allocation = int(hashlib.sha256(
-            f"pool:{session.pk}:{user.pk}:{attempt_number}".encode()
-        ).hexdigest()[:8], 16) % session.code_count + 1
-        seed = hashlib.sha256(f"pool:{session.pk}:{allocation}".encode()).hexdigest()
-        return seed, f"P{allocation:03d}-U{user.pk}-A{attempt_number}"
     nonce = secrets.token_hex(16)
     seed = hashlib.sha256(
         f"{session.pk}:{user.pk}:{attempt_number}:{nonce}".encode()
@@ -88,45 +75,38 @@ def start_attempt(user, exam_session):
                     return existing
 
                 now = timezone.now()
-                participant = ExamParticipant.objects.filter(session=session, user=user).first()
-                if not user_can_access_session(user, session, participant):
+                if not user_can_access_session(user, session):
                     raise StartAttemptError("Tài khoản không có quyền làm kỳ kiểm tra này.")
                 if session.status != ExamSession.Status.OPEN:
                     raise StartAttemptError("Kỳ kiểm tra chưa mở.")
-                opens_at = participant.available_from if participant and participant.available_from else session.opens_at
-                closes_at = participant.available_until if participant and participant.available_until else session.closes_at
-                if now < opens_at or (now >= closes_at and not (participant and participant.allow_after_deadline)):
+                opens_at = session.opens_at
+                closes_at = session.closes_at
+                if now < opens_at or now >= closes_at:
                     raise StartAttemptError("Ngoài thời gian làm bài.")
 
                 used = ExamAttempt.objects.filter(user=user, session=session).exclude(
                     status=ExamAttempt.Status.INVALIDATED
                 ).count()
-                maximum = participant.max_attempts_override if participant and participant.max_attempts_override else session.max_attempts
-                if used >= maximum:
+                if used >= session.max_attempts:
                     raise StartAttemptError("Bạn đã sử dụng hết số lượt làm.")
                 attempt_number = used + 1
-                duration = session.duration_minutes + (participant.extra_time_minutes if participant else 0)
+                duration = session.duration_minutes
                 natural_expiry = now + timedelta(minutes=duration)
-                expires_at = (
-                    natural_expiry
-                    if participant and participant.allow_after_deadline
-                    else min(natural_expiry, closes_at)
-                )
-                attempt = ExamAttempt.objects.create(
-                    user=user, session=session, attempt_number=attempt_number,
-                    expires_at=expires_at,
-                )
+                expires_at = min(natural_expiry, closes_at)
                 validation = BlueprintValidator().validate(
                     session.blueprint_version, scoring_version=session.scoring_version
                 )
                 if not validation["valid"]:
-                    raise StartAttemptError("Ma trận hoặc nguồn câu hỏi không hợp lệ để sinh đề.")
+                    detail = BlueprintValidator.format_failure(validation)
+                    raise StartAttemptError(f"Không thể sinh đề: {detail}")
                 seed, code = _generation_identity(session, user, attempt_number)
-                exam = ExamGenerator()._generate_attempt(
+                exam = ExamGenerator().generate_for_attempt(
                     session, code=code, seed=seed, actor=user,
                 )
-                attempt.generated_exam = exam
-                attempt.save(update_fields=("generated_exam",))
+                attempt = ExamAttempt.objects.create(
+                    user=user, session=session, attempt_number=attempt_number,
+                    expires_at=expires_at, generated_exam=exam,
+                )
                 AssessmentAuditLog.objects.create(
                     action="START_ATTEMPT", actor=user, object_type="ExamAttempt",
                     object_id=str(attempt.pk), details={"generated_exam_id": exam.pk},
