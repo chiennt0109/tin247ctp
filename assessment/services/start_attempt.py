@@ -97,7 +97,8 @@ def start_attempt(user, exam_session):
                     session.blueprint_version, scoring_version=session.scoring_version
                 )
                 if not validation["valid"]:
-                    raise StartAttemptError("Ma trận hoặc nguồn câu hỏi không hợp lệ để sinh đề.")
+                    detail = BlueprintValidator.format_failure(validation)
+                    raise StartAttemptError(f"Không thể sinh đề: {detail}")
                 seed, code = _generation_identity(session, user, attempt_number)
                 exam = ExamGenerator().generate_for_attempt(
                     session, code=code, seed=seed, actor=user,

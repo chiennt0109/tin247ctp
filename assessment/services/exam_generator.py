@@ -36,7 +36,6 @@ class ExamGenerator:
                     .prefetch_related("assets__source_file")
                     .order_by("source_question_id")
                 )
-                rng.shuffle(candidates)
                 slot_selected = []
                 for question in candidates:
                     family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"

@@ -16,7 +16,12 @@ def validate_scoring_version(version, *, blueprint_version=None):
         errors.append("Phiên bản phải có ít nhất một quy tắc chấm.")
     for rule in rules:
         try:
-            rule.full_clean()
+            # ScoringRule.clean() intentionally rejects edits under a locked
+            # parent. Validation here is read-only, so validate field values
+            # and constraints without treating the inspection as an edit.
+            rule.clean_fields()
+            rule.validate_unique()
+            rule.validate_constraints()
         except ValidationError as exc:
             errors.extend(exc.messages)
         if rule.max_score <= 0:

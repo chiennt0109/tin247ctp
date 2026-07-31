@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django import forms
 
 from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
@@ -11,6 +12,8 @@ from assessment.models import (
 )
 from assessment.services.blueprint_versioning import clone_blueprint_version, lock_blueprint_version
 from assessment.services.scoring_versioning import clone_scoring_version, lock_scoring_version
+from assessment.services.blueprint_validator import BlueprintValidator
+from assessment.services.session_configuration import resolve_locked_configuration
 
 
 # Django normally orders models alphabetically using their model-level
@@ -263,8 +266,38 @@ class ExamAttemptInline(admin.TabularInline):
         return False
 
 
+class ExamSessionAdminForm(forms.ModelForm):
+    blueprint = forms.ModelChoiceField(
+        queryset=ExamBlueprint.objects.all().order_by("name"), label="Ma trận",
+        help_text="Hệ thống tự chọn phiên bản ma trận và quy tắc chấm đã khóa mới nhất.",
+    )
+
+    class Meta:
+        model = ExamSession
+        exclude = ("blueprint_version", "scoring_version")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance._state.adding and self.instance.blueprint_version_id:
+            self.fields["blueprint"].initial = self.instance.blueprint_version.blueprint_id
+
+    def clean(self):
+        cleaned = super().clean()
+        blueprint = cleaned.get("blueprint")
+        if blueprint:
+            try:
+                blueprint_version, scoring_version = resolve_locked_configuration(blueprint)
+            except ValidationError as exc:
+                self.add_error("blueprint", exc)
+            else:
+                self.instance.blueprint_version = blueprint_version
+                self.instance.scoring_version = scoring_version
+        return cleaned
+
+
 @admin.register(ExamSession)
 class ExamSessionAdmin(admin.ModelAdmin):
+    form = ExamSessionAdminForm
     list_display = (
         "name", "exam_type", "opens_at", "closes_at", "status",
     )
@@ -273,6 +306,23 @@ class ExamSessionAdmin(admin.ModelAdmin):
     list_select_related = ("blueprint_version", "scoring_version", "created_by")
     filter_horizontal = ("access_groups",)
     inlines = (ExamAttemptInline,)
+    actions = ("check_generation_capacity",)
+
+    @admin.action(description="Kiểm tra khả năng sinh đề")
+    def check_generation_capacity(self, request, queryset):
+        for session in queryset.select_related("blueprint_version", "scoring_version"):
+            report = BlueprintValidator().validate(
+                session.blueprint_version, scoring_version=session.scoring_version,
+            )
+            rows = []
+            for index, row in enumerate(report["availability"], 1):
+                status = "OK" if row["status"] in {"SUFFICIENT", "TIGHT"} else "THIẾU"
+                rows.append(f"Slot {index}: cần {row['required']} / có {row['candidates']} -> {status}")
+            detail = "; ".join(rows)
+            level = messages.SUCCESS if report["valid"] else messages.ERROR
+            if not report["valid"]:
+                detail += ". " + BlueprintValidator.format_failure(report)
+            self.message_user(request, f"{session.name}: {detail}", level)
 
     def has_change_permission(self, request, obj=None):
         return not (obj and obj.status != ExamSession.Status.DRAFT) and super().has_change_permission(request, obj)
