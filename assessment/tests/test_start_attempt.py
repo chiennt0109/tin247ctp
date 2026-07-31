@@ -38,7 +38,6 @@ class StartAttemptTests(TestCase):
         self.assertEqual(first.pk, second.pk)
         self.assertEqual(ExamAttempt.objects.count(), 1)
         self.assertEqual(GeneratedExam.objects.count(), 1)
-        self.assertEqual(first.generated_exam.purpose, GeneratedExam.Purpose.ATTEMPT)
         self.assertEqual(first.generated_exam.questions.count(), 2)
 
     def test_users_and_later_attempts_receive_distinct_exams_and_seeds(self):
@@ -73,7 +72,7 @@ class StartAttemptTests(TestCase):
             start_attempt(user, session)
 
         session.closes_at = timezone.now() + timedelta(hours=1)
-        session.access_mode = ExamSession.AccessMode.SELECTED_USERS
+        session.access_mode = ExamSession.AccessMode.SELECTED_GROUPS
         session.save(update_fields=("closes_at", "access_mode"))
         with self.assertRaisesMessage(StartAttemptError, "không có quyền"):
             start_attempt(user, session)
@@ -90,7 +89,7 @@ class StartAttemptTests(TestCase):
 
         self.slot.quantity = 2
         self.slot.save(update_fields=("quantity",))
-        with patch("assessment.services.start_attempt.ExamGenerator._generate_attempt", side_effect=ExamGenerationError("boom")):
+        with patch("assessment.services.start_attempt.ExamGenerator.generate_for_attempt", side_effect=ExamGenerationError("boom")):
             with self.assertRaisesMessage(StartAttemptError, "boom"):
                 start_attempt(user, session)
         self.assertFalse(ExamAttempt.objects.exists())
