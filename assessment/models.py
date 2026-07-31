@@ -211,6 +211,16 @@ class ExamBlueprint(models.Model):
     semester = models.CharField(max_length=32, blank=True)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT, db_index=True)
     notes = models.TextField(blank=True)
+    equivalence_group = models.ForeignKey(
+        "ExamBlueprintGroup", null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="blueprints",
+    )
+    difficulty_profile = models.JSONField(default=dict, blank=True)
+    total_questions = models.PositiveIntegerField(default=0)
+    total_score = models.DecimalField(max_digits=8, decimal_places=3, default=0)
+    duration_minutes = models.PositiveIntegerField(default=0)
+    is_locked = models.BooleanField(default=False, db_index=True)
+    is_ready = models.BooleanField(default=False, db_index=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
         related_name="created_assessment_blueprints",
@@ -221,6 +231,16 @@ class ExamBlueprint(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ExamBlueprintGroup(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    code = models.SlugField(max_length=160, unique=True)
+    cognitive_tolerance = models.DecimalField(max_digits=5, decimal_places=3, default="0.100")
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
@@ -425,6 +445,10 @@ class ExamSession(models.Model):
     scoring_version = models.ForeignKey(
         ScoringSchemeVersion, on_delete=models.PROTECT, related_name="exam_sessions"
     )
+    blueprint_group = models.ForeignKey(
+        ExamBlueprintGroup, null=True, blank=True, on_delete=models.PROTECT,
+        related_name="exam_sessions",
+    )
     opens_at = models.DateTimeField(db_index=True)
     closes_at = models.DateTimeField(db_index=True)
     duration_minutes = models.PositiveIntegerField()
@@ -552,6 +576,12 @@ class ExamAttempt(models.Model):
     attempt_number = models.PositiveIntegerField()
     generated_exam = models.OneToOneField(
         GeneratedExam, on_delete=models.PROTECT, related_name="attempt"
+    )
+    blueprint = models.ForeignKey(
+        ExamBlueprint, on_delete=models.PROTECT, related_name="attempts",
+    )
+    blueprint_version = models.ForeignKey(
+        BlueprintVersion, on_delete=models.PROTECT, related_name="attempts",
     )
     started_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(db_index=True)

@@ -6,7 +6,7 @@ from django import forms
 from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamAttempt, ExamBlueprint, ExamSession, GeneratedExam, GeneratedExamQuestion,
+    ExamAttempt, ExamBlueprint, ExamBlueprintGroup, ExamSession, GeneratedExam, GeneratedExamQuestion,
     GradingResult,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
@@ -14,6 +14,7 @@ from assessment.services.blueprint_versioning import clone_blueprint_version, lo
 from assessment.services.scoring_versioning import clone_scoring_version, lock_scoring_version
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.session_configuration import resolve_locked_configuration
+from assessment.services.equivalence import validate_equivalence_group
 
 
 # Django normally orders models alphabetically using their model-level
@@ -30,6 +31,7 @@ ASSESSMENT_ADMIN_MENU = {
     "CurriculumOutcome": (60, "Yêu cầu cần đạt"),
     "QuestionSyncLog": (70, "Nhật ký đồng bộ ngân hàng"),
     "ExamBlueprint": (100, "Ma trận đề"),
+    "ExamBlueprintGroup": (105, "Nhóm ma trận tương đương"),
     "BlueprintVersion": (110, "Phiên bản ma trận"),
     "BlueprintSection": (120, "Phần thi của ma trận"),
     "ScoringScheme": (200, "Quy tắc chấm điểm"),
@@ -185,10 +187,62 @@ class BlueprintVersionAdmin(admin.ModelAdmin):
 
 @admin.register(ExamBlueprint)
 class ExamBlueprintAdmin(admin.ModelAdmin):
-    list_display = ("name", "exam_type", "grade", "semester", "status", "updated_at")
-    list_filter = ("status", "exam_type", "grade", "semester")
+    list_display = (
+        "name", "equivalence_group", "total_questions", "total_score",
+        "duration_minutes", "is_locked", "is_ready", "difficulty_profile",
+    )
+    list_filter = ("is_ready", "is_locked", "equivalence_group", "exam_type", "grade")
     search_fields = ("name", "subject")
     list_select_related = ("created_by", "approved_by")
+
+
+class EquivalentBlueprintInline(admin.TabularInline):
+    model = ExamBlueprint
+    extra = 0
+    fields = (
+        "name", "total_questions", "total_score", "duration_minutes",
+        "coverage_display", "difficulty_profile", "is_locked", "is_ready",
+    )
+    readonly_fields = fields
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="Coverage chủ đề/YCCD")
+    def coverage_display(self, obj):
+        version = obj.versions.filter(is_locked=True).order_by("-version").first()
+        if not version:
+            return "-"
+        pairs = set(version.sections.values_list("slots__curriculum_id", "slots__outcome_id"))
+        return len(pairs)
+
+
+@admin.register(ExamBlueprintGroup)
+class ExamBlueprintGroupAdmin(admin.ModelAdmin):
+    list_display = ("name", "code", "cognitive_tolerance", "ready_count", "blueprint_count")
+    inlines = (EquivalentBlueprintInline,)
+    actions = ("validate_groups",)
+
+    @admin.display(description="READY")
+    def ready_count(self, obj):
+        return obj.blueprints.filter(is_ready=True, is_locked=True).count()
+
+    @admin.display(description="Tổng ma trận")
+    def blueprint_count(self, obj):
+        return obj.blueprints.count()
+
+    @admin.action(description="Kiểm tra nhóm ma trận tương đương")
+    def validate_groups(self, request, queryset):
+        for group in queryset:
+            rows = validate_equivalence_group(group)
+            detail = "; ".join(
+                f"{row['blueprint'].name}: "
+                f"{'READY' if row['ready'] else 'THIẾU - ' + ', '.join(row['errors'])}"
+                for row in rows
+            )
+            level = messages.SUCCESS if rows and all(row["ready"] for row in rows) else messages.ERROR
+            self.message_user(request, f"{group.name}: {detail}", level)
 
 
 class ScoringRuleInline(admin.TabularInline):
@@ -268,8 +322,9 @@ class ExamAttemptInline(admin.TabularInline):
 
 class ExamSessionAdminForm(forms.ModelForm):
     blueprint = forms.ModelChoiceField(
-        queryset=ExamBlueprint.objects.all().order_by("name"), label="Ma trận",
+        queryset=ExamBlueprint.objects.all().order_by("name"), label="Ma trận đơn",
         help_text="Hệ thống tự chọn phiên bản ma trận và quy tắc chấm đã khóa mới nhất.",
+        required=False,
     )
 
     class Meta:
@@ -284,7 +339,17 @@ class ExamSessionAdminForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         blueprint = cleaned.get("blueprint")
-        if blueprint:
+        group = cleaned.get("blueprint_group")
+        if group:
+            rows = validate_equivalence_group(group)
+            ready = [row for row in rows if row["ready"]]
+            if not ready:
+                self.add_error("blueprint_group", "Nhóm không có ma trận READY + LOCKED.")
+            else:
+                blueprint_version, scoring_version = resolve_locked_configuration(ready[0]["blueprint"])
+                self.instance.blueprint_version = blueprint_version
+                self.instance.scoring_version = scoring_version
+        elif blueprint:
             try:
                 blueprint_version, scoring_version = resolve_locked_configuration(blueprint)
             except ValidationError as exc:
@@ -292,6 +357,8 @@ class ExamSessionAdminForm(forms.ModelForm):
             else:
                 self.instance.blueprint_version = blueprint_version
                 self.instance.scoring_version = scoring_version
+        else:
+            self.add_error("blueprint", "Chọn nhóm ma trận hoặc một ma trận đơn.")
         return cleaned
 
 

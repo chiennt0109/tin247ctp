@@ -1,5 +1,6 @@
 import hashlib
 import secrets
+import random
 from contextlib import contextmanager
 from datetime import timedelta
 
@@ -10,6 +11,8 @@ from django.utils import timezone
 from assessment.models import AssessmentAuditLog, ExamAttempt, ExamSession
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.exam_generator import ExamGenerationError, ExamGenerator
+from assessment.services.equivalence import validate_equivalence_group
+from assessment.services.session_configuration import resolve_locked_configuration
 
 
 class StartAttemptError(ValueError):
@@ -93,23 +96,43 @@ def start_attempt(user, exam_session):
                 duration = session.duration_minutes
                 natural_expiry = now + timedelta(minutes=duration)
                 expires_at = min(natural_expiry, closes_at)
+                seed, code = _generation_identity(session, user, attempt_number)
+                blueprint_version = session.blueprint_version
+                scoring_version = session.scoring_version
+                if session.blueprint_group_id:
+                    validate_equivalence_group(session.blueprint_group)
+                    ready = list(
+                        session.blueprint_group.blueprints.filter(is_locked=True, is_ready=True)
+                        .order_by("pk")
+                    )
+                    if not ready:
+                        raise StartAttemptError(
+                            f"Nhóm ma trận '{session.blueprint_group}' không có ma trận READY + LOCKED."
+                        )
+                    blueprint = random.Random(seed).choice(ready)
+                    blueprint_version, scoring_version = resolve_locked_configuration(blueprint)
                 validation = BlueprintValidator().validate(
-                    session.blueprint_version, scoring_version=session.scoring_version
+                    blueprint_version, scoring_version=scoring_version
                 )
                 if not validation["valid"]:
                     detail = BlueprintValidator.format_failure(validation)
                     raise StartAttemptError(f"Không thể sinh đề: {detail}")
-                seed, code = _generation_identity(session, user, attempt_number)
                 exam = ExamGenerator().generate_for_attempt(
                     session, code=code, seed=seed, actor=user,
+                    blueprint_version=blueprint_version, scoring_version=scoring_version,
                 )
                 attempt = ExamAttempt.objects.create(
                     user=user, session=session, attempt_number=attempt_number,
                     expires_at=expires_at, generated_exam=exam,
+                    blueprint=blueprint_version.blueprint, blueprint_version=blueprint_version,
                 )
                 AssessmentAuditLog.objects.create(
                     action="START_ATTEMPT", actor=user, object_type="ExamAttempt",
-                    object_id=str(attempt.pk), details={"generated_exam_id": exam.pk},
+                    object_id=str(attempt.pk), details={
+                        "generated_exam_id": exam.pk,
+                        "blueprint_id": blueprint_version.blueprint_id,
+                        "blueprint_version_id": blueprint_version.pk,
+                    },
                 )
                 return attempt
         except IntegrityError as exc:

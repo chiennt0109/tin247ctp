@@ -17,14 +17,18 @@ class ExamGenerationError(ValueError):
 
 class ExamGenerator:
     @transaction.atomic
-    def generate_for_attempt(self, session, *, code, seed, actor=None):
-        if not session.blueprint_version.is_locked or not session.scoring_version.is_locked:
+    def generate_for_attempt(
+        self, session, *, code, seed, actor=None, blueprint_version=None, scoring_version=None,
+    ):
+        blueprint_version = blueprint_version or session.blueprint_version
+        scoring_version = scoring_version or session.scoring_version
+        if not blueprint_version.is_locked or not scoring_version.is_locked:
             raise ExamGenerationError("Blueprint and scoring versions must be locked before generation")
 
         rng = random.Random(str(seed))
         selected = []
         used_question_ids, used_family_keys = set(), set()
-        sections = session.blueprint_version.sections.prefetch_related(
+        sections = blueprint_version.sections.prefetch_related(
             "slots__curriculum", "slots__outcome"
         ).all()
         for section in sections:
@@ -79,15 +83,15 @@ class ExamGenerator:
         ).encode()).hexdigest()
         report = {
             "valid": True, "question_count": len(prepared),
-            "expected_question_count": session.blueprint_version.expected_question_count,
+            "expected_question_count": blueprint_version.expected_question_count,
             "distinct_questions": len(used_question_ids), "distinct_families": len(used_family_keys),
         }
-        if len(prepared) != session.blueprint_version.expected_question_count:
+        if len(prepared) != blueprint_version.expected_question_count:
             raise ExamGenerationError("Generated question total does not match blueprint")
         exam = GeneratedExam.objects.create(
-            session=session, code=code, seed=str(seed), blueprint_version=session.blueprint_version,
-            scoring_version=session.scoring_version,
-            total_score=session.blueprint_version.expected_total_score,
+            session=session, code=code, seed=str(seed), blueprint_version=blueprint_version,
+            scoring_version=scoring_version,
+            total_score=blueprint_version.expected_total_score,
             validation_report=report, exam_hash=exam_hash, generated_by=actor,
         )
         for slot, question, revision, order, ordered_options, option_order in prepared:

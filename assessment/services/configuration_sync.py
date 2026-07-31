@@ -6,7 +6,7 @@ from django.db import transaction
 
 from assessment.models import (
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamBlueprint, ScoringRule, ScoringScheme, ScoringSchemeVersion,
+    ExamBlueprint, ExamBlueprintGroup, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 
 
@@ -53,6 +53,12 @@ class MasterConfigurationSync:
             if str(source.get("STATUS")) != "APPROVED":
                 continue
             source_id = str(source["BLUEPRINT_ID"])
+            group = None
+            group_code = str(source.get("EQUIVALENCE_GROUP") or "").strip()
+            if group_code:
+                group, _ = ExamBlueprintGroup.objects.get_or_create(
+                    code=group_code, defaults={"name": group_code},
+                )
             blueprint, was_created = ExamBlueprint.objects.update_or_create(
                 source_blueprint_id=source_id,
                 defaults={
@@ -60,6 +66,10 @@ class MasterConfigurationSync:
                     "exam_type": str(source["EXAM_TYPE"]), "grade": int(source["GRADE"]),
                     "subject": str(source.get("SUBJECT") or "Tin học"),
                     "semester": str(source.get("SEMESTER") or ""),
+                    "equivalence_group": group,
+                    "total_questions": int(source["TOTAL_QUESTIONS"]),
+                    "total_score": Decimal(str(source["TOTAL_SCORE"])),
+                    "duration_minutes": int(source["DURATION_MIN"]),
                     "status": ExamBlueprint.Status.APPROVED, "notes": str(source.get("NOTE") or ""),
                     "created_by": actor,
                 },
