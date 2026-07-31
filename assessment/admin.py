@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
@@ -7,6 +9,8 @@ from assessment.models import (
     GradingResult,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
+from assessment.services.blueprint_versioning import clone_blueprint_version, lock_blueprint_version
+from assessment.services.scoring_versioning import clone_scoring_version, lock_scoring_version
 
 
 # Django normally orders models alphabetically using their model-level
@@ -147,10 +151,33 @@ class BlueprintVersionAdmin(admin.ModelAdmin):
     )
     list_filter = ("is_locked", "blueprint__exam_type", "blueprint__grade")
     list_select_related = ("blueprint", "created_by", "approved_by")
-    readonly_fields = ("validation_report", "approved_at", "created_at")
+    readonly_fields = ("is_locked", "validation_report", "approved_at", "created_at")
+    actions = ("lock_versions", "clone_versions")
 
-    def has_change_permission(self, request, obj=None):
-        return not (obj and obj.is_locked) and super().has_change_permission(request, obj)
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.is_locked:
+            return tuple(field.name for field in self.model._meta.fields)
+        return self.readonly_fields
+
+    @admin.action(description="Khóa phiên bản")
+    def lock_versions(self, request, queryset):
+        for version in queryset:
+            try:
+                session = version.exam_sessions.select_related("scoring_version").first()
+                lock_blueprint_version(
+                    version, scoring_version=session.scoring_version if session else None,
+                    approver=request.user,
+                )
+            except (ValueError, ValidationError) as exc:
+                self.message_user(request, f"{version}: {exc}", messages.ERROR)
+            else:
+                self.message_user(request, f"Đã khóa {version}.", messages.SUCCESS)
+
+    @admin.action(description="Tạo bản sao để chỉnh sửa")
+    def clone_versions(self, request, queryset):
+        for version in queryset.filter(is_locked=True):
+            clone = clone_blueprint_version(version, actor=request.user)
+            self.message_user(request, f"Đã tạo {clone} ở trạng thái nháp.", messages.SUCCESS)
 
 
 @admin.register(ExamBlueprint)
@@ -168,6 +195,20 @@ class ScoringRuleInline(admin.TabularInline):
     def has_change_permission(self, request, obj=None):
         return not (obj and obj.is_locked) and super().has_change_permission(request, obj)
 
+    def has_add_permission(self, request, obj=None):
+        return not (obj and obj.is_locked) and super().has_add_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return not (obj and obj.is_locked) and super().has_delete_permission(request, obj)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.is_locked:
+            return tuple(
+                field.name for field in self.model._meta.fields
+                if field.name not in {"id", "version"}
+            )
+        return ()
+
 
 @admin.register(ScoringSchemeVersion)
 class ScoringSchemeVersionAdmin(admin.ModelAdmin):
@@ -175,9 +216,33 @@ class ScoringSchemeVersionAdmin(admin.ModelAdmin):
     list_filter = ("is_locked",)
     list_select_related = ("scheme", "created_by")
     inlines = (ScoringRuleInline,)
+    readonly_fields = ("is_locked", "created_at")
+    actions = ("lock_versions", "clone_versions")
 
-    def has_change_permission(self, request, obj=None):
-        return not (obj and obj.is_locked) and super().has_change_permission(request, obj)
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.is_locked:
+            return tuple(field.name for field in self.model._meta.fields)
+        return self.readonly_fields
+
+    @admin.action(description="Khóa phiên bản")
+    def lock_versions(self, request, queryset):
+        for version in queryset:
+            try:
+                session = version.exam_sessions.select_related("blueprint_version").first()
+                lock_scoring_version(
+                    version, blueprint_version=session.blueprint_version if session else None,
+                    actor=request.user,
+                )
+            except ValidationError as exc:
+                self.message_user(request, f"{version}: {'; '.join(exc.messages)}", messages.ERROR)
+            else:
+                self.message_user(request, f"Đã khóa {version}.", messages.SUCCESS)
+
+    @admin.action(description="Tạo bản sao để chỉnh sửa")
+    def clone_versions(self, request, queryset):
+        for version in queryset.filter(is_locked=True):
+            clone = clone_scoring_version(version, actor=request.user)
+            self.message_user(request, f"Đã tạo {clone} ở trạng thái nháp.", messages.SUCCESS)
 
 
 @admin.register(ScoringScheme)
