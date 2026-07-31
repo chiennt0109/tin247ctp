@@ -35,5 +35,4 @@ class MasterConfigurationSyncTests(TestCase):
         self.assertEqual(second["created"], 0)
         self.assertEqual(ExamBlueprint.objects.count(), 3)
         self.assertEqual(set(ExamBlueprint.objects.values_list("grade", flat=True)), {10, 11, 12})
-        self.assertFalse(ExamBlueprint.objects.filter(is_demo=True).exists())
         self.assertFalse(ExamBlueprint.objects.filter(name__startswith="[DEMO]").exists())

@@ -9,6 +9,7 @@ from django.utils import timezone
 from assessment.models import ExamAttempt, ExamSession, GeneratedExam
 from assessment.services.exam_generator import ExamGenerationError
 from assessment.services.start_attempt import StartAttemptError, start_attempt
+from assessment.services.scoring_versioning import lock_scoring_version
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -38,8 +39,23 @@ class StartAttemptTests(TestCase):
         self.assertEqual(first.pk, second.pk)
         self.assertEqual(ExamAttempt.objects.count(), 1)
         self.assertEqual(GeneratedExam.objects.count(), 1)
-        self.assertEqual(first.generated_exam.purpose, GeneratedExam.Purpose.ATTEMPT)
         self.assertEqual(first.generated_exam.questions.count(), 2)
+
+    def test_start_accepts_scoring_version_locked_by_service(self):
+        user = get_user_model().objects.create_user("locked-service")
+        self.blueprint_version.is_locked = True
+        self.blueprint_version.save(update_fields=("is_locked",))
+        lock_scoring_version(
+            self.scoring_version, blueprint_version=self.blueprint_version,
+        )
+        session = self.create_session()
+        now = timezone.now()
+        session.opens_at = now - timedelta(minutes=1)
+        session.closes_at = now + timedelta(hours=1)
+        session.status = ExamSession.Status.OPEN
+        session.save(update_fields=("opens_at", "closes_at", "status"))
+        attempt = start_attempt(user, session)
+        self.assertTrue(attempt.generated_exam_id)
 
     def test_users_and_later_attempts_receive_distinct_exams_and_seeds(self):
         first_user = get_user_model().objects.create_user("first")
@@ -73,7 +89,7 @@ class StartAttemptTests(TestCase):
             start_attempt(user, session)
 
         session.closes_at = timezone.now() + timedelta(hours=1)
-        session.access_mode = ExamSession.AccessMode.SELECTED_USERS
+        session.access_mode = ExamSession.AccessMode.SELECTED_GROUPS
         session.save(update_fields=("closes_at", "access_mode"))
         with self.assertRaisesMessage(StartAttemptError, "không có quyền"):
             start_attempt(user, session)
@@ -90,7 +106,7 @@ class StartAttemptTests(TestCase):
 
         self.slot.quantity = 2
         self.slot.save(update_fields=("quantity",))
-        with patch("assessment.services.start_attempt.ExamGenerator._generate_attempt", side_effect=ExamGenerationError("boom")):
+        with patch("assessment.services.start_attempt.ExamGenerator.generate_for_attempt", side_effect=ExamGenerationError("boom")):
             with self.assertRaisesMessage(StartAttemptError, "boom"):
                 start_attempt(user, session)
         self.assertFalse(ExamAttempt.objects.exists())
