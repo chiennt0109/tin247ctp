@@ -1,8 +1,14 @@
 from django.contrib.auth import get_user_model
+from django.contrib import admin
 from django.test import TestCase
 from django.urls import reverse
+import py_compile
+from pathlib import Path
 
-from assessment.admin import ASSESSMENT_ADMIN_MENU
+from assessment.admin import (
+    ASSESSMENT_ADMIN_MENU, ASSESSMENT_PRIMARY_MODELS, ExamBlueprintGroupAdmin,
+)
+from assessment.models import ExamBlueprintGroup
 
 
 class AssessmentAdminMenuTests(TestCase):
@@ -29,6 +35,7 @@ class AssessmentAdminMenuTests(TestCase):
             (
                 (order, object_name, label)
                 for object_name, (order, label) in ASSESSMENT_ADMIN_MENU.items()
+                if object_name in ASSESSMENT_PRIMARY_MODELS
             ),
             key=lambda item: (item[0], item[2]),
         )
@@ -39,10 +46,26 @@ class AssessmentAdminMenuTests(TestCase):
 
         labels = [model["name"] for model in visible_models]
         self.assertLess(labels.index("Ngân hàng câu hỏi"), labels.index("Ma trận đề"))
-        self.assertLess(labels.index("Ma trận đề"), labels.index("Quy tắc chấm điểm"))
-        self.assertLess(labels.index("Quy tắc chấm điểm"), labels.index("Kỳ kiểm tra"))
-        self.assertLess(labels.index("Kỳ kiểm tra"), labels.index("Bài làm của học sinh"))
-        self.assertLess(
-            labels.index("Bài làm của học sinh"),
-            labels.index("Nhật ký thao tác kiểm tra"),
+        self.assertLess(labels.index("Ma trận đề"), labels.index("Kỳ kiểm tra"))
+        self.assertLess(labels.index("Kỳ kiểm tra"), labels.index("Bài làm và kết quả"))
+        self.assertNotIn("Phiên bản ma trận", labels)
+        self.assertNotIn("Đề đã sinh theo bài làm", labels)
+
+    def test_blueprint_group_has_exactly_the_canonical_admin_registration(self):
+        self.assertIsInstance(
+            admin.site._registry[ExamBlueprintGroup], ExamBlueprintGroupAdmin,
         )
+
+    def test_admin_modules_compile_before_django_autodiscovery(self):
+        app_dir = Path(__file__).resolve().parents[1]
+        py_compile.compile(str(app_dir / "admin.py"), doraise=True)
+        py_compile.compile(str(app_dir / "admin_blueprint_groups.py"), doraise=True)
+
+    def test_superuser_can_open_advanced_assessment_models(self):
+        response = self.client.get(reverse("admin:app_list", args=("assessment",)) + "?advanced=1")
+        self.assertEqual(response.status_code, 200)
+        models = response.context["app_list"][0]["models"]
+        names = {model["object_name"] for model in models}
+        self.assertIn("BlueprintVersion", names)
+        self.assertIn("GeneratedExam", names)
+        self.assertContains(response, "Quản trị đơn giản")
