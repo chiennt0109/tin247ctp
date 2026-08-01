@@ -17,18 +17,18 @@ class ExamGenerationError(ValueError):
 
 class ExamGenerator:
     @transaction.atomic
-    def _generate(self, session, *, code, seed, purpose, actor=None, expires_at=None):
-        if not session.blueprint_version.is_locked or not session.scoring_version.is_locked:
+    def generate_for_attempt(
+        self, session, *, code, seed, actor=None, blueprint_version=None, scoring_version=None,
+    ):
+        blueprint_version = blueprint_version or session.blueprint_version
+        scoring_version = scoring_version or session.scoring_version
+        if not blueprint_version.is_locked or not scoring_version.is_locked:
             raise ExamGenerationError("Blueprint and scoring versions must be locked before generation")
-        if purpose not in GeneratedExam.Purpose.values:
-            raise ExamGenerationError("Generated exam purpose must be ATTEMPT or PREVIEW")
-        if purpose == GeneratedExam.Purpose.PREVIEW and expires_at is None:
-            raise ExamGenerationError("A persisted preview must have expires_at")
 
         rng = random.Random(str(seed))
         selected = []
         used_question_ids, used_family_keys = set(), set()
-        sections = session.blueprint_version.sections.prefetch_related(
+        sections = blueprint_version.sections.prefetch_related(
             "slots__curriculum", "slots__outcome"
         ).all()
         for section in sections:
@@ -40,7 +40,6 @@ class ExamGenerator:
                     .prefetch_related("assets__source_file")
                     .order_by("source_question_id")
                 )
-                rng.shuffle(candidates)
                 slot_selected = []
                 for question in candidates:
                     family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
@@ -84,17 +83,16 @@ class ExamGenerator:
         ).encode()).hexdigest()
         report = {
             "valid": True, "question_count": len(prepared),
-            "expected_question_count": session.blueprint_version.expected_question_count,
+            "expected_question_count": blueprint_version.expected_question_count,
             "distinct_questions": len(used_question_ids), "distinct_families": len(used_family_keys),
         }
-        if len(prepared) != session.blueprint_version.expected_question_count:
+        if len(prepared) != blueprint_version.expected_question_count:
             raise ExamGenerationError("Generated question total does not match blueprint")
         exam = GeneratedExam.objects.create(
-            session=session, code=code, seed=str(seed), blueprint_version=session.blueprint_version,
-            scoring_version=session.scoring_version,
-            total_score=session.blueprint_version.expected_total_score,
+            session=session, code=code, seed=str(seed), blueprint_version=blueprint_version,
+            scoring_version=scoring_version,
+            total_score=blueprint_version.expected_total_score,
             validation_report=report, exam_hash=exam_hash, generated_by=actor,
-            purpose=purpose, expires_at=expires_at,
         )
         for slot, question, revision, order, ordered_options, option_order in prepared:
             exam_question = GeneratedExamQuestion.objects.create(
@@ -120,16 +118,3 @@ class ExamGenerator:
             object_id=str(exam.pk), details={"code": code, "seed": str(seed), "exam_hash": exam_hash},
         )
         return exam
-
-    def generate_preview(self, session, *, code, seed, actor=None, expires_at):
-        return self._generate(
-            session, code=code, seed=seed, purpose=GeneratedExam.Purpose.PREVIEW,
-            actor=actor, expires_at=expires_at,
-        )
-
-    def _generate_attempt(self, session, *, code, seed, actor):
-        """Internal entry point; ATTEMPT exams are created only by start_attempt()."""
-        return self._generate(
-            session, code=code, seed=seed, purpose=GeneratedExam.Purpose.ATTEMPT,
-            actor=actor,
-        )
