@@ -166,6 +166,26 @@ class StartAttemptTests(TestCase):
 
         self.assertEqual(second.attempt_number, 2)
 
+    def test_exam_list_displays_private_remaining_attempts_and_allows_start(self):
+        user = get_user_model().objects.create_user("grant-card")
+        session = self.open_session()
+        ExamAccessGrant.objects.create(
+            session=session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+        )
+        first = start_attempt(user, session)
+        first.status = ExamAttempt.Status.SUBMITTED
+        first.save(update_fields=("status",))
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:exam_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Đã dùng 1")
+        self.assertContains(response, "Còn 1")
+        self.assertContains(response, "Bắt đầu")
+        self.assertNotContains(response, "Đã hết lượt")
+
     def test_group_time_grant_controls_access_and_attempt_deadline(self):
         user = get_user_model().objects.create_user("timed-group-user")
         group = Group.objects.create(name="Timed candidates")

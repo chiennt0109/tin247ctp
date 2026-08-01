@@ -41,9 +41,14 @@ def _user_grade(user):
 
 
 def user_can_access_session(user, session):
+    return effective_exam_access(user, session).allowed
+
+
+def effective_exam_access(user, session, *, now=None):
+    """Return the same entitlement used by Start Attempt for list/detail UIs."""
     return resolve_exam_access(
-        user, session, timezone.now(), user_grade=_user_grade(user),
-    ).allowed
+        user, session, now or timezone.now(), user_grade=_user_grade(user),
+    )
 
 
 def _generation_identity(session, user, attempt_number):
@@ -97,9 +102,7 @@ def start_attempt(user, exam_session):
                 closes_at = session.closes_at
                 if now < opens_at or now >= closes_at:
                     raise StartAttemptError("Ngoài thời gian làm bài.")
-                access = resolve_exam_access(
-                    user, session, now, user_grade=_user_grade(user),
-                )
+                access = effective_exam_access(user, session, now=now)
                 if not access.allowed:
                     raise StartAttemptError(access.reason)
                 existing = ExamAttempt.objects.select_related("generated_exam").filter(

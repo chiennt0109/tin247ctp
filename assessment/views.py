@@ -16,7 +16,7 @@ from assessment.services.analytics import exam_results_dashboard, official_attem
 from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
-from assessment.services.start_attempt import StartAttemptError, start_attempt, user_can_access_session
+from assessment.services.start_attempt import StartAttemptError, effective_exam_access, start_attempt
 from assessment.services.result_release import result_visibility
 
 
@@ -51,7 +51,8 @@ def exam_list(request):
     )
     cards = []
     for session in sessions:
-        if not user_can_access_session(request.user, session):
+        access = effective_exam_access(request.user, session)
+        if not access.allowed:
             continue
         active = ExamAttempt.objects.filter(
             user=request.user, session=session, status=ExamAttempt.Status.IN_PROGRESS
@@ -59,9 +60,15 @@ def exam_list(request):
         latest_result = ExamAttempt.objects.filter(
             user=request.user, session=session, status=ExamAttempt.Status.GRADED,
         ).order_by("-attempt_number").first()
+        attempts_remaining = (
+            None if access.max_attempts is None
+            else max(access.max_attempts - session.attempts_used, 0)
+        )
         cards.append({
             "session": session, "attempts_used": session.attempts_used,
-            "attempts_remaining": max(session.max_attempts - session.attempts_used, 0), "active_attempt": active,
+            "attempts_remaining": attempts_remaining,
+            "can_start": attempts_remaining is None or attempts_remaining > 0,
+            "active_attempt": active,
             "latest_result": latest_result,
         })
     return render(
