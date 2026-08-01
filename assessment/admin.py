@@ -12,7 +12,7 @@ import tempfile
 from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamAttempt, ExamBlueprint, ExamBlueprintGroup, ExamSession, GeneratedExam, GeneratedExamQuestion,
+    ExamAccessGrant, ExamAttempt, ExamBlueprint, ExamBlueprintGroup, ExamSession, GeneratedExam, GeneratedExamQuestion,
     GradingResult,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
@@ -379,6 +379,17 @@ class ExamAttemptInline(admin.TabularInline):
         return False
 
 
+class ExamAccessGrantInline(admin.TabularInline):
+    model = ExamAccessGrant
+    extra = 0
+    verbose_name = "Quyền và lượt làm của người dùng / nhóm"
+    verbose_name_plural = "Quyền và lượt làm riêng"
+    fields = (
+        "user", "group", "limit_mode", "max_attempts", "valid_from", "valid_until", "is_active",
+    )
+    autocomplete_fields = ("user", "group")
+
+
 class ExamSessionAdminForm(forms.ModelForm):
     blueprint = forms.ModelChoiceField(
         queryset=ExamBlueprint.objects.all().order_by("name"), label="Ma trận đơn",
@@ -396,6 +407,10 @@ class ExamSessionAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["max_attempts"].label = "Số lượt mặc định"
+        self.fields["max_attempts"].help_text = (
+            "Chỉ áp dụng cho các chế độ quyền cũ; chế độ cấp quyền riêng dùng từng dòng bên dưới."
+        )
         if not self.instance._state.adding and self.instance.blueprint_version_id:
             self.fields["blueprint"].initial = self.instance.blueprint_version.blueprint_id
 
@@ -455,7 +470,7 @@ class ExamSessionAdmin(admin.ModelAdmin):
     search_fields = ("name", "slug")
     list_select_related = ("blueprint_version", "scoring_version", "created_by")
     filter_horizontal = ("access_groups",)
-    inlines = (ExamAttemptInline,)
+    inlines = (ExamAccessGrantInline, ExamAttemptInline)
     actions = ("check_generation_capacity", "open_sessions", "close_sessions")
 
     @admin.action(description="Kiểm tra khả năng sinh đề")

@@ -2,11 +2,12 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from assessment.models import ExamAttempt, ExamSession, GeneratedExam
+from assessment.models import ExamAccessGrant, ExamAttempt, ExamSession, GeneratedExam
 from assessment.services.exam_generator import ExamGenerationError
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.scoring_versioning import lock_scoring_version
@@ -102,6 +103,83 @@ class StartAttemptTests(TestCase):
         session.access_mode = ExamSession.AccessMode.SELECTED_GROUPS
         session.save(update_fields=("closes_at", "access_mode"))
         with self.assertRaisesMessage(StartAttemptError, "không có quyền"):
+            start_attempt(user, session)
+
+    def test_user_grants_have_independent_attempt_limits(self):
+        one_attempt = get_user_model().objects.create_user("one-attempt")
+        three_attempts = get_user_model().objects.create_user("three-attempts")
+        session = self.open_session()
+        session.access_mode = ExamSession.AccessMode.ACCESS_GRANTS
+        session.save(update_fields=("access_mode",))
+        ExamAccessGrant.objects.create(
+            session=session, user=one_attempt,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=1,
+        )
+        ExamAccessGrant.objects.create(
+            session=session, user=three_attempts,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=3,
+        )
+
+        first = start_attempt(one_attempt, session)
+        first.status = ExamAttempt.Status.SUBMITTED
+        first.save(update_fields=("status",))
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
+            start_attempt(one_attempt, session)
+
+        for number in range(3):
+            attempt = start_attempt(three_attempts, session)
+            self.assertEqual(attempt.attempt_number, number + 1)
+            attempt.status = ExamAttempt.Status.SUBMITTED
+            attempt.save(update_fields=("status",))
+
+    def test_group_time_grant_controls_access_and_attempt_deadline(self):
+        user = get_user_model().objects.create_user("timed-group-user")
+        group = Group.objects.create(name="Timed candidates")
+        user.groups.add(group)
+        session = self.open_session()
+        session.access_mode = ExamSession.AccessMode.ACCESS_GRANTS
+        session.save(update_fields=("access_mode",))
+        valid_until = timezone.now() + timedelta(minutes=10)
+        grant = ExamAccessGrant.objects.create(
+            session=session, group=group,
+            limit_mode=ExamAccessGrant.LimitMode.VALIDITY,
+            valid_from=timezone.now() - timedelta(minutes=1), valid_until=valid_until,
+        )
+
+        attempt = start_attempt(user, session)
+        self.assertLessEqual(attempt.expires_at, valid_until)
+
+        attempt.status = ExamAttempt.Status.SUBMITTED
+        attempt.save(update_fields=("status",))
+        grant.valid_until = timezone.now() - timedelta(seconds=1)
+        grant.save(update_fields=("valid_until",))
+        attempts_before = ExamAttempt.objects.count()
+        exams_before = GeneratedExam.objects.count()
+        with self.assertRaisesMessage(StartAttemptError, "hết hạn"):
+            start_attempt(user, session)
+        self.assertEqual(ExamAttempt.objects.count(), attempts_before)
+        self.assertEqual(GeneratedExam.objects.count(), exams_before)
+
+    def test_direct_user_grant_overrides_group_grant(self):
+        user = get_user_model().objects.create_user("direct-over-group")
+        group = Group.objects.create(name="Broad candidates")
+        user.groups.add(group)
+        session = self.open_session()
+        session.access_mode = ExamSession.AccessMode.ACCESS_GRANTS
+        session.save(update_fields=("access_mode",))
+        ExamAccessGrant.objects.create(
+            session=session, group=group,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=3,
+        )
+        ExamAccessGrant.objects.create(
+            session=session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=1,
+        )
+        attempt = start_attempt(user, session)
+        attempt.status = ExamAttempt.Status.SUBMITTED
+        attempt.save(update_fields=("status",))
+
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
             start_attempt(user, session)
 
     def test_insufficient_pool_and_generator_error_roll_back_everything(self):

@@ -13,6 +13,7 @@ from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.exam_generator import ExamGenerationError, ExamGenerator
 from assessment.services.equivalence import validate_equivalence_group
 from assessment.services.session_configuration import resolve_locked_configuration
+from assessment.services.access_grants import resolve_exam_access
 
 
 class StartAttemptError(ValueError):
@@ -40,13 +41,9 @@ def _user_grade(user):
 
 
 def user_can_access_session(user, session):
-    if session.access_mode == ExamSession.AccessMode.ALL_USERS:
-        return True
-    if session.access_mode == ExamSession.AccessMode.SELECTED_GROUPS:
-        return session.access_groups.filter(pk__in=user.groups.values("pk")).exists()
-    if session.access_mode == ExamSession.AccessMode.SELECTED_GRADES:
-        return _user_grade(user) in {str(value) for value in session.access_grades}
-    return False
+    return resolve_exam_access(
+        user, session, timezone.now(), user_grade=_user_grade(user),
+    ).allowed
 
 
 def _generation_identity(session, user, attempt_number):
@@ -64,6 +61,12 @@ def start_attempt(user, exam_session):
                 session = ExamSession.objects.select_for_update().select_related(
                     "blueprint_version", "scoring_version"
                 ).get(pk=exam_session.pk)
+                now = timezone.now()
+                access = resolve_exam_access(
+                    user, session, now, user_grade=_user_grade(user),
+                )
+                if not access.allowed:
+                    raise StartAttemptError(access.reason)
                 existing = ExamAttempt.objects.select_related("generated_exam").filter(
                     user=user, session=session, status=ExamAttempt.Status.IN_PROGRESS
                 ).first()
@@ -77,9 +80,6 @@ def start_attempt(user, exam_session):
                         raise StartAttemptError("Bài làm đang mở không có đề; quản trị viên cần kiểm tra.")
                     return existing
 
-                now = timezone.now()
-                if not user_can_access_session(user, session):
-                    raise StartAttemptError("Tài khoản không có quyền làm kỳ kiểm tra này.")
                 if (
                     session.status == ExamSession.Status.SCHEDULED
                     and session.opens_at <= now < session.closes_at
@@ -96,12 +96,15 @@ def start_attempt(user, exam_session):
                 used = ExamAttempt.objects.filter(user=user, session=session).exclude(
                     status=ExamAttempt.Status.INVALIDATED
                 ).count()
-                if used >= session.max_attempts:
+                if access.max_attempts is not None and used >= access.max_attempts:
                     raise StartAttemptError("Bạn đã sử dụng hết số lượt làm.")
                 attempt_number = used + 1
                 duration = session.duration_minutes
                 natural_expiry = now + timedelta(minutes=duration)
-                expires_at = min(natural_expiry, closes_at)
+                deadlines = [natural_expiry, closes_at]
+                if access.valid_until:
+                    deadlines.append(access.valid_until)
+                expires_at = min(deadlines)
                 seed, code = _generation_identity(session, user, attempt_number)
                 blueprint_version = session.blueprint_version
                 scoring_version = session.scoring_version
@@ -139,6 +142,11 @@ def start_attempt(user, exam_session):
                         "generated_exam_id": exam.pk,
                         "blueprint_id": blueprint_version.blueprint_id,
                         "blueprint_version_id": blueprint_version.pk,
+                        "access_grant_id": access.grant_id,
+                        "effective_max_attempts": access.max_attempts,
+                        "access_valid_until": (
+                            access.valid_until.isoformat() if access.valid_until else None
+                        ),
                     },
                 )
                 return attempt

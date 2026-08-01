@@ -426,6 +426,7 @@ class ExamSession(models.Model):
         ALL_USERS = "ALL_USERS", "Mọi tài khoản"
         SELECTED_GROUPS = "SELECTED_GROUPS", "Nhóm được chọn"
         SELECTED_GRADES = "SELECTED_GRADES", "Khối được chọn"
+        ACCESS_GRANTS = "ACCESS_GRANTS", "Cấp quyền theo người dùng / nhóm"
 
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Nháp"
@@ -515,6 +516,80 @@ class ExamSession(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ExamAccessGrant(models.Model):
+    """Per-user or per-group attempt entitlement for one exam session."""
+
+    class LimitMode(models.TextChoices):
+        ATTEMPTS = "ATTEMPTS", "Theo số lượt làm"
+        VALIDITY = "VALIDITY", "Theo thời gian hiệu lực"
+        BOTH = "BOTH", "Theo số lượt và thời gian hiệu lực"
+
+    session = models.ForeignKey(
+        ExamSession, on_delete=models.CASCADE, related_name="access_grants",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE,
+        related_name="assessment_access_grants",
+    )
+    group = models.ForeignKey(
+        "auth.Group", null=True, blank=True, on_delete=models.CASCADE,
+        related_name="assessment_access_grants",
+    )
+    limit_mode = models.CharField(
+        max_length=16, choices=LimitMode.choices, default=LimitMode.ATTEMPTS,
+    )
+    max_attempts = models.PositiveIntegerField(null=True, blank=True)
+    valid_from = models.DateTimeField(null=True, blank=True)
+    valid_until = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    (models.Q(user__isnull=False) & models.Q(group__isnull=True))
+                    | (models.Q(user__isnull=True) & models.Q(group__isnull=False))
+                ),
+                name="assessment_grant_exactly_one_subject",
+            ),
+            models.UniqueConstraint(
+                fields=("session", "user"), condition=models.Q(user__isnull=False),
+                name="assessment_unique_session_user_grant",
+            ),
+            models.UniqueConstraint(
+                fields=("session", "group"), condition=models.Q(group__isnull=False),
+                name="assessment_unique_session_group_grant",
+            ),
+        ]
+        ordering = ("session", "user", "group")
+
+    def clean(self):
+        errors = {}
+        if bool(self.user_id) == bool(self.group_id):
+            errors["user"] = "Chọn đúng một người dùng hoặc một nhóm người dùng."
+        if self.limit_mode in {self.LimitMode.ATTEMPTS, self.LimitMode.BOTH}:
+            if not self.max_attempts:
+                errors["max_attempts"] = "Số lượt làm phải lớn hơn 0."
+        elif self.max_attempts is not None:
+            errors["max_attempts"] = "Chế độ thời gian không sử dụng giới hạn số lượt."
+        if self.limit_mode in {self.LimitMode.VALIDITY, self.LimitMode.BOTH}:
+            if not self.valid_from:
+                errors["valid_from"] = "Cần nhập thời điểm bắt đầu hiệu lực."
+            if not self.valid_until:
+                errors["valid_until"] = "Cần nhập thời điểm hết hiệu lực."
+            if self.valid_from and self.valid_until and self.valid_until <= self.valid_from:
+                errors["valid_until"] = "Thời điểm hết hiệu lực phải sau thời điểm bắt đầu."
+        elif self.valid_from or self.valid_until:
+            errors["valid_from"] = "Chế độ số lượt không sử dụng thời gian hiệu lực."
+        if errors:
+            raise ValidationError(errors)
+
+    def __str__(self):
+        subject = self.user or self.group
+        return f"{self.session}: {subject}"
 
 
 class GeneratedExam(models.Model):
