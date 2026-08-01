@@ -23,6 +23,9 @@ from assessment.services.session_configuration import resolve_locked_configurati
 from assessment.services.equivalence import validate_equivalence_group
 from assessment.services.bank_importer import WorkbookBankImporter
 from assessment.services.configuration_sync import MasterConfigurationSync
+from assessment.services.admin_workflow import (
+    close_exam_session, open_exam_session, prepare_blueprint, validate_session_ready,
+)
 
 
 # Django normally orders models alphabetically using their model-level
@@ -213,6 +216,150 @@ class ExamBlueprintAdmin(admin.ModelAdmin):
     list_filter = ("is_ready", "is_locked", "equivalence_groups", "exam_type", "grade")
     search_fields = ("name", "subject")
     list_select_related = ("created_by", "approved_by")
+    readonly_fields = (
+        "total_questions", "total_score", "duration_minutes", "difficulty_profile",
+        "is_locked", "is_ready",
+    )
+    actions = ("prepare_blueprints", "check_blueprint_sources")
+
+    @admin.display(description="Nhóm tương đương")
+    def group_names(self, obj):
+        return ", ".join(obj.equivalence_groups.values_list("name", flat=True)) or "-"
+
+    @admin.action(description="Khóa và chuẩn bị ma trận")
+    def prepare_blueprints(self, request, queryset):
+        for blueprint in queryset:
+            try:
+                prepared = prepare_blueprint(blueprint, actor=request.user)
+            except (ValidationError, ValueError) as exc:
+                self.message_user(request, f"{blueprint}: {exc}", messages.ERROR)
+            else:
+                self.message_user(
+                    request, f"{prepared}: LOCKED và READY.", messages.SUCCESS,
+                )
+
+    @admin.action(description="Kiểm tra nguồn câu")
+    def check_blueprint_sources(self, request, queryset):
+        for blueprint in queryset:
+            version = blueprint.versions.order_by("-version").first()
+            if version is None:
+                self.message_user(request, f"{blueprint}: chưa có phiên bản.", messages.ERROR)
+                continue
+            report = BlueprintValidator().validate(version)
+            detail = "; ".join(
+                f"Slot {index}: cần {row['required']} / có {row['candidates']}"
+                for index, row in enumerate(report["availability"], 1)
+            )
+            self.message_user(
+                request, f"{blueprint}: {detail}",
+                messages.SUCCESS if report["valid"] else messages.ERROR,
+            )
+
+    def get_urls(self):
+        return [
+            path(
+                "import/", self.admin_site.admin_view(self.import_blueprints),
+                name="assessment_examblueprint_import",
+            ),
+            *super().get_urls(),
+        ]
+
+    def import_blueprints(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
+        if request.method == "POST" and request.FILES.get("workbook"):
+            upload = request.FILES["workbook"]
+            if not upload.name.lower().endswith(".xlsx"):
+                self.message_user(request, "Chỉ chấp nhận file .xlsx.", messages.ERROR)
+            else:
+                temporary = tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False)
+                try:
+                    for chunk in upload.chunks():
+                        temporary.write(chunk)
+                    temporary.close()
+                    parsed = WorkbookBankImporter().parse(temporary.name)
+                    if parsed.has_fatal_errors:
+                        self.message_user(request, "Workbook không hợp lệ; không có dữ liệu được ghi.", messages.ERROR)
+                    else:
+                        with transaction.atomic():
+                            report = MasterConfigurationSync().apply(parsed, actor=request.user)
+                        self.message_user(
+                            request,
+                            f"Import hoàn tất: tạo {report['created']}, cập nhật {report['updated']} ma trận.",
+                            messages.SUCCESS,
+                        )
+                        return redirect(reverse("admin:assessment_examblueprint_changelist"))
+                finally:
+                    temporary.close()
+                    Path(temporary.name).unlink(missing_ok=True)
+        return render(request, "admin/assessment/examblueprint/import.html", {
+            **self.admin_site.each_context(request), "title": "Import ma trận từ Excel",
+            "opts": self.model._meta,
+        })
+
+
+class BlueprintGroupForm(forms.ModelForm):
+    class BlueprintChoiceField(forms.ModelMultipleChoiceField):
+        def label_from_instance(self, blueprint):
+            version = blueprint.versions.filter(is_locked=True).order_by("-version").first()
+            coverage = 0
+            if version:
+                coverage = len(set(version.sections.values_list(
+                    "slots__curriculum_id", "slots__outcome_id",
+                )))
+            state = "READY" if blueprint.is_ready else "THIẾU"
+            return (
+                f"{blueprint.name} | {blueprint.total_questions} câu | "
+                f"{blueprint.total_score} điểm | {blueprint.duration_minutes} phút | "
+                f"coverage {coverage} | {state}"
+            )
+
+    blueprints = BlueprintChoiceField(
+        queryset=ExamBlueprint.objects.all().order_by("name"),
+        widget=forms.CheckboxSelectMultiple, required=False,
+    )
+
+    class Meta:
+        model = ExamBlueprintGroup
+        fields = "__all__"
+
+
+class ExamBlueprintGroupAdmin(admin.ModelAdmin):
+    form = BlueprintGroupForm
+    list_display = (
+        "name", "code", "exam_type", "is_active", "selection_policy",
+        "ready_count", "blueprint_count",
+    )
+    actions = ("validate_groups",)
+
+    @admin.display(description="READY")
+    def ready_count(self, obj):
+        return obj.blueprints.filter(is_ready=True, is_locked=True).count()
+
+    @admin.display(description="Tổng ma trận")
+    def blueprint_count(self, obj):
+        return obj.blueprints.count()
+
+    @admin.action(description="Kiểm tra nhóm ma trận tương đương")
+    def validate_groups(self, request, queryset):
+        for group in queryset:
+            rows = validate_equivalence_group(group)
+            detail = "; ".join(
+                f"{row['blueprint'].name}: "
+                f"{'READY' if row['ready'] else 'THIẾU - ' + ', '.join(row['errors'])}"
+                f"{' (Cảnh báo: ' + ', '.join(row['warnings']) + ')' if row['warnings'] else ''}"
+                for row in rows
+            )
+            level = messages.SUCCESS if rows and all(row["ready"] for row in rows) else messages.ERROR
+            self.message_user(request, f"{group.name}: {detail}", level)
+
+
+# Some production deployments loaded an earlier technical registration for
+# this model before assessment.admin. Replace that registration explicitly so
+# admin autodiscovery remains safe and there is exactly one group interface.
+if admin.site.is_registered(ExamBlueprintGroup):
+    admin.site.unregister(ExamBlueprintGroup)
+admin.site.register(ExamBlueprintGroup, ExamBlueprintGroupAdmin)
 
     @admin.display(description="Nhóm tương đương")
     def group_names(self, obj):
@@ -468,6 +615,7 @@ class ExamSessionAdminForm(forms.ModelForm):
 @admin.register(ExamSession)
 class ExamSessionAdmin(admin.ModelAdmin):
     form = ExamSessionAdminForm
+    readonly_fields = ("status",)
     list_display = (
         "name", "exam_type", "opens_at", "closes_at", "status",
     )
@@ -476,23 +624,37 @@ class ExamSessionAdmin(admin.ModelAdmin):
     list_select_related = ("blueprint_version", "scoring_version", "created_by")
     filter_horizontal = ("access_groups",)
     inlines = (ExamAttemptInline,)
-    actions = ("check_generation_capacity",)
+    actions = ("check_generation_capacity", "open_sessions", "close_sessions")
 
     @admin.action(description="Kiểm tra khả năng sinh đề")
     def check_generation_capacity(self, request, queryset):
-        for session in queryset.select_related("blueprint_version", "scoring_version"):
-            report = BlueprintValidator().validate(
-                session.blueprint_version, scoring_version=session.scoring_version,
-            )
-            rows = []
-            for index, row in enumerate(report["availability"], 1):
-                status = "OK" if row["status"] in {"SUFFICIENT", "TIGHT"} else "THIẾU"
-                rows.append(f"Slot {index}: cần {row['required']} / có {row['candidates']} -> {status}")
-            detail = "; ".join(rows)
-            level = messages.SUCCESS if report["valid"] else messages.ERROR
-            if not report["valid"]:
-                detail += ". " + BlueprintValidator.format_failure(report)
-            self.message_user(request, f"{session.name}: {detail}", level)
+        for session in queryset:
+            try:
+                validate_session_ready(session)
+            except ValidationError as exc:
+                self.message_user(request, f"{session.name}: {exc}", messages.ERROR)
+            else:
+                self.message_user(
+                    request, f"{session.name}: đủ điều kiện mở kỳ thi.", messages.SUCCESS,
+                )
+
+    @admin.action(description="Mở kỳ thi")
+    def open_sessions(self, request, queryset):
+        for session in queryset:
+            try:
+                opened = open_exam_session(session)
+            except ValidationError as exc:
+                self.message_user(request, f"{session.name}: {exc}", messages.ERROR)
+            else:
+                self.message_user(
+                    request, f"{opened.name}: {opened.get_status_display()}.", messages.SUCCESS,
+                )
+
+    @admin.action(description="Đóng kỳ thi")
+    def close_sessions(self, request, queryset):
+        for session in queryset:
+            closed = close_exam_session(session)
+            self.message_user(request, f"{closed.name}: Đã đóng.", messages.SUCCESS)
 
     def has_change_permission(self, request, obj=None):
         return not (obj and obj.status != ExamSession.Status.DRAFT) and super().has_change_permission(request, obj)

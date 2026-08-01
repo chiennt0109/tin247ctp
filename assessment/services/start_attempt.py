@@ -80,6 +80,12 @@ def start_attempt(user, exam_session):
                 now = timezone.now()
                 if not user_can_access_session(user, session):
                     raise StartAttemptError("Tài khoản không có quyền làm kỳ kiểm tra này.")
+                if (
+                    session.status == ExamSession.Status.SCHEDULED
+                    and session.opens_at <= now < session.closes_at
+                ):
+                    session.status = ExamSession.Status.OPEN
+                    session.save(update_fields=("status", "updated_at"))
                 if session.status != ExamSession.Status.OPEN:
                     raise StartAttemptError("Kỳ kiểm tra chưa mở.")
                 opens_at = session.opens_at

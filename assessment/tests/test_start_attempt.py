@@ -41,6 +41,16 @@ class StartAttemptTests(TestCase):
         self.assertEqual(GeneratedExam.objects.count(), 1)
         self.assertEqual(first.generated_exam.questions.count(), 2)
 
+    def test_scheduled_session_transitions_to_open_at_start_time(self):
+        user = get_user_model().objects.create_user("scheduled-student")
+        session = self.open_session()
+        session.status = ExamSession.Status.SCHEDULED
+        session.save(update_fields=("status",))
+        attempt = start_attempt(user, session)
+        session.refresh_from_db()
+        self.assertEqual(session.status, ExamSession.Status.OPEN)
+        self.assertTrue(attempt.generated_exam_id)
+
     def test_start_accepts_scoring_version_locked_by_service(self):
         user = get_user_model().objects.create_user("locked-service")
         self.blueprint_version.is_locked = True

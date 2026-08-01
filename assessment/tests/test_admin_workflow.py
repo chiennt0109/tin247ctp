@@ -9,6 +9,7 @@ from assessment.models import BankQuestion, ExamSession
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.demo_cleanup import AssessmentDemoCleanup
 from assessment.services.session_configuration import resolve_locked_configuration
+from assessment.services.admin_workflow import close_exam_session, open_exam_session, prepare_blueprint
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -29,6 +30,28 @@ class AssessmentAdminWorkflowTests(TestCase):
         )
         self.assertEqual(blueprint_version, self.blueprint_version)
         self.assertEqual(scoring_version, self.scoring_version)
+
+    def test_single_prepare_action_locks_blueprint_and_scoring(self):
+        type(self.blueprint_version).objects.filter(pk=self.blueprint_version.pk).update(is_locked=False)
+        type(self.scoring_version).objects.filter(pk=self.scoring_version.pk).update(is_locked=False)
+        prepared = prepare_blueprint(self.blueprint_version.blueprint)
+        self.blueprint_version.refresh_from_db()
+        self.scoring_version.refresh_from_db()
+        self.assertTrue(prepared.is_locked)
+        self.assertTrue(prepared.is_ready)
+        self.assertTrue(self.blueprint_version.is_locked)
+        self.assertTrue(self.scoring_version.is_locked)
+
+    def test_open_and_close_session_are_explicit_workflow_actions(self):
+        session = self.create_session("workflow-status")
+        now = timezone.now()
+        session.opens_at = now - timedelta(minutes=1)
+        session.closes_at = now + timedelta(hours=1)
+        session.save(update_fields=("opens_at", "closes_at"))
+        opened = open_exam_session(session)
+        self.assertEqual(opened.status, ExamSession.Status.OPEN)
+        closed = close_exam_session(opened)
+        self.assertEqual(closed.status, ExamSession.Status.CLOSED)
 
     def test_admin_form_selects_blueprint_instead_of_internal_versions(self):
         now = timezone.now()
