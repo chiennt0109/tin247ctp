@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
-from assessment.models import ExamAttempt, ExamParticipant, ExamSession, GradingResult
+from assessment.models import ExamAttempt, ExamSession, GradingResult
 from assessment.models import AssessmentAuditLog
 from assessment.services.analytics import exam_results_dashboard, official_attempts, student_result_summary
 from assessment.services.attempt_service import (
@@ -37,9 +37,9 @@ def _rate_limited(key, *, limit, window):
 
 @login_required
 def exam_list(request):
-    """Show sessions allowed by session policy plus per-user overrides."""
+    """Show exam sessions available through their session-level access policy."""
     sessions = (
-        ExamSession.objects.filter(is_demo=False).exclude(
+        ExamSession.objects.exclude(
             status__in=(ExamSession.Status.DRAFT, ExamSession.Status.CANCELLED),
         )
         .select_related("blueprint_version")
@@ -49,17 +49,10 @@ def exam_list(request):
         )
         .order_by("opens_at", "name")
     )
-    participants = {
-        item.session_id: item for item in ExamParticipant.objects.filter(
-            user=request.user, session__in=sessions
-        )
-    }
     cards = []
     for session in sessions:
-        participant = participants.get(session.pk)
-        if not user_can_access_session(request.user, session, participant):
+        if not user_can_access_session(request.user, session):
             continue
-        maximum = participant.max_attempts_override if participant and participant.max_attempts_override else session.max_attempts
         active = ExamAttempt.objects.filter(
             user=request.user, session=session, status=ExamAttempt.Status.IN_PROGRESS
         ).first()
@@ -67,8 +60,8 @@ def exam_list(request):
             user=request.user, session=session, status=ExamAttempt.Status.GRADED,
         ).order_by("-attempt_number").first()
         cards.append({
-            "session": session, "participant": participant, "attempts_used": session.attempts_used,
-            "attempts_remaining": max(maximum - session.attempts_used, 0), "active_attempt": active,
+            "session": session, "attempts_used": session.attempts_used,
+            "attempts_remaining": max(session.max_attempts - session.attempts_used, 0), "active_attempt": active,
             "latest_result": latest_result,
         })
     return render(
@@ -184,8 +177,7 @@ def attempt_result(request, attempt_id):
     result = get_object_or_404(
         GradingResult, attempt=attempt, is_current=True,
     )
-    participant = ExamParticipant.objects.filter(session=attempt.session, user=attempt.user).first()
-    visibility = result_visibility(attempt, participant=participant)
+    visibility = result_visibility(attempt)
     if request.user.has_perm("assessment.view_results"):
         visibility = {"score": True, "answers": True, "solutions": True, "review": True}
     summary = student_result_summary(attempt)
@@ -202,7 +194,7 @@ def attempt_result(request, attempt_id):
 @login_required
 def result_list(request):
     attempts = list(ExamAttempt.objects.filter(
-        user=request.user, status=ExamAttempt.Status.GRADED, session__is_demo=False,
+        user=request.user, status=ExamAttempt.Status.GRADED,
     ).select_related("session").prefetch_related("grading_results").order_by("-submitted_at"))
     by_session = {}
     for attempt in attempts:
@@ -212,9 +204,8 @@ def result_list(request):
         official |= official_attempts(rows, rows[0].session.attempt_result_mode)
     rows = []
     for attempt in attempts:
-        participant = ExamParticipant.objects.filter(session=attempt.session, user=request.user).first()
         rows.append({
-            "attempt": attempt, "visibility": result_visibility(attempt, participant=participant),
+            "attempt": attempt, "visibility": result_visibility(attempt),
             "official": attempt.pk in official,
         })
     return render(request, "assessment/result_list.html", {"result_rows": rows})
