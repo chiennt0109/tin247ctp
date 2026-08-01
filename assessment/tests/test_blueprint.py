@@ -95,7 +95,10 @@ class BlueprintTests(TestCase):
         self.create_question("Q2")
         lock_blueprint_version(self.version, scoring_version=self.scoring_version)
         self.version.refresh_from_db()
+        self.blueprint.refresh_from_db()
         self.assertTrue(self.version.is_locked)
+        self.assertTrue(self.blueprint.is_locked)
+        self.assertTrue(self.blueprint.is_ready)
         self.assertTrue(AssessmentAuditLog.objects.filter(action="LOCK_BLUEPRINT_VERSION").exists())
         self.version.duration_minutes = 60
         with self.assertRaises(ValidationError):

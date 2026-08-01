@@ -434,14 +434,23 @@ class ExamSessionAdminForm(forms.ModelForm):
             self.instance.slug = slug
         if group:
             self.instance.exam_type = group.exam_type
-            rows = validate_equivalence_group(group)
-            ready = [row for row in rows if row["ready"]]
-            if not ready:
-                self.add_error("blueprint_group", "Nhóm không có ma trận READY + LOCKED.")
+            rows = validate_equivalence_group(group, persist=False)
+            configuration = None
+            for row in rows:
+                if row["version"] is None:
+                    continue
+                try:
+                    configuration = resolve_locked_configuration(row["blueprint"])
+                except ValidationError:
+                    continue
+                break
+            if configuration is None:
+                self.add_error(
+                    "blueprint_group",
+                    "Nhóm chưa có ma trận với phiên bản ma trận và quy tắc chấm đã LOCKED.",
+                )
             else:
-                blueprint_version, scoring_version = resolve_locked_configuration(ready[0]["blueprint"])
-                self.instance.blueprint_version = blueprint_version
-                self.instance.scoring_version = scoring_version
+                self.instance.blueprint_version, self.instance.scoring_version = configuration
         elif blueprint:
             self.instance.exam_type = blueprint.exam_type
             try:

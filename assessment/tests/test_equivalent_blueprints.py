@@ -12,7 +12,7 @@ from assessment.models import (
     ScoringScheme, ScoringSchemeVersion,
 )
 from assessment.services.start_attempt import StartAttemptError, start_attempt
-from assessment.admin import BlueprintGroupForm
+from assessment.admin import BlueprintGroupForm, ExamSessionAdminForm
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -92,6 +92,27 @@ class EquivalentBlueprintAttemptTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         group = form.save()
         self.assertEqual(group.blueprints.count(), 2)
+
+    def test_exam_session_form_does_not_reset_blueprint_lock_or_ready_flags(self):
+        blueprint_ids = [self.blueprint_version.blueprint_id, self.second_version.blueprint_id]
+        ExamBlueprint.objects.filter(pk__in=blueprint_ids).update(is_locked=True, is_ready=True)
+        now = timezone.now()
+        form = ExamSessionAdminForm(data={
+            "name": "Kỳ thi không đổi trạng thái ma trận",
+            "blueprint_group": self.group.pk,
+            "opens_at": now + timedelta(hours=1),
+            "closes_at": now + timedelta(hours=2),
+            "duration_minutes": 50, "max_attempts": 1,
+            "access_mode": "ALL_USERS", "score_release_mode": "MANUAL_RELEASE",
+            "answer_release_mode": "NEVER",
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        states = set(
+            ExamBlueprint.objects.filter(pk__in=blueprint_ids)
+            .values_list("is_locked", "is_ready")
+        )
+        self.assertEqual(states, {(True, True)})
 
     def test_blueprint_with_shortage_is_not_selected(self):
         self.second_version.sections.first().slots.update(quantity=20)

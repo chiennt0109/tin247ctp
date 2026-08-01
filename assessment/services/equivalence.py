@@ -33,7 +33,7 @@ def _signature(version):
 
 
 @transaction.atomic
-def validate_equivalence_group(group):
+def validate_equivalence_group(group, *, persist=True):
     rows = []
     reference = None
     for blueprint in group.blueprints.order_by("name"):
@@ -73,7 +73,7 @@ def validate_equivalence_group(group):
                 if any(abs(signature["cognitive"].get(level, 0) - reference_signature["cognitive"].get(level, 0)) > group.cognitive_tolerance for level in levels):
                     warnings.append("Tỷ lệ mức độ nhận thức vượt ngưỡng")
         ready = group.is_active and version is not None and not errors
-        if version:
+        if version and persist:
             ExamBlueprint.objects.filter(pk=blueprint.pk).update(
                 total_questions=version.expected_question_count,
                 total_score=version.expected_total_score,
@@ -84,7 +84,7 @@ def validate_equivalence_group(group):
                     "cognitive": {key: str(value) for key, value in (signature or {}).get("cognitive", {}).items()},
                 },
             )
-        else:
+        elif persist:
             ExamBlueprint.objects.filter(pk=blueprint.pk).update(is_locked=False, is_ready=False)
         rows.append({
             "blueprint": blueprint, "version": version, "ready": ready,
