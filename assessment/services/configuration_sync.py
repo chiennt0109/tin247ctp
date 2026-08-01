@@ -3,10 +3,11 @@ from decimal import Decimal
 import json
 
 from django.db import transaction
+from django.utils.text import slugify
 
 from assessment.models import (
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamBlueprint, ScoringRule, ScoringScheme, ScoringSchemeVersion,
+    ExamBlueprint, ExamBlueprintGroup, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 
 
@@ -53,17 +54,37 @@ class MasterConfigurationSync:
             if str(source.get("STATUS")) != "APPROVED":
                 continue
             source_id = str(source["BLUEPRINT_ID"])
+            group = None
+            group_code = str(
+                source.get("EQUIVALENCE_GROUP")
+                or source.get("BLUEPRINT_GROUP")
+                or source.get("GROUP_CODE")
+                or ""
+            ).strip()
+            if group_code:
+                group, _ = ExamBlueprintGroup.objects.get_or_create(
+                    code=slugify(group_code) or group_code,
+                    defaults={
+                        "name": group_code,
+                        "exam_type": str(source.get("EXAM_TYPE") or "GRADUATION"),
+                    },
+                )
             blueprint, was_created = ExamBlueprint.objects.update_or_create(
                 source_blueprint_id=source_id,
                 defaults={
-                    "name": str(source["BLUEPRINT_NAME"]), "is_demo": False,
+                    "name": str(source["BLUEPRINT_NAME"]),
                     "exam_type": str(source["EXAM_TYPE"]), "grade": int(source["GRADE"]),
                     "subject": str(source.get("SUBJECT") or "Tin học"),
                     "semester": str(source.get("SEMESTER") or ""),
+                    "total_questions": int(source["TOTAL_QUESTIONS"]),
+                    "total_score": Decimal(str(source["TOTAL_SCORE"])),
+                    "duration_minutes": int(source["DURATION_MIN"]),
                     "status": ExamBlueprint.Status.APPROVED, "notes": str(source.get("NOTE") or ""),
                     "created_by": actor,
                 },
             )
+            if group:
+                group.blueprints.add(blueprint)
             version_number = int(source.get("VERSION") or 1)
             version, version_created = BlueprintVersion.objects.get_or_create(
                 blueprint=blueprint, version=version_number,
@@ -102,7 +123,7 @@ class MasterConfigurationSync:
             policy_id = str(source.get("POLICY_PROFILE_ID") or f"BLUEPRINT:{source_id}")
             scheme, _ = ScoringScheme.objects.get_or_create(
                 name=f"{source['BLUEPRINT_NAME']} — Quy tắc chấm",
-                defaults={"is_demo": False, "created_by": actor},
+                defaults={"created_by": actor},
             )
             scoring, _ = ScoringSchemeVersion.objects.get_or_create(
                 scheme=scheme, version=version_number,
