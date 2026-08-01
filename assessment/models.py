@@ -211,10 +211,6 @@ class ExamBlueprint(models.Model):
     semester = models.CharField(max_length=32, blank=True)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT, db_index=True)
     notes = models.TextField(blank=True)
-    equivalence_group = models.ForeignKey(
-        "ExamBlueprintGroup", null=True, blank=True, on_delete=models.SET_NULL,
-        related_name="blueprints",
-    )
     difficulty_profile = models.JSONField(default=dict, blank=True)
     total_questions = models.PositiveIntegerField(default=0)
     total_score = models.DecimalField(max_digits=8, decimal_places=3, default=0)
@@ -237,9 +233,26 @@ class ExamBlueprint(models.Model):
 
 
 class ExamBlueprintGroup(models.Model):
+    class ExamType(models.TextChoices):
+        PRACTICE = "PRACTICE", "Luyện tập"
+        REGULAR = "REGULAR", "Kiểm tra thường xuyên"
+        PERIODIC = "PERIODIC", "Kiểm tra định kỳ"
+        GRADUATION = "GRADUATION", "Thi thử tốt nghiệp"
+        CUSTOM = "CUSTOM", "Tùy chỉnh"
+
+    class SelectionPolicy(models.TextChoices):
+        RANDOM_READY = "RANDOM_READY", "Chọn ngẫu nhiên trong các ma trận READY"
+
     name = models.CharField(max_length=255, unique=True)
     code = models.SlugField(max_length=160, unique=True)
+    exam_type = models.CharField(max_length=32, choices=ExamType.choices, default=ExamType.GRADUATION)
+    is_active = models.BooleanField(default=True, db_index=True)
+    blueprints = models.ManyToManyField(ExamBlueprint, blank=True, related_name="equivalence_groups")
+    selection_policy = models.CharField(
+        max_length=32, choices=SelectionPolicy.choices, default=SelectionPolicy.RANDOM_READY,
+    )
     cognitive_tolerance = models.DecimalField(max_digits=5, decimal_places=3, default="0.100")
+    duration_tolerance_minutes = models.PositiveIntegerField(default=0)
     description = models.TextField(blank=True)
 
     def __str__(self):

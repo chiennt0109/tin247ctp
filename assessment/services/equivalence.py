@@ -38,12 +38,14 @@ def validate_equivalence_group(group):
     reference = None
     for blueprint in group.blueprints.order_by("name"):
         version = blueprint.versions.filter(is_locked=True).order_by("-version").first()
-        errors = []
+        errors, warnings = [], []
         report = None
         signature = None
         if version is None:
             errors.append("Chưa có phiên bản LOCKED")
         else:
+            if blueprint.exam_type != group.exam_type:
+                warnings.append("Khác loại kỳ thi")
             try:
                 resolved_version, scoring_version = resolve_locked_configuration(blueprint)
             except ValidationError as exc:
@@ -60,19 +62,17 @@ def validate_equivalence_group(group):
             elif reference:
                 reference_version, reference_signature = reference
                 if version.expected_question_count != reference_version.expected_question_count:
-                    errors.append("Khác tổng số câu")
+                    warnings.append("Khác tổng số câu")
                 if version.expected_total_score != reference_version.expected_total_score:
-                    errors.append("Khác tổng điểm")
-                if version.duration_minutes != reference_version.duration_minutes:
-                    errors.append("Khác thời lượng")
+                    warnings.append("Khác tổng điểm")
+                if abs(version.duration_minutes - reference_version.duration_minutes) > group.duration_tolerance_minutes:
+                    warnings.append("Khác thời lượng vượt ngưỡng")
                 if signature["types"] != reference_signature["types"]:
-                    errors.append("Khác cơ cấu loại câu")
+                    warnings.append("Khác cơ cấu loại câu")
                 levels = set(signature["cognitive"]) | set(reference_signature["cognitive"])
                 if any(abs(signature["cognitive"].get(level, 0) - reference_signature["cognitive"].get(level, 0)) > group.cognitive_tolerance for level in levels):
-                    errors.append("Tỷ lệ mức độ nhận thức vượt ngưỡng")
-                if signature["coverage"] != reference_signature["coverage"]:
-                    errors.append("Khác phạm vi kiến thức/YCCD")
-        ready = version is not None and not errors
+                    warnings.append("Tỷ lệ mức độ nhận thức vượt ngưỡng")
+        ready = group.is_active and version is not None and not errors
         if version:
             ExamBlueprint.objects.filter(pk=blueprint.pk).update(
                 total_questions=version.expected_question_count,
@@ -87,7 +87,8 @@ def validate_equivalence_group(group):
         else:
             ExamBlueprint.objects.filter(pk=blueprint.pk).update(is_locked=False, is_ready=False)
         rows.append({
-            "blueprint": blueprint, "version": version, "ready": ready, "errors": errors,
+            "blueprint": blueprint, "version": version, "ready": ready,
+            "errors": errors, "warnings": warnings,
             "coverage": len((signature or {}).get("coverage", set())),
             "difficulty_profile": (signature or {}).get("cognitive", {}),
             "availability": (report or {}).get("availability", []),

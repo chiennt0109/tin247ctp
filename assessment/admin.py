@@ -1,7 +1,13 @@
 from django.contrib import admin
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django import forms
+from django.utils.text import slugify
+from django.urls import path, reverse
+from django.shortcuts import redirect, render
+from django.db import transaction
+from pathlib import Path
+import tempfile
 
 from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
@@ -15,6 +21,8 @@ from assessment.services.scoring_versioning import clone_scoring_version, lock_s
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.session_configuration import resolve_locked_configuration
 from assessment.services.equivalence import validate_equivalence_group
+from assessment.services.bank_importer import WorkbookBankImporter
+from assessment.services.configuration_sync import MasterConfigurationSync
 
 
 # Django normally orders models alphabetically using their model-level
@@ -37,11 +45,14 @@ ASSESSMENT_ADMIN_MENU = {
     "ScoringScheme": (200, "Quy tắc chấm điểm"),
     "ScoringSchemeVersion": (210, "Phiên bản quy tắc chấm"),
     "ExamSession": (300, "Kỳ kiểm tra"),
-    "ExamAttempt": (400, "Bài làm của học sinh"),
+    "ExamAttempt": (400, "Bài làm và kết quả"),
     "GeneratedExam": (410, "Đề đã sinh theo bài làm"),
     "AttemptAnswer": (420, "Câu trả lời đã lưu"),
     "GradingResult": (430, "Kết quả chấm điểm"),
     "AssessmentAuditLog": (500, "Nhật ký thao tác kiểm tra"),
+}
+ASSESSMENT_PRIMARY_MODELS = {
+    "BankQuestion", "ExamBlueprint", "ExamBlueprintGroup", "ExamSession", "ExamAttempt",
 }
 
 
@@ -59,6 +70,12 @@ def _install_assessment_admin_menu():
                 continue
 
             app["name"] = "Quản lý kiểm tra"
+            advanced = request.user.is_superuser and request.GET.get("advanced") == "1"
+            if not advanced:
+                app["models"] = [
+                    model for model in app["models"]
+                    if model["object_name"] in ASSESSMENT_PRIMARY_MODELS
+                ]
             for model in app["models"]:
                 order, label = ASSESSMENT_ADMIN_MENU.get(
                     model["object_name"], (1000, model["name"]),
@@ -187,13 +204,118 @@ class BlueprintVersionAdmin(admin.ModelAdmin):
 
 @admin.register(ExamBlueprint)
 class ExamBlueprintAdmin(admin.ModelAdmin):
+    change_list_template = "admin/assessment/examblueprint/change_list.html"
     list_display = (
-        "name", "equivalence_group", "total_questions", "total_score",
+        "name", "source_blueprint_id", "total_questions", "total_score",
         "duration_minutes", "is_locked", "is_ready", "difficulty_profile",
+        "group_names",
     )
-    list_filter = ("is_ready", "is_locked", "equivalence_group", "exam_type", "grade")
+    list_filter = ("is_ready", "is_locked", "equivalence_groups", "exam_type", "grade")
     search_fields = ("name", "subject")
     list_select_related = ("created_by", "approved_by")
+
+    @admin.display(description="Nhóm tương đương")
+    def group_names(self, obj):
+        return ", ".join(obj.equivalence_groups.values_list("name", flat=True)) or "-"
+
+    def get_urls(self):
+        return [
+            path(
+                "import/", self.admin_site.admin_view(self.import_blueprints),
+                name="assessment_examblueprint_import",
+            ),
+            *super().get_urls(),
+        ]
+
+    def import_blueprints(self, request):
+        if not self.has_add_permission(request):
+            raise PermissionDenied
+        if request.method == "POST" and request.FILES.get("workbook"):
+            upload = request.FILES["workbook"]
+            if not upload.name.lower().endswith(".xlsx"):
+                self.message_user(request, "Chỉ chấp nhận file .xlsx.", messages.ERROR)
+            else:
+                temporary = tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False)
+                try:
+                    for chunk in upload.chunks():
+                        temporary.write(chunk)
+                    temporary.close()
+                    parsed = WorkbookBankImporter().parse(temporary.name)
+                    if parsed.has_fatal_errors:
+                        self.message_user(request, "Workbook không hợp lệ; không có dữ liệu được ghi.", messages.ERROR)
+                    else:
+                        with transaction.atomic():
+                            report = MasterConfigurationSync().apply(parsed, actor=request.user)
+                        self.message_user(
+                            request,
+                            f"Import hoàn tất: tạo {report['created']}, cập nhật {report['updated']} ma trận.",
+                            messages.SUCCESS,
+                        )
+                        return redirect(reverse("admin:assessment_examblueprint_changelist"))
+                finally:
+                    temporary.close()
+                    Path(temporary.name).unlink(missing_ok=True)
+        return render(request, "admin/assessment/examblueprint/import.html", {
+            **self.admin_site.each_context(request), "title": "Import ma trận từ Excel",
+            "opts": self.model._meta,
+        })
+
+
+class BlueprintGroupForm(forms.ModelForm):
+    class BlueprintChoiceField(forms.ModelMultipleChoiceField):
+        def label_from_instance(self, blueprint):
+            version = blueprint.versions.filter(is_locked=True).order_by("-version").first()
+            coverage = 0
+            if version:
+                coverage = len(set(version.sections.values_list(
+                    "slots__curriculum_id", "slots__outcome_id",
+                )))
+            state = "READY" if blueprint.is_ready else "THIẾU"
+            return (
+                f"{blueprint.name} | {blueprint.total_questions} câu | "
+                f"{blueprint.total_score} điểm | {blueprint.duration_minutes} phút | "
+                f"coverage {coverage} | {state}"
+            )
+
+    blueprints = BlueprintChoiceField(
+        queryset=ExamBlueprint.objects.all().order_by("name"),
+        widget=forms.CheckboxSelectMultiple, required=False,
+    )
+
+    class Meta:
+        model = ExamBlueprintGroup
+        fields = "__all__"
+
+
+@admin.register(ExamBlueprintGroup)
+class ExamBlueprintGroupAdmin(admin.ModelAdmin):
+    form = BlueprintGroupForm
+    list_display = (
+        "name", "code", "exam_type", "is_active", "selection_policy",
+        "ready_count", "blueprint_count",
+    )
+    actions = ("validate_groups",)
+
+    @admin.display(description="READY")
+    def ready_count(self, obj):
+        return obj.blueprints.filter(is_ready=True, is_locked=True).count()
+
+    @admin.display(description="Tổng ma trận")
+    def blueprint_count(self, obj):
+        return obj.blueprints.count()
+
+    @admin.action(description="Kiểm tra nhóm ma trận tương đương")
+    def validate_groups(self, request, queryset):
+        for group in queryset:
+            rows = validate_equivalence_group(group)
+            detail = "; ".join(
+                f"{row['blueprint'].name}: "
+                f"{'READY' if row['ready'] else 'THIẾU - ' + ', '.join(row['errors'])}"
+                f"{' (Cảnh báo: ' + ', '.join(row['warnings']) + ')' if row['warnings'] else ''}"
+                for row in rows
+            )
+            level = messages.SUCCESS if rows and all(row["ready"] for row in rows) else messages.ERROR
+            self.message_user(request, f"{group.name}: {detail}", level)
 
 
 class EquivalentBlueprintInline(admin.TabularInline):
@@ -329,7 +451,11 @@ class ExamSessionAdminForm(forms.ModelForm):
 
     class Meta:
         model = ExamSession
-        exclude = ("blueprint_version", "scoring_version")
+        fields = (
+            "name", "blueprint_group", "blueprint", "opens_at", "closes_at",
+            "duration_minutes", "max_attempts", "access_mode", "access_groups", "access_grades",
+            "score_release_mode", "score_release_at", "answer_release_mode", "answer_release_at",
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -340,7 +466,16 @@ class ExamSessionAdminForm(forms.ModelForm):
         cleaned = super().clean()
         blueprint = cleaned.get("blueprint")
         group = cleaned.get("blueprint_group")
+        if self.instance._state.adding and cleaned.get("name"):
+            base = slugify(cleaned["name"]) or "ky-thi"
+            slug = base
+            suffix = 2
+            while ExamSession.objects.filter(slug=slug).exists():
+                slug = f"{base}-{suffix}"
+                suffix += 1
+            self.instance.slug = slug
         if group:
+            self.instance.exam_type = group.exam_type
             rows = validate_equivalence_group(group)
             ready = [row for row in rows if row["ready"]]
             if not ready:
@@ -350,6 +485,7 @@ class ExamSessionAdminForm(forms.ModelForm):
                 self.instance.blueprint_version = blueprint_version
                 self.instance.scoring_version = scoring_version
         elif blueprint:
+            self.instance.exam_type = blueprint.exam_type
             try:
                 blueprint_version, scoring_version = resolve_locked_configuration(blueprint)
             except ValidationError as exc:

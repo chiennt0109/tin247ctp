@@ -1,5 +1,6 @@
 from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -11,6 +12,7 @@ from assessment.models import (
     ScoringScheme, ScoringSchemeVersion,
 )
 from assessment.services.start_attempt import StartAttemptError, start_attempt
+from assessment.admin import BlueprintGroupForm
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -20,8 +22,7 @@ class EquivalentBlueprintAttemptTests(TestCase):
     def setUp(self):
         ExamGenerationTests.setUp(self)
         self.group = ExamBlueprintGroup.objects.create(name="Tốt nghiệp tương đương", code="tn-equivalent")
-        self.blueprint_version.blueprint.equivalence_group = self.group
-        self.blueprint_version.blueprint.save(update_fields=("equivalence_group",))
+        self.group.blueprints.add(self.blueprint_version.blueprint)
         self.blueprint_version.is_locked = True
         self.blueprint_version.save(update_fields=("is_locked",))
         self.scoring_version.is_locked = True
@@ -41,8 +42,8 @@ class EquivalentBlueprintAttemptTests(TestCase):
     def _second_blueprint(self):
         blueprint = ExamBlueprint.objects.create(
             name="BP tương đương 2", exam_type="GRADUATION", grade=12,
-            equivalence_group=self.group,
         )
+        self.group.blueprints.add(blueprint)
         version = BlueprintVersion.objects.create(
             blueprint=blueprint, version=1, duration_minutes=50,
             expected_question_count=2, expected_total_score=Decimal("0.500"), is_locked=True,
@@ -65,12 +66,32 @@ class EquivalentBlueprintAttemptTests(TestCase):
 
     def test_multiple_ready_blueprints_select_one_and_attempt_records_it(self):
         user = get_user_model().objects.create_user("equivalent-student")
-        attempt = start_attempt(user, self.session)
+        with patch(
+            "assessment.services.start_attempt.secrets.choice",
+            side_effect=lambda candidates: candidates[-1],
+        ) as choice:
+            attempt = start_attempt(user, self.session)
+        choice.assert_called_once()
         self.assertIn(attempt.blueprint_id, {
             self.blueprint_version.blueprint_id, self.second_version.blueprint_id,
         })
         self.assertEqual(attempt.blueprint_version_id, attempt.generated_exam.blueprint_version_id)
         self.assertEqual(attempt.blueprint_id, attempt.blueprint_version.blueprint_id)
+
+    def test_group_form_lists_all_blueprints_and_accepts_shortage(self):
+        self.second_version.sections.first().slots.update(quantity=20)
+        form = BlueprintGroupForm(data={
+            "name": "Nhóm thủ công", "code": "manual-group", "exam_type": "GRADUATION",
+            "is_active": True, "selection_policy": "RANDOM_READY",
+            "cognitive_tolerance": "0.100", "duration_tolerance_minutes": 0,
+            "blueprints": [
+                self.blueprint_version.blueprint_id, self.second_version.blueprint_id,
+            ],
+        })
+        self.assertEqual(form.fields["blueprints"].queryset.count(), 2)
+        self.assertTrue(form.is_valid(), form.errors)
+        group = form.save()
+        self.assertEqual(group.blueprints.count(), 2)
 
     def test_blueprint_with_shortage_is_not_selected(self):
         self.second_version.sections.first().slots.update(quantity=20)
@@ -89,7 +110,7 @@ class EquivalentBlueprintAttemptTests(TestCase):
     def test_no_ready_blueprint_rolls_back_cleanly(self):
         BankQuestion.objects.update(is_available=False)
         user = get_user_model().objects.create_user("no-ready")
-        with self.assertRaisesMessage(StartAttemptError, "không có ma trận READY + LOCKED"):
+        with self.assertRaisesMessage(StartAttemptError, "Chưa có ma trận đủ nguồn câu để sinh đề"):
             start_attempt(user, self.session)
         self.assertFalse(ExamAttempt.objects.exists())
         self.assertFalse(GeneratedExam.objects.exists())

@@ -3,6 +3,7 @@ from decimal import Decimal
 import json
 
 from django.db import transaction
+from django.utils.text import slugify
 
 from assessment.models import (
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
@@ -54,10 +55,19 @@ class MasterConfigurationSync:
                 continue
             source_id = str(source["BLUEPRINT_ID"])
             group = None
-            group_code = str(source.get("EQUIVALENCE_GROUP") or "").strip()
+            group_code = str(
+                source.get("EQUIVALENCE_GROUP")
+                or source.get("BLUEPRINT_GROUP")
+                or source.get("GROUP_CODE")
+                or ""
+            ).strip()
             if group_code:
                 group, _ = ExamBlueprintGroup.objects.get_or_create(
-                    code=group_code, defaults={"name": group_code},
+                    code=slugify(group_code) or group_code,
+                    defaults={
+                        "name": group_code,
+                        "exam_type": str(source.get("EXAM_TYPE") or "GRADUATION"),
+                    },
                 )
             blueprint, was_created = ExamBlueprint.objects.update_or_create(
                 source_blueprint_id=source_id,
@@ -66,7 +76,6 @@ class MasterConfigurationSync:
                     "exam_type": str(source["EXAM_TYPE"]), "grade": int(source["GRADE"]),
                     "subject": str(source.get("SUBJECT") or "Tin học"),
                     "semester": str(source.get("SEMESTER") or ""),
-                    "equivalence_group": group,
                     "total_questions": int(source["TOTAL_QUESTIONS"]),
                     "total_score": Decimal(str(source["TOTAL_SCORE"])),
                     "duration_minutes": int(source["DURATION_MIN"]),
@@ -74,6 +83,8 @@ class MasterConfigurationSync:
                     "created_by": actor,
                 },
             )
+            if group:
+                group.blueprints.add(blueprint)
             version_number = int(source.get("VERSION") or 1)
             version, version_created = BlueprintVersion.objects.get_or_create(
                 blueprint=blueprint, version=version_number,

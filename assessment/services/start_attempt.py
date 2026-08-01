@@ -107,9 +107,10 @@ def start_attempt(user, exam_session):
                     )
                     if not ready:
                         raise StartAttemptError(
-                            f"Nhóm ma trận '{session.blueprint_group}' không có ma trận READY + LOCKED."
+                            "Chưa có ma trận đủ nguồn câu để sinh đề. "
+                            f"Nhóm '{session.blueprint_group}' không có ma trận active + READY + LOCKED."
                         )
-                    blueprint = random.Random(seed).choice(ready)
+                    blueprint = secrets.choice(ready)
                     blueprint_version, scoring_version = resolve_locked_configuration(blueprint)
                 validation = BlueprintValidator().validate(
                     blueprint_version, scoring_version=scoring_version
