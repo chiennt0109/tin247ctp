@@ -93,6 +93,10 @@ def attempt_detail(request, attempt_id):
     if attempt.status != ExamAttempt.Status.IN_PROGRESS:
         messages.info(request, "Bài làm này đã kết thúc.")
         return redirect("assessment:exam_list")
+    if attempt.session.status != ExamSession.Status.OPEN:
+        submit_attempt(attempt_id=attempt.pk, user=attempt.user)
+        messages.info(request, "Kỳ kiểm tra đã đóng; bài làm đã được tự động nộp.")
+        return redirect("assessment:exam_list")
     if timezone.now() >= attempt.expires_at:
         submit_attempt(attempt_id=attempt.pk, user=attempt.user)
         messages.info(request, "Bài làm đã hết giờ và được tự động nộp.")

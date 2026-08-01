@@ -11,6 +11,7 @@ from assessment.models import ExamAccessGrant, ExamAttempt, ExamSession, Generat
 from assessment.services.exam_generator import ExamGenerationError
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.scoring_versioning import lock_scoring_version
+from assessment.services.admin_workflow import close_exam_session
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -41,6 +42,22 @@ class StartAttemptTests(TestCase):
         self.assertEqual(ExamAttempt.objects.count(), 1)
         self.assertEqual(GeneratedExam.objects.count(), 1)
         self.assertEqual(first.generated_exam.questions.count(), 2)
+
+    def test_closed_session_rejects_existing_and_new_attempts(self):
+        user = get_user_model().objects.create_user("closed-session-user")
+        other = get_user_model().objects.create_user("closed-session-other")
+        session = self.open_session()
+        attempt = start_attempt(user, session)
+
+        close_exam_session(session)
+        attempt.refresh_from_db()
+        self.assertLessEqual(attempt.expires_at, timezone.now())
+        with self.assertRaisesMessage(StartAttemptError, "đã đóng"):
+            start_attempt(user, session)
+        with self.assertRaisesMessage(StartAttemptError, "đã đóng"):
+            start_attempt(other, session)
+        self.assertEqual(ExamAttempt.objects.count(), 1)
+        self.assertEqual(GeneratedExam.objects.count(), 1)
 
     def test_scheduled_session_transitions_to_open_at_start_time(self):
         user = get_user_model().objects.create_user("scheduled-student")

@@ -1,11 +1,16 @@
 from datetime import timedelta
+from types import SimpleNamespace
+from unittest.mock import Mock
 
+from django.contrib import admin
 from django.core.management import call_command
+from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
-from assessment.admin import ExamSessionAdminForm
-from assessment.models import BankQuestion, ExamSession
+from assessment.admin import ExamSessionAdmin, ExamSessionAdminForm
+from assessment.models import BankQuestion, ExamAccessGrant, ExamSession
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.demo_cleanup import AssessmentDemoCleanup
 from assessment.services.session_configuration import resolve_locked_configuration
@@ -53,6 +58,20 @@ class AssessmentAdminWorkflowTests(TestCase):
         closed = close_exam_session(opened)
         self.assertEqual(closed.status, ExamSession.Status.CLOSED)
 
+    def test_closed_session_admin_change_page_does_not_require_writable_max_attempts(self):
+        session = self.create_session("closed-admin-form")
+        session.status = ExamSession.Status.CLOSED
+        session.save(update_fields=("status",))
+        administrator = get_user_model().objects.create_superuser(
+            "workflow-admin", "workflow@example.com", "test",
+        )
+        self.client.force_login(administrator)
+
+        response = self.client.get(reverse("admin:assessment_examsession_change", args=(session.pk,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, session.name)
+
     def test_admin_form_selects_blueprint_instead_of_internal_versions(self):
         now = timezone.now()
         form = ExamSessionAdminForm(data={
@@ -67,6 +86,43 @@ class AssessmentAdminWorkflowTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.instance.blueprint_version, self.blueprint_version)
         self.assertEqual(form.instance.scoring_version, self.scoring_version)
+
+    def test_saving_private_grant_automatically_activates_grant_access_mode(self):
+        session = self.create_session("private-grant-mode")
+        user = get_user_model().objects.create_user("private-grant-user")
+        ExamAccessGrant.objects.create(
+            session=session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+        )
+        model_admin = ExamSessionAdmin(ExamSession, admin.site)
+        formset = SimpleNamespace(model=ExamAccessGrant, save=Mock())
+
+        model_admin.save_formset(None, SimpleNamespace(instance=session), formset, True)
+
+        session.refresh_from_db()
+        self.assertEqual(session.access_mode, ExamSession.AccessMode.ACCESS_GRANTS)
+        formset.save.assert_called_once_with()
+
+    def test_admin_action_deletes_empty_session_but_preserves_used_session_history(self):
+        empty = self.create_session("empty-delete")
+        used = self.create_session("used-cancel")
+        # A generated exam is historical data and must turn delete into cancel.
+        used.generated_exams.create(
+            code="history", seed="history", blueprint_version=self.blueprint_version,
+            scoring_version=self.scoring_version, total_score=10,
+            validation_report={}, exam_hash="history", is_locked=True,
+        )
+        model_admin = ExamSessionAdmin(ExamSession, admin.site)
+        model_admin.message_user = Mock()
+
+        model_admin.delete_empty_or_cancel_sessions(
+            None, ExamSession.objects.filter(pk__in=(empty.pk, used.pk)),
+        )
+
+        self.assertFalse(ExamSession.objects.filter(pk=empty.pk).exists())
+        used.refresh_from_db()
+        self.assertEqual(used.status, ExamSession.Status.CANCELLED)
+        self.assertTrue(used.generated_exams.filter(code="history").exists())
 
     def test_diagnostic_names_slot_counts_and_exclusion_conditions(self):
         BankQuestion.objects.update(process_status="READY_FOR_PERIODIC")

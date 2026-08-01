@@ -62,6 +62,18 @@ def start_attempt(user, exam_session):
                     "blueprint_version", "scoring_version"
                 ).get(pk=exam_session.pk)
                 now = timezone.now()
+                if (
+                    session.status == ExamSession.Status.SCHEDULED
+                    and session.opens_at <= now < session.closes_at
+                ):
+                    session.status = ExamSession.Status.OPEN
+                    session.save(update_fields=("status", "updated_at"))
+                if session.status != ExamSession.Status.OPEN:
+                    raise StartAttemptError("Kỳ kiểm tra chưa mở hoặc đã đóng.")
+                opens_at = session.opens_at
+                closes_at = session.closes_at
+                if now < opens_at or now >= closes_at:
+                    raise StartAttemptError("Ngoài thời gian làm bài.")
                 access = resolve_exam_access(
                     user, session, now, user_grade=_user_grade(user),
                 )
@@ -79,19 +91,6 @@ def start_attempt(user, exam_session):
                     if existing.generated_exam_id is None:
                         raise StartAttemptError("Bài làm đang mở không có đề; quản trị viên cần kiểm tra.")
                     return existing
-
-                if (
-                    session.status == ExamSession.Status.SCHEDULED
-                    and session.opens_at <= now < session.closes_at
-                ):
-                    session.status = ExamSession.Status.OPEN
-                    session.save(update_fields=("status", "updated_at"))
-                if session.status != ExamSession.Status.OPEN:
-                    raise StartAttemptError("Kỳ kiểm tra chưa mở.")
-                opens_at = session.opens_at
-                closes_at = session.closes_at
-                if now < opens_at or now >= closes_at:
-                    raise StartAttemptError("Ngoài thời gian làm bài.")
 
                 used = ExamAttempt.objects.filter(user=user, session=session).exclude(
                     status=ExamAttempt.Status.INVALIDATED

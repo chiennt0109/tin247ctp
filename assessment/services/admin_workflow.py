@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from assessment.models import ExamBlueprint, ExamSession, ScoringSchemeVersion
+from assessment.models import ExamAttempt, ExamBlueprint, ExamSession, ScoringSchemeVersion
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.blueprint_versioning import lock_blueprint_version
 from assessment.services.equivalence import validate_equivalence_group
@@ -97,4 +97,5 @@ def close_exam_session(session):
     if session.status not in {ExamSession.Status.CANCELLED, ExamSession.Status.CLOSED}:
         session.status = ExamSession.Status.CLOSED
         session.save(update_fields=("status", "updated_at"))
+    session.attempts.filter(status=ExamAttempt.Status.IN_PROGRESS).update(expires_at=timezone.now())
     return session

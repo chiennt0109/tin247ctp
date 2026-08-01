@@ -407,15 +407,23 @@ class ExamSessionAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["max_attempts"].label = "Số lượt mặc định"
-        self.fields["max_attempts"].help_text = (
-            "Chỉ áp dụng cho các chế độ quyền cũ; chế độ cấp quyền riêng dùng từng dòng bên dưới."
-        )
+        max_attempts = self.fields.get("max_attempts")
+        if max_attempts is not None:
+            max_attempts.label = "Số lượt mặc định"
+            max_attempts.help_text = (
+                "Chỉ áp dụng cho các chế độ quyền cũ; chế độ cấp quyền riêng dùng từng dòng bên dưới."
+            )
         if not self.instance._state.adding and self.instance.blueprint_version_id:
-            self.fields["blueprint"].initial = self.instance.blueprint_version.blueprint_id
+            blueprint = self.fields.get("blueprint")
+            if blueprint is not None:
+                blueprint.initial = self.instance.blueprint_version.blueprint_id
+                if self.instance.status != ExamSession.Status.DRAFT:
+                    blueprint.disabled = True
 
     def clean(self):
         cleaned = super().clean()
+        if not self.instance._state.adding and self.instance.status != ExamSession.Status.DRAFT:
+            return cleaned
         blueprint = cleaned.get("blueprint")
         group = cleaned.get("blueprint_group")
         if self.instance._state.adding and cleaned.get("name"):
@@ -471,7 +479,25 @@ class ExamSessionAdmin(admin.ModelAdmin):
     list_select_related = ("blueprint_version", "scoring_version", "created_by")
     filter_horizontal = ("access_groups",)
     inlines = (ExamAccessGrantInline, ExamAttemptInline)
-    actions = ("check_generation_capacity", "open_sessions", "close_sessions")
+    actions = (
+        "check_generation_capacity", "open_sessions", "close_sessions",
+        "delete_empty_or_cancel_sessions",
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status != ExamSession.Status.DRAFT:
+            return tuple(
+                field for field in ExamSessionAdminForm.Meta.fields if field != "blueprint"
+            ) + ("status",)
+        return self.readonly_fields
+
+    def save_formset(self, request, form, formset, change):
+        formset.save()
+        if formset.model is ExamAccessGrant and form.instance.access_grants.filter(is_active=True).exists():
+            ExamSession.objects.filter(pk=form.instance.pk).update(
+                access_mode=ExamSession.AccessMode.ACCESS_GRANTS,
+            )
+            form.instance.access_mode = ExamSession.AccessMode.ACCESS_GRANTS
 
     @admin.action(description="Kiểm tra khả năng sinh đề")
     def check_generation_capacity(self, request, queryset):
@@ -503,8 +529,26 @@ class ExamSessionAdmin(admin.ModelAdmin):
             closed = close_exam_session(session)
             self.message_user(request, f"{closed.name}: Đã đóng.", messages.SUCCESS)
 
+    @admin.action(description="Xóa kỳ thi trống / hủy kỳ thi đã có bài làm")
+    def delete_empty_or_cancel_sessions(self, request, queryset):
+        deleted = cancelled = 0
+        for session in queryset:
+            if session.attempts.exists() or session.generated_exams.exists():
+                if session.status != ExamSession.Status.CANCELLED:
+                    session.status = ExamSession.Status.CANCELLED
+                    session.save(update_fields=("status", "updated_at"))
+                cancelled += 1
+            else:
+                session.delete()
+                deleted += 1
+        self.message_user(
+            request,
+            f"Đã xóa {deleted} kỳ thi trống; đã hủy {cancelled} kỳ thi có lịch sử bài làm.",
+            messages.SUCCESS,
+        )
+
     def has_change_permission(self, request, obj=None):
-        return not (obj and obj.status != ExamSession.Status.DRAFT) and super().has_change_permission(request, obj)
+        return super().has_change_permission(request, obj)
 
 
 class GeneratedExamQuestionInline(admin.TabularInline):
