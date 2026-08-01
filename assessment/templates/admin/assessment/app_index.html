@@ -1,0 +1,15 @@
+{% extends "admin/app_index.html" %}
+{% load i18n %}
+
+{% block content %}
+  {% if user.is_superuser %}
+    <p class="object-tools">
+      {% if request.GET.advanced == "1" %}
+        <a href="{% url 'admin:app_list' app_label='assessment' %}">Quản trị đơn giản</a>
+      {% else %}
+        <a href="{% url 'admin:app_list' app_label='assessment' %}?advanced=1">Nâng cao</a>
+      {% endif %}
+    </p>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

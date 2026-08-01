@@ -2,7 +2,9 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
-from assessment.models import AssessmentAuditLog, BlueprintSection, BlueprintSlot, BlueprintVersion
+from assessment.models import (
+    AssessmentAuditLog, BlueprintSection, BlueprintSlot, BlueprintVersion, ExamBlueprint,
+)
 from assessment.services.blueprint_validator import BlueprintValidator
 
 
@@ -56,6 +58,13 @@ def lock_blueprint_version(version, *, scoring_version=None, approver=None):
     version.approved_at = timezone.now()
     version.is_locked = True
     version.save(update_fields=("validation_report", "approved_by", "approved_at", "is_locked"))
+    ExamBlueprint.objects.filter(pk=version.blueprint_id).update(
+        total_questions=version.expected_question_count,
+        total_score=version.expected_total_score,
+        duration_minutes=version.duration_minutes,
+        is_locked=True,
+        is_ready=True,
+    )
     AssessmentAuditLog.objects.create(
         action="LOCK_BLUEPRINT_VERSION", actor=approver, object_type="BlueprintVersion",
         object_id=str(version.pk), details={"validation_report": report},

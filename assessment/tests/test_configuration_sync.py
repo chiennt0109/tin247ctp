@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 from django.test import TestCase
 
-from assessment.models import ExamBlueprint
+from assessment.models import ExamBlueprint, ExamBlueprintGroup
 from assessment.services.configuration_sync import MasterConfigurationSync
 
 
@@ -15,6 +15,7 @@ class MasterConfigurationSyncTests(TestCase):
                 "TOTAL_QUESTIONS": 1, "TOTAL_SCORE": "1", "DURATION_MIN": 15,
                 "VERSION": 1, "STATUS": "APPROVED", "SEMESTER": "1",
                 "POLICY_PROFILE_ID": "TX", "NOTE": "",
+                "EQUIVALENCE_GROUP": "TX-EQUIVALENT",
             } for grade in (10, 11, 12)],
             "BLUEPRINT_CELLS": [{
                 "BLUEPRINT_CELL_ID": f"CELL-{grade}", "BLUEPRINT_ID": f"TX-{grade}",
@@ -35,5 +36,6 @@ class MasterConfigurationSyncTests(TestCase):
         self.assertEqual(second["created"], 0)
         self.assertEqual(ExamBlueprint.objects.count(), 3)
         self.assertEqual(set(ExamBlueprint.objects.values_list("grade", flat=True)), {10, 11, 12})
-        self.assertFalse(ExamBlueprint.objects.filter(is_demo=True).exists())
+        self.assertEqual(ExamBlueprintGroup.objects.count(), 1)
+        self.assertEqual(ExamBlueprintGroup.objects.get().blueprints.count(), 3)
         self.assertFalse(ExamBlueprint.objects.filter(name__startswith="[DEMO]").exists())

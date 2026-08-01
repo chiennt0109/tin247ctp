@@ -25,5 +25,18 @@ bị từ chối. Attempt hết giờ được server chuyển `AUTO_SUBMITTED`;
 lưu. `ExamAttempt.data_version` tăng sau mỗi batch thành công; `submitted_at` lấy từ server.
 Migration `0008_attempt_answers_and_autosave` chỉ thêm bảng/field, không tác động ngân hàng.
 
-Phase tiếp theo sẽ bổ sung grading backend từ scoring snapshot, result release và RQ sweep cho
-attempt hết hạn không còn request từ trình duyệt.
+Grading backend và result release được mô tả riêng trong `docs/assessment_scoring.md`; tiến trình
+RQ có thể quét các attempt hết hạn không còn request từ trình duyệt.
+
+## Quyền và số lượt riêng — Giai đoạn 7
+
+Khi kỳ thi dùng chế độ **Cấp quyền theo người dùng / nhóm**, mỗi `ExamAccessGrant` chọn đúng
+một user hoặc một group. Grant có thể giới hạn theo số lượt, theo khoảng thời gian hiệu lực,
+hoặc đồng thời cả hai. Grant trực tiếp của user được ưu tiên hơn grant của group; nếu user thuộc
+nhiều group thì hệ thống dùng grant group đang có hiệu lực đầu tiên. Giới hạn này thay thế
+`ExamSession.max_attempts` cho user tương ứng.
+
+Backend kiểm tra grant trong cùng transaction trước khi sinh đề. Với grant theo thời gian,
+deadline của attempt là thời điểm sớm nhất giữa thời lượng bài, thời điểm đóng kỳ thi và thời
+điểm grant hết hiệu lực. Grant không hợp lệ/hết hạn hoặc hết lượt không tạo `GeneratedExam`,
+không tạo `ExamAttempt` và không tính lượt.
