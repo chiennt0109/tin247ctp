@@ -1,8 +1,12 @@
 from django.contrib.auth import get_user_model
+from django.contrib import admin
 from django.test import TestCase
 from django.urls import reverse
 
-from assessment.admin import ASSESSMENT_ADMIN_MENU, ASSESSMENT_PRIMARY_MODELS
+from assessment.admin import (
+    ASSESSMENT_ADMIN_MENU, ASSESSMENT_PRIMARY_MODELS, ExamBlueprintGroupAdmin,
+)
+from assessment.models import ExamBlueprintGroup
 
 
 class AssessmentAdminMenuTests(TestCase):
@@ -44,6 +48,11 @@ class AssessmentAdminMenuTests(TestCase):
         self.assertLess(labels.index("Kỳ kiểm tra"), labels.index("Bài làm và kết quả"))
         self.assertNotIn("Phiên bản ma trận", labels)
         self.assertNotIn("Đề đã sinh theo bài làm", labels)
+
+    def test_blueprint_group_has_exactly_the_canonical_admin_registration(self):
+        self.assertIsInstance(
+            admin.site._registry[ExamBlueprintGroup], ExamBlueprintGroupAdmin,
+        )
 
     def test_superuser_can_open_advanced_assessment_models(self):
         response = self.client.get(reverse("admin:app_list", args=("assessment",)) + "?advanced=1")

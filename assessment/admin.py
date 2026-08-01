@@ -287,7 +287,6 @@ class BlueprintGroupForm(forms.ModelForm):
         fields = "__all__"
 
 
-@admin.register(ExamBlueprintGroup)
 class ExamBlueprintGroupAdmin(admin.ModelAdmin):
     form = BlueprintGroupForm
     list_display = (
@@ -318,53 +317,12 @@ class ExamBlueprintGroupAdmin(admin.ModelAdmin):
             self.message_user(request, f"{group.name}: {detail}", level)
 
 
-class EquivalentBlueprintInline(admin.TabularInline):
-    model = ExamBlueprint
-    extra = 0
-    fields = (
-        "name", "total_questions", "total_score", "duration_minutes",
-        "coverage_display", "difficulty_profile", "is_locked", "is_ready",
-    )
-    readonly_fields = fields
-    can_delete = False
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    @admin.display(description="Coverage chủ đề/YCCD")
-    def coverage_display(self, obj):
-        version = obj.versions.filter(is_locked=True).order_by("-version").first()
-        if not version:
-            return "-"
-        pairs = set(version.sections.values_list("slots__curriculum_id", "slots__outcome_id"))
-        return len(pairs)
-
-
-@admin.register(ExamBlueprintGroup)
-class ExamBlueprintGroupAdmin(admin.ModelAdmin):
-    list_display = ("name", "code", "cognitive_tolerance", "ready_count", "blueprint_count")
-    inlines = (EquivalentBlueprintInline,)
-    actions = ("validate_groups",)
-
-    @admin.display(description="READY")
-    def ready_count(self, obj):
-        return obj.blueprints.filter(is_ready=True, is_locked=True).count()
-
-    @admin.display(description="Tổng ma trận")
-    def blueprint_count(self, obj):
-        return obj.blueprints.count()
-
-    @admin.action(description="Kiểm tra nhóm ma trận tương đương")
-    def validate_groups(self, request, queryset):
-        for group in queryset:
-            rows = validate_equivalence_group(group)
-            detail = "; ".join(
-                f"{row['blueprint'].name}: "
-                f"{'READY' if row['ready'] else 'THIẾU - ' + ', '.join(row['errors'])}"
-                for row in rows
-            )
-            level = messages.SUCCESS if rows and all(row["ready"] for row in rows) else messages.ERROR
-            self.message_user(request, f"{group.name}: {detail}", level)
+# Some production deployments loaded an earlier technical registration for
+# this model before assessment.admin. Replace that registration explicitly so
+# admin autodiscovery remains safe and there is exactly one group interface.
+if admin.site.is_registered(ExamBlueprintGroup):
+    admin.site.unregister(ExamBlueprintGroup)
+admin.site.register(ExamBlueprintGroup, ExamBlueprintGroupAdmin)
 
 
 class ScoringRuleInline(admin.TabularInline):
