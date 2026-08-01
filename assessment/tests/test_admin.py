@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.contrib import admin
 from django.test import TestCase
 from django.urls import reverse
+import py_compile
+from pathlib import Path
 
 from assessment.admin import (
     ASSESSMENT_ADMIN_MENU, ASSESSMENT_PRIMARY_MODELS, ExamBlueprintGroupAdmin,
@@ -53,6 +55,11 @@ class AssessmentAdminMenuTests(TestCase):
         self.assertIsInstance(
             admin.site._registry[ExamBlueprintGroup], ExamBlueprintGroupAdmin,
         )
+
+    def test_admin_modules_compile_before_django_autodiscovery(self):
+        app_dir = Path(__file__).resolve().parents[1]
+        py_compile.compile(str(app_dir / "admin.py"), doraise=True)
+        py_compile.compile(str(app_dir / "admin_blueprint_groups.py"), doraise=True)
 
     def test_superuser_can_open_advanced_assessment_models(self):
         response = self.client.get(reverse("admin:app_list", args=("assessment",)) + "?advanced=1")
