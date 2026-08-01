@@ -149,6 +149,23 @@ class StartAttemptTests(TestCase):
             attempt.status = ExamAttempt.Status.SUBMITTED
             attempt.save(update_fields=("status",))
 
+    def test_private_grant_overrides_legacy_session_attempt_limit_without_mode_change(self):
+        user = get_user_model().objects.create_user("grant-overrides-default")
+        session = self.open_session()
+        self.assertEqual(session.max_attempts, 1)
+        self.assertEqual(session.access_mode, ExamSession.AccessMode.ALL_USERS)
+        ExamAccessGrant.objects.create(
+            session=session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+        )
+
+        first = start_attempt(user, session)
+        first.status = ExamAttempt.Status.SUBMITTED
+        first.save(update_fields=("status",))
+        second = start_attempt(user, session)
+
+        self.assertEqual(second.attempt_number, 2)
+
     def test_group_time_grant_controls_access_and_attempt_deadline(self):
         user = get_user_model().objects.create_user("timed-group-user")
         group = Group.objects.create(name="Timed candidates")

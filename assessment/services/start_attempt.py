@@ -54,6 +54,29 @@ def _generation_identity(session, user, attempt_number):
     return seed, f"U{user.pk}-A{attempt_number}"
 
 
+def _group_configuration(session, user):
+    rows = validate_equivalence_group(session.blueprint_group)
+    candidates = [row for row in rows if row["ready"] and row["version"] is not None]
+    if not candidates:
+        raise StartAttemptError(
+            "Chưa có ma trận đủ nguồn câu để sinh đề. "
+            f"Nhóm '{session.blueprint_group}' không có ma trận READY + LOCKED."
+        )
+
+    # Do not repeat a matrix for the same student until every currently-ready
+    # matrix in the group has been used. Selection inside each cycle remains
+    # cryptographically random and is independent for every user.
+    used_blueprints = set(
+        ExamAttempt.objects.filter(user=user, session=session)
+        .exclude(status=ExamAttempt.Status.INVALIDATED)
+        .values_list("blueprint_id", flat=True)
+    )
+    unused = [row for row in candidates if row["blueprint"].pk not in used_blueprints]
+    selected = secrets.choice(unused or candidates)
+    blueprint_version, scoring_version = resolve_locked_configuration(selected["blueprint"])
+    return blueprint_version, scoring_version
+
+
 def start_attempt(user, exam_session):
     with _start_lock(exam_session.pk, user.pk):
         try:
@@ -108,18 +131,7 @@ def start_attempt(user, exam_session):
                 blueprint_version = session.blueprint_version
                 scoring_version = session.scoring_version
                 if session.blueprint_group_id:
-                    validate_equivalence_group(session.blueprint_group)
-                    ready = list(
-                        session.blueprint_group.blueprints.filter(is_locked=True, is_ready=True)
-                        .order_by("pk")
-                    )
-                    if not ready:
-                        raise StartAttemptError(
-                            "Chưa có ma trận đủ nguồn câu để sinh đề. "
-                            f"Nhóm '{session.blueprint_group}' không có ma trận active + READY + LOCKED."
-                        )
-                    blueprint = secrets.choice(ready)
-                    blueprint_version, scoring_version = resolve_locked_configuration(blueprint)
+                    blueprint_version, scoring_version = _group_configuration(session, user)
                 validation = BlueprintValidator().validate(
                     blueprint_version, scoring_version=scoring_version
                 )

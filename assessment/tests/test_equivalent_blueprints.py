@@ -78,6 +78,17 @@ class EquivalentBlueprintAttemptTests(TestCase):
         self.assertEqual(attempt.blueprint_version_id, attempt.generated_exam.blueprint_version_id)
         self.assertEqual(attempt.blueprint_id, attempt.blueprint_version.blueprint_id)
 
+    def test_later_attempt_uses_an_unused_ready_blueprint_before_repeating(self):
+        user = get_user_model().objects.create_user("equivalent-retry")
+        first = start_attempt(user, self.session)
+        first.status = ExamAttempt.Status.SUBMITTED
+        first.save(update_fields=("status",))
+
+        second = start_attempt(user, self.session)
+
+        self.assertNotEqual(first.blueprint_id, second.blueprint_id)
+        self.assertEqual(second.blueprint_version_id, second.generated_exam.blueprint_version_id)
+
     def test_group_form_lists_all_blueprints_and_accepts_shortage(self):
         self.second_version.sections.first().slots.update(quantity=20)
         form = BlueprintGroupForm(data={

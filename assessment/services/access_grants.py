@@ -33,21 +33,26 @@ def _grant_access(grant, now):
 
 def resolve_exam_access(user, session, now, user_grade=None):
     """Resolve access once; a user grant intentionally overrides group grants."""
+    # A specifically configured grant is an override, regardless of the legacy
+    # session-wide access mode. This keeps existing sessions working when an
+    # administrator adds a private entitlement after the session was opened.
+    grants = ExamAccessGrant.objects.filter(session=session, is_active=True)
+    direct = grants.filter(user=user).first()
+    if direct:
+        return _grant_access(direct, now)
+    group_grants = grants.filter(
+        group__in=user.groups.all(), user__isnull=True,
+    ).order_by("pk")
+    denied = None
+    for group_grant in group_grants:
+        resolved = _grant_access(group_grant, now)
+        if resolved.allowed:
+            return resolved
+        denied = resolved
+    if denied:
+        return denied
     if session.access_mode == ExamSession.AccessMode.ACCESS_GRANTS:
-        grants = ExamAccessGrant.objects.filter(session=session, is_active=True)
-        direct = grants.filter(user=user).first()
-        if direct:
-            return _grant_access(direct, now)
-        group_grants = grants.filter(
-            group__in=user.groups.all(), user__isnull=True,
-        ).order_by("pk")
-        denied = None
-        for group_grant in group_grants:
-            resolved = _grant_access(group_grant, now)
-            if resolved.allowed:
-                return resolved
-            denied = resolved
-        return denied or _grant_access(None, now)
+        return _grant_access(None, now)
     if session.access_mode == ExamSession.AccessMode.ALL_USERS:
         return EffectiveExamAccess(True, max_attempts=session.max_attempts)
     if session.access_mode == ExamSession.AccessMode.SELECTED_GROUPS:
