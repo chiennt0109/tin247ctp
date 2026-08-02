@@ -29,6 +29,16 @@ class BankSyncServiceTests(TestCase):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
         self.assertEqual(BankQuestionRevision.objects.filter(question=question).count(), 1)
 
+    def test_existing_database_rows_are_unchanged_not_duplicate_source_keys(self):
+        BankSyncService().apply(WorkbookBankImporter().parse(self.path))
+
+        parsed = WorkbookBankImporter().parse(self.path)
+        report = BankSyncService().preview(parsed)
+
+        self.assertEqual(report["unchanged"], 1)
+        self.assertEqual(report.get("new", 0), 0)
+        self.assertFalse(any(error["code"] == "DUPLICATE_KEY" for error in report["errors"]))
+
     def test_apply_uses_the_integer_normalized_by_dry_run_pipeline(self):
         numeric_string_path = WorkbookFactory.create(estimated_time="135")
         self.addCleanup(numeric_string_path.unlink)
