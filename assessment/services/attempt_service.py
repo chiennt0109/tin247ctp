@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.utils import timezone
 
-from assessment.models import AttemptAnswer, ExamAttempt, GeneratedExamQuestion
+from assessment.models import AttemptAnswer, ExamAttempt, ExamSession, GeneratedExamQuestion
 
 
 class AttemptStateError(ValueError):
@@ -30,6 +30,8 @@ def save_answers(*, attempt_id, user, expected_version, answers):
     attempt = _owned_attempt(attempt_id, user)
     if attempt.status != ExamAttempt.Status.IN_PROGRESS:
         raise AttemptStateError("Bài làm không còn ở trạng thái có thể chỉnh sửa.")
+    if not ExamSession.objects.filter(pk=attempt.session_id, status=ExamSession.Status.OPEN).exists():
+        raise AttemptStateError("Kỳ kiểm tra đã đóng; không thể tiếp tục lưu bài.")
     if timezone.now() >= attempt.expires_at:
         attempt.status = ExamAttempt.Status.AUTO_SUBMITTED
         attempt.submitted_at = timezone.now()

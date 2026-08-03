@@ -13,6 +13,7 @@ from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
 from assessment.services.start_attempt import start_attempt
+from assessment.services.admin_workflow import close_exam_session
 from assessment.tests.test_start_attempt import StartAttemptTests
 
 
@@ -65,6 +66,12 @@ class AttemptServiceTests(TestCase):
         with self.assertRaises(AttemptStateError):
             save_answers(attempt_id=attempt.pk, user=user, expected_version=0, answers=[])
 
+    def test_closed_session_rejects_autosave(self):
+        user, attempt = self.create_attempt("closed-autosave")
+        close_exam_session(attempt.session)
+        with self.assertRaisesMessage(AttemptStateError, "đã đóng"):
+            save_answers(attempt_id=attempt.pk, user=user, expected_version=0, answers=[])
+
     def test_attempt_row_lock_does_not_join_nullable_generated_exam(self):
         user, attempt = self.create_attempt("postgres-lock")
 
@@ -113,6 +120,31 @@ class AttemptServiceTests(TestCase):
         self.assertNotIn("question_id_snapshot", body)
         self.assertIn("autoSubmitStarted", body)
         self.assertIn("if(submitting)return", body)
+
+    def test_attempt_page_separates_mcq_true_false_and_has_sticky_navigation(self):
+        user, attempt = self.create_attempt("sectioned-attempt")
+        questions = list(attempt.generated_exam.questions.select_related("bank_question").order_by("order"))
+        true_false = questions[-1]
+        true_false.bank_question.question_type = "TRUE_FALSE_GROUP"
+        true_false.bank_question.save(update_fields=("question_type",))
+        true_false.options_snapshot = []
+        true_false.statements_snapshot = [
+            {"label": "a", "text": "Nhận định A"},
+            {"label": "b", "text": "Nhận định B"},
+        ]
+        true_false.save(update_fields=("options_snapshot", "statements_snapshot"))
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Phần I — Trắc nghiệm nhiều phương án")
+        self.assertContains(response, "Phần II — Trắc nghiệm Đúng/Sai")
+        self.assertContains(response, 'class="card question-aside-inner"', html=False)
+        self.assertContains(response, "position:sticky;top:145px")
+        self.assertContains(response, ".question-aside{align-self:stretch}")
+        self.assertContains(response, f'href="#question-{questions[0].pk}"', html=False)
+        self.assertContains(response, f'href="#question-{true_false.pk}"', html=False)
 
     def test_expired_attempt_page_auto_submits_once_and_redirects(self):
         user, attempt = self.create_attempt("expired-page")

@@ -1,0 +1,32 @@
+{% with question=row.question saved=row.saved %}
+<article id="question-{{ question.pk }}" class="card question-card mb-3" data-question-id="{{ question.pk }}">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start gap-3">
+      <h3 class="h5 mb-0">Câu {{ question.order }}</h3>
+      <label class="small text-nowrap"><input class="review-flag" type="checkbox" {% if saved.flagged_for_review %}checked{% endif %}> Xem lại</label>
+    </div>
+    <div class="my-3">{{ question.stem_snapshot|linebreaks }}</div>
+    {% if question.options_snapshot %}
+      <div class="vstack gap-2">
+        {% for option in question.options_snapshot %}
+          <label class="answer-option border rounded p-2">
+            <input class="answer-control me-2" type="radio" name="q-{{ question.pk }}" value="{{ forloop.counter0 }}" {% if saved.answer.value == forloop.counter0 %}checked{% endif %}>
+            {{ option.text|default:option }}
+          </label>
+        {% endfor %}
+      </div>
+    {% elif question.statements_snapshot %}
+      <div class="vstack gap-2">
+        {% for statement in question.statements_snapshot %}
+          <label class="answer-option border rounded p-2">
+            <input class="answer-control me-2" type="checkbox" value="{{ forloop.counter0 }}">
+            {{ statement.text|default:statement }}
+          </label>
+        {% endfor %}
+      </div>
+    {% else %}
+      <label class="form-label w-100">Câu trả lời<input class="answer-control form-control mt-2" type="text" value="{{ saved.answer.value|default:'' }}" autocomplete="off"></label>
+    {% endif %}
+  </div>
+</article>
+{% endwith %}

@@ -85,8 +85,10 @@ class BankSyncService:
                 source_id=str(row["FILE_ID"]), defaults={
                     "name": str(row.get("FILE_NAME") or ""), "mime_type": str(row.get("MIME_TYPE") or ""),
                     "drive_url": str(row.get("DRIVE_URL") or ""), "folder_path": str(row.get("FOLDER_PATH") or ""),
+                    "source_group": str(row.get("SOURCE_GROUP") or ""),
+                    "note": str(row.get("NOTE") or ""),
                     "checksum": str(row.get("CHECKSUM") or ""), "source_status": str(row.get("FILE_STATUS") or ""),
-                    "source_metadata": {"source_group": row.get("SOURCE_GROUP"), "note": row.get("NOTE")},
+                    "source_metadata": {},
                 },
             )
             result[obj.source_id] = obj
