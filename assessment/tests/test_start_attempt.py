@@ -185,6 +185,9 @@ class StartAttemptTests(TestCase):
         self.assertContains(response, "Còn 1")
         self.assertContains(response, "Bắt đầu")
         self.assertNotContains(response, "Đã hết lượt")
+        self.assertContains(response, 'class="mt-3 start-exam-form"', html=False)
+        self.assertContains(response, 'data-duration="50"', html=False)
+        self.assertContains(response, "Đồng hồ sẽ bắt đầu ngay khi đề được tạo")
 
     def test_group_time_grant_controls_access_and_attempt_deadline(self):
         user = get_user_model().objects.create_user("timed-group-user")

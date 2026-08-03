@@ -142,6 +142,7 @@ class AttemptServiceTests(TestCase):
         self.assertContains(response, "Phần II — Trắc nghiệm Đúng/Sai")
         self.assertContains(response, 'class="card question-aside-inner"', html=False)
         self.assertContains(response, "position:sticky;top:145px")
+        self.assertContains(response, ".question-aside{align-self:stretch}")
         self.assertContains(response, f'href="#question-{questions[0].pk}"', html=False)
         self.assertContains(response, f'href="#question-{true_false.pk}"', html=False)
 

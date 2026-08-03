@@ -43,7 +43,7 @@
                 {% if card.active_attempt %}
                   <a class="btn btn-primary mt-3" href="{% url 'assessment:attempt_detail' card.active_attempt.pk %}">Tiếp tục</a>
                 {% elif card.can_start %}
-                  <form method="post" action="{% url 'assessment:start_exam' exam.slug %}" class="mt-3">
+                  <form method="post" action="{% url 'assessment:start_exam' exam.slug %}" class="mt-3 start-exam-form" data-duration="{{ exam.duration_minutes }}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Bắt đầu</button>
                   </form>
@@ -66,4 +66,27 @@
     </div>
   {% endif %}
 </section>
+<script>
+(() => {
+  document.querySelectorAll('.start-exam-form').forEach(form => {
+    let starting = false;
+    form.addEventListener('submit', event => {
+      if (starting) {
+        event.preventDefault();
+        return;
+      }
+      const minutes = form.dataset.duration;
+      const accepted = window.confirm(
+        `Thời gian làm bài là ${minutes} phút. Đồng hồ sẽ bắt đầu ngay khi đề được tạo. Bạn có muốn bắt đầu bây giờ?`
+      );
+      if (!accepted) {
+        event.preventDefault();
+        return;
+      }
+      starting = true;
+      form.querySelector('button[type="submit"]').disabled = true;
+    });
+  });
+})();
+</script>
 {% endblock %}
