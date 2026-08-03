@@ -9,7 +9,10 @@ from assessment.services.bank_importer import BankValidationError, WorkbookBankI
 
 
 REQUIRED_HEADERS = {
-    "FILES": ["FILE_ID", "FILE_NAME", "MIME_TYPE", "DRIVE_URL", "FOLDER_PATH", "CHECKSUM", "FILE_STATUS"],
+    "FILES": [
+        "FILE_ID", "FILE_NAME", "MIME_TYPE", "DRIVE_URL", "FOLDER_PATH",
+        "SOURCE_GROUP", "NOTE", "CHECKSUM", "FILE_STATUS",
+    ],
     "CURRICULUM": ["CURRICULUM_ID", "GRADE", "SUBJECT", "PROGRAM_VERSION", "TOPIC_CODE", "TOPIC_NAME", "ORDER_NO", "STATUS", "NOTE"],
     "CURRICULUM_OUTCOMES": ["OUTCOME_ID", "CURRICULUM_ID", "OUTCOME_CODE", "OUTCOME_TEXT", "LEVEL", "STATUS", "NOTE"],
     "QUESTIONS": ["QUESTION_ID", "QUESTION_CODE", "QUESTION_TYPE", "COGNITIVE_LEVEL", "STEM_TEXT", "ANSWER_KEY", "EXPLANATION_ID", "STATUS", "VERSION", "LANGUAGE", "CREATED_AT", "UPDATED_AT", "NOTE", "DIFFICULTY", "COMPETENCY", "ESTIMATED_TIME_SEC", "USE_PURPOSE", "SHUFFLE_ALLOWED", "FAMILY_ID", "PROCESS_STATUS", "CLASSIFICATION_BASIS"],
@@ -28,7 +31,8 @@ class WorkbookFactory:
     @staticmethod
     def create(
         *, missing_answer=False, duplicate_question=False, duplicate_source=False,
-        estimated_time=60, reorder_question_headers=False,
+        estimated_time=60, reorder_question_headers=False, source_group="", file_note="",
+        checksum="",
     ):
         workbook = Workbook()
         workbook.remove(workbook.active)
@@ -42,7 +46,10 @@ class WorkbookFactory:
                     actual_headers[purpose_index], actual_headers[estimated_index]
                 )
             sheet.append(actual_headers)
-        workbook["FILES"].append(["F1", "source.pdf", "application/pdf", "https://example.com/f", "/source", "", "PARSED"])
+        workbook["FILES"].append([
+            "F1", "source.pdf", "application/pdf", "https://example.com/f", "/source",
+            source_group, file_note, checksum, "PARSED",
+        ])
         workbook["CURRICULUM"].append(["C1", 12, "Tin học", "GDPT2018", "A", "Topic", 1, "REVIEW", ""])
         workbook["CURRICULUM_OUTCOMES"].append(["O1", "C1", "YCCD_01", "Outcome", "BIET", "REVIEW", ""])
         question = dict(zip(REQUIRED_HEADERS["QUESTIONS"], [
@@ -188,6 +195,18 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         self.assertFalse(parsed.errors)
         self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 75)
+
+    def test_dry_run_reports_remaining_char_field_overflow(self):
+        path = WorkbookFactory.create(checksum="x" * 129)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertIn({
+            "code": "FIELD_TOO_LONG", "sheet": "FILES", "row": 2,
+            "column": "CHECKSUM", "field": "checksum", "length": 129,
+            "max_length": 128,
+        }, parsed.errors)
 
     def test_estimated_time_blank_becomes_none(self):
         path = WorkbookFactory.create(estimated_time="")

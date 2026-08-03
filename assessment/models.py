@@ -48,6 +48,8 @@ class BankSourceFile(models.Model):
     mime_type = models.CharField(max_length=255, blank=True)
     drive_url = models.URLField(max_length=1000, blank=True)
     folder_path = models.TextField(blank=True)
+    source_group = models.TextField(blank=True)
+    note = models.TextField(blank=True)
     checksum = models.CharField(max_length=128, blank=True)
     source_status = models.CharField(max_length=32, blank=True)
     source_metadata = models.JSONField(default=dict, blank=True)

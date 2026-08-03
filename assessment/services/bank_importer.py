@@ -47,6 +47,15 @@ REQUIRED_SHEETS = {
     "SCORE_RULES", "BLUEPRINTS", "BLUEPRINT_CELLS", "BLUEPRINT_SLOTS", "QUY_UOC",
 }
 
+MODEL_FIELD_MAPPINGS = {
+    "FILES": {
+        "FILE_ID": "source_id", "FILE_NAME": "name", "MIME_TYPE": "mime_type",
+        "DRIVE_URL": "drive_url", "FOLDER_PATH": "folder_path",
+        "SOURCE_GROUP": "source_group", "NOTE": "note", "CHECKSUM": "checksum",
+        "FILE_STATUS": "source_status",
+    },
+}
+
 
 class BankValidationError(ValueError):
     pass
@@ -190,6 +199,7 @@ class WorkbookBankImporter:
         errors, warnings = [], []
         key_rows = self._validate_unique_keys(rows, errors)
         self._normalize_and_validate_types(rows, errors)
+        self._validate_model_field_lengths(rows, errors)
         questions = self._build_questions(rows, raw_rows, errors, warnings)
         return ParsedBank(
             source_path=source_path,
@@ -237,6 +247,30 @@ class WorkbookBankImporter:
                         "normalized_values": [by_row[row]["normalized"] for row in row_numbers],
                     })
         return indexes
+
+    @staticmethod
+    def _validate_model_field_lengths(rows, errors):
+        # Import lazily so the parser module remains usable by workbook-only
+        # tooling while Django is being initialized.
+        from assessment.models import BankSourceFile
+
+        models_by_sheet = {"FILES": BankSourceFile}
+        for sheet, mapping in MODEL_FIELD_MAPPINGS.items():
+            model = models_by_sheet[sheet]
+            for row in rows.get(sheet, ()):
+                for column, field_name in mapping.items():
+                    value = row.get(column)
+                    if value in (None, ""):
+                        continue
+                    field = model._meta.get_field(field_name)
+                    max_length = getattr(field, "max_length", None)
+                    if max_length is not None and len(str(value)) > max_length:
+                        errors.append({
+                            "code": "FIELD_TOO_LONG", "sheet": sheet,
+                            "row": row.get("__row__"), "column": column,
+                            "field": field_name, "length": len(str(value)),
+                            "max_length": max_length,
+                        })
 
     @staticmethod
     def _normalize_and_validate_types(rows, errors):
