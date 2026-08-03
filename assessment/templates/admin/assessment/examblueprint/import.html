@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block nav-breadcrumbs %}
+  <nav aria-label="Breadcrumbs"><div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Trang chủ</a> &rsaquo;
+    <a href="{% url 'admin:app_list' app_label='assessment' %}">Assessment</a> &rsaquo;
+    <a href="{% url 'admin:assessment_examblueprint_changelist' %}">Ma trận đề</a> &rsaquo; Import
+  </div></nav>
+{% endblock %}
+
+{% block content %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <div class="form-row">
+        <label class="required" for="id_workbook">Workbook master (.xlsx):</label>
+        <input id="id_workbook" type="file" name="workbook" accept=".xlsx" required>
+      </div>
+    </fieldset>
+    <div class="submit-row"><input type="submit" value="Import ma trận" class="default"></div>
+  </form>
+{% endblock %}

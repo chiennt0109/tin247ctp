@@ -1,14 +1,16 @@
 import hashlib
 import json
 import math
+import re
 import unicodedata
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 
 
 QUESTION_TYPES = {"MCQ_SINGLE", "TRUE_FALSE_GROUP", "SHORT_ANSWER", "ESSAY", "PRACTICAL"}
@@ -46,6 +48,16 @@ REQUIRED_SHEETS = {
     "QUESTION_CURRICULUM", "QUESTION_SOURCES", "DUPLICATES", "POLICY_PROFILES",
     "SCORE_RULES", "BLUEPRINTS", "BLUEPRINT_CELLS", "BLUEPRINT_SLOTS", "QUY_UOC",
 }
+
+MODEL_FIELD_MAPPINGS = {
+    "FILES": {
+        "FILE_ID": "source_id", "FILE_NAME": "name", "MIME_TYPE": "mime_type",
+        "DRIVE_URL": "drive_url", "FOLDER_PATH": "folder_path",
+        "SOURCE_GROUP": "source_group", "NOTE": "note", "CHECKSUM": "checksum",
+        "FILE_STATUS": "source_status",
+    },
+}
+FILES_NOTE_MARKERS = ("COMPLETED_SOURCE_DETAILS=",)
 
 
 class BankValidationError(ValueError):
@@ -130,6 +142,13 @@ def _normalize_header(value):
     return "_".join(normalized.split())
 
 
+def _normalize_source_key(value):
+    """Normalize a physical sheet key exactly once, without changing its case."""
+    if value is None:
+        return ""
+    return unicodedata.normalize("NFKC", str(value)).strip()
+
+
 def _sheet_rows(workbook, name):
     sheet = workbook[name]
     iterator = sheet.iter_rows(values_only=True)
@@ -139,11 +158,30 @@ def _sheet_rows(workbook, name):
         raise BankValidationError(f"Sheet {name} contains duplicate normalized headers")
     rows = []
     for row_number, values in enumerate(iterator, start=2):
-        record = {header: _canonical(value) for header, value in zip(headers, values) if header}
+        # Positional mapping is deliberate: never compact/filter None values,
+        # otherwise a blank CHECKSUM can shift NOTE into the checksum column.
+        row_values = list(values)
+        record = {
+            headers[index]: _canonical(row_values[index] if index < len(row_values) else None)
+            for index in range(len(headers))
+            if headers[index]
+        }
+        record["__cells__"] = {
+            headers[index]: f"{get_column_letter(index + 1)}{row_number}"
+            for index in range(len(headers)) if headers[index]
+        }
+        record["__header_indexes__"] = {
+            headers[index]: index + 1 for index in range(len(headers)) if headers[index]
+        }
         # Master rule: the first column is the unique key. Formatting/formula-only rows are ignored.
-        if not record.get(headers[0]):
+        raw_key = record.get(headers[0])
+        normalized_key = _normalize_source_key(raw_key)
+        if not normalized_key:
             continue
+        record[headers[0]] = normalized_key
         record["__row__"] = row_number
+        record["__key_raw__"] = str(raw_key)
+        record["__key_normalized__"] = normalized_key
         rows.append(record)
     return rows
 
@@ -156,6 +194,7 @@ class ParsedBank:
     questions: list
     errors: list
     warnings: list
+    key_rows: dict
 
     @property
     def has_fatal_errors(self):
@@ -175,8 +214,11 @@ class WorkbookBankImporter:
         rows = {name: _sheet_rows(cached, name) for name in cached.sheetnames}
         raw_rows = {name: _sheet_rows(raw, name) for name in ("QUESTIONS",)}
         errors, warnings = [], []
-        self._validate_unique_keys(rows, errors)
+        key_rows = self._validate_unique_keys(rows, errors)
         self._normalize_and_validate_types(rows, errors)
+        self._normalize_file_metadata(rows)
+        self._validate_model_field_lengths(rows, errors)
+        self._validate_file_checksums(rows, errors)
         questions = self._build_questions(rows, raw_rows, errors, warnings)
         return ParsedBank(
             source_path=source_path,
@@ -185,18 +227,114 @@ class WorkbookBankImporter:
             questions=questions,
             errors=errors,
             warnings=warnings,
+            key_rows=key_rows,
         )
 
     @staticmethod
     def _validate_unique_keys(rows, errors):
+        indexes = {}
         for sheet, records in rows.items():
             if not records:
+                indexes[sheet] = {}
                 continue
-            key = next(field for field in records[0] if field != "__row__")
-            counts = Counter(str(record.get(key)) for record in records)
-            for value, count in counts.items():
-                if count > 1:
-                    errors.append({"code": "DUPLICATE_KEY", "sheet": sheet, "key": value, "count": count})
+            key = next(field for field in records[0] if not field.startswith("__"))
+            occurrences = defaultdict(dict)
+            for record in records:
+                normalized = record.get("__key_normalized__", _normalize_source_key(record.get(key)))
+                row_number = record.get("__row__")
+                # Row number is the physical identity. If a downstream list is
+                # accidentally concatenated with itself, the same physical row
+                # must not become a duplicate.
+                occurrences[normalized].setdefault(row_number, {
+                    "raw": record.get("__key_raw__", record.get(key)),
+                    "normalized": normalized,
+                })
+            indexes[sheet] = {
+                normalized: sorted(by_row)
+                for normalized, by_row in occurrences.items()
+            }
+            for value, by_row in occurrences.items():
+                row_numbers = sorted(by_row)
+                if len(row_numbers) > 1:
+                    errors.append({
+                        "code": "DUPLICATE_KEY",
+                        "sheet": sheet,
+                        "key": value,
+                        "count": len(row_numbers),
+                        "row_numbers": row_numbers,
+                        "raw_values": [by_row[row]["raw"] for row in row_numbers],
+                        "normalized_values": [by_row[row]["normalized"] for row in row_numbers],
+                    })
+        return indexes
+
+    @staticmethod
+    def _validate_model_field_lengths(rows, errors):
+        # Import lazily so the parser module remains usable by workbook-only
+        # tooling while Django is being initialized.
+        from assessment.models import BankSourceFile
+
+        models_by_sheet = {"FILES": BankSourceFile}
+        for sheet, mapping in MODEL_FIELD_MAPPINGS.items():
+            model = models_by_sheet[sheet]
+            for row in rows.get(sheet, ()):
+                for column, field_name in mapping.items():
+                    value = row.get(column)
+                    if value in (None, ""):
+                        continue
+                    field = model._meta.get_field(field_name)
+                    max_length = getattr(field, "max_length", None)
+                    if max_length is not None and len(str(value)) > max_length:
+                        raw = str(value)
+                        errors.append({
+                            "code": "FIELD_TOO_LONG", "sheet": sheet,
+                            "row": row.get("__row__"), "column": column,
+                            "field": field_name, "length": len(str(value)),
+                            "max_length": max_length,
+                            "cell": row.get("__cells__", {}).get(column),
+                            "raw_value_preview": raw[:120],
+                            "header_index": row.get("__header_indexes__", {}).get(column),
+                            "model_field": field_name,
+                        })
+
+    @staticmethod
+    def _normalize_file_metadata(rows):
+        """Handle tagged metadata stored in the legacy CHECKSUM cell.
+
+        The canonical master has historical FILES rows where a clearly tagged
+        source-detail payload was written to CHECKSUM (for example
+        ``COMPLETED_SOURCE_DETAILS=...``) while NOTE is empty. This is not a
+        checksum and must be preserved losslessly as note metadata. Arbitrary
+        invalid checksum values are never moved and still fail validation.
+        """
+        for row in rows.get("FILES", ()):
+            checksum = row.get("CHECKSUM")
+            if checksum in (None, ""):
+                continue
+            raw = str(checksum)
+            if not raw.startswith(FILES_NOTE_MARKERS):
+                continue
+            note = str(row.get("NOTE") or "")
+            row["NOTE"] = f"{note}\n{raw}".strip() if note else raw
+            row["CHECKSUM"] = None
+
+    @staticmethod
+    def _validate_file_checksums(rows, errors):
+        checksum_pattern = re.compile(r"^(?:[0-9a-fA-F]{64}|SHA256:[0-9a-fA-F]{64})$")
+        for row in rows.get("FILES", ()):
+            value = row.get("CHECKSUM")
+            if value in (None, ""):
+                continue
+            raw = str(value)
+            if not checksum_pattern.fullmatch(raw):
+                errors.append({
+                    "code": "INVALID_CHECKSUM", "sheet": "FILES",
+                    "row": row.get("__row__"), "column": "CHECKSUM",
+                    "cell": row.get("__cells__", {}).get("CHECKSUM"),
+                    "raw_value_preview": raw[:120],
+                    "header_index": row.get("__header_indexes__", {}).get("CHECKSUM"),
+                    "model_field": "checksum",
+                    "allowed": ["blank", "64 hex characters", "SHA256: + 64 hex characters"],
+                })
 
     @staticmethod
     def _normalize_and_validate_types(rows, errors):
