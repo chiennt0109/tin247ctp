@@ -10,8 +10,9 @@ from assessment.services.bank_importer import BankValidationError, WorkbookBankI
 
 REQUIRED_HEADERS = {
     "FILES": [
-        "FILE_ID", "FILE_NAME", "MIME_TYPE", "DRIVE_URL", "FOLDER_PATH",
-        "SOURCE_GROUP", "NOTE", "CHECKSUM", "FILE_STATUS",
+        "FILE_ID", "FILE_NAME", "MIME_TYPE", "PARENT_FOLDER_ID", "FOLDER_PATH",
+        "DRIVE_URL", "SOURCE_GROUP", "FILE_STATUS", "CHECKSUM", "CREATED_AT",
+        "MODIFIED_AT", "INDEXED_AT", "NOTE",
     ],
     "CURRICULUM": ["CURRICULUM_ID", "GRADE", "SUBJECT", "PROGRAM_VERSION", "TOPIC_CODE", "TOPIC_NAME", "ORDER_NO", "STATUS", "NOTE"],
     "CURRICULUM_OUTCOMES": ["OUTCOME_ID", "CURRICULUM_ID", "OUTCOME_CODE", "OUTCOME_TEXT", "LEVEL", "STATUS", "NOTE"],
@@ -47,8 +48,8 @@ class WorkbookFactory:
                 )
             sheet.append(actual_headers)
         workbook["FILES"].append([
-            "F1", "source.pdf", "application/pdf", "https://example.com/f", "/source",
-            source_group, file_note, checksum, "PARSED",
+            "F1", "source.pdf", "application/pdf", "PARENT", "/source",
+            "https://example.com/f", source_group, "PARSED", checksum, "", "", "", file_note,
         ])
         workbook["CURRICULUM"].append(["C1", 12, "Tin học", "GDPT2018", "A", "Topic", 1, "REVIEW", ""])
         workbook["CURRICULUM_OUTCOMES"].append(["O1", "C1", "YCCD_01", "Outcome", "BIET", "REVIEW", ""])
@@ -210,8 +211,8 @@ class WorkbookBankImporterTests(SimpleTestCase):
         self.assertEqual(error["model_field"], "checksum")
         self.assertEqual(error["length"], 129)
         self.assertEqual(error["max_length"], 128)
-        self.assertEqual(error["cell"], "H2")
-        self.assertEqual(error["header_index"], 8)
+        self.assertEqual(error["cell"], "I2")
+        self.assertEqual(error["header_index"], 9)
         self.assertEqual(error["raw_value_preview"], "x" * 120)
 
     def test_blank_checksum_and_long_note_keep_their_physical_columns(self):
@@ -232,9 +233,10 @@ class WorkbookBankImporterTests(SimpleTestCase):
         workbook = load_workbook(path)
         sheet = workbook["FILES"]
         sheet["C2"] = None  # MIME_TYPE
-        sheet["D2"] = None  # DRIVE_URL
+        sheet["D2"] = None  # PARENT_FOLDER_ID
         sheet["E2"] = None  # FOLDER_PATH
-        sheet["H2"] = None  # CHECKSUM
+        sheet["F2"] = None  # DRIVE_URL
+        sheet["I2"] = None  # CHECKSUM
         workbook.save(path)
         self.addCleanup(path.unlink)
 
@@ -255,9 +257,21 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         error = next(error for error in parsed.errors if error["code"] == "INVALID_CHECKSUM")
 
-        self.assertEqual(error["cell"], "H2")
-        self.assertEqual(error["header_index"], 8)
+        self.assertEqual(error["cell"], "I2")
+        self.assertEqual(error["header_index"], 9)
         self.assertEqual(error["model_field"], "checksum")
+
+    def test_tagged_legacy_checksum_payload_is_preserved_as_note(self):
+        payload = "COMPLETED_SOURCE_DETAILS=" + "THANH_HOA," * 60
+        path = WorkbookFactory.create(checksum=payload)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+        source = parsed.rows["FILES"][0]
+
+        self.assertFalse(parsed.errors)
+        self.assertIsNone(source["CHECKSUM"])
+        self.assertEqual(source["NOTE"], payload)
 
     def test_estimated_time_blank_becomes_none(self):
         path = WorkbookFactory.create(estimated_time="")

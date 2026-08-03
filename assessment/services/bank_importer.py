@@ -57,6 +57,7 @@ MODEL_FIELD_MAPPINGS = {
         "FILE_STATUS": "source_status",
     },
 }
+FILES_NOTE_MARKERS = ("COMPLETED_SOURCE_DETAILS=",)
 
 
 class BankValidationError(ValueError):
@@ -215,6 +216,7 @@ class WorkbookBankImporter:
         errors, warnings = [], []
         key_rows = self._validate_unique_keys(rows, errors)
         self._normalize_and_validate_types(rows, errors)
+        self._normalize_file_metadata(rows)
         self._validate_model_field_lengths(rows, errors)
         self._validate_file_checksums(rows, errors)
         questions = self._build_questions(rows, raw_rows, errors, warnings)
@@ -293,6 +295,27 @@ class WorkbookBankImporter:
                             "header_index": row.get("__header_indexes__", {}).get(column),
                             "model_field": field_name,
                         })
+
+    @staticmethod
+    def _normalize_file_metadata(rows):
+        """Handle tagged metadata stored in the legacy CHECKSUM cell.
+
+        The canonical master has historical FILES rows where a clearly tagged
+        source-detail payload was written to CHECKSUM (for example
+        ``COMPLETED_SOURCE_DETAILS=...``) while NOTE is empty. This is not a
+        checksum and must be preserved losslessly as note metadata. Arbitrary
+        invalid checksum values are never moved and still fail validation.
+        """
+        for row in rows.get("FILES", ()):
+            checksum = row.get("CHECKSUM")
+            if checksum in (None, ""):
+                continue
+            raw = str(checksum)
+            if not raw.startswith(FILES_NOTE_MARKERS):
+                continue
+            note = str(row.get("NOTE") or "")
+            row["NOTE"] = f"{note}\n{raw}".strip() if note else raw
+            row["CHECKSUM"] = None
 
     @staticmethod
     def _validate_file_checksums(rows, errors):
