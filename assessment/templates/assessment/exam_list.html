@@ -31,7 +31,10 @@
                   <dt class="col-5">Thời lượng</dt>
                   <dd class="col-7">{{ exam.duration_minutes }} phút</dd>
                   <dt class="col-5">Số lần làm</dt>
-                  <dd class="col-7">Đã dùng {{ card.attempts_used }} · Còn {{ card.attempts_remaining }}</dd>
+                  <dd class="col-7">
+                    Đã dùng {{ card.attempts_used }} ·
+                    {% if card.attempts_remaining is None %}Không giới hạn{% else %}Còn {{ card.attempts_remaining }}{% endif %}
+                  </dd>
                   <dt class="col-5">Thời gian mở</dt>
                   <dd class="col-7">{{ exam.opens_at|date:"H:i d/m/Y" }}</dd>
                   <dt class="col-5">Thời gian đóng</dt>
@@ -39,7 +42,7 @@
                 </dl>
                 {% if card.active_attempt %}
                   <a class="btn btn-primary mt-3" href="{% url 'assessment:attempt_detail' card.active_attempt.pk %}">Tiếp tục</a>
-                {% elif card.attempts_remaining > 0 %}
+                {% elif card.can_start %}
                   <form method="post" action="{% url 'assessment:start_exam' exam.slug %}" class="mt-3">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Bắt đầu</button>
