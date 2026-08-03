@@ -1,5 +1,6 @@
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 from django.test import SimpleTestCase
 from openpyxl import Workbook, load_workbook
@@ -8,7 +9,10 @@ from assessment.services.bank_importer import BankValidationError, WorkbookBankI
 
 
 REQUIRED_HEADERS = {
-    "FILES": ["FILE_ID", "FILE_NAME", "MIME_TYPE", "DRIVE_URL", "FOLDER_PATH", "CHECKSUM", "FILE_STATUS"],
+    "FILES": [
+        "FILE_ID", "FILE_NAME", "MIME_TYPE", "DRIVE_URL", "FOLDER_PATH",
+        "SOURCE_GROUP", "NOTE", "CHECKSUM", "FILE_STATUS",
+    ],
     "CURRICULUM": ["CURRICULUM_ID", "GRADE", "SUBJECT", "PROGRAM_VERSION", "TOPIC_CODE", "TOPIC_NAME", "ORDER_NO", "STATUS", "NOTE"],
     "CURRICULUM_OUTCOMES": ["OUTCOME_ID", "CURRICULUM_ID", "OUTCOME_CODE", "OUTCOME_TEXT", "LEVEL", "STATUS", "NOTE"],
     "QUESTIONS": ["QUESTION_ID", "QUESTION_CODE", "QUESTION_TYPE", "COGNITIVE_LEVEL", "STEM_TEXT", "ANSWER_KEY", "EXPLANATION_ID", "STATUS", "VERSION", "LANGUAGE", "CREATED_AT", "UPDATED_AT", "NOTE", "DIFFICULTY", "COMPETENCY", "ESTIMATED_TIME_SEC", "USE_PURPOSE", "SHUFFLE_ALLOWED", "FAMILY_ID", "PROCESS_STATUS", "CLASSIFICATION_BASIS"],
@@ -27,7 +31,8 @@ class WorkbookFactory:
     @staticmethod
     def create(
         *, missing_answer=False, duplicate_question=False, duplicate_source=False,
-        estimated_time=60, reorder_question_headers=False,
+        estimated_time=60, reorder_question_headers=False, source_group="", file_note="",
+        checksum="",
     ):
         workbook = Workbook()
         workbook.remove(workbook.active)
@@ -41,7 +46,10 @@ class WorkbookFactory:
                     actual_headers[purpose_index], actual_headers[estimated_index]
                 )
             sheet.append(actual_headers)
-        workbook["FILES"].append(["F1", "source.pdf", "application/pdf", "https://example.com/f", "/source", "", "PARSED"])
+        workbook["FILES"].append([
+            "F1", "source.pdf", "application/pdf", "https://example.com/f", "/source",
+            source_group, file_note, checksum, "PARSED",
+        ])
         workbook["CURRICULUM"].append(["C1", 12, "Tin học", "GDPT2018", "A", "Topic", 1, "REVIEW", ""])
         workbook["CURRICULUM_OUTCOMES"].append(["O1", "C1", "YCCD_01", "Outcome", "BIET", "REVIEW", ""])
         question = dict(zip(REQUIRED_HEADERS["QUESTIONS"], [
@@ -89,6 +97,81 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         self.assertTrue(any(error["code"] == "DUPLICATE_KEY" for error in parsed.errors))
 
+    def test_single_outcome_physical_row_is_not_a_duplicate(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertEqual(parsed.key_rows["CURRICULUM_OUTCOMES"]["O1"], [2])
+        self.assertFalse(any(
+            error["code"] == "DUPLICATE_KEY" and error["sheet"] == "CURRICULUM_OUTCOMES"
+            for error in parsed.errors
+        ))
+
+    def test_duplicate_outcome_reports_distinct_physical_rows_and_values(self):
+        path = WorkbookFactory.create()
+        workbook = load_workbook(path)
+        workbook["CURRICULUM_OUTCOMES"].append(
+            ["Ｏ1 ", "C1", "YCCD_02", "Duplicate", "BIET", "REVIEW", ""],
+        )
+        workbook.save(path)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+        error = next(
+            error for error in parsed.errors
+            if error["code"] == "DUPLICATE_KEY" and error["sheet"] == "CURRICULUM_OUTCOMES"
+        )
+
+        self.assertEqual(error["key"], "O1")
+        self.assertEqual(error["count"], 2)
+        self.assertEqual(error["row_numbers"], [2, 3])
+        self.assertEqual(error["raw_values"], ["O1", "Ｏ1 "])
+        self.assertEqual(error["normalized_values"], ["O1", "O1"])
+
+    def test_same_physical_outcome_row_appended_twice_is_not_duplicate(self):
+        records = [{
+            "OUTCOME_ID": "O1", "__row__": 133,
+            "__key_raw__": "O1", "__key_normalized__": "O1",
+        }]
+        errors = []
+
+        indexes = WorkbookBankImporter._validate_unique_keys(
+            {"CURRICULUM_OUTCOMES": records + records}, errors,
+        )
+
+        self.assertEqual(indexes["CURRICULUM_OUTCOMES"]["O1"], [133])
+        self.assertEqual(errors, [])
+
+    def test_question_and_blueprint_references_do_not_duplicate_outcome(self):
+        path = WorkbookFactory.create()
+        workbook = load_workbook(path)
+        sheet = workbook["BLUEPRINT_CELLS"]
+        sheet.cell(row=1, column=2, value="OUTCOME_ID")
+        sheet.append(["BC1", "O1"])
+        workbook.save(path)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertEqual(parsed.key_rows["CURRICULUM_OUTCOMES"]["O1"], [2])
+        self.assertFalse(any(
+            error["code"] == "DUPLICATE_KEY" and error.get("key") == "O1"
+            for error in parsed.errors
+        ))
+
+    def test_curriculum_outcomes_worksheet_is_parsed_once(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        from assessment.services import bank_importer
+
+        with patch.object(bank_importer, "_sheet_rows", wraps=bank_importer._sheet_rows) as reader:
+            WorkbookBankImporter().parse(path)
+
+        outcome_calls = [call for call in reader.call_args_list if call.args[1] == "CURRICULUM_OUTCOMES"]
+        self.assertEqual(len(outcome_calls), 1)
+
     def test_rejects_missing_required_sheet(self):
         path = WorkbookFactory.create()
         workbook = load_workbook(path)
@@ -112,6 +195,18 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         self.assertFalse(parsed.errors)
         self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 75)
+
+    def test_dry_run_reports_remaining_char_field_overflow(self):
+        path = WorkbookFactory.create(checksum="x" * 129)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertIn({
+            "code": "FIELD_TOO_LONG", "sheet": "FILES", "row": 2,
+            "column": "CHECKSUM", "field": "checksum", "length": 129,
+            "max_length": 128,
+        }, parsed.errors)
 
     def test_estimated_time_blank_becomes_none(self):
         path = WorkbookFactory.create(estimated_time="")

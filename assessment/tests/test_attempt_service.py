@@ -13,6 +13,7 @@ from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
 from assessment.services.start_attempt import start_attempt
+from assessment.services.admin_workflow import close_exam_session
 from assessment.tests.test_start_attempt import StartAttemptTests
 
 
@@ -63,6 +64,12 @@ class AttemptServiceTests(TestCase):
         self.assertEqual(second.status, ExamAttempt.Status.GRADED)
         self.assertIsNotNone(second.submitted_at)
         with self.assertRaises(AttemptStateError):
+            save_answers(attempt_id=attempt.pk, user=user, expected_version=0, answers=[])
+
+    def test_closed_session_rejects_autosave(self):
+        user, attempt = self.create_attempt("closed-autosave")
+        close_exam_session(attempt.session)
+        with self.assertRaisesMessage(AttemptStateError, "đã đóng"):
             save_answers(attempt_id=attempt.pk, user=user, expected_version=0, answers=[])
 
     def test_attempt_row_lock_does_not_join_nullable_generated_exam(self):

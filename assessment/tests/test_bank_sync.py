@@ -1,8 +1,14 @@
+from io import StringIO
+
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from openpyxl import load_workbook
 
-from assessment.models import BankQuestion, BankQuestionRevision, QuestionAsset, QuestionSyncLog
+from assessment.models import (
+    BankQuestion, BankQuestionRevision, BankSourceFile, CurriculumNode,
+    QuestionAsset, QuestionSyncLog,
+)
 from assessment.services.bank_importer import WorkbookBankImporter
 from assessment.services.bank_sync import BankSyncService
 from assessment.tests.test_bank_importer import WorkbookFactory
@@ -29,6 +35,54 @@ class BankSyncServiceTests(TestCase):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
         self.assertEqual(BankQuestionRevision.objects.filter(question=question).count(), 1)
 
+    def test_existing_database_rows_are_unchanged_not_duplicate_source_keys(self):
+        BankSyncService().apply(WorkbookBankImporter().parse(self.path))
+
+        parsed = WorkbookBankImporter().parse(self.path)
+        report = BankSyncService().preview(parsed)
+
+        self.assertEqual(report["unchanged"], 1)
+        self.assertEqual(report.get("new", 0), 0)
+        self.assertFalse(any(error["code"] == "DUPLICATE_KEY" for error in report["errors"]))
+
+    def test_thirteen_new_questions_are_created_exactly_once(self):
+        workbook = load_workbook(self.path)
+        question_sheet = workbook["QUESTIONS"]
+        question_headers = [cell.value for cell in question_sheet[1]]
+        original_question = dict(zip(question_headers, next(question_sheet.iter_rows(min_row=2, values_only=True))))
+        for number in range(2, 14):
+            question_id = f"Q{number}"
+            question = dict(original_question)
+            question.update({
+                "QUESTION_ID": question_id, "QUESTION_CODE": question_id,
+                "FAMILY_ID": f"FAM{number}",
+            })
+            question_sheet.append([question.get(header) for header in question_headers])
+            for index, label in enumerate("ABCD", 1):
+                workbook["OPTIONS"].append([
+                    f"{question_id}-OP{index}", question_id, label, label,
+                    label == "A", index, "APPROVED",
+                ])
+            workbook["QUESTION_CURRICULUM"].append([
+                f"{question_id}-QC", question_id, "C1", "O1", 1, "APPROVED", "",
+            ])
+            workbook["QUESTION_SOURCES"].append([
+                f"{question_id}-QS", question_id, "F1", "1", "", "", "", "APPROVED",
+            ])
+        workbook.save(self.path)
+
+        first = WorkbookBankImporter().parse(self.path)
+        self.assertEqual(len(first.questions), 13)
+        BankSyncService().apply(first)
+        second = WorkbookBankImporter().parse(self.path)
+        second_report = BankSyncService().preview(second)
+        BankSyncService().apply(second)
+
+        self.assertEqual(BankQuestion.objects.count(), 13)
+        self.assertEqual(BankQuestionRevision.objects.count(), 13)
+        self.assertEqual(second_report["unchanged"], 13)
+        self.assertEqual(second_report.get("new", 0), 0)
+
     def test_apply_uses_the_integer_normalized_by_dry_run_pipeline(self):
         numeric_string_path = WorkbookFactory.create(estimated_time="135")
         self.addCleanup(numeric_string_path.unlink)
@@ -37,6 +91,33 @@ class BankSyncServiceTests(TestCase):
         self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 135)
         BankSyncService().apply(parsed)
         self.assertEqual(BankQuestion.objects.get().estimated_time_seconds, 135)
+
+    def test_long_file_source_group_and_note_are_preserved(self):
+        source_group = "Nhóm nguồn " + "g" * 450
+        note = "Ghi chú " + "n" * 1200
+        path = WorkbookFactory.create(source_group=source_group, file_note=note)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        BankSyncService().apply(parsed)
+
+        source = BankSourceFile.objects.get(source_id="F1")
+        self.assertEqual(source.source_group, source_group)
+        self.assertEqual(source.note, note)
+
+    def test_mid_sync_failure_rolls_back_files_curriculum_and_questions(self):
+        parsed = WorkbookBankImporter().parse(self.path)
+
+        from unittest.mock import patch
+        with patch.object(BankSyncService, "_sync_question", side_effect=RuntimeError("mid-sync")):
+            with self.assertRaisesMessage(ValueError, "mid-sync"):
+                BankSyncService().apply(parsed)
+
+        self.assertFalse(BankSourceFile.objects.exists())
+        self.assertFalse(CurriculumNode.objects.exists())
+        self.assertFalse(BankQuestion.objects.exists())
+        self.assertFalse(QuestionSyncLog.objects.exists())
 
     def test_changed_content_creates_revision_and_preserves_old_revision(self):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
@@ -82,3 +163,21 @@ class BankSyncServiceTests(TestCase):
         self.assertEqual(asset.source_page, "3")
         self.assertEqual(asset.source_section, "newest-section")
         self.assertEqual(QuestionAsset.objects.count(), 1)
+
+    @override_settings(QUESTION_BANK_SYNC_ENABLED=True)
+    def test_apply_validation_failure_reports_failed_and_writes_nothing(self):
+        invalid_path = WorkbookFactory.create(checksum="x" * 129)
+        self.addCleanup(invalid_path.unlink)
+        output = StringIO()
+
+        with self.assertRaises(CommandError):
+            call_command(
+                "sync_exam_bank", "--source", str(invalid_path), "--apply",
+                stdout=output, verbosity=0,
+            )
+
+        self.assertIn('"mode": "APPLY_VALIDATION"', output.getvalue())
+        self.assertIn('"mode": "APPLY_FAILED"', output.getvalue())
+        self.assertNotIn('"mode": "APPLY_SUCCESS"', output.getvalue())
+        self.assertFalse(BankSourceFile.objects.exists())
+        self.assertFalse(QuestionSyncLog.objects.exists())
