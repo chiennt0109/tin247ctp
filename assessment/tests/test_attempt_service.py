@@ -121,6 +121,30 @@ class AttemptServiceTests(TestCase):
         self.assertIn("autoSubmitStarted", body)
         self.assertIn("if(submitting)return", body)
 
+    def test_attempt_page_separates_mcq_true_false_and_has_sticky_navigation(self):
+        user, attempt = self.create_attempt("sectioned-attempt")
+        questions = list(attempt.generated_exam.questions.select_related("bank_question").order_by("order"))
+        true_false = questions[-1]
+        true_false.bank_question.question_type = "TRUE_FALSE_GROUP"
+        true_false.bank_question.save(update_fields=("question_type",))
+        true_false.options_snapshot = []
+        true_false.statements_snapshot = [
+            {"label": "a", "text": "Nhận định A"},
+            {"label": "b", "text": "Nhận định B"},
+        ]
+        true_false.save(update_fields=("options_snapshot", "statements_snapshot"))
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Phần I — Trắc nghiệm nhiều phương án")
+        self.assertContains(response, "Phần II — Trắc nghiệm Đúng/Sai")
+        self.assertContains(response, 'class="card question-aside-inner"', html=False)
+        self.assertContains(response, "position:sticky;top:145px")
+        self.assertContains(response, f'href="#question-{questions[0].pk}"', html=False)
+        self.assertContains(response, f'href="#question-{true_false.pk}"', html=False)
+
     def test_expired_attempt_page_auto_submits_once_and_redirects(self):
         user, attempt = self.create_attempt("expired-page")
         attempt.expires_at = timezone.now() - timedelta(seconds=1)

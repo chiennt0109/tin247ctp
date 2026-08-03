@@ -108,13 +108,23 @@ def attempt_detail(request, attempt_id):
         submit_attempt(attempt_id=attempt.pk, user=attempt.user)
         messages.info(request, "Bài làm đã hết giờ và được tự động nộp.")
         return redirect("assessment:exam_list")
-    questions = list(attempt.generated_exam.questions.only(
-        "order", "stem_snapshot", "options_snapshot", "statements_snapshot"
+    questions = list(attempt.generated_exam.questions.select_related("bank_question").only(
+        "order", "stem_snapshot", "options_snapshot", "statements_snapshot",
+        "bank_question__question_type",
     ).order_by("order"))
     saved = {answer.exam_question_id: answer for answer in attempt.answers.all()}
-    question_rows = [{"question": question, "saved": saved.get(question.pk)} for question in questions]
+    question_rows = [{
+        "question": question, "saved": saved.get(question.pk),
+        "question_type": question.bank_question.question_type,
+    } for question in questions]
+    mcq_rows = [row for row in question_rows if row["question_type"] == "MCQ_SINGLE"]
+    true_false_rows = [row for row in question_rows if row["question_type"] == "TRUE_FALSE_GROUP"]
+    other_rows = [row for row in question_rows if row["question_type"] not in {
+        "MCQ_SINGLE", "TRUE_FALSE_GROUP",
+    }]
     return render(request, "assessment/attempt.html", {
         "attempt": attempt, "question_rows": question_rows,
+        "mcq_rows": mcq_rows, "true_false_rows": true_false_rows, "other_rows": other_rows,
         "server_now_ms": int(timezone.now().timestamp() * 1000),
         "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
     })
