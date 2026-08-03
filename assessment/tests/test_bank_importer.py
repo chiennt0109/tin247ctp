@@ -202,11 +202,62 @@ class WorkbookBankImporterTests(SimpleTestCase):
 
         parsed = WorkbookBankImporter().parse(path)
 
-        self.assertIn({
-            "code": "FIELD_TOO_LONG", "sheet": "FILES", "row": 2,
-            "column": "CHECKSUM", "field": "checksum", "length": 129,
-            "max_length": 128,
-        }, parsed.errors)
+        error = next(error for error in parsed.errors if error["code"] == "FIELD_TOO_LONG")
+        self.assertEqual(error["sheet"], "FILES")
+        self.assertEqual(error["row"], 2)
+        self.assertEqual(error["column"], "CHECKSUM")
+        self.assertEqual(error["field"], "checksum")
+        self.assertEqual(error["model_field"], "checksum")
+        self.assertEqual(error["length"], 129)
+        self.assertEqual(error["max_length"], 128)
+        self.assertEqual(error["cell"], "H2")
+        self.assertEqual(error["header_index"], 8)
+        self.assertEqual(error["raw_value_preview"], "x" * 120)
+
+    def test_blank_checksum_and_long_note_keep_their_physical_columns(self):
+        note = "N" * 1000
+        path = WorkbookFactory.create(file_note=note, checksum="")
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+        source = parsed.rows["FILES"][0]
+
+        self.assertFalse(parsed.errors)
+        self.assertEqual(source["NOTE"], note)
+        self.assertIsNone(source["CHECKSUM"])
+        self.assertEqual(source["FILE_STATUS"], "PARSED")
+
+    def test_multiple_middle_blanks_do_not_shift_file_columns(self):
+        path = WorkbookFactory.create(source_group="group", file_note="note")
+        workbook = load_workbook(path)
+        sheet = workbook["FILES"]
+        sheet["C2"] = None  # MIME_TYPE
+        sheet["D2"] = None  # DRIVE_URL
+        sheet["E2"] = None  # FOLDER_PATH
+        sheet["H2"] = None  # CHECKSUM
+        workbook.save(path)
+        self.addCleanup(path.unlink)
+
+        source = WorkbookBankImporter().parse(path).rows["FILES"][0]
+
+        self.assertIsNone(source["MIME_TYPE"])
+        self.assertIsNone(source["DRIVE_URL"])
+        self.assertIsNone(source["FOLDER_PATH"])
+        self.assertEqual(source["SOURCE_GROUP"], "group")
+        self.assertEqual(source["NOTE"], "note")
+        self.assertIsNone(source["CHECKSUM"])
+        self.assertEqual(source["FILE_STATUS"], "PARSED")
+
+    def test_invalid_checksum_format_is_fatal(self):
+        path = WorkbookFactory.create(checksum="not-a-sha256")
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+        error = next(error for error in parsed.errors if error["code"] == "INVALID_CHECKSUM")
+
+        self.assertEqual(error["cell"], "H2")
+        self.assertEqual(error["header_index"], 8)
+        self.assertEqual(error["model_field"], "checksum")
 
     def test_estimated_time_blank_becomes_none(self):
         path = WorkbookFactory.create(estimated_time="")

@@ -106,6 +106,30 @@ class BankSyncServiceTests(TestCase):
         self.assertEqual(source.source_group, source_group)
         self.assertEqual(source.note, note)
 
+    def test_valid_checksum_is_saved_unchanged(self):
+        checksum = "SHA256:" + "a1" * 32
+        path = WorkbookFactory.create(checksum=checksum)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertFalse(parsed.errors)
+        BankSyncService().apply(parsed)
+
+        self.assertEqual(BankSourceFile.objects.get(source_id="F1").checksum, checksum)
+
+    def test_validation_error_prevents_all_apply_writes(self):
+        path = WorkbookFactory.create(checksum="invalid")
+        self.addCleanup(path.unlink)
+        parsed = WorkbookBankImporter().parse(path)
+        self.assertTrue(parsed.has_fatal_errors)
+
+        with self.assertRaises(ValueError):
+            BankSyncService().apply(parsed)
+
+        self.assertFalse(BankSourceFile.objects.exists())
+        self.assertFalse(CurriculumNode.objects.exists())
+        self.assertFalse(BankQuestion.objects.exists())
+
     def test_mid_sync_failure_rolls_back_files_curriculum_and_questions(self):
         parsed = WorkbookBankImporter().parse(self.path)
 
