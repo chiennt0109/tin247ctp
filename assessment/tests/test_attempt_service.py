@@ -145,6 +145,15 @@ class AttemptServiceTests(TestCase):
         self.assertContains(response, ".question-aside{align-self:stretch}")
         self.assertContains(response, f'href="#question-{questions[0].pk}"', html=False)
         self.assertContains(response, f'href="#question-{true_false.pk}"', html=False)
+        self.assertEqual(
+            [row["part_order"] for row in response.context["mcq_rows"]],
+            list(range(1, len(questions))),
+        )
+        self.assertEqual(
+            [row["part_order"] for row in response.context["true_false_rows"]],
+            [1],
+        )
+        self.assertContains(response, 'aria-label="Phần II, câu 1"', html=False)
 
     def test_expired_attempt_page_auto_submits_once_and_redirects(self):
         user, attempt = self.create_attempt("expired-page")

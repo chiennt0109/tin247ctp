@@ -122,6 +122,9 @@ def attempt_detail(request, attempt_id):
     other_rows = [row for row in question_rows if row["question_type"] not in {
         "MCQ_SINGLE", "TRUE_FALSE_GROUP",
     }]
+    for rows in (mcq_rows, true_false_rows, other_rows):
+        for part_order, row in enumerate(rows, start=1):
+            row["part_order"] = part_order
     return render(request, "assessment/attempt.html", {
         "attempt": attempt, "question_rows": question_rows,
         "mcq_rows": mcq_rows, "true_false_rows": true_false_rows, "other_rows": other_rows,
