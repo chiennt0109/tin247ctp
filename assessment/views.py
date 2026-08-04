@@ -225,7 +225,9 @@ def attempt_result(request, attempt_id):
     if attempt.user_id != request.user.pk and request.user.has_perm("assessment.view_results"):
         visibility = {"score": True, "answers": True, "solutions": True, "review": True}
     summary = student_result_summary(attempt)
-    detail_sections = result_sections(attempt, result) if visibility["answers"] else []
+    detail_sections = result_sections(
+        attempt, result, include_correct_answers=visibility["answers"],
+    ) if visibility["score"] else []
     attempts = list(ExamAttempt.objects.filter(
         user=attempt.user, session=attempt.session, status=ExamAttempt.Status.GRADED,
     ).order_by("attempt_number"))

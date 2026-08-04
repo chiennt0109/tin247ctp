@@ -8,8 +8,12 @@ PARTS = (
 )
 
 
-def result_sections(attempt, result):
-    """Return result rows in the same part/order layout as the attempt page."""
+def result_sections(attempt, result, *, include_correct_answers=False):
+    """Return result rows in the same part/order layout as the attempt page.
+
+    When answers are not released, callers can still show the student's own
+    per-question outcomes without exposing official answer keys.
+    """
     details = {
         str(item.get("exam_question_id")): item
         for item in result.detail
@@ -30,7 +34,9 @@ def result_sections(attempt, result):
         detail = dict(details.get(str(question.pk), {}))
         detail.update({"question": question, "question_type": question_type})
         if question_type == "TRUE_FALSE_GROUP":
-            detail["statements"] = _true_false_statements(question, detail)
+            detail["statements"] = _true_false_statements(
+                question, detail, include_correct_answers=include_correct_answers,
+            )
         grouped[key].append(detail)
 
     sections = []
@@ -44,11 +50,13 @@ def result_sections(attempt, result):
     return sections
 
 
-def _true_false_statements(question, detail):
-    expected = decrypt_json(question.protected_answer_snapshot)
-    expected_values = truth_values(
-        expected.get("answer_key"), len(question.statements_snapshot),
-    )
+def _true_false_statements(question, detail, *, include_correct_answers=False):
+    expected_values = []
+    if include_correct_answers:
+        expected = decrypt_json(question.protected_answer_snapshot)
+        expected_values = truth_values(
+            expected.get("answer_key"), len(question.statements_snapshot),
+        )
     if detail.get("outcome") == "BLANK":
         submitted_values = [None] * len(question.statements_snapshot)
     else:
@@ -57,13 +65,21 @@ def _true_false_statements(question, detail):
         )
     rows = []
     for index, statement in enumerate(question.statements_snapshot):
-        correct_value = expected_values[index] if index < len(expected_values) else False
+        correct_value = (
+            expected_values[index]
+            if include_correct_answers and index < len(expected_values)
+            else None
+        )
         submitted_value = submitted_values[index] if index < len(submitted_values) else False
         rows.append({
             "label": statement.get("label") if isinstance(statement, dict) else None,
             "text": statement.get("text", statement) if isinstance(statement, dict) else statement,
             "correct_value": correct_value,
             "submitted_value": submitted_value,
-            "is_correct": submitted_value is not None and submitted_value == correct_value,
+            "is_correct": (
+                submitted_value is not None
+                and correct_value is not None
+                and submitted_value == correct_value
+            ),
         })
     return rows
