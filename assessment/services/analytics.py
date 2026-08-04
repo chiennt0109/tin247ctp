@@ -4,7 +4,7 @@ from statistics import median
 
 from django.contrib.auth import get_user_model
 
-from assessment.models import ExamAttempt, ExamParticipant, GradingResult
+from assessment.models import ExamAttempt, GradingResult
 
 
 def official_attempts(attempts, policy):
@@ -59,8 +59,6 @@ def exam_results_dashboard(session):
     status_counts = Counter(item.status for item in attempts)
     if session.access_mode == session.AccessMode.ALL_USERS:
         eligible = get_user_model().objects.filter(is_active=True).count()
-    elif session.access_mode == session.AccessMode.SELECTED_USERS:
-        eligible = ExamParticipant.objects.filter(session=session, is_enabled=True, can_access=True).count()
     elif session.access_mode == session.AccessMode.SELECTED_GROUPS:
         eligible = get_user_model().objects.filter(groups__in=session.access_groups.all(), is_active=True).distinct().count()
     else:
