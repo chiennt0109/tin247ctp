@@ -18,6 +18,7 @@ from assessment.services.attempt_service import (
 )
 from assessment.services.start_attempt import StartAttemptError, effective_exam_access, start_attempt
 from assessment.services.result_release import result_visibility
+from assessment.services.result_presentation import result_sections
 
 
 def exam_list_redirect(request):
@@ -205,13 +206,15 @@ def attempt_result(request, attempt_id):
     if request.user.has_perm("assessment.view_results"):
         visibility = {"score": True, "answers": True, "solutions": True, "review": True}
     summary = student_result_summary(attempt)
+    detail_sections = result_sections(attempt, result) if visibility["answers"] else []
     attempts = list(ExamAttempt.objects.filter(
         user=attempt.user, session=attempt.session, status=ExamAttempt.Status.GRADED,
     ).order_by("attempt_number"))
     official = official_attempts(attempts, attempt.session.attempt_result_mode)
     return render(request, "assessment/result.html", {
         "attempt": attempt, "result": result, "visibility": visibility,
-        "summary": summary, "attempts": attempts, "official_attempt_ids": official,
+        "summary": summary, "detail_sections": detail_sections,
+        "attempts": attempts, "official_attempt_ids": official,
     })
 
 
