@@ -2,7 +2,7 @@
 {% block title %}{{ attempt.session.name }} — Lần {{ attempt.attempt_number }}{% endblock %}
 {% block content %}
 <style>
-  .assessment-shell{max-width:1180px;margin:auto}.assessment-head{position:sticky;top:64px;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 0}.question-layout{display:grid;grid-template-columns:1fr 260px;gap:20px}.question-card{scroll-margin-top:150px}.question-nav{position:sticky;top:145px;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.question-nav a{display:grid;place-items:center;min-height:38px;border:1px solid #cbd5e1;border-radius:8px;text-decoration:none}.question-nav a.answered{background:#dcfce7;border-color:#22c55e}.save-state{min-width:120px}@media(max-width:900px){.question-layout{grid-template-columns:1fr}.question-aside{order:-1}.question-nav{position:static;grid-template-columns:repeat(10,1fr)}}
+  .assessment-shell{max-width:1180px;margin:auto}.assessment-head{position:sticky;top:64px;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 0}.question-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:20px;align-items:start}.exam-part{scroll-margin-top:145px}.part-heading{border-left:5px solid #2563eb;background:#eff6ff;border-radius:10px;padding:14px 16px;margin-bottom:14px}.part-heading.true-false{border-color:#7c3aed;background:#f5f3ff}.question-card{scroll-margin-top:145px}.answer-option{cursor:pointer;transition:background .15s,border-color .15s}.answer-option:hover{background:#f8fafc;border-color:#94a3b8!important}.question-aside{align-self:stretch}.question-aside-inner{position:sticky;top:145px}.question-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.question-nav a{display:grid;place-items:center;min-height:38px;border:1px solid #cbd5e1;border-radius:8px;text-decoration:none}.question-nav a.answered{background:#dcfce7;border-color:#22c55e}.nav-part-title{font-size:.78rem;font-weight:700;color:#475569;margin:12px 0 7px}.save-state{min-width:120px}@media(max-width:900px){.question-layout{grid-template-columns:1fr}.question-aside{order:-1;align-self:auto}.question-aside-inner{position:static}.question-nav{grid-template-columns:repeat(10,1fr)}}
 </style>
 <main class="assessment-shell px-3 py-3" data-attempt-id="{{ attempt.pk }}" data-version="{{ attempt.data_version|unlocalize }}" data-server-now="{{ server_now_ms|unlocalize }}" data-expires-at="{{ expires_at_ms|unlocalize }}">
   <header class="assessment-head d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -10,20 +10,30 @@
     <div class="d-flex align-items-center gap-3"><span id="save-state" class="save-state text-muted" role="status">Đã tải</span><strong id="countdown" aria-live="polite">--:--</strong><button id="submit-attempt" class="btn btn-danger">Nộp bài</button></div>
   </header>
   <div id="connection-warning" class="alert alert-warning mt-3 d-none" role="alert">Mất kết nối. Câu trả lời được giữ trên thiết bị và sẽ lưu lại khi có mạng.</div>
+  {% if allow_attempt_download %}
+    <section class="card border-0 shadow-sm mt-3"><div class="card-body">
+      <h2 class="h6">Tải gói đề được cấp quyền</h2>
+      <p class="small text-muted mb-2">Các tệp được đóng gói từ snapshot đề đã sinh cho bài làm này. Chỉ tạo tối đa 8 mã để tránh tải nặng VPS.</p>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <label class="small mb-0">Số mã trộn
+          <select id="download-variants" class="form-select form-select-sm d-inline-block w-auto ms-1">
+            <option value="4">4 mã</option>
+            <option value="8">8 mã</option>
+          </select>
+        </label>
+        <a class="btn btn-sm btn-outline-primary download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam' %}">Download đề</a>
+        <a class="btn btn-sm btn-outline-danger download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}">Đề + đáp án</a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'assessment:attempt_download' attempt.pk 'blueprint' %}">Ma trận + đặc tả</a>
+      </div>
+    </div></section>
+  {% endif %}
   <div class="question-layout mt-3">
     <section aria-label="Danh sách câu hỏi">
-      {% for row in question_rows %}{% with question=row.question saved=row.saved %}
-      <article id="question-{{ forloop.counter }}" class="card question-card mb-3" data-question-id="{{ question.pk }}">
-        <div class="card-body"><div class="d-flex justify-content-between"><h2 class="h5">Câu {{ question.order }}</h2><label><input class="review-flag" type="checkbox" {% if saved.flagged_for_review %}checked{% endif %}> Xem lại</label></div>
-          <div class="mb-3">{{ question.stem_snapshot|linebreaks }}</div>
-          {% if question.options_snapshot %}<div class="vstack gap-2">{% for option in question.options_snapshot %}<label class="border rounded p-2"><input class="answer-control me-2" type="radio" name="q-{{ question.pk }}" value="{{ forloop.counter0 }}" {% if saved.answer.value == forloop.counter0 %}checked{% endif %}>{{ option.text|default:option }}</label>{% endfor %}</div>
-          {% elif question.statements_snapshot %}<div class="vstack gap-2">{% for statement in question.statements_snapshot %}<label class="border rounded p-2"><input class="answer-control me-2" type="checkbox" value="{{ forloop.counter0 }}">{{ statement.text|default:statement }}</label>{% endfor %}</div>
-          {% else %}<label class="form-label w-100">Câu trả lời<input class="answer-control form-control mt-2" type="text" value="{{ saved.answer.value|default:'' }}" autocomplete="off"></label>{% endif %}
-        </div>
-      </article>
-      {% endwith %}{% endfor %}
+      {% if mcq_rows %}<section class="exam-part" aria-labelledby="mcq-part-title"><header class="part-heading"><h2 id="mcq-part-title" class="h5 mb-1">Phần I — Trắc nghiệm nhiều phương án</h2><p class="small text-muted mb-0">Chọn một phương án đúng cho mỗi câu hỏi.</p></header>{% for row in mcq_rows %}{% include "assessment/_question_card.html" %}{% endfor %}</section>{% endif %}
+      {% if true_false_rows %}<section class="exam-part mt-4" aria-labelledby="tf-part-title"><header class="part-heading true-false"><h2 id="tf-part-title" class="h5 mb-1">Phần II — Trắc nghiệm Đúng/Sai</h2><p class="small text-muted mb-0">Xác định tính đúng hoặc sai của từng nhận định.</p></header>{% for row in true_false_rows %}{% include "assessment/_question_card.html" %}{% endfor %}</section>{% endif %}
+      {% if other_rows %}<section class="exam-part mt-4" aria-labelledby="other-part-title"><header class="part-heading"><h2 id="other-part-title" class="h5 mb-1">Phần khác</h2></header>{% for row in other_rows %}{% include "assessment/_question_card.html" %}{% endfor %}</section>{% endif %}
     </section>
-    <aside class="question-aside"><div class="card"><div class="card-body"><h2 class="h6">Chuyển câu nhanh</h2><nav class="question-nav">{% for row in question_rows %}<a href="#question-{{ forloop.counter }}" aria-label="Câu {{ forloop.counter }}">{{ forloop.counter }}</a>{% endfor %}</nav><p class="small text-muted mt-3 mb-0">Màu xanh: đã trả lời. Đánh dấu “Xem lại” không thay đổi đáp án.</p></div></div></aside>
+    <aside class="question-aside"><div class="card question-aside-inner"><div class="card-body"><h2 class="h6">Chuyển câu nhanh</h2>{% if mcq_rows %}<div class="nav-part-title">Phần I · Nhiều phương án</div><nav class="question-nav">{% for row in mcq_rows %}<a data-question-id="{{ row.question.pk }}" href="#question-{{ row.question.pk }}" aria-label="Phần I, câu {{ row.part_order }}">{{ row.part_order }}</a>{% endfor %}</nav>{% endif %}{% if true_false_rows %}<div class="nav-part-title">Phần II · Đúng/Sai</div><nav class="question-nav">{% for row in true_false_rows %}<a data-question-id="{{ row.question.pk }}" href="#question-{{ row.question.pk }}" aria-label="Phần II, câu {{ row.part_order }}">{{ row.part_order }}</a>{% endfor %}</nav>{% endif %}{% if other_rows %}<div class="nav-part-title">Phần khác</div><nav class="question-nav">{% for row in other_rows %}<a data-question-id="{{ row.question.pk }}" href="#question-{{ row.question.pk }}" aria-label="Phần khác, câu {{ row.part_order }}">{{ row.part_order }}</a>{% endfor %}</nav>{% endif %}<p class="small text-muted mt-3 mb-0">Màu xanh: đã trả lời. Đánh dấu “Xem lại” không thay đổi đáp án.</p></div></div></aside>
   </div>
   <form class="d-none">{% csrf_token %}</form>
 </main>
@@ -35,7 +45,7 @@
   const csrf=document.querySelector('[name=csrfmiddlewaretoken]').value, state=document.getElementById('save-state');
   const storageKey=`assessment-attempt-${attemptId}`;
   function collect(card){const controls=[...card.querySelectorAll('.answer-control')];let value;if(controls[0]?.type==='radio')value=controls.find(x=>x.checked)?.value??null;else if(controls[0]?.type==='checkbox')value=controls.filter(x=>x.checked).map(x=>x.value);else value=controls[0]?.value??'';return {question_id:Number(card.dataset.questionId),answer:{value},flagged_for_review:card.querySelector('.review-flag').checked};}
-  function paint(){document.querySelectorAll('.question-card').forEach((card,i)=>{const a=collect(card).answer.value,done=Array.isArray(a)?a.length>0:a!==null&&a!=='';document.querySelectorAll('.question-nav a')[i].classList.toggle('answered',done);});}
+  function paint(){document.querySelectorAll('.question-card').forEach(card=>{const a=collect(card).answer.value,done=Array.isArray(a)?a.length>0:a!==null&&a!=='';document.querySelector(`.question-nav a[data-question-id="${card.dataset.questionId}"]`)?.classList.toggle('answered',done);});}
   function restoreLocal(){try{const queued=JSON.parse(localStorage.getItem(storageKey)||'null');if(!queued||queued.version!==version)return;const byId=new Map(queued.answers.map(x=>[String(x.question_id),x]));document.querySelectorAll('.question-card').forEach(card=>{const item=byId.get(card.dataset.questionId);if(!item)return;const controls=[...card.querySelectorAll('.answer-control')],value=item.answer?.value;if(controls[0]?.type==='radio')controls.forEach(x=>x.checked=String(x.value)===String(value));else if(controls[0]?.type==='checkbox'){const values=new Set((value||[]).map(String));controls.forEach(x=>x.checked=values.has(String(x.value)));}else if(controls[0])controls[0].value=value??'';card.querySelector('.review-flag').checked=Boolean(item.flagged_for_review);});state.textContent='Đã khôi phục bản chưa lưu';}catch(e){localStorage.removeItem(storageKey);}}
   async function save(){if(saving)return false;saving=true;state.textContent='Đang lưu…';const answers=[...document.querySelectorAll('.question-card')].map(collect);localStorage.setItem(storageKey,JSON.stringify({version,answers}));try{const r=await fetch(saveUrl,{method:'PATCH',headers:{'Content-Type':'application/json','X-CSRFToken':csrf},body:JSON.stringify({version,answers})});const data=await r.json();if(!r.ok)throw Object.assign(new Error(data.error||'Không thể lưu'),{status:r.status,serverVersion:data.version});version=data.version;root.dataset.version=version;localStorage.removeItem(storageKey);state.textContent='Đã lưu';document.getElementById('connection-warning').classList.add('d-none');return true;}catch(e){state.textContent=e.status===409?'Dữ liệu đã thay đổi':'Chưa lưu';document.getElementById('connection-warning').classList.remove('d-none');return false;}finally{saving=false;}}
   function schedule(){clearTimeout(timer);state.textContent='Có thay đổi';timer=setTimeout(save,700);paint();}
@@ -43,6 +53,10 @@
   const offset=Number(root.dataset.serverNow)-Date.now(), expiry=Number(root.dataset.expiresAt);function tick(){const left=Math.max(0,expiry-(Date.now()+offset)),sec=Math.ceil(left/1000);document.getElementById('countdown').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;if(left<=0&&!autoSubmitStarted){autoSubmitStarted=true;submit(true);}}setInterval(tick,1000);tick();
   async function submit(auto=false){if(submitting)return;submitting=true;document.getElementById('submit-attempt').disabled=true;clearTimeout(timer);const saved=await save();if(!saved&&!auto){alert('Câu trả lời chưa lưu được. Hãy kiểm tra kết nối trước khi nộp.');submitting=false;document.getElementById('submit-attempt').disabled=false;return;}if(!auto&&!confirm('Bạn chắc chắn muốn nộp bài?')){submitting=false;document.getElementById('submit-attempt').disabled=false;return;}try{const r=await fetch(submitUrl,{method:'POST',headers:{'X-CSRFToken':csrf}}),data=await r.json();if(r.ok){localStorage.removeItem(storageKey);alert(auto?'Đã hết giờ. Bài đã được tự động nộp.':'Nộp bài thành công.');location.href=data.result_url||'/assessment/exams/';return;}alert(data.error||'Không thể nộp bài.');}catch(e){alert('Không thể kết nối máy chủ để nộp bài.');}submitting=false;document.getElementById('submit-attempt').disabled=false;}
   document.getElementById('submit-attempt').addEventListener('click',()=>submit(false));
+  document.querySelectorAll('.download-with-variants').forEach(link=>link.addEventListener('click',e=>{
+    const variants=document.getElementById('download-variants')?.value||'4';
+    link.href=link.href.split('?')[0]+`?variants=${encodeURIComponent(variants)}`;
+  }));
 })();
 </script>
 {% endblock %}
