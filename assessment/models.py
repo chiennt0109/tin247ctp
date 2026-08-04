@@ -546,6 +546,13 @@ class ExamAccessGrant(models.Model):
     valid_from = models.DateTimeField(null=True, blank=True)
     valid_until = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    allow_download = models.BooleanField(
+        default=False,
+        help_text=(
+            "Cho phép tải gói ZIP gồm đề, đáp án, ma trận và đặc tả "
+            "cho người dùng/nhóm được cấp quyền này."
+        ),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

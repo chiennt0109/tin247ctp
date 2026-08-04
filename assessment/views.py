@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.cache import cache
 from django.db.models import Count, Q
-from django.http import Http404, JsonResponse
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -15,6 +16,9 @@ from assessment.models import AssessmentAuditLog
 from assessment.services.analytics import exam_results_dashboard, official_attempts, student_result_summary
 from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
+)
+from assessment.services.attempt_downloads import (
+    build_attempt_download_zip, user_download_permission,
 )
 from assessment.services.start_attempt import StartAttemptError, effective_exam_access, start_attempt
 from assessment.services.result_release import result_visibility
@@ -145,12 +149,36 @@ def attempt_detail(request, attempt_id):
     for rows in (mcq_rows, true_false_rows, other_rows):
         for part_order, row in enumerate(rows, start=1):
             row["part_order"] = part_order
+    download_permission = user_download_permission(request.user, attempt.session)
     return render(request, "assessment/attempt.html", {
         "attempt": attempt, "question_rows": question_rows,
         "mcq_rows": mcq_rows, "true_false_rows": true_false_rows, "other_rows": other_rows,
         "server_now_ms": int(timezone.now().timestamp() * 1000),
         "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
+        "allow_attempt_download": download_permission.allowed,
     })
+
+
+@login_required
+def download_attempt_package(request, attempt_id, package):
+    attempt = get_object_or_404(
+        ExamAttempt.objects.select_related("session"), pk=attempt_id, user=request.user,
+    )
+    variants = request.GET.get("variants", "1")
+    try:
+        payload = build_attempt_download_zip(
+            attempt=attempt, user=request.user, package=package, variants=variants,
+        )
+    except PermissionDenied:
+        raise Http404
+    except ValidationError as exc:
+        return JsonResponse({"error": "; ".join(exc.messages)}, status=400)
+    response = HttpResponse(payload, content_type="application/zip")
+    response["Content-Disposition"] = (
+        f'attachment; filename="assessment-{attempt.pk}-{package}.zip"'
+    )
+    response["Cache-Control"] = "no-store"
+    return response
 
 
 @login_required
@@ -205,6 +233,7 @@ def attempt_state(request, attempt_id):
         "status": attempt.status, "version": attempt.data_version,
         "server_now_ms": int(timezone.now().timestamp() * 1000),
         "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
+        "allow_attempt_download": download_permission.allowed,
     })
 
 

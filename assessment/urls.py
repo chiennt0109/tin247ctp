@@ -13,6 +13,10 @@ urlpatterns = [
     path("results/<uuid:attempt_id>/", views.attempt_result, name="result_detail"),
     path("attempts/<uuid:attempt_id>/", views.attempt_detail, name="attempt_detail"),
     path("attempts/<uuid:attempt_id>/result/", views.attempt_result, name="attempt_result"),
+    path(
+        "attempts/<uuid:attempt_id>/download/<str:package>/",
+        views.download_attempt_package, name="attempt_download",
+    ),
     path("api/attempts/<uuid:attempt_id>/answers/", views.autosave_answers, name="autosave_answers"),
     path("api/attempts/<uuid:attempt_id>/submit/", views.submit_attempt_view, name="submit_attempt"),
     path("api/attempts/<uuid:attempt_id>/state/", views.attempt_state, name="attempt_state"),

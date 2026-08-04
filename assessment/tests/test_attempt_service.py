@@ -1,4 +1,6 @@
+import io
 import json
+import zipfile
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
@@ -8,7 +10,7 @@ from django.db import connection
 from django.urls import reverse
 from django.utils import timezone
 
-from assessment.models import AttemptAnswer, ExamAttempt
+from assessment.models import AttemptAnswer, ExamAccessGrant, ExamAttempt
 from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
@@ -108,6 +110,76 @@ class AttemptServiceTests(TestCase):
         self.client.force_login(intruder)
         denied = self.client.patch(url, json.dumps(payload), content_type="application/json")
         self.assertEqual(denied.status_code, 404)
+
+
+    def test_attempt_download_options_require_explicit_grant_flag(self):
+        user, attempt = self.create_attempt("download-ui")
+        self.client.force_login(user)
+
+        hidden = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
+        self.assertNotContains(hidden, "Download đề")
+
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        visible = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
+
+        self.assertContains(visible, "Download đề")
+        self.assertContains(visible, "Đề + đáp án")
+        self.assertContains(visible, "Ma trận + đặc tả")
+
+    def test_download_exam_zip_is_bounded_and_uses_generated_snapshot(self):
+        user, attempt = self.create_attempt("download-zip")
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        self.client.force_login(user)
+
+        denied = self.client.get(reverse(
+            "assessment:attempt_download", args=(attempt.pk, "exam"),
+        ) + "?variants=99")
+        self.assertEqual(denied.status_code, 400)
+
+        response = self.client.get(reverse(
+            "assessment:attempt_download", args=(attempt.pk, "exam_answers"),
+        ) + "?variants=4")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/zip")
+        with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+            names = set(archive.namelist())
+            self.assertIn("de-thi/ma-01.txt", names)
+            self.assertIn("de-thi/ma-04.txt", names)
+            self.assertIn("ma-tran/blueprint.json", names)
+            self.assertIn("dac-ta/scoring.json", names)
+            exam_text = archive.read("de-thi/ma-01.txt").decode()
+        self.assertIn(attempt.session.name, exam_text)
+        self.assertIn("Đáp án", exam_text)
+
+    def test_download_denied_without_grant_or_for_another_user(self):
+        user, attempt = self.create_attempt("download-denied-owner")
+        other = get_user_model().objects.create_user("download-denied-other")
+        self.client.force_login(user)
+
+        no_grant = self.client.get(reverse(
+            "assessment:attempt_download", args=(attempt.pk, "blueprint"),
+        ))
+        self.assertEqual(no_grant.status_code, 404)
+
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        self.client.force_login(other)
+        other_user = self.client.get(reverse(
+            "assessment:attempt_download", args=(attempt.pk, "blueprint"),
+        ))
+        self.assertEqual(other_user.status_code, 404)
 
     def test_attempt_page_contains_no_protected_answer_material(self):
         user, attempt = self.create_attempt()

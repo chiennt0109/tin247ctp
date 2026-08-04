@@ -10,6 +10,23 @@
     <div class="d-flex align-items-center gap-3"><span id="save-state" class="save-state text-muted" role="status">Đã tải</span><strong id="countdown" aria-live="polite">--:--</strong><button id="submit-attempt" class="btn btn-danger">Nộp bài</button></div>
   </header>
   <div id="connection-warning" class="alert alert-warning mt-3 d-none" role="alert">Mất kết nối. Câu trả lời được giữ trên thiết bị và sẽ lưu lại khi có mạng.</div>
+  {% if allow_attempt_download %}
+    <section class="card border-0 shadow-sm mt-3"><div class="card-body">
+      <h2 class="h6">Tải gói đề được cấp quyền</h2>
+      <p class="small text-muted mb-2">Các tệp được đóng gói từ snapshot đề đã sinh cho bài làm này. Chỉ tạo tối đa 8 mã để tránh tải nặng VPS.</p>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <label class="small mb-0">Số mã trộn
+          <select id="download-variants" class="form-select form-select-sm d-inline-block w-auto ms-1">
+            <option value="4">4 mã</option>
+            <option value="8">8 mã</option>
+          </select>
+        </label>
+        <a class="btn btn-sm btn-outline-primary download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam' %}">Download đề</a>
+        <a class="btn btn-sm btn-outline-danger download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}">Đề + đáp án</a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'assessment:attempt_download' attempt.pk 'blueprint' %}">Ma trận + đặc tả</a>
+      </div>
+    </div></section>
+  {% endif %}
   <div class="question-layout mt-3">
     <section aria-label="Danh sách câu hỏi">
       {% if mcq_rows %}<section class="exam-part" aria-labelledby="mcq-part-title"><header class="part-heading"><h2 id="mcq-part-title" class="h5 mb-1">Phần I — Trắc nghiệm nhiều phương án</h2><p class="small text-muted mb-0">Chọn một phương án đúng cho mỗi câu hỏi.</p></header>{% for row in mcq_rows %}{% include "assessment/_question_card.html" %}{% endfor %}</section>{% endif %}
@@ -36,6 +53,10 @@
   const offset=Number(root.dataset.serverNow)-Date.now(), expiry=Number(root.dataset.expiresAt);function tick(){const left=Math.max(0,expiry-(Date.now()+offset)),sec=Math.ceil(left/1000);document.getElementById('countdown').textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;if(left<=0&&!autoSubmitStarted){autoSubmitStarted=true;submit(true);}}setInterval(tick,1000);tick();
   async function submit(auto=false){if(submitting)return;submitting=true;document.getElementById('submit-attempt').disabled=true;clearTimeout(timer);const saved=await save();if(!saved&&!auto){alert('Câu trả lời chưa lưu được. Hãy kiểm tra kết nối trước khi nộp.');submitting=false;document.getElementById('submit-attempt').disabled=false;return;}if(!auto&&!confirm('Bạn chắc chắn muốn nộp bài?')){submitting=false;document.getElementById('submit-attempt').disabled=false;return;}try{const r=await fetch(submitUrl,{method:'POST',headers:{'X-CSRFToken':csrf}}),data=await r.json();if(r.ok){localStorage.removeItem(storageKey);alert(auto?'Đã hết giờ. Bài đã được tự động nộp.':'Nộp bài thành công.');location.href=data.result_url||'/assessment/exams/';return;}alert(data.error||'Không thể nộp bài.');}catch(e){alert('Không thể kết nối máy chủ để nộp bài.');}submitting=false;document.getElementById('submit-attempt').disabled=false;}
   document.getElementById('submit-attempt').addEventListener('click',()=>submit(false));
+  document.querySelectorAll('.download-with-variants').forEach(link=>link.addEventListener('click',e=>{
+    const variants=document.getElementById('download-variants')?.value||'4';
+    link.href=link.href.split('?')[0]+`?variants=${encodeURIComponent(variants)}`;
+  }));
 })();
 </script>
 {% endblock %}

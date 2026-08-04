@@ -385,7 +385,8 @@ class ExamAccessGrantInline(admin.TabularInline):
     verbose_name = "Quyền và lượt làm của người dùng / nhóm"
     verbose_name_plural = "Quyền và lượt làm riêng"
     fields = (
-        "user", "group", "limit_mode", "max_attempts", "valid_from", "valid_until", "is_active",
+        "user", "group", "limit_mode", "max_attempts", "valid_from", "valid_until",
+        "is_active", "allow_download",
     )
     autocomplete_fields = ("user", "group")
 
