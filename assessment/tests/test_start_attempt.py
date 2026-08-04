@@ -217,6 +217,26 @@ class StartAttemptTests(TestCase):
         self.assertEqual(ExamAttempt.objects.count(), attempts_before)
         self.assertEqual(GeneratedExam.objects.count(), exams_before)
 
+        self.client.force_login(user)
+        response = self.client.get(reverse("assessment:exam_list"))
+        self.assertContains(response, session.name)
+        self.assertContains(response, "Quyền làm bài chưa có hiệu lực hoặc đã hết hạn.")
+        self.assertContains(response, "Không thể bắt đầu")
+
+    def test_exam_stays_visible_when_user_has_used_all_attempts(self):
+        user = get_user_model().objects.create_user("exhausted-card-user")
+        session = self.open_session()
+        attempt = start_attempt(user, session)
+        attempt.status = ExamAttempt.Status.SUBMITTED
+        attempt.save(update_fields=("status",))
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:exam_list"))
+
+        self.assertContains(response, session.name)
+        self.assertContains(response, "Bạn đã sử dụng hết số lượt làm.")
+        self.assertContains(response, "Không thể bắt đầu")
+
     def test_direct_user_grant_overrides_group_grant(self):
         user = get_user_model().objects.create_user("direct-over-group")
         group = Group.objects.create(name="Broad candidates")

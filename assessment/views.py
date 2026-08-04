@@ -51,13 +51,16 @@ def exam_list(request):
         .order_by("opens_at", "name")
     )
     cards = []
+    now = timezone.now()
     for session in sessions:
-        access = effective_exam_access(request.user, session)
-        if not access.allowed:
+        access = effective_exam_access(request.user, session, now=now)
+        if not access.visible:
             continue
-        active = ExamAttempt.objects.filter(
-            user=request.user, session=session, status=ExamAttempt.Status.IN_PROGRESS
-        ).first()
+        active = None
+        if access.allowed:
+            active = ExamAttempt.objects.filter(
+                user=request.user, session=session, status=ExamAttempt.Status.IN_PROGRESS
+            ).first()
         latest_result = ExamAttempt.objects.filter(
             user=request.user, session=session, status=ExamAttempt.Status.GRADED,
         ).order_by("-attempt_number").first()
@@ -65,10 +68,26 @@ def exam_list(request):
             None if access.max_attempts is None
             else max(access.max_attempts - session.attempts_used, 0)
         )
+        unavailable_reason = access.reason
+        session_can_start = (
+            session.status in {ExamSession.Status.OPEN, ExamSession.Status.SCHEDULED}
+            and session.opens_at <= now < session.closes_at
+        )
+        if access.allowed and not session_can_start:
+            unavailable_reason = (
+                "Kỳ kiểm tra chưa đến thời gian mở."
+                if now < session.opens_at else "Kỳ kiểm tra đã đóng."
+            )
+        if access.allowed and session_can_start and attempts_remaining == 0:
+            unavailable_reason = "Bạn đã sử dụng hết số lượt làm."
+        can_start = (
+            access.allowed and session_can_start
+            and (attempts_remaining is None or attempts_remaining > 0)
+        )
         cards.append({
             "session": session, "attempts_used": session.attempts_used,
             "attempts_remaining": attempts_remaining,
-            "can_start": attempts_remaining is None or attempts_remaining > 0,
+            "can_start": can_start, "unavailable_reason": unavailable_reason,
             "active_attempt": active,
             "latest_result": latest_result,
         })
@@ -203,7 +222,7 @@ def attempt_result(request, attempt_id):
         GradingResult, attempt=attempt, is_current=True,
     )
     visibility = result_visibility(attempt)
-    if request.user.has_perm("assessment.view_results"):
+    if attempt.user_id != request.user.pk and request.user.has_perm("assessment.view_results"):
         visibility = {"score": True, "answers": True, "solutions": True, "review": True}
     summary = student_result_summary(attempt)
     detail_sections = result_sections(attempt, result) if visibility["answers"] else []

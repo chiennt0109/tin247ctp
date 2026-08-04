@@ -48,7 +48,8 @@
                     <button type="submit" class="btn btn-primary">Bắt đầu</button>
                   </form>
                 {% else %}
-                  <button class="btn btn-secondary mt-3" disabled>Đã hết lượt</button>
+                  {% if card.unavailable_reason %}<div class="alert alert-warning py-2 mt-3 mb-0" role="status">{{ card.unavailable_reason }}</div>{% endif %}
+                  <button class="btn btn-secondary mt-2" disabled>Không thể bắt đầu</button>
                 {% endif %}
                 {% if card.latest_result %}
                   <a class="btn btn-outline-primary mt-3" href="{% url 'assessment:attempt_result' card.latest_result.pk %}">Xem kết quả</a>

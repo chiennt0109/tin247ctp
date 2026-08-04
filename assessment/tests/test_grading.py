@@ -82,6 +82,25 @@ class GradingTests(TestCase):
         self.assertContains(visible, "chưa được công bố")
         self.assertFalse(result_visibility(attempt)["answers"])
 
+    def test_superuser_taking_own_exam_does_not_bypass_answer_release_policy(self):
+        user = get_user_model().objects.create_superuser(
+            "admin-student", "admin-student@example.com", "test",
+        )
+        session = self.open_session()
+        session.score_release_mode = ExamSession.ReleaseMode.AFTER_SUBMIT
+        session.answer_release_mode = ExamSession.ReleaseMode.NEVER
+        session.save(update_fields=("score_release_mode", "answer_release_mode"))
+        attempt = start_attempt(user, session)
+        submit_attempt(attempt_id=attempt.pk, user=user)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("assessment:attempt_result", args=(attempt.pk,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["detail_sections"], [])
+        self.assertNotContains(response, "Chi tiết")
+        self.assertContains(response, "Đáp án và kết quả từng câu chưa được công bố.")
+
     def test_result_uses_exam_part_order_and_explains_true_false_statements(self):
         user = get_user_model().objects.create_user("true-false-result-student")
         session = self.open_session()

@@ -6,6 +6,7 @@ from assessment.models import ExamAccessGrant, ExamSession
 @dataclass(frozen=True)
 class EffectiveExamAccess:
     allowed: bool
+    visible: bool = False
     max_attempts: int | None = None
     valid_until: object | None = None
     grant_id: int | None = None
@@ -14,17 +15,25 @@ class EffectiveExamAccess:
 
 def _grant_access(grant, now):
     if not grant or not grant.is_active:
-        return EffectiveExamAccess(False, reason="Tài khoản chưa được cấp quyền làm kỳ kiểm tra này.")
+        return EffectiveExamAccess(
+            False, visible=bool(grant),
+            reason="Tài khoản chưa được cấp quyền làm kỳ kiểm tra này.",
+        )
     uses_time = grant.limit_mode in {
         ExamAccessGrant.LimitMode.VALIDITY, ExamAccessGrant.LimitMode.BOTH,
     }
-    if uses_time and (now < grant.valid_from or now >= grant.valid_until):
-        return EffectiveExamAccess(False, reason="Quyền làm bài chưa có hiệu lực hoặc đã hết hạn.")
     uses_attempts = grant.limit_mode in {
         ExamAccessGrant.LimitMode.ATTEMPTS, ExamAccessGrant.LimitMode.BOTH,
     }
+    if uses_time and (now < grant.valid_from or now >= grant.valid_until):
+        return EffectiveExamAccess(
+            False, visible=True,
+            max_attempts=grant.max_attempts if uses_attempts else None,
+            valid_until=grant.valid_until, grant_id=grant.pk,
+            reason="Quyền làm bài chưa có hiệu lực hoặc đã hết hạn.",
+        )
     return EffectiveExamAccess(
-        True,
+        True, visible=True,
         max_attempts=grant.max_attempts if uses_attempts else None,
         valid_until=grant.valid_until if uses_time else None,
         grant_id=grant.pk,
@@ -54,7 +63,7 @@ def resolve_exam_access(user, session, now, user_grade=None):
     if session.access_mode == ExamSession.AccessMode.ACCESS_GRANTS:
         return _grant_access(None, now)
     if session.access_mode == ExamSession.AccessMode.ALL_USERS:
-        return EffectiveExamAccess(True, max_attempts=session.max_attempts)
+        return EffectiveExamAccess(True, visible=True, max_attempts=session.max_attempts)
     if session.access_mode == ExamSession.AccessMode.SELECTED_GROUPS:
         allowed = session.access_groups.filter(pk__in=user.groups.values("pk")).exists()
     elif session.access_mode == ExamSession.AccessMode.SELECTED_GRADES:
@@ -62,6 +71,6 @@ def resolve_exam_access(user, session, now, user_grade=None):
     else:
         allowed = False
     return EffectiveExamAccess(
-        allowed, max_attempts=session.max_attempts,
+        allowed, visible=allowed, max_attempts=session.max_attempts,
         reason="" if allowed else "Tài khoản không có quyền làm kỳ kiểm tra này.",
     )
