@@ -235,7 +235,7 @@ def download_resource_package(request, package_id, package):
         return JsonResponse({"error": "; ".join(exc.messages)}, status=400)
     response = HttpResponse(payload, content_type="application/zip")
     response["Content-Disposition"] = (
-        f'attachment; filename="assessment-resource-{resource.pk}-{package}.zip"'
+        f'attachment; filename="GOI_DE_{resource.generated_exam.code}.zip"'
     )
     response["Cache-Control"] = "no-store"
     return response
@@ -259,7 +259,7 @@ def download_attempt_package(request, attempt_id, package):
         return JsonResponse({"error": "; ".join(exc.messages)}, status=400)
     response = HttpResponse(payload, content_type="application/zip")
     response["Content-Disposition"] = (
-        f'attachment; filename="assessment-{attempt.pk}-{package}.zip"'
+        f'attachment; filename="GOI_DE_{attempt.generated_exam.code}.zip"'
     )
     response["Cache-Control"] = "no-store"
     return response

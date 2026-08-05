@@ -18,6 +18,7 @@ from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
 from assessment.services.resource_packages import create_resource_package
+from assessment.services.attempt_downloads import build_attempt_download_zip
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.admin_workflow import close_exam_session
 from assessment.services.usage_ledger import committed_usage_count
@@ -157,11 +158,59 @@ class AttemptServiceTests(TestCase):
         self.assertEqual(response["Content-Type"], "application/zip")
         with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
             names = set(archive.namelist())
-            self.assertIn("de-thi/ma-01.txt", names)
-            self.assertIn("de-thi/ma-04.txt", names)
-            exam_text = archive.read("de-thi/ma-01.txt").decode()
-        self.assertIn(attempt.session.name, exam_text)
-        self.assertNotIn("Đáp án", exam_text)
+            root = f"GOI_DE_{attempt.generated_exam.code}"
+            self.assertIn(f"{root}/01_DE_THI_{attempt.generated_exam.code}.docx", names)
+            self.assertIn(f"{root}/01_DE_THI_{attempt.generated_exam.code}.pdf", names)
+            self.assertIn(f"{root}/05_SNAPSHOT_{attempt.generated_exam.code}.xlsx", names)
+            self.assertIn(f"{root}/06_MANIFEST_{attempt.generated_exam.code}.txt", names)
+            self.assertFalse(any(name.endswith(".json") for name in names))
+            docx_payload = archive.read(f"{root}/01_DE_THI_{attempt.generated_exam.code}.docx")
+            pdf_payload = archive.read(f"{root}/01_DE_THI_{attempt.generated_exam.code}.pdf")
+            manifest_text = archive.read(f"{root}/06_MANIFEST_{attempt.generated_exam.code}.txt").decode()
+        self.assertTrue(docx_payload.startswith(b"PK"))
+        self.assertTrue(pdf_payload.startswith(b"%PDF"))
+        self.assertIn(attempt.session.name, manifest_text)
+        self.assertNotIn("answer_key", manifest_text)
+
+
+    def test_full_standard_zip_contains_required_files_without_json_and_preserves_order(self):
+        user, attempt = self.create_attempt("download-full")
+        before = list(attempt.generated_exam.questions.order_by("order").values_list("question_id_snapshot", "order", "option_order"))
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+
+        payload = build_attempt_download_zip(attempt=attempt, user=user, package="exam_answers", variants=1)
+        after = list(attempt.generated_exam.questions.order_by("order").values_list("question_id_snapshot", "order", "option_order"))
+
+        self.assertEqual(before, after)
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            names = set(archive.namelist())
+            root = f"GOI_DE_{attempt.generated_exam.code}"
+            required = {
+                f"{root}/01_DE_THI_{attempt.generated_exam.code}.docx",
+                f"{root}/01_DE_THI_{attempt.generated_exam.code}.pdf",
+                f"{root}/02_DAP_AN_{attempt.generated_exam.code}.docx",
+                f"{root}/02_DAP_AN_{attempt.generated_exam.code}.pdf",
+                f"{root}/03_MA_TRAN_{attempt.generated_exam.code}.xlsx",
+                f"{root}/03_MA_TRAN_{attempt.generated_exam.code}.pdf",
+                f"{root}/04_BAN_DAC_TA_{attempt.generated_exam.code}.docx",
+                f"{root}/04_BAN_DAC_TA_{attempt.generated_exam.code}.pdf",
+                f"{root}/05_SNAPSHOT_{attempt.generated_exam.code}.xlsx",
+                f"{root}/06_MANIFEST_{attempt.generated_exam.code}.txt",
+                f"{root}/07_VALIDATION_REPORT_{attempt.generated_exam.code}.txt",
+                f"{root}/README.txt",
+            }
+            self.assertTrue(required.issubset(names))
+            self.assertFalse(any(name.endswith(".json") for name in names))
+            answer_docx = archive.read(f"{root}/02_DAP_AN_{attempt.generated_exam.code}.docx")
+            matrix_xlsx = archive.read(f"{root}/03_MA_TRAN_{attempt.generated_exam.code}.xlsx")
+            report = archive.read(f"{root}/07_VALIDATION_REPORT_{attempt.generated_exam.code}.txt").decode()
+        self.assertGreater(len(answer_docx), 100)
+        self.assertTrue(matrix_xlsx.startswith(b"PK"))
+        self.assertIn("PASS | GeneratedExam integrity", report)
 
     def test_download_denied_without_grant_or_for_another_user(self):
         user, attempt = self.create_attempt("download-denied-owner")
