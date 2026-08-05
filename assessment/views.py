@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import Paginator
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -205,13 +206,15 @@ def my_resources(request):
     ]
     packages = ExamResourcePackage.objects.filter(user=request.user).select_related(
         "session", "generated_exam", "blueprint_version",
-    ).order_by("-created_at")
+    ).order_by("session__name", "-created_at")
     package_rows = [
         {"package": package, "answers_released": _session_answers_released(package.session)}
         for package in packages
     ]
+    attempt_page = Paginator(attempt_rows, 20).get_page(request.GET.get("attempt_page"))
+    package_page = Paginator(package_rows, 20).get_page(request.GET.get("package_page"))
     return render(request, "assessment/my_resources.html", {
-        "attempt_rows": attempt_rows, "package_rows": package_rows,
+        "attempt_page": attempt_page, "package_page": package_page,
     })
 
 
