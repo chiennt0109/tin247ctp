@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Tài nguyên của tôi{% endblock %}
+{% block content %}
+<main class="container-fluid py-4 px-3 px-lg-4">
+  <a href="{% url 'assessment:exam_list' %}" class="text-decoration-none">← Các kỳ kiểm tra</a>
+  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 my-3">
+    <div>
+      <p class="text-primary fw-semibold mb-1">📦 Tài nguyên đã sinh</p>
+      <h1 class="display-6 fw-bold mb-1">Tài nguyên của tôi</h1>
+      <p class="text-muted mb-0">Tải lại đề đã sinh từ bài làm trực tuyến hoặc gói đề tải. Tải lại không trừ thêm lượt.</p>
+    </div>
+  </div>
+
+  <section class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4"><div class="card-body p-0">
+    <div class="p-4 border-bottom bg-white"><h2 class="h5 mb-0">Đề từ bài làm trực tuyến</h2></div>
+    {% if attempt_page %}<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-uppercase small text-muted"><tr><th class="ps-4">Kỳ kiểm tra</th><th>Lần</th><th>Thời gian tạo</th><th>Ma trận</th><th class="text-end pe-4">Tải lại</th></tr></thead>
+      <tbody>{% regroup attempt_page.object_list by attempt.session.name as attempt_groups %}{% for group in attempt_groups %}
+        <tr class="table-primary-subtle"><th colspan="5" class="ps-4 py-3 text-primary-emphasis">{{ group.grouper }}</th></tr>
+        {% for row in group.list %}{% with attempt=row.attempt visibility=row.visibility %}<tr>
+          <td class="ps-4 fw-semibold">{{ attempt.session.name }}</td><td>{{ attempt.attempt_number }}</td>
+          <td>{{ attempt.started_at|date:"H:i d/m/Y" }}</td><td>{{ attempt.blueprint_version }}</td>
+          <td class="text-end pe-4">
+            <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'assessment:attempt_download' attempt.pk 'exam' %}?variants=1">Đề</a>
+            {% if visibility.answers %}<a class="btn btn-sm btn-outline-danger rounded-pill px-3" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}?variants=1">Đề + đáp án</a>{% endif %}
+            <a class="btn btn-sm btn-outline-secondary rounded-pill px-3" href="{% url 'assessment:attempt_download' attempt.pk 'blueprint' %}">Ma trận + đặc tả</a>
+          </td>
+        </tr>{% endwith %}{% endfor %}
+      {% endfor %}</tbody>
+    </table></div>{% else %}<p class="text-muted p-4 mb-0">Chưa có bài làm trực tuyến.</p>{% endif %}
+    {% if attempt_page.has_other_pages %}<nav class="p-3 border-top" aria-label="Phân trang bài làm">
+      <ul class="pagination pagination-sm justify-content-end mb-0">
+        {% if attempt_page.has_previous %}<li class="page-item"><a class="page-link" href="?attempt_page={{ attempt_page.previous_page_number }}&package_page={{ package_page.number }}">Trước</a></li>{% endif %}
+        <li class="page-item disabled"><span class="page-link">Trang {{ attempt_page.number }}/{{ attempt_page.paginator.num_pages }}</span></li>
+        {% if attempt_page.has_next %}<li class="page-item"><a class="page-link" href="?attempt_page={{ attempt_page.next_page_number }}&package_page={{ package_page.number }}">Sau</a></li>{% endif %}
+      </ul>
+    </nav>{% endif %}
+  </div></section>
+
+  <section class="card border-0 shadow-sm rounded-4 overflow-hidden"><div class="card-body p-0">
+    <div class="p-4 border-bottom bg-white"><h2 class="h5 mb-0">Gói đề tải đã tạo</h2></div>
+    {% if package_page %}<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-uppercase small text-muted"><tr><th class="ps-4">Kỳ kiểm tra</th><th>Thời gian tạo</th><th>Ma trận</th><th>Trạng thái</th><th class="text-end pe-4">Tải lại</th></tr></thead>
+      <tbody>{% regroup package_page.object_list by package.session.name as package_groups %}{% for group in package_groups %}
+        <tr class="table-primary-subtle"><th colspan="5" class="ps-4 py-3 text-primary-emphasis">{{ group.grouper }}</th></tr>
+        {% for row in group.list %}{% with package=row.package %}<tr>
+          <td class="ps-4 fw-semibold">{{ package.session.name }}</td><td>{{ package.created_at|date:"H:i d/m/Y" }}</td>
+          <td>{{ package.blueprint_version }}</td><td><span class="badge rounded-pill text-bg-light border">{{ package.get_status_display }}</span></td>
+          <td class="text-end pe-4">{% if package.status == 'READY' %}
+            <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'assessment:resource_download' package.pk 'exam' %}?variants=1">Đề</a>
+            {% if row.answers_released %}<a class="btn btn-sm btn-outline-danger rounded-pill px-3" href="{% url 'assessment:resource_download' package.pk 'exam_answers' %}?variants=1">Đề + đáp án</a>{% endif %}
+            <a class="btn btn-sm btn-outline-secondary rounded-pill px-3" href="{% url 'assessment:resource_download' package.pk 'blueprint' %}">Ma trận + đặc tả</a>
+          {% else %}<span class="text-muted">Chưa sẵn sàng</span>{% endif %}</td>
+        </tr>{% endwith %}{% endfor %}
+      {% endfor %}</tbody>
+    </table></div>{% else %}<p class="text-muted p-4 mb-0">Chưa có gói đề tải.</p>{% endif %}
+    {% if package_page.has_other_pages %}<nav class="p-3 border-top" aria-label="Phân trang gói đề">
+      <ul class="pagination pagination-sm justify-content-end mb-0">
+        {% if package_page.has_previous %}<li class="page-item"><a class="page-link" href="?attempt_page={{ attempt_page.number }}&package_page={{ package_page.previous_page_number }}">Trước</a></li>{% endif %}
+        <li class="page-item disabled"><span class="page-link">Trang {{ package_page.number }}/{{ package_page.paginator.num_pages }}</span></li>
+        {% if package_page.has_next %}<li class="page-item"><a class="page-link" href="?attempt_page={{ attempt_page.number }}&package_page={{ package_page.next_page_number }}">Sau</a></li>{% endif %}
+      </ul>
+    </nav>{% endif %}
+  </div></section>
+</main>
+{% endblock %}

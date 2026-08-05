@@ -59,16 +59,34 @@ class Command(BaseCommand):
                 parsed.errors = [e for e in parsed.errors if e.get("question_id") == options["question_id"]]
             report = BankSyncService().preview(parsed)
             report["configuration"] = MasterConfigurationSync().preview(parsed)
-            report.update({"source_sha256": parsed.source_sha256, "mode": "APPLY" if options["apply"] else "DRY_RUN"})
+            report.update({
+                "source_sha256": parsed.source_sha256,
+                "mode": "APPLY_VALIDATION" if options["apply"] else "DRY_RUN",
+            })
             self.stdout.write(json.dumps(report, ensure_ascii=False, indent=2, default=str))
             if parsed.has_fatal_errors:
+                if options["apply"]:
+                    self.stdout.write(json.dumps({
+                        "mode": "APPLY_FAILED", "error": "Validation failed",
+                        "source_sha256": parsed.source_sha256,
+                    }, ensure_ascii=False, indent=2))
                 raise CommandError("Validation failed; no changes were applied")
             if options["apply"]:
-                with transaction.atomic():
-                    log = BankSyncService().apply(parsed, source_label=source)
-                    configuration = MasterConfigurationSync().apply(parsed)
-                self.stdout.write(self.style.SUCCESS(f"Applied atomically; sync log #{log.pk}"))
-                self.stdout.write(json.dumps({"configuration_applied": configuration}, ensure_ascii=False, indent=2, default=str))
+                try:
+                    with transaction.atomic():
+                        log = BankSyncService().apply(parsed, source_label=source)
+                        configuration = MasterConfigurationSync().apply(parsed)
+                except Exception as exc:
+                    self.stdout.write(json.dumps({
+                        "mode": "APPLY_FAILED", "error": str(exc),
+                        "source_sha256": parsed.source_sha256,
+                    }, ensure_ascii=False, indent=2))
+                    raise CommandError("Apply failed; transaction rolled back") from exc
+                self.stdout.write(json.dumps({
+                    "mode": "APPLY_SUCCESS", "sync_log_id": log.pk,
+                    "configuration_applied": configuration,
+                    "source_sha256": parsed.source_sha256,
+                }, ensure_ascii=False, indent=2, default=str))
             else:
                 self.stdout.write(self.style.SUCCESS("Dry-run completed; database unchanged"))
         except (BankValidationError, requests.RequestException, OSError) as exc:

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from assessment.models import (
-    AssessmentAuditLog, BankQuestion, BlueprintSection, BlueprintSlot, BlueprintVersion, ExamBlueprint,
+    AssessmentAuditLog, BankQuestion, BankQuestionRevision, BlueprintSection, BlueprintSlot, BlueprintVersion, ExamBlueprint,
     ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 from assessment.services.blueprint_validator import BlueprintValidator
@@ -40,13 +40,20 @@ class BlueprintTests(TestCase):
 
     @staticmethod
     def create_question(question_id, family=""):
-        return BankQuestion.objects.create(
+        question = BankQuestion.objects.create(
             source_question_id=question_id, question_type="MCQ_SINGLE",
             cognitive_level="BIET", difficulty=1, source_status="ACTIVE",
             process_status="READY_FOR_GRADUATION", use_purpose="GRADUATION",
             content_hash=question_id.ljust(64, "0")[:64], is_available=True,
             duplicate_family_id=family,
         )
+        revision = BankQuestionRevision.objects.create(
+            question=question, source_version="1", content_hash=question.content_hash,
+            stem_text=question_id, protected_answer={"answer_key": "A"},
+        )
+        question.current_revision = revision
+        question.save(update_fields=("current_revision",))
+        return question
 
     def test_validator_accepts_totals_inventory_and_scoring_coverage(self):
         self.create_question("Q1")
@@ -88,7 +95,10 @@ class BlueprintTests(TestCase):
         self.create_question("Q2")
         lock_blueprint_version(self.version, scoring_version=self.scoring_version)
         self.version.refresh_from_db()
+        self.blueprint.refresh_from_db()
         self.assertTrue(self.version.is_locked)
+        self.assertTrue(self.blueprint.is_locked)
+        self.assertTrue(self.blueprint.is_ready)
         self.assertTrue(AssessmentAuditLog.objects.filter(action="LOCK_BLUEPRINT_VERSION").exists())
         self.version.duration_minutes = 60
         with self.assertRaises(ValidationError):
