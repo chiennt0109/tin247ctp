@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Tài nguyên của tôi{% endblock %}
+{% block content %}
+<main class="container py-4">
+  <a href="{% url 'assessment:exam_list' %}" class="text-decoration-none">← Các kỳ kiểm tra</a>
+  <h1 class="h3 mt-3">Tài nguyên của tôi</h1>
+  <p class="text-muted">Tải lại đề đã sinh từ bài làm trực tuyến hoặc gói đề tải. Tải lại không trừ thêm lượt.</p>
+
+  <section class="card border-0 shadow-sm mb-4"><div class="card-body">
+    <h2 class="h5">Đề từ bài làm trực tuyến</h2>
+    {% if attempt_rows %}<div class="table-responsive"><table class="table align-middle">
+      <thead><tr><th>Kỳ kiểm tra</th><th>Lần</th><th>Thời gian tạo</th><th>Ma trận</th><th>Tải lại</th></tr></thead>
+      <tbody>{% for row in attempt_rows %}{% with attempt=row.attempt visibility=row.visibility %}<tr>
+        <td>{{ attempt.session.name }}</td><td>{{ attempt.attempt_number }}</td>
+        <td>{{ attempt.started_at|date:"H:i d/m/Y" }}</td><td>{{ attempt.blueprint_version }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'assessment:attempt_download' attempt.pk 'exam' %}?variants=1">Đề</a>
+          {% if visibility.answers %}<a class="btn btn-sm btn-outline-danger" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}?variants=1">Đề + đáp án</a>{% endif %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'assessment:attempt_download' attempt.pk 'blueprint' %}">Ma trận + đặc tả</a>
+        </td>
+      </tr>{% endwith %}{% endfor %}</tbody>
+    </table></div>{% else %}<p class="text-muted mb-0">Chưa có bài làm trực tuyến.</p>{% endif %}
+  </div></section>
+
+  <section class="card border-0 shadow-sm"><div class="card-body">
+    <h2 class="h5">Gói đề tải đã tạo</h2>
+    {% if package_rows %}<div class="table-responsive"><table class="table align-middle">
+      <thead><tr><th>Kỳ kiểm tra</th><th>Thời gian tạo</th><th>Ma trận</th><th>Trạng thái</th><th>Tải lại</th></tr></thead>
+      <tbody>{% for row in package_rows %}{% with package=row.package %}<tr>
+        <td>{{ package.session.name }}</td><td>{{ package.created_at|date:"H:i d/m/Y" }}</td>
+        <td>{{ package.blueprint_version }}</td><td>{{ package.get_status_display }}</td>
+        <td>{% if package.status == 'READY' %}
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'assessment:resource_download' package.pk 'exam' %}?variants=1">Đề</a>
+          {% if row.answers_released %}<a class="btn btn-sm btn-outline-danger" href="{% url 'assessment:resource_download' package.pk 'exam_answers' %}?variants=1">Đề + đáp án</a>{% endif %}
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'assessment:resource_download' package.pk 'blueprint' %}">Ma trận + đặc tả</a>
+        {% else %}<span class="text-muted">Chưa sẵn sàng</span>{% endif %}</td>
+      </tr>{% endwith %}{% endfor %}</tbody>
+    </table></div>{% else %}<p class="text-muted mb-0">Chưa có gói đề tải.</p>{% endif %}
+  </div></section>
+</main>
+{% endblock %}

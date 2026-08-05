@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from assessment.models import AssessmentAuditLog, ExamSession
 from assessment.services.blueprint_versioning import lock_blueprint_version
+from assessment.services.scoring_versioning import lock_scoring_version
 
 
 @transaction.atomic
@@ -20,8 +21,9 @@ def publish_exam_session(session, *, actor=None):
             session.blueprint_version, scoring_version=session.scoring_version, approver=actor,
         )
     if not session.scoring_version.is_locked:
-        session.scoring_version.is_locked = True
-        session.scoring_version.save(update_fields=("is_locked",))
+        lock_scoring_version(
+            session.scoring_version, blueprint_version=session.blueprint_version, actor=actor,
+        )
     now = timezone.now()
     session.status = ExamSession.Status.OPEN if session.opens_at <= now < session.closes_at else ExamSession.Status.SCHEDULED
     session.published_at = now
