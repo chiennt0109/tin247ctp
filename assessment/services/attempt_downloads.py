@@ -50,9 +50,33 @@ def build_attempt_download_zip(*, attempt, user, package, variants=1):
         raise ValidationError("Gói tải xuống không hợp lệ.")
 
     attempt = _hydrate_attempt(attempt.pk)
+    return _build_zip(attempt=attempt, package=package, variants=variants, grant_id=permission.grant_id)
+
+
+def build_resource_package_zip(*, resource_package, user, package, variants=1):
+    if resource_package.user_id != user.pk:
+        raise PermissionDenied("Bạn không có quyền tải gói này.")
+    permission = user_download_permission(user, resource_package.session)
+    if not permission.allowed:
+        raise PermissionDenied("Tài khoản chưa được cấp quyền tải đề.")
+    try:
+        variants = int(variants)
+    except (TypeError, ValueError) as exc:
+        raise ValidationError("Số mã đề không hợp lệ.") from exc
+    if variants not in VARIANT_CHOICES or variants > MAX_VARIANTS:
+        raise ValidationError("Chỉ được tạo 1, 4 hoặc 8 mã đề.")
+    if package not in {"exam", "exam_answers", "blueprint"}:
+        raise ValidationError("Gói tải xuống không hợp lệ.")
+    return _build_zip(
+        attempt=_ResourcePackageAttempt(resource_package),
+        package=package, variants=variants, grant_id=permission.grant_id,
+    )
+
+
+def _build_zip(*, attempt, package, variants, grant_id):
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
-        archive.writestr("README.txt", _readme(attempt, package, variants, permission.grant_id))
+        archive.writestr("README.txt", _readme(attempt, package, variants, grant_id))
         if package in {"exam", "exam_answers"}:
             include_answers = package == "exam_answers"
             for index in range(1, variants + 1):
@@ -206,3 +230,14 @@ def _scoring_payload(attempt):
         ],
     }
     return json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+class _ResourcePackageAttempt:
+    def __init__(self, resource_package):
+        self.pk = resource_package.pk
+        self.user_id = resource_package.user_id
+        self.session = resource_package.session
+        self.generated_exam = resource_package.generated_exam
+        self.blueprint = resource_package.blueprint
+        self.blueprint_id = resource_package.blueprint_id
+        self.blueprint_version = resource_package.blueprint_version

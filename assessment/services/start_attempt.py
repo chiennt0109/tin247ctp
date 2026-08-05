@@ -8,12 +8,13 @@ from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-from assessment.models import AssessmentAuditLog, ExamAttempt, ExamSession
+from assessment.models import AssessmentAuditLog, ExamAttempt, ExamSession, ExamUsageRecord
 from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.exam_generator import ExamGenerationError, ExamGenerator
 from assessment.services.equivalence import validate_equivalence_group
 from assessment.services.session_configuration import resolve_locked_configuration
 from assessment.services.access_grants import resolve_exam_access
+from assessment.services.usage_ledger import commit_usage, committed_usage_count, reserve_usage
 
 
 class StartAttemptError(ValueError):
@@ -82,7 +83,7 @@ def _group_configuration(session, user):
     return blueprint_version, scoring_version
 
 
-def start_attempt(user, exam_session):
+def start_attempt(user, exam_session, *, idempotency_key=None):
     with _start_lock(exam_session.pk, user.pk):
         try:
             with transaction.atomic():
@@ -118,12 +119,22 @@ def start_attempt(user, exam_session):
                         raise StartAttemptError("Bài làm đang mở không có đề; quản trị viên cần kiểm tra.")
                     return existing
 
-                used = ExamAttempt.objects.filter(user=user, session=session).exclude(
-                    status=ExamAttempt.Status.INVALIDATED
-                ).count()
+                used = committed_usage_count(user, session)
                 if access.max_attempts is not None and used >= access.max_attempts:
                     raise StartAttemptError("Bạn đã sử dụng hết số lượt làm.")
-                attempt_number = used + 1
+                attempt_number = ExamAttempt.objects.filter(user=user, session=session).exclude(
+                    status=ExamAttempt.Status.INVALIDATED
+                ).count() + 1
+                usage_key = idempotency_key or f"online:{session.pk}:{user.pk}:{attempt_number}"
+                usage, created_usage = reserve_usage(
+                    user=user, session=session,
+                    usage_type=ExamUsageRecord.UsageType.ONLINE_ATTEMPT,
+                    idempotency_key=usage_key,
+                )
+                if not created_usage and usage.status == ExamUsageRecord.Status.COMMITTED and usage.exam_attempt_id:
+                    return usage.exam_attempt
+                if not created_usage and usage.status == ExamUsageRecord.Status.RESERVED:
+                    raise StartAttemptError("Yêu cầu bắt đầu đang được xử lý, vui lòng thử lại.")
                 duration = session.duration_minutes
                 natural_expiry = now + timedelta(minutes=duration)
                 deadlines = [natural_expiry, closes_at]
@@ -150,6 +161,7 @@ def start_attempt(user, exam_session):
                     expires_at=expires_at, generated_exam=exam,
                     blueprint=blueprint_version.blueprint, blueprint_version=blueprint_version,
                 )
+                commit_usage(usage, attempt=attempt)
                 AssessmentAuditLog.objects.create(
                     action="START_ATTEMPT", actor=user, object_type="ExamAttempt",
                     object_id=str(attempt.pk), details={

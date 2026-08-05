@@ -12,7 +12,8 @@ import tempfile
 from assessment.models import (
     AssessmentAuditLog, AttemptAnswer, BankQuestion, BankQuestionRevision, BankSourceFile,
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
-    ExamAccessGrant, ExamAttempt, ExamBlueprint, ExamBlueprintGroup, ExamSession, GeneratedExam, GeneratedExamQuestion,
+    ExamAccessGrant, ExamAttempt, ExamBlueprint, ExamBlueprintGroup, ExamResourcePackage,
+    ExamSession, ExamUsageRecord, GeneratedExam, GeneratedExamQuestion,
     GradingResult,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
@@ -601,3 +602,32 @@ class GradingResultAdmin(ReadOnlyProjectionAdmin):
 
 
 _install_assessment_admin_menu()
+
+
+@admin.register(ExamUsageRecord)
+class ExamUsageRecordAdmin(admin.ModelAdmin):
+    list_display = ("user", "exam_session", "usage_type", "status", "created_at", "committed_at")
+    list_filter = ("usage_type", "status")
+    search_fields = ("user__username", "exam_session__name", "idempotency_key")
+    readonly_fields = (
+        "user", "exam_session", "usage_type", "status", "exam_attempt",
+        "resource_package", "idempotency_key", "created_at", "committed_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(ExamResourcePackage)
+class ExamResourcePackageAdmin(admin.ModelAdmin):
+    list_display = ("session", "user", "blueprint_version", "status", "created_at", "last_downloaded_at")
+    list_filter = ("status", "session")
+    search_fields = ("user__username", "session__name", "content_hash")
+    readonly_fields = (
+        "user", "session", "generated_exam", "blueprint", "blueprint_version",
+        "seed", "question_snapshot", "answer_snapshot", "scoring_snapshot",
+        "manifest", "content_hash", "status", "created_at", "last_downloaded_at",
+    )
+
+    def has_add_permission(self, request):
+        return False

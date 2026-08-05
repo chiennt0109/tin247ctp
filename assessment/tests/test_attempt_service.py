@@ -4,18 +4,23 @@ import zipfile
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.db import connection
 from django.urls import reverse
 from django.utils import timezone
 
-from assessment.models import AttemptAnswer, ExamAccessGrant, ExamAttempt
+from assessment.models import (
+    AttemptAnswer, ExamAccessGrant, ExamAttempt, ExamResourcePackage, ExamUsageRecord,
+)
 from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
-from assessment.services.start_attempt import start_attempt
+from assessment.services.resource_packages import create_resource_package
+from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.admin_workflow import close_exam_session
+from assessment.services.usage_ledger import committed_usage_count
 from assessment.tests.test_start_attempt import StartAttemptTests
 
 
@@ -127,8 +132,8 @@ class AttemptServiceTests(TestCase):
         visible = self.client.get(reverse("assessment:attempt_detail", args=(attempt.pk,)))
 
         self.assertContains(visible, "Download đề")
-        self.assertContains(visible, "Đề + đáp án")
         self.assertContains(visible, "Ma trận + đặc tả")
+        self.assertNotContains(visible, "Đề + đáp án")
 
     def test_download_exam_zip_is_bounded_and_uses_generated_snapshot(self):
         user, attempt = self.create_attempt("download-zip")
@@ -145,7 +150,7 @@ class AttemptServiceTests(TestCase):
         self.assertEqual(denied.status_code, 400)
 
         response = self.client.get(reverse(
-            "assessment:attempt_download", args=(attempt.pk, "exam_answers"),
+            "assessment:attempt_download", args=(attempt.pk, "exam"),
         ) + "?variants=4")
 
         self.assertEqual(response.status_code, 200)
@@ -154,11 +159,9 @@ class AttemptServiceTests(TestCase):
             names = set(archive.namelist())
             self.assertIn("de-thi/ma-01.txt", names)
             self.assertIn("de-thi/ma-04.txt", names)
-            self.assertIn("ma-tran/blueprint.json", names)
-            self.assertIn("dac-ta/scoring.json", names)
             exam_text = archive.read("de-thi/ma-01.txt").decode()
         self.assertIn(attempt.session.name, exam_text)
-        self.assertIn("Đáp án", exam_text)
+        self.assertNotIn("Đáp án", exam_text)
 
     def test_download_denied_without_grant_or_for_another_user(self):
         user, attempt = self.create_attempt("download-denied-owner")
@@ -180,6 +183,63 @@ class AttemptServiceTests(TestCase):
             "assessment:attempt_download", args=(attempt.pk, "blueprint"),
         ))
         self.assertEqual(other_user.status_code, 404)
+
+
+    def test_online_attempt_and_download_package_share_quota(self):
+        user = get_user_model().objects.create_user("shared-quota")
+        session = self.open_session()
+        ExamAccessGrant.objects.create(
+            session=session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+
+        first = start_attempt(user, session, idempotency_key="online-one")
+        submit_attempt(attempt_id=first.pk, user=user)
+        package = create_resource_package(user, session, idempotency_key="download-one")
+
+        self.assertEqual(committed_usage_count(user, session), 2)
+        self.assertEqual(ExamUsageRecord.objects.filter(status=ExamUsageRecord.Status.COMMITTED).count(), 2)
+        self.assertEqual(package.status, ExamResourcePackage.Status.READY)
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
+            start_attempt(user, session, idempotency_key="online-two")
+
+    def test_download_package_retry_is_idempotent_and_redownload_is_free(self):
+        user = get_user_model().objects.create_user("download-idempotent")
+        session = self.open_session()
+        ExamAccessGrant.objects.create(
+            session=session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        first = create_resource_package(user, session, idempotency_key="same-download-click")
+        second = create_resource_package(user, session, idempotency_key="same-download-click")
+        self.client.force_login(user)
+        response = self.client.get(reverse(
+            "assessment:resource_download", args=(first.pk, "exam"),
+        ) + "?variants=1")
+
+        self.assertEqual(first.pk, second.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(committed_usage_count(user, session), 1)
+
+    def test_stale_reservation_cleanup_releases_usage_without_deleting_real_data(self):
+        user, attempt = self.create_attempt("cleanup-usage")
+        reserved = ExamUsageRecord.objects.create(
+            user=user, exam_session=attempt.session,
+            usage_type=ExamUsageRecord.UsageType.DOWNLOAD_PACKAGE,
+            status=ExamUsageRecord.Status.RESERVED, idempotency_key="stale",
+        )
+        ExamUsageRecord.objects.filter(pk=reserved.pk).update(
+            created_at=timezone.now() - timedelta(hours=2),
+        )
+
+        call_command("cleanup_exam_resources", "--apply", verbosity=0)
+
+        reserved.refresh_from_db()
+        self.assertEqual(reserved.status, ExamUsageRecord.Status.RELEASED)
+        self.assertTrue(ExamAttempt.objects.filter(pk=attempt.pk).exists())
+        self.assertEqual(committed_usage_count(user, attempt.session), 1)
 
     def test_attempt_page_contains_no_protected_answer_material(self):
         user, attempt = self.create_attempt()

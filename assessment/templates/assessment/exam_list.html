@@ -8,7 +8,8 @@
     <div>
       <p class="text-primary fw-semibold mb-1">📝 Kiểm tra và luyện tập</p>
       <h1 id="assessment-title" class="h2 fw-bold mb-1">Tin học đại trà</h1>
-      <p class="text-muted mb-0">Các kỳ kiểm tra tài khoản của bạn được phép tham gia.</p>
+      <p class="text-muted mb-0">Các kỳ kiểm tra và tài nguyên đề tài khoản của bạn được phép tham gia.</p>
+      <a class="btn btn-outline-secondary btn-sm mt-2" href="{% url 'assessment:my_resources' %}">Tài nguyên của tôi</a>
     </div>
   </div>
 
@@ -30,10 +31,11 @@
                 <dl class="row small mb-0 mt-3">
                   <dt class="col-5">Thời lượng</dt>
                   <dd class="col-7">{{ exam.duration_minutes }} phút</dd>
-                  <dt class="col-5">Số lần làm</dt>
+                  <dt class="col-5">Hạn mức chung</dt>
                   <dd class="col-7">
                     Đã dùng {{ card.attempts_used }} ·
                     {% if card.attempts_remaining is None %}Không giới hạn{% else %}Còn {{ card.attempts_remaining }}{% endif %}
+                    <br><span class="text-muted">Online {{ card.usage_breakdown.online_attempts }} · Tải đề {{ card.usage_breakdown.download_packages }}</span>
                   </dd>
                   <dt class="col-5">Thời gian mở</dt>
                   <dd class="col-7">{{ exam.opens_at|date:"H:i d/m/Y" }}</dd>
@@ -45,11 +47,21 @@
                 {% elif card.can_start %}
                   <form method="post" action="{% url 'assessment:start_exam' exam.slug %}" class="mt-3 start-exam-form" data-duration="{{ exam.duration_minutes }}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Bắt đầu</button>
+                    <input type="hidden" name="idempotency_key" value="{{ card.online_idempotency_key }}">
+                    <button type="submit" class="btn btn-primary">Bắt đầu làm bài</button>
                   </form>
                 {% else %}
                   {% if card.unavailable_reason %}<div class="alert alert-warning py-2 mt-3 mb-0" role="status">{{ card.unavailable_reason }}</div>{% endif %}
                   <button class="btn btn-secondary mt-2" disabled>Không thể bắt đầu</button>
+                {% endif %}
+                {% if card.can_start and card.download_allowed %}
+                  <form method="post" action="{% url 'assessment:create_download_resource' exam.slug %}" class="d-inline-block mt-3 ms-2 create-resource-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="idempotency_key" value="{{ card.download_idempotency_key }}">
+                    <button type="submit" class="btn btn-outline-primary">Tạo đề để tải</button>
+                  </form>
+                {% elif card.download_allowed and card.unavailable_reason %}
+                  <button class="btn btn-outline-secondary mt-3 ms-2" disabled>Không thể tạo đề tải</button>
                 {% endif %}
                 {% if card.latest_result %}
                   <a class="btn btn-outline-primary mt-3" href="{% url 'assessment:attempt_result' card.latest_result.pk %}">Xem kết quả</a>
@@ -69,6 +81,17 @@
 </section>
 <script>
 (() => {
+  document.querySelectorAll('.create-resource-form').forEach(form => {
+    let creating = false;
+    form.addEventListener('submit', event => {
+      if (creating) { event.preventDefault(); return; }
+      if (!window.confirm('Tạo một gói đề mới để tải sẽ sử dụng 1 lượt chung. Bạn muốn tiếp tục?')) {
+        event.preventDefault(); return;
+      }
+      creating = true;
+      form.querySelector('button[type="submit"]').disabled = true;
+    });
+  });
   document.querySelectorAll('.start-exam-form').forEach(form => {
     let starting = false;
     form.addEventListener('submit', event => {

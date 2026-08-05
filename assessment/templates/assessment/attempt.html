@@ -22,7 +22,7 @@
           </select>
         </label>
         <a class="btn btn-sm btn-outline-primary download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam' %}">Download đề</a>
-        <a class="btn btn-sm btn-outline-danger download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}">Đề + đáp án</a>
+        {% if allow_attempt_answer_download %}<a class="btn btn-sm btn-outline-danger download-with-variants" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}">Đề + đáp án</a>{% endif %}
         <a class="btn btn-sm btn-outline-secondary" href="{% url 'assessment:attempt_download' attempt.pk 'blueprint' %}">Ma trận + đặc tả</a>
       </div>
     </div></section>

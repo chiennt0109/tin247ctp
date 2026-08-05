@@ -656,6 +656,77 @@ class GeneratedExamAsset(models.Model):
     checksum_snapshot = models.CharField(max_length=128, blank=True)
 
 
+class ExamResourcePackage(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Đang tạo"
+        READY = "READY", "Sẵn sàng"
+        FAILED = "FAILED", "Lỗi"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="assessment_resource_packages"
+    )
+    session = models.ForeignKey(ExamSession, on_delete=models.PROTECT, related_name="resource_packages")
+    generated_exam = models.OneToOneField(
+        GeneratedExam, on_delete=models.PROTECT, related_name="resource_package"
+    )
+    blueprint = models.ForeignKey(ExamBlueprint, on_delete=models.PROTECT, related_name="resource_packages")
+    blueprint_version = models.ForeignKey(
+        BlueprintVersion, on_delete=models.PROTECT, related_name="resource_packages"
+    )
+    seed = models.CharField(max_length=128)
+    question_snapshot = models.JSONField(default=list, blank=True)
+    answer_snapshot = models.JSONField(default=dict, blank=True)
+    scoring_snapshot = models.JSONField(default=dict, blank=True)
+    manifest = models.JSONField(default=dict, blank=True)
+    content_hash = models.CharField(max_length=64, db_index=True)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_downloaded_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+
+class ExamUsageRecord(models.Model):
+    class UsageType(models.TextChoices):
+        ONLINE_ATTEMPT = "ONLINE_ATTEMPT", "Làm bài trực tuyến"
+        DOWNLOAD_PACKAGE = "DOWNLOAD_PACKAGE", "Tạo đề tải"
+
+    class Status(models.TextChoices):
+        RESERVED = "RESERVED", "Đã giữ lượt"
+        COMMITTED = "COMMITTED", "Đã dùng lượt"
+        RELEASED = "RELEASED", "Đã hoàn lượt"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="assessment_usage_records"
+    )
+    exam_session = models.ForeignKey(
+        ExamSession, on_delete=models.PROTECT, related_name="usage_records"
+    )
+    usage_type = models.CharField(max_length=32, choices=UsageType.choices)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.RESERVED, db_index=True)
+    exam_attempt = models.OneToOneField(
+        "ExamAttempt", null=True, blank=True, on_delete=models.PROTECT, related_name="usage_record"
+    )
+    resource_package = models.OneToOneField(
+        ExamResourcePackage, null=True, blank=True, on_delete=models.PROTECT, related_name="usage_record"
+    )
+    idempotency_key = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    committed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user", "exam_session", "idempotency_key"),
+                name="assessment_unique_usage_idempotency",
+            ),
+        ]
+        indexes = [models.Index(fields=("user", "exam_session", "status"), name="assessment_usage_quota_idx")]
+        ordering = ("-created_at",)
+
+
 class ExamAttempt(models.Model):
     class Status(models.TextChoices):
         IN_PROGRESS = "IN_PROGRESS", "Đang làm"

@@ -1,9 +1,9 @@
 import json
+import uuid
 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.cache import cache
-from django.db.models import Count, Q
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
-from assessment.models import ExamAttempt, ExamSession, GradingResult
+from assessment.models import ExamAttempt, ExamResourcePackage, ExamSession, GradingResult
 from assessment.models import AssessmentAuditLog
 from assessment.services.analytics import exam_results_dashboard, official_attempts, student_result_summary
 from assessment.services.attempt_service import (
@@ -20,6 +20,10 @@ from assessment.services.attempt_service import (
 from assessment.services.attempt_downloads import (
     build_attempt_download_zip, user_download_permission,
 )
+from assessment.services.resource_packages import (
+    ResourcePackageError, create_resource_package, download_package_zip,
+)
+from assessment.services.usage_ledger import usage_breakdown
 from assessment.services.start_attempt import StartAttemptError, effective_exam_access, start_attempt
 from assessment.services.result_release import result_visibility
 from assessment.services.result_presentation import result_sections
@@ -49,9 +53,6 @@ def exam_list(request):
         )
         .select_related("blueprint_version")
         .prefetch_related("access_groups")
-        .annotate(
-            attempts_used=Count("attempts", filter=Q(attempts__user=request.user) & ~Q(attempts__status="INVALIDATED"))
-        )
         .order_by("opens_at", "name")
     )
     cards = []
@@ -68,9 +69,11 @@ def exam_list(request):
         latest_result = ExamAttempt.objects.filter(
             user=request.user, session=session, status=ExamAttempt.Status.GRADED,
         ).order_by("-attempt_number").first()
+        breakdown = usage_breakdown(request.user, session)
+        used_total = breakdown["total"]
         attempts_remaining = (
             None if access.max_attempts is None
-            else max(access.max_attempts - session.attempts_used, 0)
+            else max(access.max_attempts - used_total, 0)
         )
         unavailable_reason = access.reason
         session_can_start = (
@@ -89,8 +92,11 @@ def exam_list(request):
             and (attempts_remaining is None or attempts_remaining > 0)
         )
         cards.append({
-            "session": session, "attempts_used": session.attempts_used,
-            "attempts_remaining": attempts_remaining,
+            "session": session, "attempts_used": used_total,
+            "usage_breakdown": breakdown, "attempts_remaining": attempts_remaining,
+            "download_allowed": user_download_permission(request.user, session).allowed,
+            "online_idempotency_key": uuid.uuid4().hex,
+            "download_idempotency_key": uuid.uuid4().hex,
             "can_start": can_start, "unavailable_reason": unavailable_reason,
             "active_attempt": active,
             "latest_result": latest_result,
@@ -107,11 +113,27 @@ def exam_list(request):
 def start_exam(request, slug):
     session = get_object_or_404(ExamSession, slug=slug)
     try:
-        attempt = start_attempt(request.user, session)
+        attempt = start_attempt(
+            request.user, session,
+            idempotency_key=request.POST.get("idempotency_key") or None,
+        )
     except StartAttemptError as exc:
         messages.error(request, str(exc))
         return redirect("assessment:exam_list")
     return redirect("assessment:attempt_detail", attempt_id=attempt.pk)
+
+@login_required
+@require_POST
+def create_download_resource(request, slug):
+    session = get_object_or_404(ExamSession, slug=slug)
+    key = request.POST.get("idempotency_key") or uuid.uuid4().hex
+    try:
+        package = create_resource_package(request.user, session, idempotency_key=key)
+    except ResourcePackageError as exc:
+        messages.error(request, str(exc))
+        return redirect("assessment:exam_list")
+    messages.success(request, "Đã tạo gói đề tải. Bạn có thể tải lại trong Tài nguyên của tôi.")
+    return redirect("assessment:my_resources")
 
 
 @login_required
@@ -156,7 +178,64 @@ def attempt_detail(request, attempt_id):
         "server_now_ms": int(timezone.now().timestamp() * 1000),
         "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
         "allow_attempt_download": download_permission.allowed,
+        "allow_attempt_answer_download": False,
     })
+
+
+
+def _session_answers_released(session, *, now=None):
+    now = now or timezone.now()
+    return (
+        (session.answer_release_mode == ExamSession.ReleaseMode.AFTER_CLOSE and now >= session.closes_at)
+        or (session.answer_release_mode == ExamSession.ReleaseMode.MANUAL and bool(session.answers_released_at))
+        or (
+            session.answer_release_mode == ExamSession.ReleaseMode.AT_TIME
+            and bool(session.answer_release_at and now >= session.answer_release_at)
+        )
+    )
+
+@login_required
+def my_resources(request):
+    attempts = ExamAttempt.objects.filter(user=request.user).select_related(
+        "session", "generated_exam", "blueprint_version",
+    ).order_by("-started_at")
+    attempt_rows = [
+        {"attempt": attempt, "visibility": result_visibility(attempt)}
+        for attempt in attempts
+    ]
+    packages = ExamResourcePackage.objects.filter(user=request.user).select_related(
+        "session", "generated_exam", "blueprint_version",
+    ).order_by("-created_at")
+    package_rows = [
+        {"package": package, "answers_released": _session_answers_released(package.session)}
+        for package in packages
+    ]
+    return render(request, "assessment/my_resources.html", {
+        "attempt_rows": attempt_rows, "package_rows": package_rows,
+    })
+
+
+@login_required
+def download_resource_package(request, package_id, package):
+    resource = get_object_or_404(
+        ExamResourcePackage.objects.select_related("session", "generated_exam", "blueprint"),
+        pk=package_id, user=request.user, status=ExamResourcePackage.Status.READY,
+    )
+    variants = request.GET.get("variants", "1")
+    if package == "exam_answers" and not _session_answers_released(resource.session):
+        raise Http404
+    try:
+        payload = download_package_zip(resource, request.user, package_type=package, variants=variants)
+    except PermissionDenied:
+        raise Http404
+    except ValidationError as exc:
+        return JsonResponse({"error": "; ".join(exc.messages)}, status=400)
+    response = HttpResponse(payload, content_type="application/zip")
+    response["Content-Disposition"] = (
+        f'attachment; filename="assessment-resource-{resource.pk}-{package}.zip"'
+    )
+    response["Cache-Control"] = "no-store"
+    return response
 
 
 @login_required
@@ -165,6 +244,8 @@ def download_attempt_package(request, attempt_id, package):
         ExamAttempt.objects.select_related("session"), pk=attempt_id, user=request.user,
     )
     variants = request.GET.get("variants", "1")
+    if package == "exam_answers" and not result_visibility(attempt)["answers"]:
+        raise Http404
     try:
         payload = build_attempt_download_zip(
             attempt=attempt, user=request.user, package=package, variants=variants,
@@ -234,6 +315,7 @@ def attempt_state(request, attempt_id):
         "server_now_ms": int(timezone.now().timestamp() * 1000),
         "expires_at_ms": int(attempt.expires_at.timestamp() * 1000),
         "allow_attempt_download": download_permission.allowed,
+        "allow_attempt_answer_download": False,
     })
 
 
