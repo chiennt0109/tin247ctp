@@ -43,7 +43,7 @@ def _single_choice(question, submitted, expected):
     return str(expected_value).strip().upper() in accepted
 
 
-def _truth_values(value, size):
+def truth_values(value, size):
     if isinstance(value, dict):
         return [bool(value.get(str(index), value.get(index, False))) for index in range(size)]
     if isinstance(value, str):
@@ -87,8 +87,8 @@ def _grade_question(question, answer, rule):
         correct = _single_choice(question, submitted, expected)
         score = _decimal(config.get("correct", maximum)) if correct else _decimal(config.get("incorrect", 0))
     elif question.bank_question.question_type == "TRUE_FALSE_GROUP":
-        expected_values = _truth_values(expected.get("answer_key"), len(question.statements_snapshot))
-        submitted_values = _truth_values(submitted, len(question.statements_snapshot))
+        expected_values = truth_values(expected.get("answer_key"), len(question.statements_snapshot))
+        submitted_values = truth_values(submitted, len(question.statements_snapshot))
         correct_items = sum(a == b for a, b in zip(submitted_values, expected_values, strict=False))
         table = config.get("score_by_correct_count", {})
         score = _decimal(table.get(str(correct_items), maximum if correct_items == len(expected_values) else 0))

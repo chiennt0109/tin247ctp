@@ -69,6 +69,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "accounts.middleware.TrialDeviceCookieMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -178,6 +179,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 ACCOUNT_FORMS = {
     "signup": "accounts.forms.SecureSignupForm",
 }
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.TrialSocialAccountAdapter"
 
 #------------------------
 SOCIALACCOUNT_PROVIDERS = {
@@ -268,6 +270,16 @@ SUBMISSION_THROTTLE_ENABLED = True
 SUBMISSION_THROTTLE_RATE = 3          # max submissions
 SUBMISSION_THROTTLE_WINDOW = 60       # seconds
 SUBMISSION_THROTTLE_VIEWS = ["submissions:submission_create"]  # only judge submissions
+
+# General IT trial. IP/device values are risk signals, never hard identity.
+GENERAL_IT_TRIAL_ENABLED = os.environ.get("GENERAL_IT_TRIAL_ENABLED", "True").lower() == "true"
+GENERAL_IT_TRIAL_QUOTA = int(os.environ.get("GENERAL_IT_TRIAL_QUOTA", "3"))
+TRIAL_DEVICE_COOKIE_MAX_AGE_DAYS = int(os.environ.get("TRIAL_DEVICE_COOKIE_MAX_AGE_DAYS", "365"))
+TRIAL_IDENTITY_RETENTION_DAYS = int(os.environ.get("TRIAL_IDENTITY_RETENTION_DAYS", "180"))
+TRIAL_SIGNUP_IP_LIMIT_HOUR = int(os.environ.get("TRIAL_SIGNUP_IP_LIMIT_HOUR", "5"))
+TRIAL_SIGNUP_IP_LIMIT_DAY = int(os.environ.get("TRIAL_SIGNUP_IP_LIMIT_DAY", "20"))
+TRIAL_SIGNUP_DEVICE_LIMIT_DAY = int(os.environ.get("TRIAL_SIGNUP_DEVICE_LIMIT_DAY", "2"))
+TRIAL_SIGNUP_DEVICE_LIMIT_30D = int(os.environ.get("TRIAL_SIGNUP_DEVICE_LIMIT_30D", "5"))
 
 
 # =====================
