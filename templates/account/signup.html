@@ -20,7 +20,16 @@
       </div>
       <p class="rounded-xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">Mật khẩu tối thiểu 10 ký tự, không quá giống thông tin cá nhân, không phổ biến và không chỉ gồm chữ số.</p>
       <div class="sr-only" aria-hidden="true">{{ form.honeypot }}</div>
-      <div class="rounded-xl border border-slate-200 p-4">{{ form.captcha }}{% for error in form.captcha.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}</div>
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        {{ form.captcha_token }}
+        <label for="{{ form.captcha_answer.id_for_label }}" class="text-sm font-semibold text-slate-700">Xác minh bảo mật</label>
+        <div class="mt-2 flex items-center gap-4">
+          <span id="captcha-question" class="whitespace-nowrap rounded-lg bg-blue-100 px-4 py-3 text-lg font-bold tracking-wider text-blue-800">{{ form.captcha_question }}</span>
+          <div class="flex-1">{{ form.captcha_answer }}</div>
+        </div>
+        <p class="mt-2 text-xs text-slate-500">Thử thách bảo mật hết hạn sau 10 phút.</p>
+        {% for error in form.captcha_answer.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}
+      </div>
       <button type="submit" class="w-full rounded-xl bg-blue-600 px-4 py-3 font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200">Gửi đăng ký</button>
     </form>
     <p class="mt-7 text-center text-sm text-slate-600">Đã có tài khoản? <a href="{% url 'account_login' %}" class="font-bold text-blue-600 hover:underline">Đăng nhập</a></p>

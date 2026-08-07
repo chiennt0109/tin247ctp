@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    #captcha
-    "django_recaptcha",    
     "crispy_forms",
     "crispy_bootstrap5",
     # ung dung du an
@@ -180,16 +178,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 #Captcha
 
-# The site key is public and may safely have a production fallback. The secret
-# must only be supplied by the VPS environment/.env and is never committed.
-RECAPTCHA_PUBLIC_KEY = os.environ.get(
-    "RECAPTCHA_PUBLIC_KEY",
-    "6LcvP3ktAAAAANb-T5Mbkr0aOqLupPVPKjSkyYKl",
-).strip()
-RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY", "").strip()
-# Use Google's standard endpoint. This can be changed to www.recaptcha.net in
-# .env for networks where google.com is unavailable.
-RECAPTCHA_DOMAIN = os.environ.get("RECAPTCHA_DOMAIN", "www.google.com").strip()
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
