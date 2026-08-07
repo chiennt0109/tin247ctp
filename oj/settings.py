@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    #captcha
-    "django_recaptcha",    
     "crispy_forms",
     "crispy_bootstrap5",
     # ung dung du an
@@ -156,11 +154,23 @@ LOGOUT_REDIRECT_URL = "/"
 # =====================
 # ??  Allauth
 # =====================
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "none"
-ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_ADAPTER = "accounts.adapters.ApprovalAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.ApprovalSocialAccountAdapter"
+
+# Do not disclose whether an email is registered during password reset.
+ACCOUNT_PREVENT_ENUMERATION = True
+ACCOUNT_EMAIL_NOTIFICATIONS = True
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 10}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -168,9 +178,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 #Captcha
 
-RECAPTCHA_PUBLIC_KEY = os.environ.get("RECAPTCHA_PUBLIC_KEY", "")
-RECAPTCHA_PRIVATE_KEY = os.environ.get("RECAPTCHA_PRIVATE_KEY", "")
-RECAPTCHA_REQUIRED_SCORE = 0.85  
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
@@ -199,8 +206,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # 
-SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_DEBUG = True
+# OAuth login requires an explicit POST confirmation, reducing login-CSRF risk.
+SOCIALACCOUNT_LOGIN_ON_GET = False
 
 # 
 logging.basicConfig(level=logging.DEBUG)

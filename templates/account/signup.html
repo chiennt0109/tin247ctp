@@ -1,87 +1,38 @@
 {% extends "base.html" %}
-{% load static %}
-
+{% block title %}Đăng ký tài khoản | CodePath{% endblock %}
 {% block content %}
-<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-100 py-10">
-  <div class="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 border border-gray-200">
-    <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">
-      ✨ Đăng ký tài khoản
-    </h1>
-
-    <form method="post" action="{% url 'account_signup' %}" class="space-y-5" autocomplete="off" novalidate>
+<style>
+  .auth-shell{min-height:calc(100vh - 64px);background:radial-gradient(circle at 85% 15%,#dbeafe 0,transparent 28%),#f8fafc}.signup-card{box-shadow:0 24px 70px rgba(15,23,42,.13)}
+  .signup-card input:not([type=hidden]){width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.75rem 1rem;margin-top:.35rem;outline:none}.signup-card input:focus{border-color:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+</style>
+<section class="auth-shell flex items-center justify-center px-4 py-12">
+  <div class="signup-card w-full max-w-2xl rounded-3xl border border-white bg-white p-7 sm:p-11">
+    <div class="flex items-start gap-4"><div class="rounded-2xl bg-blue-600 p-3 text-2xl text-white">✦</div><div><p class="text-sm font-bold uppercase tracking-widest text-blue-600">Tạo hồ sơ học tập</p><h1 class="mt-1 text-3xl font-bold text-slate-900">Đăng ký tài khoản</h1><p class="mt-2 text-sm text-slate-500">Sau khi gửi, quản trị viên sẽ duyệt để kích hoạt tài khoản.</p></div></div>
+    {% if form.non_field_errors %}<div class="mt-6 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" action="{% url 'account_signup' %}" class="mt-8 space-y-5" autocomplete="off">
       {% csrf_token %}
-
-      <!-- Username -->
-      <div>
-        <label for="{{ form.username.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">
-          👤 Tên đăng nhập
-        </label>
-        {{ form.username }}
-        {% if form.username.errors %}
-          <div class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</div>
-        {% endif %}
+      {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div><label for="{{ form.username.id_for_label }}" class="text-sm font-semibold text-slate-700">Tên đăng nhập</label>{{ form.username }}{% for error in form.username.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}</div>
+        <div><label for="{{ form.email.id_for_label }}" class="text-sm font-semibold text-slate-700">Email</label>{{ form.email }}{% for error in form.email.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}</div>
+        <div><label for="{{ form.password1.id_for_label }}" class="text-sm font-semibold text-slate-700">Mật khẩu</label>{{ form.password1 }}{% for error in form.password1.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}</div>
+        <div><label for="{{ form.password2.id_for_label }}" class="text-sm font-semibold text-slate-700">Nhập lại mật khẩu</label>{{ form.password2 }}{% for error in form.password2.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}</div>
       </div>
-
-      <!-- Email -->
-      <div>
-        <label for="{{ form.email.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">
-          📧 Email
-        </label>
-        {{ form.email }}
-        {% if form.email.errors %}
-          <div class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</div>
-        {% endif %}
+      <p class="rounded-xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">Mật khẩu tối thiểu 10 ký tự, không quá giống thông tin cá nhân, không phổ biến và không chỉ gồm chữ số.</p>
+      <div class="sr-only" aria-hidden="true">{{ form.honeypot }}</div>
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        {{ form.captcha_token }}
+        <label for="{{ form.captcha_answer.id_for_label }}" class="text-sm font-semibold text-slate-700">Xác minh bảo mật</label>
+        <div class="mt-2 flex items-center gap-4">
+          <span id="captcha-question" class="whitespace-nowrap rounded-lg bg-blue-100 px-4 py-3 text-lg font-bold tracking-wider text-blue-800">{{ form.captcha_question }}</span>
+          <div class="flex-1">{{ form.captcha_answer }}</div>
+        </div>
+        <p class="mt-2 text-xs text-slate-500">Thử thách bảo mật hết hạn sau 10 phút.</p>
+        {% for error in form.captcha_answer.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}
       </div>
-
-      <!-- Password -->
-      <div>
-        <label for="{{ form.password1.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">
-          🔒 Mật khẩu
-        </label>
-        {{ form.password1 }}
-        <small class="text-gray-500 text-xs">
-          Mật khẩu cần ≥ 8 ký tự, có chữ hoa, thường, số và ký tự đặc biệt.
-        </small>
-        {% if form.password1.errors %}
-          <div class="text-red-600 text-sm mt-1">{{ form.password1.errors.0 }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Password Confirmation -->
-      <div>
-        <label for="{{ form.password2.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">
-          ✅ Nhập lại mật khẩu
-        </label>
-        {{ form.password2 }}
-        {% if form.password2.errors %}
-          <div class="text-red-600 text-sm mt-1">{{ form.password2.errors.0 }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Honeypot -->
-      <div class="hidden">
-        {{ form.honeypot }}
-      </div>
-
-      <!-- Captcha -->
-      <div>
-        {{ form.captcha }}
-        {% if form.captcha.errors %}
-          <div class="text-red-600 text-sm mt-1">{{ form.captcha.errors.0 }}</div>
-        {% endif %}
-      </div>
-
-      <!-- Submit -->
-      <button type="submit"
-        class="w-full py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:opacity-90 focus:ring-4 focus:ring-blue-300 focus:outline-none transition">
-        🚀 Tạo tài khoản
-      </button>
+      <button type="submit" class="w-full rounded-xl bg-blue-600 px-4 py-3 font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200">Gửi đăng ký</button>
     </form>
-
-    <p class="text-center text-sm text-gray-600 mt-5">
-      Đã có tài khoản?
-      <a href="{% url 'account_login' %}" class="text-blue-600 font-semibold hover:underline">Đăng nhập ngay</a>
-    </p>
+    <p class="mt-7 text-center text-sm text-slate-600">Đã có tài khoản? <a href="{% url 'account_login' %}" class="font-bold text-blue-600 hover:underline">Đăng nhập</a></p>
   </div>
 </section>
 {% endblock %}
