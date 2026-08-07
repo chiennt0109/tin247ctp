@@ -15,7 +15,11 @@ class SecureSignupForm(SignupForm):
     # reCAPTCHA thực sự
     captcha = ReCaptchaField(
         widget=ReCaptchaV2Checkbox,
-        label="Xác thực bạn không phải robot"
+        label="Xác thực bạn không phải robot",
+        error_messages={
+            "required": "Vui lòng xác nhận bạn không phải robot.",
+            "captcha_invalid": "Không thể xác thực reCAPTCHA. Vui lòng thử lại.",
+        },
     )
 
     def clean_honeypot(self):

@@ -1,8 +1,19 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.conf import settings
+from django.test import SimpleTestCase, TestCase
+
+from .forms import SecureSignupForm
 
 from .adapters import apply_registration_approval
 from .models import RegistrationRequest, RegistrationSettings
+
+
+class SignupCaptchaTests(SimpleTestCase):
+    def test_signup_form_renders_configured_v2_site_key(self):
+        html = str(SecureSignupForm()["captcha"])
+
+        self.assertIn(f'data-sitekey="{settings.RECAPTCHA_PUBLIC_KEY}"', html)
+        self.assertIn("g-recaptcha", html)
 
 
 class RegistrationApprovalTests(TestCase):
