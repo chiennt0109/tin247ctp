@@ -47,8 +47,6 @@ class StartAttemptTests(TestCase):
     def test_eligible_signup_receives_existing_per_session_grant(self):
         user = get_user_model().objects.create_user("trial-eligible")
         session = self.open_session()
-        session.allow_signup_trial = True
-        session.save(update_fields=("allow_signup_trial",))
         request = RequestFactory().get(
             "/accounts/signup/", REMOTE_ADDR="203.0.113.20",
             HTTP_COOKIE="trial_device_id=ec14d06c-ea64-44d0-af9c-652abc3eed18",
@@ -59,12 +57,29 @@ class StartAttemptTests(TestCase):
         self.assertEqual(grant.max_attempts, 3)
         self.assertEqual(grant.limit_mode, ExamAccessGrant.LimitMode.ATTEMPTS)
 
+    def test_exam_list_repairs_grant_when_session_opens_after_signup(self):
+        user = get_user_model().objects.create_user("trial-before-session")
+        device = "975ceef3-baa6-4811-8644-1cc4bce5e876"
+        signup_request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.21")
+        signup_request.COOKIES = {"trial_device_id": device}
+        signup_request.trial_device_id = device
+        provision_signup_trial(user, signup_request)
+        session = self.open_session()
+        self.assertFalse(ExamAccessGrant.objects.filter(user=user, session=session).exists())
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("assessment:exam_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(ExamAccessGrant.objects.filter(
+            user=user, session=session, max_attempts=3, is_active=True,
+        ).exists())
+        self.assertContains(response, session.name)
+
     def test_second_account_on_same_device_gets_no_second_trial_grant(self):
         first_user = get_user_model().objects.create_user("trial-first")
         second_user = get_user_model().objects.create_user("trial-second")
         session = self.open_session()
-        session.allow_signup_trial = True
-        session.save(update_fields=("allow_signup_trial",))
         device = "5082af47-1c76-4e8d-93a7-c47016467e86"
         for user in (first_user, second_user):
             request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.30")

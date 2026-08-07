@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 
 from django.contrib.auth.decorators import login_required
@@ -26,8 +27,11 @@ from assessment.services.resource_packages import (
 )
 from assessment.services.usage_ledger import usage_breakdown
 from assessment.services.start_attempt import StartAttemptError, effective_exam_access, start_attempt
+from assessment.services.general_it_trial import ensure_signup_trial_grants
 from assessment.services.result_release import result_visibility
 from assessment.services.result_presentation import result_sections
+
+logger = logging.getLogger(__name__)
 
 
 def exam_list_redirect(request):
@@ -48,6 +52,11 @@ def _rate_limited(key, *, limit, window):
 @login_required
 def exam_list(request):
     """Show exam sessions available through their session-level access policy."""
+    try:
+        ensure_signup_trial_grants(request.user)
+    except Exception:
+        # Trial reconciliation must never make the assessment page unavailable.
+        logger.exception("Could not reconcile signup trial grants", extra={"user_id": request.user.pk})
     sessions = (
         ExamSession.objects.exclude(
             status__in=(ExamSession.Status.DRAFT, ExamSession.Status.CANCELLED),

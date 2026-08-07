@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from assessment.models import (
@@ -48,7 +49,16 @@ def grant_initial_trial(user, *, actor=None, entitlement=None):
     """Write trial access through the existing per-user × per-session grants."""
     quota = _limit("GENERAL_IT_TRIAL_QUOTA", 3)
     grants = []
-    for session in ExamSession.objects.filter(allow_signup_trial=True):
+    now = timezone.now()
+    sessions = ExamSession.objects.filter(
+        Q(allow_signup_trial=True)
+        | Q(
+            status=ExamSession.Status.OPEN,
+            opens_at__lte=now,
+            closes_at__gt=now,
+        )
+    ).distinct()
+    for session in sessions:
         grant, created = ExamAccessGrant.objects.get_or_create(
             session=session, user=user,
             defaults={
@@ -65,6 +75,24 @@ def grant_initial_trial(user, *, actor=None, entitlement=None):
                 details={"session_id": str(session.pk), "max_attempts": quota, "grant_id": grant.pk},
             )
     return grants
+
+
+@transaction.atomic
+def ensure_signup_trial_grants(user):
+    """Repair eligible signup grants when an exam opens after registration."""
+    if not getattr(settings, "GENERAL_IT_TRIAL_ENABLED", True):
+        return []
+    link = TrialAccountLink.objects.select_for_update().select_related("entitlement").filter(
+        user=user,
+    ).first()
+    if not link or link.entitlement.status != TrialEntitlement.Status.ACTIVE:
+        return []
+    eligible_owner = TrialAuditEvent.objects.filter(
+        entitlement=link.entitlement, user=user, event_type="SIGNUP_GRANTED",
+    ).exists()
+    if not eligible_owner:
+        return []
+    return grant_initial_trial(user, entitlement=link.entitlement)
 
 
 @transaction.atomic
