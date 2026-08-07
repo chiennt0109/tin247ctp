@@ -7,7 +7,10 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from assessment.models import ExamAccessGrant, ExamAttempt, ExamSession, GeneratedExam
+from assessment.models import (
+    ExamAccessGrant, ExamAttempt, ExamSession, ExamUsageRecord, GeneratedExam,
+    TrialAccountLink, TrialEntitlement,
+)
 from assessment.services.exam_generator import ExamGenerationError
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.scoring_versioning import lock_scoring_version
@@ -42,6 +45,45 @@ class StartAttemptTests(TestCase):
         self.assertEqual(ExamAttempt.objects.count(), 1)
         self.assertEqual(GeneratedExam.objects.count(), 1)
         self.assertEqual(first.generated_exam.questions.count(), 2)
+
+    def test_shared_trial_entitlement_has_three_uses_across_accounts(self):
+        first_user = get_user_model().objects.create_user("trial-shared-one")
+        second_user = get_user_model().objects.create_user("trial-shared-two")
+        entitlement = TrialEntitlement.objects.create(quota_total=3)
+        TrialAccountLink.objects.create(user=first_user, entitlement=entitlement)
+        TrialAccountLink.objects.create(user=second_user, entitlement=entitlement)
+        session = self.open_session()
+        session.max_attempts = 10
+        session.save(update_fields=("max_attempts",))
+
+        one = start_attempt(first_user, session, idempotency_key="shared-1")
+        one.status = ExamAttempt.Status.SUBMITTED
+        one.save(update_fields=("status",))
+        two = start_attempt(second_user, session, idempotency_key="shared-2")
+        two.status = ExamAttempt.Status.SUBMITTED
+        two.save(update_fields=("status",))
+        three = start_attempt(first_user, session, idempotency_key="shared-3")
+        three.status = ExamAttempt.Status.SUBMITTED
+        three.save(update_fields=("status",))
+
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt dùng thử"):
+            start_attempt(second_user, session, idempotency_key="shared-4")
+        self.assertEqual(entitlement.quota_used, 3)
+        self.assertEqual(
+            ExamUsageRecord.objects.filter(trial_entitlement=entitlement).count(), 3,
+        )
+
+    def test_trial_retry_and_refresh_do_not_consume_twice(self):
+        user = get_user_model().objects.create_user("trial-idempotent")
+        entitlement = TrialEntitlement.objects.create(quota_total=3)
+        TrialAccountLink.objects.create(user=user, entitlement=entitlement)
+        session = self.open_session()
+        session.max_attempts = 10
+        session.save(update_fields=("max_attempts",))
+        first = start_attempt(user, session, idempotency_key="same-start")
+        retried = start_attempt(user, session, idempotency_key="same-start")
+        self.assertEqual(first.pk, retried.pk)
+        self.assertEqual(entitlement.quota_used, 1)
 
     def test_closed_session_rejects_existing_and_new_attempts(self):
         user = get_user_model().objects.create_user("closed-session-user")

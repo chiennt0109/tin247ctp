@@ -15,6 +15,7 @@ from assessment.services.equivalence import validate_equivalence_group
 from assessment.services.session_configuration import resolve_locked_configuration
 from assessment.services.access_grants import resolve_exam_access
 from assessment.services.usage_ledger import commit_usage, committed_usage_count, reserve_usage
+from assessment.services.general_it_trial import TrialQuotaExceeded
 
 
 class StartAttemptError(ValueError):
@@ -184,4 +185,6 @@ def start_attempt(user, exam_session, *, idempotency_key=None):
                 return existing
             raise StartAttemptError("Không thể tạo bài làm do xung đột dữ liệu.") from exc
         except ExamGenerationError as exc:
+            raise StartAttemptError(str(exc)) from exc
+        except TrialQuotaExceeded as exc:
             raise StartAttemptError(str(exc)) from exc

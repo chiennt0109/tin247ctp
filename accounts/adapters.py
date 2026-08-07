@@ -1,36 +1,19 @@
-from allauth.account.adapter import DefaultAccountAdapter
+import logging
+
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 
-from .models import RegistrationRequest, RegistrationSettings
+from assessment.services.general_it_trial import provision_signup_trial
+
+logger = logging.getLogger(__name__)
 
 
-def apply_registration_approval(user):
-    """Apply the approval policy to a newly-created local or social account."""
-    approved = RegistrationSettings.auto_approval_enabled()
-    user.is_active = approved
-    user.save(update_fields=("is_active",))
-    RegistrationRequest.objects.update_or_create(
-        user=user,
-        defaults={
-            "status": (
-                RegistrationRequest.Status.APPROVED
-                if approved
-                else RegistrationRequest.Status.PENDING
-            )
-        },
-    )
-    return user
+class TrialSocialAccountAdapter(DefaultSocialAccountAdapter):
+    """Provision the same trial for first-time social signups, never for login."""
 
-
-class ApprovalAccountAdapter(DefaultAccountAdapter):
-    def save_user(self, request, user, form, commit=True):
-        user = super().save_user(request, user, form, commit=commit)
-        if commit:
-            apply_registration_approval(user)
-        return user
-
-
-class ApprovalSocialAccountAdapter(DefaultSocialAccountAdapter):
     def save_user(self, request, sociallogin, form=None):
         user = super().save_user(request, sociallogin, form=form)
-        return apply_registration_approval(user)
+        try:
+            provision_signup_trial(user, request)
+        except Exception:
+            logger.exception("Could not provision General IT trial for social signup")
+        return user

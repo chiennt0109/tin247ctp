@@ -715,6 +715,10 @@ class ExamUsageRecord(models.Model):
     idempotency_key = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
     committed_at = models.DateTimeField(null=True, blank=True)
+    trial_entitlement = models.ForeignKey(
+        "TrialEntitlement", null=True, blank=True, on_delete=models.PROTECT,
+        related_name="usage_records",
+    )
 
     class Meta:
         constraints = [
@@ -725,6 +729,71 @@ class ExamUsageRecord(models.Model):
         ]
         indexes = [models.Index(fields=("user", "exam_session", "status"), name="assessment_usage_quota_idx")]
         ordering = ("-created_at",)
+
+
+class TrialEntitlement(models.Model):
+    """A privacy-preserving trial allowance which may be shared by accounts."""
+
+    class Status(models.TextChoices):
+        ACTIVE = "ACTIVE", "Bình thường"
+        REVIEW_REQUIRED = "REVIEW_REQUIRED", "Cần xem xét"
+        REVOKED = "REVOKED", "Đã thu hồi"
+
+    quota_total = models.PositiveIntegerField(default=3)
+    status = models.CharField(max_length=24, choices=Status.choices, default=Status.ACTIVE, db_index=True)
+    created_reason = models.CharField(max_length=32, default="SIGNUP")
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    first_used_at = models.DateTimeField(null=True, blank=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="reviewed_trial_entitlements",
+    )
+
+    @property
+    def quota_used(self):
+        return self.usage_records.filter(status=ExamUsageRecord.Status.COMMITTED).count()
+
+    @property
+    def quota_remaining(self):
+        return max(self.quota_total - self.quota_used, 0)
+
+
+class TrialDevice(models.Model):
+    entitlement = models.ForeignKey(TrialEntitlement, on_delete=models.PROTECT, related_name="devices")
+    device_hash = models.CharField(max_length=64, unique=True)
+    first_seen_at = models.DateTimeField(auto_now_add=True)
+    last_seen_at = models.DateTimeField(auto_now=True)
+
+
+class TrialAccountLink(models.Model):
+    entitlement = models.ForeignKey(TrialEntitlement, on_delete=models.PROTECT, related_name="account_links")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="general_it_trial_link",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class TrialAuditEvent(models.Model):
+    entitlement = models.ForeignKey(
+        TrialEntitlement, null=True, blank=True, on_delete=models.PROTECT, related_name="audit_events",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="trial_audit_events",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="authored_trial_audit_events",
+    )
+    event_type = models.CharField(max_length=40, db_index=True)
+    device_hash = models.CharField(max_length=64, blank=True)
+    ip_hash = models.CharField(max_length=64, blank=True, db_index=True)
+    details = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
 
 class ExamAttempt(models.Model):
