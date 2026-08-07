@@ -11,6 +11,7 @@ from oj import views as roadmap_views
 from . import views_api
 from learning_analytics import api as learning_analytics_api
 from learning_analytics import views as learning_analytics_views
+from accounts import password_reset_views
 urlpatterns = [
     # ==========================
     # 🌐 Trang chủ
@@ -98,6 +99,10 @@ urlpatterns = [
     # ==========================
     # 👤 Tài khoản & Xác thực
     # ==========================
+    path("accounts/password/reset/", password_reset_views.password_reset_request, name="account_reset_password"),
+    path("accounts/password/reset/confirm/", password_reset_views.password_reset_confirm, name="account_reset_password_confirm_code"),
+    re_path(r"^accounts/password/reset/key/.+$", RedirectView.as_view(pattern_name="account_reset_password_confirm_code", permanent=False)),
+    path("accounts/password/reset/done/", RedirectView.as_view(pattern_name="account_reset_password", permanent=False)),
     path("accounts/", include("allauth.urls")),
 
     # ==========================

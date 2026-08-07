@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
+from django.contrib.auth.hashers import check_password, make_password
+import secrets
 
 
 class RegistrationSettings(models.Model):
@@ -75,3 +77,88 @@ class RegistrationRequest(models.Model):
         self.reviewed_at = timezone.now()
         self.reviewed_by = reviewer
         self.save(update_fields=("status", "reviewed_at", "reviewed_by"))
+
+
+class PasswordResetRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Chờ xử lý"
+        ISSUED = "issued", "Đã cấp mã"
+        COMPLETED = "completed", "Đã hoàn tất"
+        EXPIRED = "expired", "Đã hết hạn"
+        REJECTED = "rejected", "Đã từ chối"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="manual_password_reset_requests",
+        verbose_name="Tài khoản",
+    )
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
+    requested_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày yêu cầu")
+    handled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="handled_password_resets",
+        verbose_name="Người xử lý",
+    )
+    handled_at = models.DateTimeField(null=True, blank=True, verbose_name="Ngày xử lý")
+    token_hash = models.CharField(max_length=128, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True, verbose_name="Hết hạn lúc")
+    used_at = models.DateTimeField(null=True, blank=True, verbose_name="Sử dụng lúc")
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name="Hoàn tất lúc")
+
+    class Meta:
+        ordering = ("-requested_at",)
+        verbose_name = "Yêu cầu đặt lại mật khẩu"
+        verbose_name_plural = "Quản lý đặt lại mật khẩu"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user",),
+                condition=models.Q(status="pending"),
+                name="one_pending_password_reset_per_user",
+            ),
+            models.UniqueConstraint(
+                fields=("user",),
+                condition=models.Q(status="issued"),
+                name="one_issued_password_reset_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} – {self.get_status_display()}"
+
+    @staticmethod
+    def normalize_code(code):
+        return "".join(character for character in code.upper() if character.isalnum())
+
+    @classmethod
+    def generate_code(cls):
+        alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+        raw = "".join(secrets.choice(alphabet) for _ in range(12))
+        return "-".join(raw[index:index + 4] for index in range(0, 12, 4))
+
+    @transaction.atomic
+    def issue(self, reviewer):
+        now = timezone.now()
+        type(self).objects.select_for_update().filter(
+            user=self.user,
+            status=self.Status.ISSUED,
+        ).exclude(pk=self.pk).update(status=self.Status.EXPIRED)
+        code = self.generate_code()
+        self.status = self.Status.ISSUED
+        self.token_hash = make_password(self.normalize_code(code))
+        self.expires_at = now + timezone.timedelta(hours=24)
+        self.handled_by = reviewer
+        self.handled_at = now
+        self.used_at = None
+        self.completed_at = None
+        self.save(update_fields=(
+            "status", "token_hash", "expires_at", "handled_by", "handled_at",
+            "used_at", "completed_at",
+        ))
+        return code
+
+    def code_matches(self, code):
+        return bool(self.token_hash) and check_password(self.normalize_code(code), self.token_hash)
