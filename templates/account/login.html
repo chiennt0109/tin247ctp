@@ -1,38 +1,38 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load socialaccount %}
 
-{% block title %}Đăng nhập | Elearning CodePath OJ{% endblock %}
-
+{% block title %}Đăng nhập an toàn | CodePath{% endblock %}
 {% block content %}
-<section class="flex justify-center items-center py-16 bg-gradient-to-br from-indigo-50 via-sky-100 to-indigo-50">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Đăng nhập tài khoản</h2>
-    <p class="text-center text-gray-500 mb-6 text-sm">Học tập và rèn luyện cùng <b>CodePath</b></p>
-
-    <form method="post" class="space-y-4">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit"
-              class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition">
-        🔐 Đăng nhập
-      </button>
-    </form>
-
-    <div class="my-4 flex items-center">
-      <div class="flex-grow border-t border-gray-200"></div>
-      <span class="px-2 text-gray-400 text-sm">hoặc</span>
-      <div class="flex-grow border-t border-gray-200"></div>
-    </div>
-
-    <a href="{% provider_login_url 'google' %}"
-       class="w-full inline-flex items-center justify-center gap-2 bg-white border border-gray-300 py-2.5 rounded-lg shadow-sm hover:bg-gray-50 transition">
-      <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png" class="w-5 h-5" alt="Google">
-      <span class="font-medium text-gray-700">Đăng nhập với Google</span>
-    </a>
-
-    <div class="text-center mt-5 text-sm text-gray-600">
-      <a href="{% url 'account_reset_password' %}" class="text-sky-600 hover:underline">Quên mật khẩu?</a> |
-      <a href="{% url 'account_signup' %}" class="text-sky-600 hover:underline">Đăng ký</a>
+<style>
+  .auth-shell{min-height:calc(100vh - 64px);background:radial-gradient(circle at 15% 10%,#dbeafe 0,transparent 32%),radial-gradient(circle at 90% 80%,#e0e7ff 0,transparent 28%),#f8fafc}
+  .auth-card{box-shadow:0 24px 70px rgba(15,23,42,.13)}
+  .auth-card input{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.8rem 1rem;margin-top:.4rem;background:#fff;outline:none;transition:.2s}
+  .auth-card input:focus{border-color:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+</style>
+<section class="auth-shell flex items-center justify-center px-4 py-12">
+  <div class="auth-card grid w-full max-w-4xl overflow-hidden rounded-3xl bg-white lg:grid-cols-5">
+    <aside class="hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-900 p-10 text-white lg:col-span-2 lg:block">
+      <div class="mb-12 inline-flex rounded-xl bg-white/10 p-3 text-2xl">⌘</div>
+      <h1 class="text-3xl font-bold leading-tight">Tiếp tục hành trình lập trình</h1>
+      <p class="mt-4 text-sm leading-6 text-blue-100">Kết nối an toàn với không gian học tập, bài tập và các kỳ thi của bạn.</p>
+      <ul class="mt-10 space-y-4 text-sm text-blue-50"><li>✓ Phiên đăng nhập được bảo vệ</li><li>✓ Không tiết lộ thông tin tài khoản</li><li>✓ Hỗ trợ đăng nhập Google</li></ul>
+    </aside>
+    <div class="p-7 sm:p-11 lg:col-span-3">
+      <p class="text-sm font-bold uppercase tracking-widest text-blue-600">CodePath</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-900">Chào mừng trở lại</h2>
+      <p class="mt-2 text-sm text-slate-500">Nhập thông tin tài khoản để tiếp tục.</p>
+      {% if form.non_field_errors %}<div class="mt-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">Tên đăng nhập/email hoặc mật khẩu không chính xác.</div>{% endif %}
+      <form method="post" action="{% url 'account_login' %}" class="mt-7 space-y-5">
+        {% csrf_token %}
+        {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
+        <div><label for="{{ form.login.id_for_label }}" class="text-sm font-semibold text-slate-700">Tên đăng nhập hoặc email</label>{{ form.login }}{% if form.login.errors %}<p class="mt-1 text-sm text-red-600">{{ form.login.errors.0 }}</p>{% endif %}</div>
+        <div><div class="flex justify-between"><label for="{{ form.password.id_for_label }}" class="text-sm font-semibold text-slate-700">Mật khẩu</label><a href="{% url 'account_reset_password' %}" class="text-sm font-semibold text-blue-600 hover:underline">Quên mật khẩu?</a></div>{{ form.password }}{% if form.password.errors %}<p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>{% endif %}</div>
+        <label class="flex items-center gap-2 text-sm text-slate-600">{{ form.remember }} Ghi nhớ đăng nhập trên thiết bị này</label>
+        <button class="w-full rounded-xl bg-blue-600 px-4 py-3 font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200" type="submit">Đăng nhập an toàn</button>
+      </form>
+      <div class="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400"><span class="h-px flex-1 bg-slate-200"></span>hoặc<span class="h-px flex-1 bg-slate-200"></span></div>
+      <a href="{% provider_login_url 'google' %}" class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 px-4 py-3 font-semibold text-slate-700 transition hover:bg-slate-50">G&nbsp; Tiếp tục với Google</a>
+      <p class="mt-7 text-center text-sm text-slate-600">Chưa có tài khoản? <a href="{% url 'account_signup' %}" class="font-bold text-blue-600 hover:underline">Đăng ký ngay</a></p>
     </div>
   </div>
 </section>
