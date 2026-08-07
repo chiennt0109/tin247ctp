@@ -8,22 +8,29 @@
   {% if visibility.score %}
     <section class="card border-0 shadow-sm mb-3"><div class="card-body">
       <p class="text-muted mb-1">Điểm</p><strong class="display-5">{{ result.total_score }} / {{ result.max_score }}</strong>
-      {% if visibility.answers %}<div class="row mt-3 text-center">
+      <div class="row mt-3 text-center">
         <div class="col"><strong>{{ result.correct_count }}</strong><br><span class="text-success">Đúng</span></div>
         <div class="col"><strong>{{ result.incorrect_count }}</strong><br><span class="text-danger">Sai</span></div>
         <div class="col"><strong>{{ result.blank_count }}</strong><br><span class="text-muted">Bỏ trống</span></div>
-      </div>{% endif %}
+      </div>
     </div></section>
   {% else %}
     <div class="alert alert-info">Điểm đã được ghi nhận và đang chờ công bố.</div>
   {% endif %}
-  {% if visibility.answers %}
-    <section class="card border-0 shadow-sm"><div class="card-body"><h2 class="h5">Chi tiết</h2>
-      <ol class="list-group list-group-numbered">{% for item in result.detail %}
-        <li class="list-group-item d-flex justify-content-between"><span>{% if item.outcome == 'CORRECT' %}Đúng{% elif item.outcome == 'BLANK' %}Bỏ trống{% else %}Sai{% endif %}</span><strong>{{ item.score }} / {{ item.max_score }}</strong></li>
-      {% endfor %}</ol>
+  {% if detail_sections %}
+    <section class="card border-0 shadow-sm"><div class="card-body"><h2 class="h5">Chi tiết bài làm</h2>
+      {% if not visibility.answers %}<div class="alert alert-warning py-2">Bạn có thể xem câu nào đúng/sai và lựa chọn của mình. Đáp án chính thức chưa được công bố.</div>{% endif %}
+      {% for section in detail_sections %}
+        <h3 class="h6 mt-3">{{ section.title }}</h3>
+        <div class="list-group mb-3">{% for item in section.rows %}
+          <article class="list-group-item">
+            <div class="d-flex justify-content-between gap-3"><strong>Câu {{ item.part_order }}: {% if item.outcome == 'CORRECT' %}<span class="text-success">Đúng</span>{% elif item.outcome == 'BLANK' %}<span class="text-muted">Bỏ trống</span>{% else %}<span class="text-danger">Sai</span>{% endif %}</strong><strong>{{ item.score }} / {{ item.max_score }}</strong></div>
+            {% if item.question_type == 'TRUE_FALSE_GROUP' %}<div class="table-responsive mt-2"><table class="table table-sm align-middle mb-0"><thead><tr><th>Ý</th><th>Nội dung</th><th>Bạn chọn</th>{% if visibility.answers %}<th>Đáp án</th><th>Kết quả</th>{% endif %}</tr></thead><tbody>{% for statement in item.statements %}<tr><th>{{ statement.label|default:forloop.counter }}</th><td>{{ statement.text }}</td><td>{% if statement.submitted_value is None %}<span class="text-muted">Bỏ trống</span>{% elif statement.submitted_value %}Đúng{% else %}Sai{% endif %}</td>{% if visibility.answers %}<td>{% if statement.correct_value %}Đúng{% else %}Sai{% endif %}</td><td>{% if statement.is_correct %}<span class="badge text-bg-success">Chính xác</span>{% else %}<span class="badge text-bg-danger">Chưa chính xác</span>{% endif %}</td>{% endif %}</tr>{% endfor %}</tbody></table></div>{% endif %}
+          </article>
+        {% endfor %}</div>
+      {% endfor %}
     </div></section>
-  {% elif visibility.score %}<p class="text-muted">Đáp án và kết quả từng câu chưa được công bố.</p>{% endif %}
+  {% elif visibility.score %}<p class="text-muted">Chưa có chi tiết bài làm để hiển thị.</p>{% endif %}
   {% if visibility.score %}<section class="mt-4"><h2 class="h5">Phân tích kết quả</h2>
     <h3 class="h6 mt-3">Theo phần thi</h3>{% include "assessment/result_breakdown.html" with rows=summary.sections %}
     <h3 class="h6 mt-3">Theo chủ đề</h3>{% include "assessment/result_breakdown.html" with rows=summary.topics %}

@@ -1,8 +1,13 @@
 # accounts/forms.py
+import logging
+
 from django import forms
 from allauth.account.forms import SignupForm
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
+from assessment.services.general_it_trial import provision_signup_trial
+
+logger = logging.getLogger(__name__)
 
 class SecureSignupForm(SignupForm):
     # Honeypot: bot sẽ điền, người thật không thấy
@@ -28,5 +33,9 @@ class SecureSignupForm(SignupForm):
     def save(self, request):
         # gọi save gốc của allauth để tạo user
         user = super().save(request)
-        # bạn có thể gán thêm role mặc định, nhóm lớp,... tại đây
+        # Trial failures must not roll back or break the user's DMOJ account.
+        try:
+            provision_signup_trial(user, request)
+        except Exception:
+            logger.exception("Could not provision General IT trial")
         return user
