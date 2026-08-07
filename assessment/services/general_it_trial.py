@@ -9,7 +9,8 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from assessment.models import (
-    ExamUsageRecord, TrialAccountLink, TrialAuditEvent, TrialDevice, TrialEntitlement,
+    ExamAccessGrant, ExamSession, TrialAccountLink, TrialAuditEvent, TrialDevice,
+    TrialEntitlement,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,29 @@ def request_ip(request):
 
 def _limit(name, default):
     return int(getattr(settings, name, default))
+
+
+def grant_initial_trial(user, *, actor=None, entitlement=None):
+    """Write trial access through the existing per-user × per-session grants."""
+    quota = _limit("GENERAL_IT_TRIAL_QUOTA", 3)
+    grants = []
+    for session in ExamSession.objects.filter(allow_signup_trial=True):
+        grant, created = ExamAccessGrant.objects.get_or_create(
+            session=session, user=user,
+            defaults={
+                "limit_mode": ExamAccessGrant.LimitMode.ATTEMPTS,
+                "max_attempts": quota,
+                "is_active": True,
+            },
+        )
+        if created:
+            grants.append(grant)
+            TrialAuditEvent.objects.create(
+                entitlement=entitlement, user=user, actor=actor,
+                event_type="TRIAL_ACCESS_GRANT_CREATED",
+                details={"session_id": str(session.pk), "max_attempts": quota, "grant_id": grant.pk},
+            )
+    return grants
 
 
 @transaction.atomic
@@ -82,9 +106,9 @@ def provision_signup_trial(user, request):
         or device_month >= _limit("TRIAL_SIGNUP_DEVICE_LIMIT_30D", 5)
     )
     entitlement = TrialEntitlement.objects.create(
-        quota_total=_limit("GENERAL_IT_TRIAL_QUOTA", 3),
         status=(TrialEntitlement.Status.REVIEW_REQUIRED if review else TrialEntitlement.Status.ACTIVE),
     )
+    owns_new_identity = True
     try:
         with transaction.atomic():
             TrialDevice.objects.create(entitlement=entitlement, device_hash=device_hash)
@@ -94,6 +118,7 @@ def provision_signup_trial(user, request):
         shared = TrialDevice.objects.select_related("entitlement").get(device_hash=device_hash)
         entitlement.delete()
         entitlement = shared.entitlement
+        owns_new_identity = False
     TrialAccountLink.objects.create(user=user, entitlement=entitlement)
     TrialAuditEvent.objects.create(
         entitlement=entitlement, user=user,
@@ -101,36 +126,11 @@ def provision_signup_trial(user, request):
         device_hash=device_hash, ip_hash=ip_hash,
         details={"ip_hour": ip_hour, "ip_day": ip_day, "device_day": device_day, "device_30d": device_month},
     )
+    if not review and owns_new_identity:
+        grant_initial_trial(user, entitlement=entitlement)
     return entitlement
 
 
 def entitlement_for_user(user):
     link = TrialAccountLink.objects.select_related("entitlement").filter(user=user).first()
     return link.entitlement if link else None
-
-
-def trial_usage(entitlement):
-    return ExamUsageRecord.objects.filter(
-        trial_entitlement=entitlement, status=ExamUsageRecord.Status.COMMITTED,
-    ).count()
-
-
-class TrialQuotaExceeded(ValueError):
-    pass
-
-
-def lock_and_validate_trial(user):
-    """Called inside the existing usage transaction before reserving one use."""
-    link = TrialAccountLink.objects.filter(user=user).values_list("entitlement_id", flat=True).first()
-    if not link:
-        return None
-    entitlement = TrialEntitlement.objects.select_for_update().get(pk=link)
-    if entitlement.status == TrialEntitlement.Status.REVOKED:
-        raise TrialQuotaExceeded("Quyền dùng thử đã bị thu hồi.")
-    if entitlement.status == TrialEntitlement.Status.REVIEW_REQUIRED and not entitlement.is_verified:
-        raise TrialQuotaExceeded("Quyền dùng thử đang chờ quản trị viên xác nhận.")
-    if entitlement.expires_at and timezone.now() >= entitlement.expires_at:
-        raise TrialQuotaExceeded("Quyền dùng thử đã hết hạn.")
-    if trial_usage(entitlement) >= entitlement.quota_total:
-        raise TrialQuotaExceeded("Bạn đã sử dụng hết số lượt dùng thử.")
-    return entitlement

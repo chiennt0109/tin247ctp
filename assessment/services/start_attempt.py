@@ -15,7 +15,6 @@ from assessment.services.equivalence import validate_equivalence_group
 from assessment.services.session_configuration import resolve_locked_configuration
 from assessment.services.access_grants import resolve_exam_access
 from assessment.services.usage_ledger import commit_usage, committed_usage_count, reserve_usage
-from assessment.services.general_it_trial import TrialQuotaExceeded
 
 
 class StartAttemptError(ValueError):

@@ -491,6 +491,10 @@ class ExamSession(models.Model):
     allow_blueprint_download = models.BooleanField(default=False)
     allow_review = models.BooleanField(default=False)
     allow_retry_after_answers = models.BooleanField(default=False)
+    allow_signup_trial = models.BooleanField(
+        default=False,
+        help_text="Tự động cấp quyền 3 lượt cho tài khoản mới đủ điều kiện dùng thử.",
+    )
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT, db_index=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
@@ -715,10 +719,6 @@ class ExamUsageRecord(models.Model):
     idempotency_key = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
     committed_at = models.DateTimeField(null=True, blank=True)
-    trial_entitlement = models.ForeignKey(
-        "TrialEntitlement", null=True, blank=True, on_delete=models.PROTECT,
-        related_name="usage_records",
-    )
 
     class Meta:
         constraints = [
@@ -732,34 +732,21 @@ class ExamUsageRecord(models.Model):
 
 
 class TrialEntitlement(models.Model):
-    """A privacy-preserving trial allowance which may be shared by accounts."""
+    """Privacy-preserving signup eligibility; runtime quota remains in access grants."""
 
     class Status(models.TextChoices):
         ACTIVE = "ACTIVE", "Bình thường"
         REVIEW_REQUIRED = "REVIEW_REQUIRED", "Cần xem xét"
         REVOKED = "REVOKED", "Đã thu hồi"
 
-    quota_total = models.PositiveIntegerField(default=3)
     status = models.CharField(max_length=24, choices=Status.choices, default=Status.ACTIVE, db_index=True)
     created_reason = models.CharField(max_length=32, default="SIGNUP")
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    first_used_at = models.DateTimeField(null=True, blank=True)
-    last_used_at = models.DateTimeField(null=True, blank=True)
-    expires_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
         related_name="reviewed_trial_entitlements",
     )
-
-    @property
-    def quota_used(self):
-        return self.usage_records.filter(status=ExamUsageRecord.Status.COMMITTED).count()
-
-    @property
-    def quota_remaining(self):
-        return max(self.quota_total - self.quota_used, 0)
-
 
 class TrialDevice(models.Model):
     entitlement = models.ForeignKey(TrialEntitlement, on_delete=models.PROTECT, related_name="devices")

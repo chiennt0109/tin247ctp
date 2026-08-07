@@ -12,7 +12,6 @@ from assessment.services.exam_generator import ExamGenerationError, ExamGenerato
 from assessment.services.session_configuration import resolve_locked_configuration
 from assessment.services.start_attempt import _group_configuration, effective_exam_access
 from assessment.services.usage_ledger import commit_usage, committed_usage_count, reserve_usage
-from assessment.services.general_it_trial import TrialQuotaExceeded
 
 
 class ResourcePackageError(ValueError):
@@ -135,8 +134,6 @@ def create_resource_package(user, exam_session, *, idempotency_key):
             )
             return package
     except ExamGenerationError as exc:
-        raise ResourcePackageError(str(exc)) from exc
-    except TrialQuotaExceeded as exc:
         raise ResourcePackageError(str(exc)) from exc
     except IntegrityError as exc:
         raise ResourcePackageError("Không thể tạo gói tài nguyên do xung đột dữ liệu.") from exc

@@ -76,11 +76,6 @@ def exam_list(request):
             None if access.max_attempts is None
             else max(access.max_attempts - used_total, 0)
         )
-        if "trial_remaining" in breakdown:
-            attempts_remaining = (
-                breakdown["trial_remaining"] if attempts_remaining is None
-                else min(attempts_remaining, breakdown["trial_remaining"])
-            )
         unavailable_reason = access.reason
         session_can_start = (
             session.status in {ExamSession.Status.OPEN, ExamSession.Status.SCHEDULED}

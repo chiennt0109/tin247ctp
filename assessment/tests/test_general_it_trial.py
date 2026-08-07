@@ -19,10 +19,9 @@ class GeneralITTrialProvisioningTests(TestCase):
         request.trial_device_id = request_device_id(request)
         return request
 
-    def test_new_account_gets_three_use_entitlement(self):
+    def test_new_account_gets_active_trial_eligibility(self):
         user = get_user_model().objects.create_user("trial-one")
         entitlement = provision_signup_trial(user, self.request())
-        self.assertEqual(entitlement.quota_total, 3)
         self.assertEqual(entitlement.status, TrialEntitlement.Status.ACTIVE)
         self.assertEqual(user.general_it_trial_link.entitlement, entitlement)
 

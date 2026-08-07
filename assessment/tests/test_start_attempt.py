@@ -3,18 +3,16 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from assessment.models import (
-    ExamAccessGrant, ExamAttempt, ExamSession, ExamUsageRecord, GeneratedExam,
-    TrialAccountLink, TrialEntitlement,
-)
+from assessment.models import ExamAccessGrant, ExamAttempt, ExamSession, GeneratedExam
 from assessment.services.exam_generator import ExamGenerationError
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.scoring_versioning import lock_scoring_version
 from assessment.services.admin_workflow import close_exam_session
+from assessment.services.general_it_trial import provision_signup_trial
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -46,44 +44,39 @@ class StartAttemptTests(TestCase):
         self.assertEqual(GeneratedExam.objects.count(), 1)
         self.assertEqual(first.generated_exam.questions.count(), 2)
 
-    def test_shared_trial_entitlement_has_three_uses_across_accounts(self):
-        first_user = get_user_model().objects.create_user("trial-shared-one")
-        second_user = get_user_model().objects.create_user("trial-shared-two")
-        entitlement = TrialEntitlement.objects.create(quota_total=3)
-        TrialAccountLink.objects.create(user=first_user, entitlement=entitlement)
-        TrialAccountLink.objects.create(user=second_user, entitlement=entitlement)
+    def test_eligible_signup_receives_existing_per_session_grant(self):
+        user = get_user_model().objects.create_user("trial-eligible")
         session = self.open_session()
-        session.max_attempts = 10
-        session.save(update_fields=("max_attempts",))
-
-        one = start_attempt(first_user, session, idempotency_key="shared-1")
-        one.status = ExamAttempt.Status.SUBMITTED
-        one.save(update_fields=("status",))
-        two = start_attempt(second_user, session, idempotency_key="shared-2")
-        two.status = ExamAttempt.Status.SUBMITTED
-        two.save(update_fields=("status",))
-        three = start_attempt(first_user, session, idempotency_key="shared-3")
-        three.status = ExamAttempt.Status.SUBMITTED
-        three.save(update_fields=("status",))
-
-        with self.assertRaisesMessage(StartAttemptError, "hết số lượt dùng thử"):
-            start_attempt(second_user, session, idempotency_key="shared-4")
-        self.assertEqual(entitlement.quota_used, 3)
-        self.assertEqual(
-            ExamUsageRecord.objects.filter(trial_entitlement=entitlement).count(), 3,
+        session.allow_signup_trial = True
+        session.save(update_fields=("allow_signup_trial",))
+        request = RequestFactory().get(
+            "/accounts/signup/", REMOTE_ADDR="203.0.113.20",
+            HTTP_COOKIE="trial_device_id=ec14d06c-ea64-44d0-af9c-652abc3eed18",
         )
+        request.trial_device_id = "ec14d06c-ea64-44d0-af9c-652abc3eed18"
+        provision_signup_trial(user, request)
+        grant = ExamAccessGrant.objects.get(user=user, session=session)
+        self.assertEqual(grant.max_attempts, 3)
+        self.assertEqual(grant.limit_mode, ExamAccessGrant.LimitMode.ATTEMPTS)
 
-    def test_trial_retry_and_refresh_do_not_consume_twice(self):
-        user = get_user_model().objects.create_user("trial-idempotent")
-        entitlement = TrialEntitlement.objects.create(quota_total=3)
-        TrialAccountLink.objects.create(user=user, entitlement=entitlement)
+    def test_second_account_on_same_device_gets_no_second_trial_grant(self):
+        first_user = get_user_model().objects.create_user("trial-first")
+        second_user = get_user_model().objects.create_user("trial-second")
         session = self.open_session()
-        session.max_attempts = 10
-        session.save(update_fields=("max_attempts",))
-        first = start_attempt(user, session, idempotency_key="same-start")
-        retried = start_attempt(user, session, idempotency_key="same-start")
-        self.assertEqual(first.pk, retried.pk)
-        self.assertEqual(entitlement.quota_used, 1)
+        session.allow_signup_trial = True
+        session.save(update_fields=("allow_signup_trial",))
+        device = "5082af47-1c76-4e8d-93a7-c47016467e86"
+        for user in (first_user, second_user):
+            request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.30")
+            request.COOKIES = {"trial_device_id": device}
+            request.trial_device_id = device
+            provision_signup_trial(user, request)
+        self.assertTrue(ExamAccessGrant.objects.filter(user=first_user, session=session).exists())
+        self.assertFalse(ExamAccessGrant.objects.filter(user=second_user, session=session).exists())
+        self.assertEqual(
+            first_user.general_it_trial_link.entitlement_id,
+            second_user.general_it_trial_link.entitlement_id,
+        )
 
     def test_closed_session_rejects_existing_and_new_attempts(self):
         user = get_user_model().objects.create_user("closed-session-user")
