@@ -98,7 +98,6 @@ urlpatterns = [
     # ==========================
     # 👤 Tài khoản & Xác thực
     # ==========================
-    path("accounts/", include(("accounts.urls", "accounts"), namespace="accounts")),
     path("accounts/", include("allauth.urls")),
 
     # ==========================
