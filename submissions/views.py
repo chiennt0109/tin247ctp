@@ -2,16 +2,22 @@
 import os
 import json
 import hashlib
+import logging
 
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.core.cache.backends.locmem import LocMemCache
+from django.views.decorators.http import require_POST
 
 from redis import Redis
 
 from .models import Submission
-from problems.models import Problem
+from problems.models import Problem, TestCase
 from judge.dispatcher import JudgeDispatcher
+from judge.runner import compile_submission, run_case
+from judge.sandbox import SandboxManager
 from contests.utils import update_participation
 
 from django.utils import timezone
@@ -24,6 +30,8 @@ from contests.models import Contest, PracticeSession
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 LOCK_TTL = 5      # chặn double–click trong 5s
 IDEMP_TTL = 30    # cùng 1 code trong 30s → dùng lại submission cũ
+logger = logging.getLogger(__name__)
+_sample_fallback_cache = LocMemCache("sample-run-fallback", {})
 
 
 def _sha1(s: str) -> str:
@@ -66,8 +74,94 @@ def submission_page(request, problem_id):
             "contest_id": contest_id,
             "practice": practice,
             "remaining": remaining,
+            "sample_tests": TestCase.objects.filter(
+                problem=problem, is_sample=True
+            ).order_by("id"),
         },
     )
+
+
+@login_required
+@require_POST
+def run_sample(request, problem_id):
+    """Compile and run one public sample (or bounded custom input) in the judge sandbox."""
+    problem = get_object_or_404(Problem, pk=problem_id)
+    language = (request.POST.get("language") or "").strip()
+    source = request.POST.get("source") or ""
+    sample_id = (request.POST.get("sample_id") or "").strip()
+
+    if language not in {"cpp", "python", "pypy"}:
+        return JsonResponse({"ok": False, "error": "Ngôn ngữ không được hỗ trợ."}, status=400)
+    if not source.strip() or len(source.encode("utf-8")) > 100_000:
+        return JsonResponse({"ok": False, "error": "Mã nguồn trống hoặc vượt quá 100 KB."}, status=400)
+
+    throttle_key = f"sample-run:{request.user.pk}"
+    try:
+        allowed = cache.add(throttle_key, "1", timeout=3)
+    except Exception:
+        # Redis/cache không phải là thành phần bắt buộc của runner. Production
+        # trước đây trỏ cache tới localhost nên lỗi kết nối tại đây làm Django
+        # trả trang HTML 500 và frontend hiểu nhầm là mất kết nối.
+        logger.warning("Sample-run cache unavailable; using in-process throttle", exc_info=True)
+        allowed = _sample_fallback_cache.add(throttle_key, "1", timeout=3)
+    if not allowed:
+        return JsonResponse({"ok": False, "error": "Vui lòng đợi 3 giây trước lần chạy tiếp theo."}, status=429)
+
+    expected = None
+    if sample_id:
+        sample = get_object_or_404(TestCase, pk=sample_id, problem=problem, is_sample=True)
+        input_data, expected = sample.input_data, sample.expected_output
+    else:
+        # Bài cũ chưa có test ví dụ: chỉ nhận stdin dạng văn bản, không bao giờ
+        # đưa nội dung này vào shell command hoặc ghi vào bộ test chính thức.
+        input_data = request.POST.get("custom_input") or ""
+        if len(input_data.encode("utf-8")) > 64_000:
+            return JsonResponse({"ok": False, "error": "Dữ liệu vào vượt quá 64 KB."}, status=400)
+
+    sandbox = SandboxManager()
+    ctx = None
+    try:
+        ctx = sandbox.create(f"sample_{request.user.pk}")
+        bundle, compile_error = compile_submission(language, source, ctx.root_dir)
+        if bundle is None:
+            return JsonResponse({"ok": False, "verdict": "CE", "error": compile_error[:8000]})
+        result = run_case(
+            bundle, input_data,
+            time_limit=min(max(float(problem.time_limit or 1), .1), 5),
+            memory_limit_mb=min(max(int(problem.memory_limit or 256), 64), 512),
+        )
+        return_code = int(result.get("return_code", 1))
+        output = (result.get("stdout") or "")[:64_000]
+        verdict = "OK" if return_code == 0 else ("TLE" if return_code == 124 else "RE")
+        matches = None if expected is None or return_code != 0 else output.split() == expected.split()
+        if matches is False:
+            verdict = "WA"
+        elif matches is True:
+            verdict = "AC"
+        return JsonResponse({
+            "ok": return_code == 0,
+            "verdict": verdict,
+            "output": output,
+            "expected": expected,
+            "matches": matches,
+            "time": round(float(result.get("time") or 0), 3),
+            "error": (result.get("stderr") or "")[:8000],
+        })
+    except Exception:
+        # Luôn trả JSON để client có thể hiển thị lỗi vận hành (Docker/image/
+        # permission/timeout) thay vì rơi vào thông báo chung do parse HTML 500.
+        logger.exception("Sample runner failed for user=%s problem=%s", request.user.pk, problem.pk)
+        return JsonResponse({
+            "ok": False,
+            "verdict": "JE",
+            "error": (
+                "Máy chạy thử hiện chưa sẵn sàng. Vui lòng kiểm tra Docker, "
+                "các image judge-cpp/judge-py và quyền chạy Docker của dịch vụ web."
+            ),
+        }, status=503)
+    finally:
+        if ctx is not None:
+            sandbox.destroy(ctx)
 
 
 # ======================================================
