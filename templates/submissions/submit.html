@@ -3,12 +3,12 @@
 
 {% block content %}
 <div class="container-fluid py-3" style="max-width:1450px;">
-  <div class="row g-4">
+  <div class="row g-3 submission-workspace">
 
     <!-- ============================
          🧩 CỘT TRÁI: HIỂN THỊ ĐỀ BÀI
     ============================= -->
-    <div class="col-lg-5 col-md-12">
+    <div class="col-xl-5 col-md-12 problem-column">
       <div class="card border-0 shadow-sm rounded-4 h-100 p-4" style="font-size:14px;">
         <h5 class="fw-bold text-primary mb-2">{{ problem.title }}</h5>
         <div class="text-muted small mb-2">
@@ -27,7 +27,7 @@
     <!-- ============================
          💻 CỘT PHẢI: CODE + SUBMIT
     ============================= -->
-    <div class="col-lg-7 col-md-12">
+    <div class="col-xl-7 col-md-12 code-column">
       <div class="card border-0 shadow-sm rounded-4 p-3" style="font-size:14px;">
 
         <!-- 🎯 TITLE + BUTTONS -->
@@ -40,7 +40,7 @@
             ⏳ Còn lại: <span id="timer-text">--:--</span>
           </div>
           {% endif %}
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2 flex-wrap justify-content-end">
             {% if practice %}
               <!-- QUAY LẠI PRACTICE -->
               <a href="/contests/{{ contest_id }}/practice/?practice=1"
@@ -80,15 +80,20 @@
           <input type="hidden" id="practice" name="practice" value="{{ practice|yesno:'1,0' }}">
 
           <!-- Ngôn ngữ -->
-          <div class="mb-3">
+          <div class="row g-2 mb-3 align-items-end">
+            <div class="col-md-7">
             <label class="form-label small fw-semibold">Ngôn ngữ lập trình</label>
             <select class="form-select form-select-sm" id="language" name="language" required>
               <option value="">-- Chọn ngôn ngữ --</option>
               <option value="python">🐍 Python 3</option>
               <option value="pypy">⚡ PyPy 3</option>
               <option value="cpp">💻 C++17</option>
-              <option value="java">☕ Java</option>
             </select>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label small fw-semibold" for="sourceFile">📁 Tải mã nguồn lên</label>
+              <input id="sourceFile" class="form-control form-control-sm" type="file" accept=".cpp,.cc,.cxx,.py,.txt,text/plain">
+            </div>
           </div>
 
           <!-- CODE EDITOR -->
@@ -99,6 +104,29 @@
             <textarea id="source" name="source" hidden></textarea>
           </div>
         </form>
+
+        <section class="sample-runner rounded-3 p-3 mt-1" aria-labelledby="sample-title">
+          <div class="d-flex gap-2 align-items-end flex-wrap">
+            <div class="flex-grow-1">
+              <label id="sample-title" class="form-label fw-semibold">🧪 Chạy thử trước khi chấm</label>
+              {% if sample_tests %}
+              <select id="sampleSelect" class="form-select form-select-sm">
+                {% for sample in sample_tests %}<option value="{{ sample.id }}">Ví dụ {{ forloop.counter }}</option>{% endfor %}
+              </select>
+              <div hidden id="sampleData">{% for sample in sample_tests %}<textarea data-sample-id="{{ sample.id }}" data-kind="input">{{ sample.input_data }}</textarea><textarea data-sample-id="{{ sample.id }}" data-kind="expected">{{ sample.expected_output }}</textarea>{% endfor %}</div>
+              {% else %}
+              <div class="small text-warning mb-1">Bài cũ chưa có test ví dụ — bạn có thể nhập stdin để chạy thử an toàn.</div>
+              {% endif %}
+            </div>
+            <button id="runSampleBtn" class="btn btn-info btn-sm fw-semibold" type="button">▶ Biên dịch và chạy</button>
+          </div>
+          <div class="row g-2 mt-1">
+            <div class="col-md-4"><label class="small">Dữ liệu vào</label><textarea id="sampleInput" class="form-control sample-io" {% if sample_tests %}readonly{% endif %}>{% if sample_tests %}{{ sample_tests.0.input_data }}{% endif %}</textarea></div>
+            <div class="col-md-4"><label class="small">Kết quả mong đợi</label><textarea id="sampleExpected" class="form-control sample-io" readonly>{% if sample_tests %}{{ sample_tests.0.expected_output }}{% endif %}</textarea></div>
+            <div class="col-md-4"><label class="small">Kết quả chạy code</label><textarea id="sampleOutput" class="form-control sample-io" readonly></textarea></div>
+          </div>
+          <div id="sampleStatus" class="small mt-2" role="status"></div>
+        </section>
 
         <!-- KẾT QUẢ -->
         <div id="result-box" class="border rounded-3 p-3 bg-light mt-3" style="display:none;">
@@ -148,6 +176,15 @@
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.3/src-min-noconflict/ext-language_tools.js"></script>
 
 <style>
+.submission-workspace > .problem-column { flex:0 0 40%; max-width:40%; }
+.submission-workspace > .code-column { flex:0 0 60%; max-width:60%; }
+#editor { background:#16181d; color:#f8fafc; }
+.sample-runner { background:#111827; color:#e5e7eb; }
+.sample-io { min-height:115px; background:#1f2937; color:#f9fafb; border-color:#374151; font-family:monospace; font-size:12px; }
+.sample-io:focus { background:#1f2937; color:#fff; }
+@media (max-width:1199.98px) {
+  .submission-workspace > .problem-column, .submission-workspace > .code-column { flex:0 0 100%; max-width:100%; }
+}
 .markdown-body pre code {
   background:#f8fafc;
   padding:6px 10px;
@@ -213,7 +250,7 @@ try {
 // 3) ACE EDITOR
 // ========================================
 const editor = ace.edit("editor");
-editor.setTheme("ace/theme/github");
+editor.setTheme("ace/theme/monokai");
 editor.setOptions({
   enableBasicAutocompletion:true,
   enableLiveAutocompletion:true,
@@ -253,6 +290,54 @@ langSelect.addEventListener("change", function(){
   saved.language = this.value;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   changeMode();
+});
+
+// Upload chỉ đọc tệp văn bản cục bộ và đưa nội dung vào editor; không upload
+// tệp thô lên server. Backend vẫn kiểm tra kích thước mã nguồn khi chạy/nộp.
+document.getElementById("sourceFile").addEventListener("change", async function(){
+  const file = this.files[0];
+  if (!file) return;
+  if (file.size > 100000) { this.value = ""; return alert("Tệp mã nguồn tối đa 100 KB."); }
+  editor.setValue(await file.text(), -1);
+  const ext = file.name.split(".").pop().toLowerCase();
+  if (["cpp", "cc", "cxx"].includes(ext)) langSelect.value = "cpp";
+  else if (ext === "py") langSelect.value = "python";
+  langSelect.dispatchEvent(new Event("change"));
+});
+
+const sampleSelect = document.getElementById("sampleSelect");
+function showSelectedSample(){
+  if (!sampleSelect) return;
+  const id = sampleSelect.value;
+  const input = document.querySelector(`#sampleData textarea[data-sample-id="${id}"][data-kind="input"]`);
+  const expected = document.querySelector(`#sampleData textarea[data-sample-id="${id}"][data-kind="expected"]`);
+  document.getElementById("sampleInput").value = input ? input.value : "";
+  document.getElementById("sampleExpected").value = expected ? expected.value : "";
+  document.getElementById("sampleOutput").value = "";
+}
+if (sampleSelect) sampleSelect.addEventListener("change", showSelectedSample);
+
+document.getElementById("runSampleBtn").addEventListener("click", async function(){
+  const status = document.getElementById("sampleStatus");
+  const language = langSelect.value;
+  if (!language) return alert("Vui lòng chọn ngôn ngữ.");
+  this.disabled = true;
+  status.textContent = "⏳ Đang chạy trong sandbox...";
+  const form = new FormData();
+  form.append("language", language);
+  form.append("source", editor.getValue());
+  form.append("sample_id", sampleSelect ? sampleSelect.value : "");
+  if (!sampleSelect) form.append("custom_input", document.getElementById("sampleInput").value);
+  try {
+    const response = await fetch("{% url 'submissions:run_sample' problem.id %}", {
+      method:"POST", headers:{"X-CSRFToken":document.querySelector("[name=csrfmiddlewaretoken]").value}, body:form
+    });
+    const data = await response.json();
+    document.getElementById("sampleOutput").value = data.output || data.error || "";
+    status.className = `small mt-2 ${data.verdict === "AC" || data.verdict === "OK" ? "text-success" : "text-danger"}`;
+    status.textContent = `${data.verdict || "Lỗi"} · ${data.time || 0}s${data.matches === false ? " · Kết quả chưa khớp" : ""}`;
+  } catch (error) { status.className="small mt-2 text-danger"; status.textContent="Không thể kết nối máy chạy thử."; }
+  finally { this.disabled = false; }
 });
 
 // ========================================
