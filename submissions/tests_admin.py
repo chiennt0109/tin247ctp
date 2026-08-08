@@ -18,6 +18,11 @@ class SubmissionAdminTests(TestCase):
         Submission.objects.create(
             user=cls.alice, problem=problem, language="python", source_code="", verdict="Accepted"
         )
+        # Repeated Accepted submissions for one user/problem count as attempts,
+        # but only as one submitted and one Accepted problem.
+        Submission.objects.create(
+            user=cls.alice, problem=problem, language="python", source_code="", verdict="Accepted"
+        )
         Submission.objects.create(
             user=cls.alice, problem=problem, language="python", source_code="", verdict="Wrong Answer"
         )
@@ -34,12 +39,18 @@ class SubmissionAdminTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["submission_totals"],
-            {"submission_count": 3, "accepted_count": 2, "user_count": 2},
+            {
+                "submission_attempt_count": 4,
+                "submitted_problem_count": 2,
+                "accepted_problem_count": 2,
+                "user_count": 2,
+            },
         )
         summaries = list(response.context["submission_user_summary"])
         self.assertEqual(summaries[0]["user__username"], "alice")
-        self.assertEqual(summaries[0]["submission_count"], 2)
-        self.assertEqual(summaries[0]["accepted_count"], 1)
+        self.assertEqual(summaries[0]["submission_attempt_count"], 3)
+        self.assertEqual(summaries[0]["submitted_problem_count"], 1)
+        self.assertEqual(summaries[0]["accepted_problem_count"], 1)
         self.assertContains(response, "Thống kê bài nộp theo bộ lọc")
 
     def test_user_filter_is_applied_to_summary(self):
@@ -51,7 +62,12 @@ class SubmissionAdminTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["submission_totals"],
-            {"submission_count": 1, "accepted_count": 1, "user_count": 1},
+            {
+                "submission_attempt_count": 1,
+                "submitted_problem_count": 1,
+                "accepted_problem_count": 1,
+                "user_count": 1,
+            },
         )
         summaries = list(response.context["submission_user_summary"])
         self.assertEqual([item["user__username"] for item in summaries], ["bob"])

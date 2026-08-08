@@ -33,9 +33,18 @@ class SubmissionAdmin(admin.ModelAdmin):
         changelist = response.context_data["cl"]
         filtered_submissions = changelist.queryset
         totals = filtered_submissions.aggregate(
-            submission_count=Count("id"),
-            accepted_count=Count("id", filter=Q(verdict="Accepted")),
+            submission_attempt_count=Count("id"),
             user_count=Count("user_id", distinct=True),
+        )
+        # A problem is counted once per user, even when that user submits (or gets
+        # Accepted for) the same problem multiple times.
+        totals.update(
+            submitted_problem_count=filtered_submissions.values(
+                "user_id", "problem_id"
+            ).distinct().count(),
+            accepted_problem_count=filtered_submissions.filter(
+                verdict="Accepted"
+            ).values("user_id", "problem_id").distinct().count(),
         )
         user_summary = (
             filtered_submissions.values(
@@ -46,10 +55,13 @@ class SubmissionAdmin(admin.ModelAdmin):
                 "user__email",
             )
             .annotate(
-                submission_count=Count("id"),
-                accepted_count=Count("id", filter=Q(verdict="Accepted")),
+                submission_attempt_count=Count("id"),
+                submitted_problem_count=Count("problem_id", distinct=True),
+                accepted_problem_count=Count(
+                    "problem_id", filter=Q(verdict="Accepted"), distinct=True
+                ),
             )
-            .order_by("-submission_count", "user__username")
+            .order_by("-submission_attempt_count", "user__username")
         )
 
         response.context_data.update(

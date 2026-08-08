@@ -8,10 +8,13 @@
       <p>
         <strong>Tài khoản đã nộp:</strong> {{ submission_totals.user_count|default:0 }}
         &nbsp; | &nbsp;
-        <strong>Tổng số bài nộp:</strong> {{ submission_totals.submission_count|default:0 }}
+        <strong>Tổng số lượt nộp:</strong> {{ submission_totals.submission_attempt_count|default:0 }}
         &nbsp; | &nbsp;
-        <strong>Tổng số bài Accepted:</strong> {{ submission_totals.accepted_count|default:0 }}
+        <strong>Số bài đã nộp:</strong> {{ submission_totals.submitted_problem_count|default:0 }}
+        &nbsp; | &nbsp;
+        <strong>Số bài Accepted:</strong> {{ submission_totals.accepted_problem_count|default:0 }}
       </p>
+      <p class="help">Số bài được tính theo từng tài khoản và từng đề bài; nộp hoặc Accepted cùng một bài nhiều lần vẫn chỉ tính là một bài.</p>
 
       {% if submission_user_summary %}
         <div class="results">
@@ -21,8 +24,9 @@
                 <th scope="col">Tài khoản</th>
                 <th scope="col">Họ tên</th>
                 <th scope="col">Email</th>
-                <th scope="col">Tổng bài nộp</th>
-                <th scope="col">Accepted</th>
+                <th scope="col">Số lượt nộp</th>
+                <th scope="col">Số bài đã nộp</th>
+                <th scope="col">Số bài Accepted</th>
               </tr>
             </thead>
             <tbody>
@@ -33,8 +37,9 @@
                   </th>
                   <td>{{ item.user__first_name }} {{ item.user__last_name }}</td>
                   <td>{{ item.user__email|default:"-" }}</td>
-                  <td>{{ item.submission_count }}</td>
-                  <td>{{ item.accepted_count }}</td>
+                  <td>{{ item.submission_attempt_count }}</td>
+                  <td>{{ item.submitted_problem_count }}</td>
+                  <td>{{ item.accepted_problem_count }}</td>
                 </tr>
               {% endfor %}
             </tbody>
