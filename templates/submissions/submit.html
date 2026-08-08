@@ -111,6 +111,7 @@
               <label id="sample-title" class="form-label fw-semibold">🧪 Chạy thử trước khi chấm</label>
               {% if sample_tests %}
               <select id="sampleSelect" class="form-select form-select-sm">
+                <option value="">Dữ liệu tự nhập</option>
                 {% for sample in sample_tests %}<option value="{{ sample.id }}">Ví dụ {{ forloop.counter }}</option>{% endfor %}
               </select>
               <div hidden id="sampleData">{% for sample in sample_tests %}<textarea data-sample-id="{{ sample.id }}" data-kind="input">{{ sample.input_data }}</textarea><textarea data-sample-id="{{ sample.id }}" data-kind="expected">{{ sample.expected_output }}</textarea>{% endfor %}</div>
@@ -121,11 +122,13 @@
             <button id="runSampleBtn" class="btn btn-info btn-sm fw-semibold" type="button">▶ Biên dịch và chạy</button>
           </div>
           <div class="row g-2 mt-1">
-            <div class="col-md-4"><label class="small">Dữ liệu vào</label><textarea id="sampleInput" class="form-control sample-io" {% if sample_tests %}readonly{% endif %}>{% if sample_tests %}{{ sample_tests.0.input_data }}{% endif %}</textarea></div>
-            <div class="col-md-4"><label class="small">Kết quả mong đợi</label><textarea id="sampleExpected" class="form-control sample-io" readonly>{% if sample_tests %}{{ sample_tests.0.expected_output }}{% endif %}</textarea></div>
+            <div class="col-md-4"><label class="small">Dữ liệu vào</label><textarea id="sampleInput" class="form-control sample-io"></textarea></div>
+            <div class="col-md-4"><label class="small">Kết quả mong đợi</label><textarea id="sampleExpected" class="form-control sample-io" readonly></textarea></div>
             <div class="col-md-4"><label class="small">Kết quả chạy code</label><textarea id="sampleOutput" class="form-control sample-io" readonly></textarea></div>
           </div>
           <div id="sampleStatus" class="small mt-2" role="status"></div>
+          <pre id="compileOutput" class="sample-error mt-2" hidden></pre>
+          <pre id="runtimeError" class="sample-error mt-2" hidden></pre>
         </section>
 
         <!-- KẾT QUẢ -->
@@ -182,6 +185,7 @@
 .sample-runner { background:#111827; color:#e5e7eb; }
 .sample-io { min-height:115px; background:#1f2937; color:#f9fafb; border-color:#374151; font-family:monospace; font-size:12px; }
 .sample-io:focus { background:#1f2937; color:#fff; }
+.sample-error { max-height:180px; overflow:auto; white-space:pre-wrap; background:#2b1720; color:#fecaca; padding:10px; border-radius:6px; }
 @media (max-width:1199.98px) {
   .submission-workspace > .problem-column, .submission-workspace > .code-column { flex:0 0 100%; max-width:100%; }
 }
@@ -312,6 +316,7 @@ function showSelectedSample(){
   const input = document.querySelector(`#sampleData textarea[data-sample-id="${id}"][data-kind="input"]`);
   const expected = document.querySelector(`#sampleData textarea[data-sample-id="${id}"][data-kind="expected"]`);
   document.getElementById("sampleInput").value = input ? input.value : "";
+  document.getElementById("sampleInput").readOnly = Boolean(id);
   document.getElementById("sampleExpected").value = expected ? expected.value : "";
   document.getElementById("sampleOutput").value = "";
 }
@@ -321,19 +326,29 @@ document.getElementById("runSampleBtn").addEventListener("click", async function
   const status = document.getElementById("sampleStatus");
   const language = langSelect.value;
   if (!language) return alert("Vui lòng chọn ngôn ngữ.");
+  const source = editor.getValue();
+  if (!source.trim()) return alert("Vui lòng nhập mã nguồn");
   this.disabled = true;
-  status.textContent = "⏳ Đang chạy trong sandbox...";
-  const form = new FormData();
-  form.append("language", language);
-  form.append("source", editor.getValue());
-  form.append("sample_id", sampleSelect ? sampleSelect.value : "");
-  if (!sampleSelect) form.append("custom_input", document.getElementById("sampleInput").value);
+  const originalLabel = this.textContent;
+  this.textContent = "⏳ Đang biên dịch/chạy...";
+  status.textContent = "Đang biên dịch/chạy...";
+  const compileBox = document.getElementById("compileOutput");
+  const runtimeBox = document.getElementById("runtimeError");
+  compileBox.hidden = runtimeBox.hidden = true;
+  compileBox.textContent = runtimeBox.textContent = "";
+  const payload = {
+    problem_code:"{{ problem.code|escapejs }}",
+    language:language === "cpp" ? "cpp17" : "python",
+    source,
+    stdin:document.getElementById("sampleInput").value,
+    sample_id:sampleSelect ? sampleSelect.value : ""
+  };
   try {
-    const response = await fetch("{% url 'submissions:run_sample' problem.id %}", {
+    const response = await fetch("{% url 'playground_run_api' %}", {
       method:"POST",
       credentials:"same-origin",
-      headers:{"X-CSRFToken":document.querySelector("[name=csrfmiddlewaretoken]").value,"X-Requested-With":"XMLHttpRequest"},
-      body:form
+      headers:{"Content-Type":"application/json","X-CSRFToken":document.querySelector("[name=csrfmiddlewaretoken]").value,"X-Requested-With":"XMLHttpRequest"},
+      body:JSON.stringify(payload)
     });
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.includes("application/json")) {
@@ -341,16 +356,30 @@ document.getElementById("runSampleBtn").addEventListener("click", async function
       throw new Error(`HTTP ${response.status}: ${body.slice(0, 160)}`);
     }
     const data = await response.json();
-    document.getElementById("sampleOutput").value = data.output || data.error || "";
-    status.className = `small mt-2 ${data.verdict === "AC" || data.verdict === "OK" ? "text-success" : "text-danger"}`;
-    status.textContent = `${data.verdict || `HTTP ${response.status}`} · ${data.time || 0}s${data.matches === false ? " · Kết quả chưa khớp" : ""}`;
+    document.getElementById("sampleOutput").value = data.stdout || "";
+    const success = data.status === "OK";
+    status.className = `small mt-2 ${success ? "text-success" : "text-danger"}`;
+    status.textContent = `${data.status || `HTTP ${response.status}`} · ${data.time_ms || 0} ms${data.matches_sample === false ? " · Kết quả chưa khớp test ví dụ" : ""}`;
+    if (data.status === "CE") {
+      compileBox.hidden = false;
+      compileBox.textContent = `Lỗi biên dịch:\n${data.compile_output || "Không có chi tiết."}`;
+    } else if (["RE", "TLE", "MLE", "OUTPUT_LIMIT"].includes(data.status)) {
+      runtimeBox.hidden = false;
+      runtimeBox.textContent = `Lỗi chạy (${data.status}):\n${data.stderr || "Không có stderr."}`;
+    } else if (data.status === "SYSTEM_ERROR") {
+      runtimeBox.hidden = false;
+      runtimeBox.textContent = `Máy chạy thử chưa sẵn sàng: ${data.message || "Lỗi hệ thống"}`;
+    } else if (data.stderr) {
+      runtimeBox.hidden = false;
+      runtimeBox.textContent = `stderr:\n${data.stderr}`;
+    }
   } catch (error) {
     console.error("sample runner:", error);
     status.className="small mt-2 text-danger";
     status.textContent="Máy chạy thử trả về phản hồi không hợp lệ. Hãy tải lại trang hoặc báo quản trị viên.";
     document.getElementById("sampleOutput").value = error.message || String(error);
   }
-  finally { this.disabled = false; }
+  finally { this.disabled = false; this.textContent = originalLabel; }
 });
 
 // ========================================

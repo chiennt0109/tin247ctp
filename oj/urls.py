@@ -5,7 +5,7 @@ from . import views
 from . import scratch as scratch_views
 from problems import views_admin
 from django.views.generic import RedirectView
-from submissions import views_callback
+from submissions import views_callback, views as submissions_views
 
 from oj import views as roadmap_views
 from . import views_api
@@ -71,6 +71,7 @@ urlpatterns = [
     path("run_code/", views.run_code_online, name="run_code_online"),
     path("run_code/page/", views.run_code_page, name="run_code_page"),
     path("api/run_code/", views.api_run_code, name="api_run_code"),
+    path("api/playground/run/", submissions_views.playground_run_api, name="playground_run_api"),
 
     path("api/student/<int:id>/analytics", learning_analytics_api.student_analytics, name="student_analytics"),
     path("api/student/<int:id>/skills", learning_analytics_api.student_skills, name="student_skills"),

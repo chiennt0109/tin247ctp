@@ -16,8 +16,7 @@ from redis import Redis
 from .models import Submission
 from problems.models import Problem, TestCase
 from judge.dispatcher import JudgeDispatcher
-from judge.runner import compile_submission, run_case
-from judge.sandbox import SandboxManager
+from judge.playground import PlaygroundSystemError, normalize_language, run_playground
 from contests.utils import update_participation
 
 from django.utils import timezone
@@ -84,16 +83,44 @@ def submission_page(request, problem_id):
 @login_required
 @require_POST
 def run_sample(request, problem_id):
-    """Compile and run one public sample (or bounded custom input) in the judge sandbox."""
+    """Backward-compatible form endpoint used by older submission pages."""
     problem = get_object_or_404(Problem, pk=problem_id)
-    language = (request.POST.get("language") or "").strip()
-    source = request.POST.get("source") or ""
-    sample_id = (request.POST.get("sample_id") or "").strip()
+    data = {
+        "language": request.POST.get("language"),
+        "source": request.POST.get("source"),
+        "stdin": request.POST.get("custom_input", ""),
+        "sample_id": request.POST.get("sample_id", ""),
+    }
+    return _playground_response(request, problem, data)
 
-    if language not in {"cpp", "python", "pypy"}:
-        return JsonResponse({"ok": False, "error": "Ngôn ngữ không được hỗ trợ."}, status=400)
+
+@login_required
+@require_POST
+def playground_run_api(request):
+    """POST /api/playground/run/ using the normalized JSON contract."""
+    try:
+        data = json.loads(request.body or b"{}")
+    except (TypeError, ValueError, UnicodeDecodeError):
+        return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Invalid JSON"}, status=400)
+    if not isinstance(data, dict):
+        return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Invalid JSON object"}, status=400)
+    problem_code = (data.get("problem_code") or "").strip()
+    if not problem_code:
+        return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Thiếu mã bài."}, status=400)
+    problem = get_object_or_404(Problem, code=problem_code)
+    return _playground_response(request, problem, data)
+
+
+def _playground_response(request, problem, data):
+    language = normalize_language(data.get("language") or "")
+    source = data.get("source") or ""
+    sample_id = str(data.get("sample_id") or "").strip()
+    input_data = data.get("stdin") or ""
+
+    if language is None:
+        return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Ngôn ngữ không được hỗ trợ."}, status=400)
     if not source.strip() or len(source.encode("utf-8")) > 100_000:
-        return JsonResponse({"ok": False, "error": "Mã nguồn trống hoặc vượt quá 100 KB."}, status=400)
+        return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Mã nguồn trống hoặc vượt quá 100 KB."}, status=400)
 
     throttle_key = f"sample-run:{request.user.pk}"
     try:
@@ -105,63 +132,44 @@ def run_sample(request, problem_id):
         logger.warning("Sample-run cache unavailable; using in-process throttle", exc_info=True)
         allowed = _sample_fallback_cache.add(throttle_key, "1", timeout=3)
     if not allowed:
-        return JsonResponse({"ok": False, "error": "Vui lòng đợi 3 giây trước lần chạy tiếp theo."}, status=429)
+        return JsonResponse({"ok": False, "status": "RATE_LIMIT", "message": "Vui lòng đợi 3 giây trước lần chạy tiếp theo."}, status=429)
 
     expected = None
     if sample_id:
+        if problem is None:
+            return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Thiếu mã bài."}, status=400)
         sample = get_object_or_404(TestCase, pk=sample_id, problem=problem, is_sample=True)
         input_data, expected = sample.input_data, sample.expected_output
-    else:
-        # Bài cũ chưa có test ví dụ: chỉ nhận stdin dạng văn bản, không bao giờ
-        # đưa nội dung này vào shell command hoặc ghi vào bộ test chính thức.
-        input_data = request.POST.get("custom_input") or ""
-        if len(input_data.encode("utf-8")) > 64_000:
-            return JsonResponse({"ok": False, "error": "Dữ liệu vào vượt quá 64 KB."}, status=400)
+    if len(input_data.encode("utf-8")) > 64_000:
+        return JsonResponse({"ok": False, "status": "BAD_REQUEST", "message": "Dữ liệu vào vượt quá 64 KB."}, status=400)
 
-    sandbox = SandboxManager()
-    ctx = None
     try:
-        ctx = sandbox.create(f"sample_{request.user.pk}")
-        bundle, compile_error = compile_submission(language, source, ctx.root_dir)
-        if bundle is None:
-            return JsonResponse({"ok": False, "verdict": "CE", "error": compile_error[:8000]})
-        result = run_case(
-            bundle, input_data,
+        result = run_playground(
+            language, source, input_data,
             time_limit=min(max(float(problem.time_limit or 1), .1), 5),
-            memory_limit_mb=min(max(int(problem.memory_limit or 256), 64), 512),
+            memory_mb=min(max(int(problem.memory_limit or 256), 64), 512),
         )
-        return_code = int(result.get("return_code", 1))
-        output = (result.get("stdout") or "")[:64_000]
-        verdict = "OK" if return_code == 0 else ("TLE" if return_code == 124 else "RE")
-        matches = None if expected is None or return_code != 0 else output.split() == expected.split()
-        if matches is False:
-            verdict = "WA"
-        elif matches is True:
-            verdict = "AC"
-        return JsonResponse({
-            "ok": return_code == 0,
-            "verdict": verdict,
-            "output": output,
-            "expected": expected,
-            "matches": matches,
-            "time": round(float(result.get("time") or 0), 3),
-            "error": (result.get("stderr") or "")[:8000],
-        })
-    except Exception:
-        # Luôn trả JSON để client có thể hiển thị lỗi vận hành (Docker/image/
-        # permission/timeout) thay vì rơi vào thông báo chung do parse HTML 500.
+        payload = result.payload()
+        if expected is not None:
+            payload["expected_output"] = expected
+            payload["matches_sample"] = result.status == "OK" and result.stdout.split() == expected.split()
+        return JsonResponse(payload)
+    except PlaygroundSystemError as exc:
         logger.exception("Sample runner failed for user=%s problem=%s", request.user.pk, problem.pk)
         return JsonResponse({
             "ok": False,
-            "verdict": "JE",
-            "error": (
-                "Máy chạy thử hiện chưa sẵn sàng. Vui lòng kiểm tra Docker, "
-                "các image judge-cpp/judge-py và quyền chạy Docker của dịch vụ web."
-            ),
+            "status": "SYSTEM_ERROR",
+            "message": "Playground runner is not ready",
+            "detail": str(exc)[:500],
         }, status=503)
-    finally:
-        if ctx is not None:
-            sandbox.destroy(ctx)
+    except Exception:
+        logger.exception("Unexpected playground error for user=%s problem=%s", request.user.pk, problem.pk)
+        return JsonResponse({
+            "ok": False,
+            "status": "SYSTEM_ERROR",
+            "message": "Playground runner is not ready",
+            "detail": "Unexpected internal runner error",
+        }, status=503)
 
 
 # ======================================================
