@@ -1,15 +1,24 @@
 # accounts/forms.py
 import logging
+import secrets
 
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import SetPasswordForm
+from django.core import signing
+from django.utils.crypto import salted_hmac
 from allauth.account.forms import SignupForm
-from django_recaptcha.fields import ReCaptchaField
-from django_recaptcha.widgets import ReCaptchaV2Checkbox
 from assessment.services.general_it_trial import provision_signup_trial
 
 logger = logging.getLogger(__name__)
+CAPTCHA_SALT = "accounts.signup-captcha"
+CAPTCHA_MAX_AGE = 10 * 60
+
+
+def captcha_numbers(nonce):
+    """Derive operands server-side so the signed token contains no answer."""
+    digest = salted_hmac(CAPTCHA_SALT, nonce).digest()
+    return digest[0] % 8 + 2, digest[1] % 8 + 2
 
 
 class PasswordResetRequestForm(forms.Form):
@@ -47,7 +56,7 @@ class PasswordResetConfirmForm(SetPasswordForm):
 
 
 class SecureSignupForm(SignupForm):
-    """Signup form with a self-hosted, expiring and single-use challenge."""
+    """Signup form with a self-hosted, signed and expiring challenge."""
 
     honeypot = forms.CharField(
         required=False,
