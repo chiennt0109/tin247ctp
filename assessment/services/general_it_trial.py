@@ -65,6 +65,7 @@ def grant_initial_trial(user, *, actor=None, entitlement=None):
                 "limit_mode": ExamAccessGrant.LimitMode.ATTEMPTS,
                 "max_attempts": quota,
                 "is_active": True,
+                "grant_source": ExamAccessGrant.GrantSource.AUTO_TRIAL,
             },
         )
         if created:
@@ -148,6 +149,14 @@ def provision_signup_trial(user, request):
         entitlement = shared.entitlement
         owns_new_identity = False
     TrialAccountLink.objects.create(user=user, entitlement=entitlement)
+    if not owns_new_identity:
+        TrialAuditEvent.objects.create(
+            entitlement=entitlement, user=user,
+            event_type="ACCOUNT_LINKED_EXISTING_DEVICE",
+            device_hash=device_hash, ip_hash=ip_hash,
+            details={"concurrent_signup": True},
+        )
+        return entitlement
     TrialAuditEvent.objects.create(
         entitlement=entitlement, user=user,
         event_type="SIGNUP_REVIEW_REQUIRED" if review else "SIGNUP_GRANTED",
