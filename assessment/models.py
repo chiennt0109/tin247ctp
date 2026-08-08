@@ -532,6 +532,10 @@ class ExamAccessGrant(models.Model):
         VALIDITY = "VALIDITY", "Theo thời gian hiệu lực"
         BOTH = "BOTH", "Theo số lượt và thời gian hiệu lực"
 
+    class GrantSource(models.TextChoices):
+        ADMIN = "ADMIN", "Quản trị viên"
+        AUTO_TRIAL = "AUTO_TRIAL", "Dùng thử tự động"
+
     session = models.ForeignKey(
         ExamSession, on_delete=models.CASCADE, related_name="access_grants",
     )
@@ -550,6 +554,10 @@ class ExamAccessGrant(models.Model):
     valid_from = models.DateTimeField(null=True, blank=True)
     valid_until = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    grant_source = models.CharField(
+        max_length=16, choices=GrantSource.choices, default=GrantSource.ADMIN,
+        help_text="Nguồn tạo quyền; không tham gia tính hoặc giới hạn số lượt.",
+    )
     allow_download = models.BooleanField(
         default=False,
         help_text=(
@@ -584,8 +592,8 @@ class ExamAccessGrant(models.Model):
         if bool(self.user_id) == bool(self.group_id):
             errors["user"] = "Chọn đúng một người dùng hoặc một nhóm người dùng."
         if self.limit_mode in {self.LimitMode.ATTEMPTS, self.LimitMode.BOTH}:
-            if not self.max_attempts:
-                errors["max_attempts"] = "Số lượt làm phải lớn hơn 0."
+            if self.max_attempts is None:
+                errors["max_attempts"] = "Cần nhập số lượt làm (có thể là 0)."
         elif self.max_attempts is not None:
             errors["max_attempts"] = "Chế độ thời gian không sử dụng giới hạn số lượt."
         if self.limit_mode in {self.LimitMode.VALIDITY, self.LimitMode.BOTH}:

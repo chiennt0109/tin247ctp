@@ -45,12 +45,12 @@ def resolve_exam_access(user, session, now, user_grade=None):
     # A specifically configured grant is an override, regardless of the legacy
     # session-wide access mode. This keeps existing sessions working when an
     # administrator adds a private entitlement after the session was opened.
-    grants = ExamAccessGrant.objects.filter(session=session, is_active=True)
+    grants = ExamAccessGrant.objects.filter(session=session)
     direct = grants.filter(user=user).first()
     if direct:
         return _grant_access(direct, now)
     group_grants = grants.filter(
-        group__in=user.groups.all(), user__isnull=True,
+        group__in=user.groups.all(), user__isnull=True, is_active=True,
     ).order_by("pk")
     denied = None
     for group_grant in group_grants:
