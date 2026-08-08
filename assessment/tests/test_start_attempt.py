@@ -56,6 +56,58 @@ class StartAttemptTests(TestCase):
         grant = ExamAccessGrant.objects.get(user=user, session=session)
         self.assertEqual(grant.max_attempts, 3)
         self.assertEqual(grant.limit_mode, ExamAccessGrant.LimitMode.ATTEMPTS)
+        self.assertEqual(grant.grant_source, ExamAccessGrant.GrantSource.AUTO_TRIAL)
+
+    def test_admin_values_are_never_overwritten_by_trial_reconciliation(self):
+        user = get_user_model().objects.create_user("trial-admin-override")
+        session = self.open_session()
+        grant = ExamAccessGrant.objects.create(
+            user=user, session=session, max_attempts=0,
+            grant_source=ExamAccessGrant.GrantSource.ADMIN,
+        )
+        request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.22")
+        request.trial_device_id = "8dc75226-afab-42f0-982f-97390d7c0f66"
+
+        provision_signup_trial(user, request)
+        grant.refresh_from_db()
+
+        self.assertEqual(grant.max_attempts, 0)
+        self.assertEqual(grant.grant_source, ExamAccessGrant.GrantSource.ADMIN)
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
+            start_attempt(user, session)
+
+    def test_inactive_explicit_admin_grant_denies_legacy_public_access(self):
+        user = get_user_model().objects.create_user("explicitly-disabled")
+        session = self.open_session()
+        ExamAccessGrant.objects.create(
+            user=user, session=session, max_attempts=3, is_active=False,
+        )
+
+        with self.assertRaisesMessage(StartAttemptError, "chưa được cấp quyền"):
+            start_attempt(user, session)
+
+    def test_admin_attempt_and_time_changes_are_effective_without_trial_cap(self):
+        user = get_user_model().objects.create_user("trial-admin-window")
+        session = self.open_session()
+        request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.23")
+        request.trial_device_id = "304d8831-8131-41e4-a38a-e3cc31f2b4fd"
+        provision_signup_trial(user, request)
+        grant = ExamAccessGrant.objects.get(user=user, session=session)
+
+        grant.max_attempts = 10
+        grant.save(update_fields=("max_attempts",))
+        for _ in range(4):
+            attempt = start_attempt(user, session)
+            attempt.status = ExamAttempt.Status.GRADED
+            attempt.save(update_fields=("status",))
+
+        grant.limit_mode = ExamAccessGrant.LimitMode.BOTH
+        grant.max_attempts = 1
+        grant.valid_from = timezone.now() - timedelta(minutes=1)
+        grant.valid_until = timezone.now() + timedelta(minutes=1)
+        grant.save()
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
+            start_attempt(user, session)
 
     def test_exam_list_repairs_grant_when_session_opens_after_signup(self):
         user = get_user_model().objects.create_user("trial-before-session")
