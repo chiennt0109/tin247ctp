@@ -90,6 +90,12 @@ class TestCase(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     input_data = models.TextField()
     expected_output = models.TextField()
+    is_sample = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Test ví dụ",
+        help_text="Chỉ các test được đánh dấu mới hiển thị cho thí sinh.",
+    )
 
     def __str__(self):
         return f"TestCase for {self.problem.code}"
@@ -187,4 +193,3 @@ def update_has_editorial_on_delete(sender, instance, **kwargs):
     if problem.has_editorial:
         problem.has_editorial = False
         problem.save(update_fields=["has_editorial"])
-

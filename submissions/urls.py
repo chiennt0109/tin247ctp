@@ -12,6 +12,7 @@ urlpatterns = [
     # 🚀 API xử lý nộp bài (POST)
     # /submissions/<problem_id>/submit/
     path("<int:problem_id>/submit/", views.submission_create, name="submission_create"),
+    path("<int:problem_id>/run-sample/", views.run_sample, name="run_sample"),
 
     # 📄 Chi tiết bài nộp
     # /submissions/<submission_id>/detail/
