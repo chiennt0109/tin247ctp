@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
+from django.core import signing
 from django.test import TestCase
 
 from accounts.adapters import (
     ApprovalAccountAdapter, ApprovalSocialAccountAdapter, apply_registration_approval,
 )
-from accounts.forms import PasswordResetConfirmForm, PasswordResetRequestForm
+from accounts.forms import (
+    CAPTCHA_SALT, PasswordResetConfirmForm, PasswordResetRequestForm,
+    SecureSignupForm, captcha_numbers,
+)
 from accounts.models import RegistrationRequest, RegistrationSettings
 
 
@@ -50,3 +54,32 @@ class ApprovalAdapterTests(TestCase):
         user.refresh_from_db()
         self.assertTrue(user.is_active)
         self.assertEqual(user.registration_request.status, RegistrationRequest.Status.APPROVED)
+
+
+class SecureSignupFormTests(TestCase):
+    def test_unbound_form_builds_a_signed_math_challenge(self):
+        form = SecureSignupForm()
+
+        token = form.fields["captcha_token"].initial
+        payload = signing.loads(token, salt=CAPTCHA_SALT)
+        left, right = captcha_numbers(payload["nonce"])
+
+        self.assertEqual(form.captcha_question, f"{left} + {right} = ?")
+
+    def test_bound_form_rejects_an_incorrect_challenge_answer(self):
+        initial = SecureSignupForm()
+        token = initial.fields["captcha_token"].initial
+        payload = signing.loads(token, salt=CAPTCHA_SALT)
+        left, right = captcha_numbers(payload["nonce"])
+        form = SecureSignupForm(data={
+            "username": "captcha-user",
+            "email": "captcha@example.com",
+            "password1": "safe-password-123!",
+            "password2": "safe-password-123!",
+            "captcha_token": token,
+            "captcha_answer": left + right + 1,
+            "honeypot": "",
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("captcha_answer", form.errors)
