@@ -58,14 +58,14 @@
                   {% if contest_state == "ended" or contest_state == "not_started" %}
                     {{ p.code }}
                   {% else %}
-                    <a href="{% url 'problems:problem_detail' p.id %}?contest_id={{ contest.id }}">{{ p.code }}</a>
+                    <a href="{% url 'submissions:submission_page' p.id %}?contest_id={{ contest.id }}">{{ p.code }}</a>
                   {% endif %}
                 </td>
                 <td class="fw-semibold text-primary">
                   {% if contest_state == "ended" or contest_state == "not_started" %}
                     {{ p.title }}
                   {% else %}
-                    <a href="{% url 'problems:problem_detail' p.id %}?contest_id={{ contest.id }}">{{ p.title }}</a>
+                    <a href="{% url 'submissions:submission_page' p.id %}?contest_id={{ contest.id }}">{{ p.title }}</a>
                   {% endif %}
                 </td>
                 <td class="text-center">
@@ -74,7 +74,7 @@
                   {% elif contest_state == "not_started" %}
                     <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>⏳ Chưa bắt đầu</button>
                   {% else %}
-                    <a href="{% url 'problems:problem_detail' p.id %}?contest_id={{ contest.id }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">🚀 Làm bài</a>
+                    <a href="{% url 'submissions:submission_page' p.id %}?contest_id={{ contest.id }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">🚀 Làm bài</a>
                   {% endif %}
                 </td>
               </tr>

@@ -141,7 +141,7 @@
                 <div>
                   <span class="badge rounded-pill bg-primary me-2">{{ letter }}</span>
 
-                  <a href="{% url 'problems:problem_detail' prob.id %}?practice=1&contest_id={{ contest.id }}"
+                  <a href="{% url 'submissions:submission_page' prob.id %}?practice=1&contest_id={{ contest.id }}"
                      class="text-decoration-none">
                     {{ prob.code }} – {{ prob.title }}
                   </a>

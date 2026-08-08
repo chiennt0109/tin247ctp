@@ -6,12 +6,16 @@ import hashlib
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.views.decorators.http import require_POST
 
 from redis import Redis
 
 from .models import Submission
-from problems.models import Problem
+from problems.models import Problem, TestCase
 from judge.dispatcher import JudgeDispatcher
+from judge.runner import compile_submission, run_case
+from judge.sandbox import SandboxManager
 from contests.utils import update_participation
 
 from django.utils import timezone
@@ -66,8 +70,72 @@ def submission_page(request, problem_id):
             "contest_id": contest_id,
             "practice": practice,
             "remaining": remaining,
+            "sample_tests": TestCase.objects.filter(
+                problem=problem, is_sample=True
+            ).order_by("id"),
         },
     )
+
+
+@login_required
+@require_POST
+def run_sample(request, problem_id):
+    """Compile and run one public sample (or bounded custom input) in the judge sandbox."""
+    problem = get_object_or_404(Problem, pk=problem_id)
+    language = (request.POST.get("language") or "").strip()
+    source = request.POST.get("source") or ""
+    sample_id = (request.POST.get("sample_id") or "").strip()
+
+    if language not in {"cpp", "python", "pypy"}:
+        return JsonResponse({"ok": False, "error": "Ngôn ngữ không được hỗ trợ."}, status=400)
+    if not source.strip() or len(source.encode("utf-8")) > 100_000:
+        return JsonResponse({"ok": False, "error": "Mã nguồn trống hoặc vượt quá 100 KB."}, status=400)
+
+    throttle_key = f"sample-run:{request.user.pk}"
+    if not cache.add(throttle_key, "1", timeout=3):
+        return JsonResponse({"ok": False, "error": "Vui lòng đợi 3 giây trước lần chạy tiếp theo."}, status=429)
+
+    expected = None
+    if sample_id:
+        sample = get_object_or_404(TestCase, pk=sample_id, problem=problem, is_sample=True)
+        input_data, expected = sample.input_data, sample.expected_output
+    else:
+        # Bài cũ chưa có test ví dụ: chỉ nhận stdin dạng văn bản, không bao giờ
+        # đưa nội dung này vào shell command hoặc ghi vào bộ test chính thức.
+        input_data = request.POST.get("custom_input") or ""
+        if len(input_data.encode("utf-8")) > 64_000:
+            return JsonResponse({"ok": False, "error": "Dữ liệu vào vượt quá 64 KB."}, status=400)
+
+    sandbox = SandboxManager()
+    ctx = sandbox.create(f"sample_{request.user.pk}")
+    try:
+        bundle, compile_error = compile_submission(language, source, ctx.root_dir)
+        if bundle is None:
+            return JsonResponse({"ok": False, "verdict": "CE", "error": compile_error[:8000]})
+        result = run_case(
+            bundle, input_data,
+            time_limit=min(max(float(problem.time_limit or 1), .1), 5),
+            memory_limit_mb=min(max(int(problem.memory_limit or 256), 64), 512),
+        )
+        return_code = int(result.get("return_code", 1))
+        output = (result.get("stdout") or "")[:64_000]
+        verdict = "OK" if return_code == 0 else ("TLE" if return_code == 124 else "RE")
+        matches = None if expected is None or return_code != 0 else output.split() == expected.split()
+        if matches is False:
+            verdict = "WA"
+        elif matches is True:
+            verdict = "AC"
+        return JsonResponse({
+            "ok": return_code == 0,
+            "verdict": verdict,
+            "output": output,
+            "expected": expected,
+            "matches": matches,
+            "time": round(float(result.get("time") or 0), 3),
+            "error": (result.get("stderr") or "")[:8000],
+        })
+    finally:
+        sandbox.destroy(ctx)
 
 
 # ======================================================
