@@ -186,7 +186,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 ACCOUNT_FORMS = {
     "signup": "accounts.forms.SecureSignupForm",
 }
-SOCIALACCOUNT_ADAPTER = "accounts.adapters.TrialSocialAccountAdapter"
 
 #------------------------
 SOCIALACCOUNT_PROVIDERS = {

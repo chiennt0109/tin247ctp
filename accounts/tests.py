@@ -1,7 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from accounts.adapters import (
+    ApprovalAccountAdapter, ApprovalSocialAccountAdapter, apply_registration_approval,
+)
 from accounts.forms import PasswordResetConfirmForm, PasswordResetRequestForm
+from accounts.models import RegistrationRequest, RegistrationSettings
 
 
 class PasswordResetFormCompatibilityTests(TestCase):
@@ -20,3 +24,29 @@ class PasswordResetFormCompatibilityTests(TestCase):
         form.save()
         user.refresh_from_db()
         self.assertTrue(user.check_password("new-password-456!"))
+
+
+class ApprovalAdapterTests(TestCase):
+    def test_configured_adapter_classes_are_importable(self):
+        self.assertTrue(issubclass(ApprovalAccountAdapter, object))
+        self.assertTrue(issubclass(ApprovalSocialAccountAdapter, object))
+
+    def test_new_user_is_pending_when_auto_approval_is_disabled(self):
+        RegistrationSettings.objects.create(auto_approve=False)
+        user = get_user_model().objects.create_user("pending-user")
+
+        apply_registration_approval(user)
+
+        user.refresh_from_db()
+        self.assertFalse(user.is_active)
+        self.assertEqual(user.registration_request.status, RegistrationRequest.Status.PENDING)
+
+    def test_new_user_is_active_when_auto_approval_is_enabled(self):
+        RegistrationSettings.objects.create(auto_approve=True)
+        user = get_user_model().objects.create_user("approved-user", is_active=False)
+
+        apply_registration_approval(user)
+
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+        self.assertEqual(user.registration_request.status, RegistrationRequest.Status.APPROVED)
