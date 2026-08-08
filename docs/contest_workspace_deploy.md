@@ -13,6 +13,19 @@ sudo systemctl restart tin247ctp-rqworker
 sudo systemctl --no-pager --full status tin247ctp tin247ctp-rqworker
 ```
 
+Nếu nút **Biên dịch và chạy** báo `JE`, kiểm tra Redis và Docker bằng tài khoản
+đang chạy dịch vụ web (thay `www-data` nếu VPS dùng user khác):
+
+```bash
+sudo -u www-data docker image inspect judge-cpp judge-py
+sudo -u www-data docker run --rm --network=none judge-cpp g++ --version
+sudo -u www-data docker run --rm --network=none judge-py python3 --version
+sudo journalctl -u tin247ctp -n 100 --no-pager
+```
+
+Ứng dụng dùng `CACHE_URL` nếu biến này tồn tại, nếu không sẽ dùng `REDIS_URL`.
+Không đặt Redis production cố định thành `localhost` khi Redis chạy ở dịch vụ khác.
+
 Migration `problems.0009_testcase_is_sample` thêm cờ **Test ví dụ**. Test cũ mặc
 định là test ẩn; quản trị viên có thể mở bài trong admin và đánh dấu những test
 được phép công khai. Nên sao lưu cơ sở dữ liệu trước khi migrate trên production.

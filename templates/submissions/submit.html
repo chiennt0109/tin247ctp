@@ -330,13 +330,26 @@ document.getElementById("runSampleBtn").addEventListener("click", async function
   if (!sampleSelect) form.append("custom_input", document.getElementById("sampleInput").value);
   try {
     const response = await fetch("{% url 'submissions:run_sample' problem.id %}", {
-      method:"POST", headers:{"X-CSRFToken":document.querySelector("[name=csrfmiddlewaretoken]").value}, body:form
+      method:"POST",
+      credentials:"same-origin",
+      headers:{"X-CSRFToken":document.querySelector("[name=csrfmiddlewaretoken]").value,"X-Requested-With":"XMLHttpRequest"},
+      body:form
     });
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      const body = await response.text();
+      throw new Error(`HTTP ${response.status}: ${body.slice(0, 160)}`);
+    }
     const data = await response.json();
     document.getElementById("sampleOutput").value = data.output || data.error || "";
     status.className = `small mt-2 ${data.verdict === "AC" || data.verdict === "OK" ? "text-success" : "text-danger"}`;
-    status.textContent = `${data.verdict || "Lỗi"} · ${data.time || 0}s${data.matches === false ? " · Kết quả chưa khớp" : ""}`;
-  } catch (error) { status.className="small mt-2 text-danger"; status.textContent="Không thể kết nối máy chạy thử."; }
+    status.textContent = `${data.verdict || `HTTP ${response.status}`} · ${data.time || 0}s${data.matches === false ? " · Kết quả chưa khớp" : ""}`;
+  } catch (error) {
+    console.error("sample runner:", error);
+    status.className="small mt-2 text-danger";
+    status.textContent="Máy chạy thử trả về phản hồi không hợp lệ. Hãy tải lại trang hoặc báo quản trị viên.";
+    document.getElementById("sampleOutput").value = error.message || String(error);
+  }
   finally { this.disabled = false; }
 });
 

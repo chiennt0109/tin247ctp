@@ -2,11 +2,13 @@
 import os
 import json
 import hashlib
+import logging
 
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.cache.backends.locmem import LocMemCache
 from django.views.decorators.http import require_POST
 
 from redis import Redis
@@ -28,6 +30,8 @@ from contests.models import Contest, PracticeSession
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 LOCK_TTL = 5      # chặn double–click trong 5s
 IDEMP_TTL = 30    # cùng 1 code trong 30s → dùng lại submission cũ
+logger = logging.getLogger(__name__)
+_sample_fallback_cache = LocMemCache("sample-run-fallback", {})
 
 
 def _sha1(s: str) -> str:
@@ -92,7 +96,15 @@ def run_sample(request, problem_id):
         return JsonResponse({"ok": False, "error": "Mã nguồn trống hoặc vượt quá 100 KB."}, status=400)
 
     throttle_key = f"sample-run:{request.user.pk}"
-    if not cache.add(throttle_key, "1", timeout=3):
+    try:
+        allowed = cache.add(throttle_key, "1", timeout=3)
+    except Exception:
+        # Redis/cache không phải là thành phần bắt buộc của runner. Production
+        # trước đây trỏ cache tới localhost nên lỗi kết nối tại đây làm Django
+        # trả trang HTML 500 và frontend hiểu nhầm là mất kết nối.
+        logger.warning("Sample-run cache unavailable; using in-process throttle", exc_info=True)
+        allowed = _sample_fallback_cache.add(throttle_key, "1", timeout=3)
+    if not allowed:
         return JsonResponse({"ok": False, "error": "Vui lòng đợi 3 giây trước lần chạy tiếp theo."}, status=429)
 
     expected = None
@@ -107,8 +119,9 @@ def run_sample(request, problem_id):
             return JsonResponse({"ok": False, "error": "Dữ liệu vào vượt quá 64 KB."}, status=400)
 
     sandbox = SandboxManager()
-    ctx = sandbox.create(f"sample_{request.user.pk}")
+    ctx = None
     try:
+        ctx = sandbox.create(f"sample_{request.user.pk}")
         bundle, compile_error = compile_submission(language, source, ctx.root_dir)
         if bundle is None:
             return JsonResponse({"ok": False, "verdict": "CE", "error": compile_error[:8000]})
@@ -134,8 +147,21 @@ def run_sample(request, problem_id):
             "time": round(float(result.get("time") or 0), 3),
             "error": (result.get("stderr") or "")[:8000],
         })
+    except Exception:
+        # Luôn trả JSON để client có thể hiển thị lỗi vận hành (Docker/image/
+        # permission/timeout) thay vì rơi vào thông báo chung do parse HTML 500.
+        logger.exception("Sample runner failed for user=%s problem=%s", request.user.pk, problem.pk)
+        return JsonResponse({
+            "ok": False,
+            "verdict": "JE",
+            "error": (
+                "Máy chạy thử hiện chưa sẵn sàng. Vui lòng kiểm tra Docker, "
+                "các image judge-cpp/judge-py và quyền chạy Docker của dịch vụ web."
+            ),
+        }, status=503)
     finally:
-        sandbox.destroy(ctx)
+        if ctx is not None:
+            sandbox.destroy(ctx)
 
 
 # ======================================================
