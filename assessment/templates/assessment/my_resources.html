@@ -21,9 +21,11 @@
           <td class="ps-4 fw-semibold">{{ attempt.session.name }}</td><td>{{ attempt.attempt_number }}</td>
           <td>{{ attempt.started_at|date:"H:i d/m/Y" }}</td><td>{{ attempt.blueprint_version }}</td>
           <td class="text-end pe-4">
+            {% if row.download_allowed %}
             <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'assessment:attempt_download' attempt.pk 'exam' %}?variants=1">Đề</a>
             {% if visibility.answers %}<a class="btn btn-sm btn-outline-danger rounded-pill px-3" href="{% url 'assessment:attempt_download' attempt.pk 'exam_answers' %}?variants=1">Đề + đáp án</a>{% endif %}
             <a class="btn btn-sm btn-outline-secondary rounded-pill px-3" href="{% url 'assessment:attempt_download' attempt.pk 'blueprint' %}">Ma trận + đặc tả</a>
+            {% endif %}
           </td>
         </tr>{% endwith %}{% endfor %}
       {% endfor %}</tbody>
@@ -47,9 +49,11 @@
           <td class="ps-4 fw-semibold">{{ package.session.name }}</td><td>{{ package.created_at|date:"H:i d/m/Y" }}</td>
           <td>{{ package.blueprint_version }}</td><td><span class="badge rounded-pill text-bg-light border">{{ package.get_status_display }}</span></td>
           <td class="text-end pe-4">{% if package.status == 'READY' %}
+            {% if row.download_allowed %}
             <a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'assessment:resource_download' package.pk 'exam' %}?variants=1">Đề</a>
             {% if row.answers_released %}<a class="btn btn-sm btn-outline-danger rounded-pill px-3" href="{% url 'assessment:resource_download' package.pk 'exam_answers' %}?variants=1">Đề + đáp án</a>{% endif %}
             <a class="btn btn-sm btn-outline-secondary rounded-pill px-3" href="{% url 'assessment:resource_download' package.pk 'blueprint' %}">Ma trận + đặc tả</a>
+            {% endif %}
           {% else %}<span class="text-muted">Chưa sẵn sàng</span>{% endif %}</td>
         </tr>{% endwith %}{% endfor %}
       {% endfor %}</tbody>

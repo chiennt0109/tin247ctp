@@ -138,7 +138,7 @@ def create_download_resource(request, slug):
     session = get_object_or_404(ExamSession, slug=slug)
     key = request.POST.get("idempotency_key") or uuid.uuid4().hex
     try:
-        package = create_resource_package(request.user, session, idempotency_key=key)
+        create_resource_package(request.user, session, idempotency_key=key)
     except ResourcePackageError as exc:
         messages.error(request, str(exc))
         return redirect("assessment:exam_list")
@@ -206,18 +206,35 @@ def _session_answers_released(session, *, now=None):
 
 @login_required
 def my_resources(request):
+    download_permissions = {}
+
+    def can_download(session):
+        if session.pk not in download_permissions:
+            download_permissions[session.pk] = user_download_permission(
+                request.user, session,
+            ).allowed
+        return download_permissions[session.pk]
+
     attempts = ExamAttempt.objects.filter(user=request.user).select_related(
         "session", "generated_exam", "blueprint_version",
     ).order_by("-started_at")
     attempt_rows = [
-        {"attempt": attempt, "visibility": result_visibility(attempt)}
+        {
+            "attempt": attempt,
+            "visibility": result_visibility(attempt),
+            "download_allowed": can_download(attempt.session),
+        }
         for attempt in attempts
     ]
     packages = ExamResourcePackage.objects.filter(user=request.user).select_related(
         "session", "generated_exam", "blueprint_version",
     ).order_by("session__name", "-created_at")
     package_rows = [
-        {"package": package, "answers_released": _session_answers_released(package.session)}
+        {
+            "package": package,
+            "answers_released": _session_answers_released(package.session),
+            "download_allowed": can_download(package.session),
+        }
         for package in packages
     ]
     attempt_page = Paginator(attempt_rows, 20).get_page(request.GET.get("attempt_page"))
@@ -321,7 +338,10 @@ def submit_attempt_view(request, attempt_id):
 
 @login_required
 def attempt_state(request, attempt_id):
-    attempt = get_object_or_404(ExamAttempt, pk=attempt_id, user=request.user)
+    attempt = get_object_or_404(
+        ExamAttempt.objects.select_related("session"), pk=attempt_id, user=request.user,
+    )
+    download_permission = user_download_permission(request.user, attempt.session)
     return JsonResponse({
         "status": attempt.status, "version": attempt.data_version,
         "server_now_ms": int(timezone.now().timestamp() * 1000),
