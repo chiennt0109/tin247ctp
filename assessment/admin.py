@@ -389,8 +389,9 @@ class ExamAccessGrantInline(admin.TabularInline):
     verbose_name_plural = "Quyền và lượt làm riêng"
     fields = (
         "user", "group", "limit_mode", "max_attempts", "valid_from", "valid_until",
-        "is_active", "allow_download",
+        "is_active", "allow_download", "grant_source",
     )
+    readonly_fields = ("grant_source",)
     autocomplete_fields = ("user", "group")
 
 
@@ -498,7 +499,19 @@ class ExamSessionAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
     def save_formset(self, request, form, formset, change):
-        formset.save()
+        if formset.model is ExamAccessGrant:
+            instances = formset.save(commit=False)
+            for deleted in formset.deleted_objects:
+                deleted.delete()
+            for grant in instances:
+                # Once an administrator changes an automatic row, it is an
+                # explicit administrator decision and trial review/revocation
+                # must never alter it again.
+                grant.grant_source = ExamAccessGrant.GrantSource.ADMIN
+                grant.save()
+            formset.save_m2m()
+        else:
+            formset.save()
         if formset.model is ExamAccessGrant and form.instance.access_grants.filter(is_active=True).exists():
             ExamSession.objects.filter(pk=form.instance.pk).update(
                 access_mode=ExamSession.AccessMode.ACCESS_GRANTS,
@@ -686,7 +699,10 @@ class TrialEntitlementAdmin(admin.ModelAdmin):
             grant_ids = obj.audit_events.filter(
                 event_type="TRIAL_ACCESS_GRANT_CREATED",
             ).values_list("details__grant_id", flat=True)
-            ExamAccessGrant.objects.filter(pk__in=list(grant_ids)).update(is_active=False)
+            ExamAccessGrant.objects.filter(
+                pk__in=list(grant_ids),
+                grant_source=ExamAccessGrant.GrantSource.AUTO_TRIAL,
+            ).update(is_active=False)
             self._audit(request, obj, "ADMIN_REVOKED")
 
 

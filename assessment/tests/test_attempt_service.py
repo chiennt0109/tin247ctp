@@ -136,6 +136,27 @@ class AttemptServiceTests(TestCase):
         self.assertContains(visible, "Ma trận + đặc tả")
         self.assertNotContains(visible, "Đề + đáp án")
 
+    def test_my_resources_hides_redownload_actions_without_current_permission(self):
+        user, attempt = self.create_attempt("resources-download-ui")
+        self.client.force_login(user)
+        attempt_exam_url = reverse(
+            "assessment:attempt_download", args=(attempt.pk, "exam"),
+        )
+
+        hidden = self.client.get(reverse("assessment:my_resources"))
+
+        self.assertEqual(hidden.status_code, 200)
+        self.assertNotContains(hidden, attempt_exam_url)
+
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        visible = self.client.get(reverse("assessment:my_resources"))
+
+        self.assertContains(visible, attempt_exam_url)
+
     def test_download_exam_zip_is_bounded_and_uses_generated_snapshot(self):
         user, attempt = self.create_attempt("download-zip")
         ExamAccessGrant.objects.create(

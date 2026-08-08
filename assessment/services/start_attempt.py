@@ -1,6 +1,5 @@
 import hashlib
 import secrets
-import random
 from contextlib import contextmanager
 from datetime import timedelta
 
@@ -184,6 +183,4 @@ def start_attempt(user, exam_session, *, idempotency_key=None):
                 return existing
             raise StartAttemptError("Không thể tạo bài làm do xung đột dữ liệu.") from exc
         except ExamGenerationError as exc:
-            raise StartAttemptError(str(exc)) from exc
-        except TrialQuotaExceeded as exc:
             raise StartAttemptError(str(exc)) from exc
