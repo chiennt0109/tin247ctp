@@ -28,6 +28,11 @@ PHYSICAL_STATUS_MAP = {
     # the model's canonical physical status vocabulary.
     "NEEDS_REVIEW": "REVIEW",
 }
+READY_STATUS_BY_PURPOSE = {
+    "PRACTICE": "READY_FOR_PRACTICE",
+    "PERIODIC": "READY_FOR_PERIODIC",
+    "GRADUATION": "READY_FOR_GRADUATION",
+}
 ANSWER_GUIDE_FIELDS = ("ANSWER_GUIDE", "MARKING_GUIDE", "HUONG_DAN_CHAM")
 USE_PURPOSES = {"PRACTICE", "PERIODIC", "GRADUATION", "NONE", "REVIEW_ONLY"}
 
@@ -222,7 +227,7 @@ class WorkbookBankImporter:
         raw_rows = {name: _sheet_rows(raw, name) for name in ("QUESTIONS",)}
         errors, warnings = [], []
         key_rows = self._validate_unique_keys(rows, errors)
-        self._normalize_and_validate_types(rows, errors)
+        self._normalize_and_validate_types(rows, errors, warnings)
         self._normalize_file_metadata(rows)
         self._validate_model_field_lengths(rows, errors)
         self._validate_file_checksums(rows, errors)
@@ -344,12 +349,34 @@ class WorkbookBankImporter:
                 })
 
     @staticmethod
-    def _normalize_and_validate_types(rows, errors):
+    def _normalize_and_validate_types(rows, errors, warnings):
         for row in rows.get("QUESTIONS", ()):
             raw_status = row.get("STATUS")
             normalized = str(raw_status).strip().upper() if raw_status not in (None, "") else raw_status
             row["__source_status__"] = raw_status
             row["STATUS"] = PHYSICAL_STATUS_MAP.get(normalized, normalized)
+            raw_process_status = row.get("PROCESS_STATUS")
+            row["__source_process_status__"] = raw_process_status
+            if raw_process_status in (None, ""):
+                # Some current-bank rows predate the physical PROCESS_STATUS
+                # projection.  Derive it only when the independent physical
+                # approval gate and the explicit use purpose agree.  Draft,
+                # pending, inactive and otherwise ambiguous rows remain invalid.
+                if row["STATUS"] in {"ACTIVE", "APPROVED"}:
+                    derived = READY_STATUS_BY_PURPOSE.get(str(row.get("USE_PURPOSE") or "").strip().upper())
+                elif row["STATUS"] == "REVIEW":
+                    derived = "NEEDS_REVIEW"
+                else:
+                    derived = None
+                if derived:
+                    row["PROCESS_STATUS"] = derived
+                    row["__process_status_derived__"] = True
+                    warnings.append({
+                        "code": "DERIVED_PROCESS_STATUS", "sheet": "QUESTIONS",
+                        "row": row.get("__row__"), "question_id": str(row.get("QUESTION_ID")),
+                        "source_status": raw_status, "use_purpose": row.get("USE_PURPOSE"),
+                        "derived_value": derived,
+                    })
 
         specs = (
             (INTEGER_FIELDS, _optional_integer, "integer"),
@@ -485,7 +512,16 @@ class WorkbookBankImporter:
                     if row.get(field) is None:
                         qerrors.append(f"MISSING_CACHED_{field}")
             if qerrors:
-                errors.append({"code": "INVALID_QUESTION", "question_id": qid, "issues": qerrors})
+                error = {"code": "INVALID_QUESTION", "question_id": qid, "issues": qerrors}
+                if "INVALID_PROCESS_STATUS" in qerrors:
+                    error["process_status_context"] = {
+                        "source_value": row.get("__source_process_status__"),
+                        "normalized_value": row.get("PROCESS_STATUS"),
+                        "physical_status": row.get("STATUS"),
+                        "use_purpose": row.get("USE_PURPOSE"),
+                        "cell": row.get("__cells__", {}).get("PROCESS_STATUS"),
+                    }
+                errors.append(error)
                 continue
             normalized_options = [
                 {"label": item.get("OPTION_LABEL"), "text": item.get("OPTION_TEXT"),

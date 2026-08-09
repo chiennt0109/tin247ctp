@@ -176,6 +176,8 @@ class BankSyncService:
                 "outcome": outcomes.get(str(mapping.get("OUTCOME_ID"))),
                 "source_metadata": {"note": row.get("NOTE"), "classification_basis": row.get("CLASSIFICATION_BASIS"),
                                     "source_physical_status": row.get("__source_status__"),
+                                    "source_process_status": row.get("__source_process_status__"),
+                                    "process_status_derived": bool(row.get("__process_status_derived__")),
                                     "formula_fields": item["formula_fields"]},
             },
         )
