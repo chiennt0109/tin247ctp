@@ -33,13 +33,11 @@ class ExamGenerator:
         ).all()
         for section in sections:
             for slot in section.slots.all():
-                candidates = list(
-                    BlueprintValidator._candidate_queryset(slot)
-                    .filter(current_revision__isnull=False)
-                    .select_related("current_revision")
-                    .prefetch_related("assets__source_file")
-                    .order_by("source_question_id")
-                )
+                candidates = BlueprintValidator.candidates_for_slot(slot)
+                # Selection, not only presentation order, is derived from the
+                # persisted seed. Sorting in the validator makes this stable
+                # across database query plans.
+                rng.shuffle(candidates)
                 slot_selected = []
                 for question in candidates:
                     family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
@@ -68,14 +66,20 @@ class ExamGenerator:
             if session.shuffle_options and question.shuffle_allowed:
                 rng.shuffle(option_order)
             ordered_options = [options[index] for index in option_order]
+            statement_order = list(range(len(revision.statements)))
+            if session.shuffle_options and question.shuffle_allowed:
+                rng.shuffle(statement_order)
+            ordered_statements = [revision.statements[index] for index in statement_order]
             item = {
                 "order": order, "question_id": question.source_question_id,
                 "source_version": revision.source_version, "content_hash": revision.content_hash,
                 "slot_id": slot.pk, "option_order": option_order,
+                "statement_order": statement_order,
                 "score": str(slot.score_per_item),
             }
             snapshot_payload.append(item)
-            prepared.append((slot, question, revision, order, ordered_options, option_order))
+            prepared.append((slot, question, revision, order, ordered_options, option_order,
+                             ordered_statements, statement_order))
 
         exam_hash = hashlib.sha256(json.dumps(
             {"session": str(session.pk), "code": code, "seed": str(seed), "items": snapshot_payload},
@@ -94,14 +98,16 @@ class ExamGenerator:
             total_score=blueprint_version.expected_total_score,
             validation_report=report, exam_hash=exam_hash, generated_by=actor,
         )
-        for slot, question, revision, order, ordered_options, option_order in prepared:
+        for (slot, question, revision, order, ordered_options, option_order,
+             ordered_statements, statement_order) in prepared:
             exam_question = GeneratedExamQuestion.objects.create(
                 exam=exam, bank_question=question, bank_revision=revision, blueprint_slot=slot,
                 order=order, question_id_snapshot=question.source_question_id,
                 source_version_snapshot=revision.source_version, stem_snapshot=revision.stem_text,
-                options_snapshot=ordered_options, statements_snapshot=revision.statements,
+                options_snapshot=ordered_options, statements_snapshot=ordered_statements,
                 protected_answer_snapshot=encrypt_json(revision.protected_answer),
-                option_order=option_order, score=slot.score_per_item,
+                option_order=option_order, statement_order=statement_order,
+                score=slot.score_per_item,
                 content_hash_snapshot=revision.content_hash,
             )
             for asset in question.assets.select_related("source_file").all():
