@@ -500,16 +500,19 @@ class ExamSessionAdmin(admin.ModelAdmin):
 
     def save_formset(self, request, form, formset, change):
         if formset.model is ExamAccessGrant:
-            instances = formset.save(commit=False)
-            for deleted in formset.deleted_objects:
-                deleted.delete()
-            for grant in instances:
-                # Once an administrator changes an automatic row, it is an
-                # explicit administrator decision and trial review/revocation
-                # must never alter it again.
-                grant.grant_source = ExamAccessGrant.GrantSource.ADMIN
-                grant.save()
-            formset.save_m2m()
+            if hasattr(formset, "deleted_objects"):
+                instances = formset.save(commit=False)
+                for deleted in formset.deleted_objects:
+                    deleted.delete()
+                for grant in instances:
+                    # Once an administrator changes an automatic row, it is an
+                    # explicit administrator decision and trial review/revocation
+                    # must never alter it again.
+                    grant.grant_source = ExamAccessGrant.GrantSource.ADMIN
+                    grant.save()
+                formset.save_m2m()
+            else:
+                formset.save()
         else:
             formset.save()
         if formset.model is ExamAccessGrant and form.instance.access_grants.filter(is_active=True).exists():

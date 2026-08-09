@@ -200,6 +200,7 @@ class AssessmentAuditLog(models.Model):
 class ExamBlueprint(models.Model):
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Nháp"
+        REVIEW = "REVIEW", "Đang rà soát"
         APPROVED = "APPROVED", "Đã duyệt"
         LOCKED = "LOCKED", "Đã khóa"
 
@@ -646,6 +647,7 @@ class GeneratedExamQuestion(models.Model):
     statements_snapshot = models.JSONField(default=list, blank=True)
     protected_answer_snapshot = models.TextField()
     option_order = models.JSONField(default=list, blank=True)
+    statement_order = models.JSONField(default=list, blank=True)
     score = models.DecimalField(max_digits=8, decimal_places=3)
     content_hash_snapshot = models.CharField(max_length=64)
 

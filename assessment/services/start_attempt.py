@@ -145,6 +145,18 @@ def start_attempt(user, exam_session, *, idempotency_key=None):
                 scoring_version = session.scoring_version
                 if session.blueprint_group_id:
                     blueprint_version, scoring_version = _group_configuration(session, user)
+                blueprint = blueprint_version.blueprint
+                # Legacy locked sessions used DRAFT as their physical status.
+                # REVIEW is the explicit non-auto-use workflow state; newly
+                # synchronized usable blueprints are persisted as APPROVED.
+                if blueprint.status == blueprint.Status.REVIEW:
+                    raise StartAttemptError(
+                        f"Ma trận {blueprint.source_blueprint_id or blueprint.pk} chưa APPROVED."
+                    )
+                if (blueprint.difficulty_profile or {}).get("AUTO_USE") == "BLOCKED":
+                    raise StartAttemptError(
+                        f"Ma trận {blueprint.source_blueprint_id or blueprint.pk} bị chặn AUTO_USE."
+                    )
                 validation = BlueprintValidator().validate(
                     blueprint_version, scoring_version=scoring_version
                 )

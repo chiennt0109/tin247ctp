@@ -34,7 +34,7 @@ class BlueprintValidator:
 
         used_question_ids, used_family_keys = set(), set()
         for slot in slot_list:
-            raw_candidates = list(self._candidate_queryset(slot).order_by("source_question_id"))
+            raw_candidates = list(self.candidates_for_slot(slot))
             candidates = []
             excluded_by_previous_slots = 0
             for question in raw_candidates:
@@ -111,6 +111,36 @@ class BlueprintValidator:
         elif slot.required_process_status:
             queryset = queryset.filter(process_status=slot.required_process_status)
         return queryset
+
+    @classmethod
+    def candidates_for_slot(cls, slot):
+        """Return the strict, deterministic DB-backed pool for a logical slot.
+
+        ``required_tags`` is deliberately evaluated as structured metadata rather
+        than text searching.  It supports either ``["TAG"]`` (membership in the
+        question's ``tags`` metadata) or ``{"NLS_PRIMARY": "..."}`` style gates.
+        This keeps NLS/AI separate from the subject competency field.
+        """
+        questions = cls._candidate_queryset(slot).order_by("source_question_id")
+        return [question for question in questions if cls._metadata_matches(slot, question)]
+
+    @staticmethod
+    def _metadata_matches(slot, question):
+        metadata = question.source_metadata or {}
+        required = slot.required_tags or []
+        excluded = slot.excluded_tags or []
+        tags = set(metadata.get("tags") or metadata.get("TAGS") or [])
+        if isinstance(required, dict):
+            if any(metadata.get(key) != value for key, value in required.items()):
+                return False
+        elif any(tag not in tags for tag in required):
+            return False
+        if isinstance(excluded, dict):
+            if any(metadata.get(key) == value for key, value in excluded.items()):
+                return False
+        elif any(tag in tags for tag in excluded):
+            return False
+        return True
 
     @classmethod
     def explain_slot(cls, slot):
