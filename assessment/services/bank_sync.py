@@ -10,6 +10,20 @@ from assessment.models import (
 
 
 AVAILABLE_PROCESS_STATUSES = {"READY_FOR_PRACTICE", "READY_FOR_PERIODIC", "READY_FOR_GRADUATION"}
+MANUAL_QUESTION_TYPES = {"ESSAY", "PRACTICAL"}
+
+
+def question_is_structurally_eligible(item):
+    """Eligibility shared by preview/persistence; never infer readiness from STATUS."""
+    if item["question_type"] == "MCQ_SINGLE":
+        return len(item["options"]) == 4 and bool(item.get("answer_key"))
+    if item["question_type"] == "TRUE_FALSE_GROUP":
+        return len(item["statements"]) == 4 and bool(item.get("answer_key"))
+    if item["question_type"] == "SHORT_ANSWER":
+        return bool(item.get("answer_key"))
+    if item["question_type"] in MANUAL_QUESTION_TYPES:
+        return bool(item.get("answer_guide") or item.get("answer_key"))
+    return False
 
 
 class BankSyncService:
@@ -18,15 +32,25 @@ class BankSyncService:
         source_ids = {item["question_id"] for item in parsed.questions}
         counts = Counter()
         for item in parsed.questions:
+            counts[f"{item['question_type'].lower()}_valid"] += 1
             current = existing.get(item["question_id"])
             if current is None:
                 counts["new"] += 1
+                counts[f"{item['question_type'].lower()}_new"] += 1
             elif current.content_hash != item["content_hash"]:
                 counts["changed"] += 1
+                counts[f"{item['question_type'].lower()}_changed"] += 1
             else:
                 counts["unchanged"] += 1
-            if item["process_status"] != "READY_FOR_PERIODIC":
+            periodic_eligible = (
+                item["process_status"] == "READY_FOR_PERIODIC"
+                and question_is_structurally_eligible(item)
+            )
+            if not periodic_eligible:
                 counts["not_periodic_eligible"] += 1
+                counts[f"{item['question_type'].lower()}_not_periodic_eligible"] += 1
+            else:
+                counts[f"{item['question_type'].lower()}_periodic_eligible"] += 1
             if item["process_status"] != "READY_FOR_GRADUATION":
                 counts["not_graduation_eligible"] += 1
         counts["retired"] = len(set(existing) - source_ids)
@@ -144,18 +168,28 @@ class BankSyncService:
                 # never reinterpret raw spreadsheet values differently from dry-run.
                 "estimated_time_seconds": item["estimated_time_seconds"],
                 "content_hash": item["content_hash"],
-                "is_available": item["process_status"] in AVAILABLE_PROCESS_STATUSES,
+                "is_available": (
+                    item["process_status"] in AVAILABLE_PROCESS_STATUSES
+                    and question_is_structurally_eligible(item)
+                ),
                 "curriculum": curriculum.get(str(mapping.get("CURRICULUM_ID"))),
                 "outcome": outcomes.get(str(mapping.get("OUTCOME_ID"))),
                 "source_metadata": {"note": row.get("NOTE"), "classification_basis": row.get("CLASSIFICATION_BASIS"),
+                                    "source_physical_status": row.get("__source_status__"),
                                     "formula_fields": item["formula_fields"]},
             },
         )
+        protected_answer = {"answer_key": item["answer_key"]}
+        if item["question_type"] in MANUAL_QUESTION_TYPES:
+            protected_answer.update({
+                "answer_guide": item.get("answer_guide") or item.get("answer_key"),
+                "manual_score_required": True,
+            })
         revision, _ = BankQuestionRevision.objects.get_or_create(
             question=question, content_hash=item["content_hash"], defaults={
                 "source_version": item["source_version"], "stem_text": item["stem_text"],
                 "options": item["options"], "statements": item["statements"],
-                "protected_answer": {"answer_key": item["answer_key"]},
+                "protected_answer": protected_answer,
                 "explanation_source_id": str(row.get("EXPLANATION_ID") or ""),
                 "source_metadata": {"source_row": row.get("__row__")},
             },

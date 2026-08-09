@@ -22,6 +22,13 @@ PROCESS_STATUSES = {
     "READY_FOR_GRADUATION", "NEEDS_REVIEW", "OUTDATED", "RETIRED",
 }
 STATUS_VALUES = {"DRAFT", "PENDING", "REVIEW", "APPROVED", "ACTIVE", "INACTIVE", "REJECTED", "ARCHIVED"}
+PHYSICAL_STATUS_MAP = {
+    # The master historically uses the workflow wording in the physical STATUS
+    # column.  Keep PROCESS_STATUS untouched, but project that one value onto
+    # the model's canonical physical status vocabulary.
+    "NEEDS_REVIEW": "REVIEW",
+}
+ANSWER_GUIDE_FIELDS = ("ANSWER_GUIDE", "MARKING_GUIDE", "HUONG_DAN_CHAM")
 USE_PURPOSES = {"PRACTICE", "PERIODIC", "GRADUATION", "NONE", "REVIEW_ONLY"}
 
 # Types used by either validation or persistence. Normalization happens once in
@@ -338,6 +345,12 @@ class WorkbookBankImporter:
 
     @staticmethod
     def _normalize_and_validate_types(rows, errors):
+        for row in rows.get("QUESTIONS", ()):
+            raw_status = row.get("STATUS")
+            normalized = str(raw_status).strip().upper() if raw_status not in (None, "") else raw_status
+            row["__source_status__"] = raw_status
+            row["STATUS"] = PHYSICAL_STATUS_MAP.get(normalized, normalized)
+
         specs = (
             (INTEGER_FIELDS, _optional_integer, "integer"),
             (DECIMAL_FIELDS, _optional_decimal, "decimal"),
@@ -424,7 +437,14 @@ class WorkbookBankImporter:
                 qerrors.append("INVALID_COGNITIVE_LEVEL")
             if not str(row.get("STEM_TEXT") or "").strip():
                 qerrors.append("MISSING_STEM")
-            if row.get("ANSWER_KEY") in (None, ""):
+            answer_guide = next(
+                (row.get(field) for field in ANSWER_GUIDE_FIELDS if row.get(field) not in (None, "")),
+                None,
+            )
+            answer_value = row.get("ANSWER_KEY")
+            if qtype in {"ESSAY", "PRACTICAL"}:
+                answer_value = answer_guide if answer_guide not in (None, "") else answer_value
+            if answer_value in (None, ""):
                 qerrors.append("MISSING_ANSWER")
             if str(row.get("PROCESS_STATUS") or "") not in PROCESS_STATUSES:
                 qerrors.append("INVALID_PROCESS_STATUS")
@@ -483,6 +503,7 @@ class WorkbookBankImporter:
                 "question_id": qid, "question_code": row.get("QUESTION_CODE"), "question_type": qtype,
                 "cognitive_level": row.get("COGNITIVE_LEVEL"), "stem_text": row.get("STEM_TEXT"),
                 "answer_key": row.get("ANSWER_KEY"), "source_version": str(row.get("VERSION")),
+                "answer_guide": answer_guide,
                 "options": normalized_options, "statements": normalized_statements,
                 "curriculum_id": mapping.get("CURRICULUM_ID"), "outcome_id": mapping.get("OUTCOME_ID"),
                 "difficulty": difficulty, "competency": row.get("COMPETENCY"),

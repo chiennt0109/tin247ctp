@@ -92,6 +92,37 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         self.assertIn("MISSING_ANSWER", parsed.errors[0]["issues"])
 
+    def test_imports_periodic_essay_without_options_and_maps_physical_review_status(self):
+        path = WorkbookFactory.create()
+        workbook = load_workbook(path)
+        headers = [cell.value for cell in workbook["QUESTIONS"][1]]
+        row = dict(zip(headers, next(workbook["QUESTIONS"].iter_rows(min_row=2, values_only=True))))
+        row.update({
+            "QUESTION_ID": "Q_ESSAY", "QUESTION_CODE": "Q_ESSAY",
+            "QUESTION_TYPE": "ESSAY", "ANSWER_KEY": "Rubric: đủ 3 ý",
+            "STATUS": "NEEDS_REVIEW", "PROCESS_STATUS": "READY_FOR_PERIODIC",
+            "USE_PURPOSE": "PERIODIC", "SHUFFLE_ALLOWED": False,
+            "FAMILY_ID": "ESSAY_FAMILY",
+        })
+        workbook["QUESTIONS"].append([row.get(header) for header in headers])
+        workbook["QUESTION_CURRICULUM"].append(
+            ["QC_ESSAY", "Q_ESSAY", "C1", "O1", 1, "APPROVED", ""]
+        )
+        workbook["QUESTION_SOURCES"].append(
+            ["QS_ESSAY", "Q_ESSAY", "F1", "1", "", "", "", "APPROVED"]
+        )
+        workbook.save(path)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        essay = next(question for question in parsed.questions if question["question_id"] == "Q_ESSAY")
+        self.assertEqual(essay["options"], [])
+        self.assertEqual(essay["process_status"], "READY_FOR_PERIODIC")
+        self.assertEqual(essay["row"]["STATUS"], "REVIEW")
+        self.assertEqual(essay["row"]["__source_status__"], "NEEDS_REVIEW")
+        self.assertFalse(any(error.get("question_id") == "Q_ESSAY" for error in parsed.errors))
+
     def test_rejects_duplicate_question_key(self):
         path = WorkbookFactory.create(duplicate_question=True)
         self.addCleanup(path.unlink)
