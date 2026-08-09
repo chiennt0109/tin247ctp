@@ -216,6 +216,11 @@ def _exam_lines(ctx, *, include_answers):
     lines.extend(["", "PHẦN II — TRẮC NGHIỆM ĐÚNG/SAI"])
     for question in _tf_questions(ctx):
         lines.extend(_question_exam_lines(question, include_answers=include_answers))
+    manual = _manual_questions(ctx)
+    if manual:
+        lines.extend(["", "PHẦN III — TỰ LUẬN/THỰC HÀNH"])
+        for question in manual:
+            lines.extend(_question_exam_lines(question, include_answers=include_answers))
     return lines
 
 
@@ -252,6 +257,13 @@ def _answer_lines(ctx):
         for question in tf:
             answer = _tf_answer_map(question)
             lines.append(f"{question.order} | {answer.get('a', 'NEEDS_REVIEW')} | {answer.get('b', 'NEEDS_REVIEW')} | {answer.get('c', 'NEEDS_REVIEW')} | {answer.get('d', 'NEEDS_REVIEW')}")
+    manual = _manual_questions(ctx)
+    if manual:
+        lines.extend(["", "PHẦN III — HƯỚNG DẪN CHẤM TỰ LUẬN/THỰC HÀNH"])
+        for question in manual:
+            payload = decrypt_json(question.protected_answer_snapshot)
+            guide = payload.get("answer_guide") or payload.get("answer_key") or "NEEDS_REVIEW"
+            lines.extend([f"Câu {question.order} ({question.score} điểm)", str(guide), ""])
     return lines
 
 
@@ -261,6 +273,10 @@ def _mcq_questions(ctx):
 
 def _tf_questions(ctx):
     return [q for q in ctx.questions if q.statements_snapshot]
+
+
+def _manual_questions(ctx):
+    return [q for q in ctx.questions if q.bank_question.question_type in {"ESSAY", "PRACTICAL"}]
 
 
 def _ordered_options(question):
@@ -425,7 +441,10 @@ def _spec_rows(ctx, *, public):
             getattr(curriculum, "source_id", "NEEDS_REVIEW"),
             getattr(outcome, "source_id", "NEEDS_REVIEW"),
             getattr(outcome, "text", "NEEDS_REVIEW"),
-            "Đúng/Sai" if question.statements_snapshot else "Nhiều lựa chọn",
+            ({"ESSAY": "Tự luận", "PRACTICAL": "Thực hành"}.get(
+                question.bank_question.question_type,
+                "Đúng/Sai" if question.statements_snapshot else "Nhiều lựa chọn",
+            )),
             slot.cognitive_level or question.bank_question.cognitive_level or "NEEDS_REVIEW",
             slot.competency or question.bank_question.competency or "NEEDS_REVIEW",
             len(question.statements_snapshot) if question.statements_snapshot else 1,
@@ -447,7 +466,10 @@ def _snapshot_sheets(ctx):
             question.blueprint_slot_id, str(question.score), question.content_hash_snapshot,
         ])
         order_rows.append([
-            question.order, "STATEMENT" if question.statements_snapshot else "OPTION", ",".join(map(str, question.option_order or [])),
+            question.order,
+            ("STATEMENT" if question.statements_snapshot else
+             "MANUAL" if question.bank_question.question_type in {"ESSAY", "PRACTICAL"} else "OPTION"),
+            ",".join(map(str, question.option_order or [])),
         ])
         source_rows.append([
             question.order, question.question_id_snapshot,

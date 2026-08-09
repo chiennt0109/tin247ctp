@@ -92,6 +92,56 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         self.assertIn("MISSING_ANSWER", parsed.errors[0]["issues"])
 
+    def test_imports_periodic_essay_without_options_and_maps_physical_review_status(self):
+        path = WorkbookFactory.create()
+        workbook = load_workbook(path)
+        headers = [cell.value for cell in workbook["QUESTIONS"][1]]
+        row = dict(zip(headers, next(workbook["QUESTIONS"].iter_rows(min_row=2, values_only=True))))
+        row.update({
+            "QUESTION_ID": "Q_ESSAY", "QUESTION_CODE": "Q_ESSAY",
+            "QUESTION_TYPE": "ESSAY", "ANSWER_KEY": "Rubric: đủ 3 ý",
+            "STATUS": "ACTIVE", "PROCESS_STATUS": None,
+            "USE_PURPOSE": "PERIODIC", "SHUFFLE_ALLOWED": False,
+            "FAMILY_ID": "ESSAY_FAMILY",
+        })
+        workbook["QUESTIONS"].append([row.get(header) for header in headers])
+        workbook["QUESTION_CURRICULUM"].append(
+            ["QC_ESSAY", "Q_ESSAY", "C1", "O1", 1, "APPROVED", ""]
+        )
+        workbook["QUESTION_SOURCES"].append(
+            ["QS_ESSAY", "Q_ESSAY", "F1", "1", "", "", "", "APPROVED"]
+        )
+        workbook.save(path)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        essay = next(question for question in parsed.questions if question["question_id"] == "Q_ESSAY")
+        self.assertEqual(essay["options"], [])
+        self.assertEqual(essay["process_status"], "READY_FOR_PERIODIC")
+        self.assertEqual(essay["row"]["STATUS"], "ACTIVE")
+        self.assertIsNone(essay["row"]["__source_process_status__"])
+        self.assertTrue(essay["row"]["__process_status_derived__"])
+        warning = next(item for item in parsed.warnings if item["question_id"] == "Q_ESSAY")
+        self.assertEqual(warning["derived_value"], "READY_FOR_PERIODIC")
+        self.assertFalse(any(error.get("question_id") == "Q_ESSAY" for error in parsed.errors))
+
+    def test_blank_process_status_is_not_derived_for_draft_periodic_question(self):
+        path = WorkbookFactory.create()
+        workbook = load_workbook(path)
+        headers = [cell.value for cell in workbook["QUESTIONS"][1]]
+        workbook["QUESTIONS"].cell(2, headers.index("STATUS") + 1, "DRAFT")
+        workbook["QUESTIONS"].cell(2, headers.index("USE_PURPOSE") + 1, "PERIODIC")
+        workbook["QUESTIONS"].cell(2, headers.index("PROCESS_STATUS") + 1).value = None
+        workbook.save(path)
+        self.addCleanup(path.unlink)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        error = next(item for item in parsed.errors if item.get("question_id") == "Q1")
+        self.assertIn("INVALID_PROCESS_STATUS", error["issues"])
+        self.assertFalse(parsed.warnings)
+
     def test_rejects_duplicate_question_key(self):
         path = WorkbookFactory.create(duplicate_question=True)
         self.addCleanup(path.unlink)

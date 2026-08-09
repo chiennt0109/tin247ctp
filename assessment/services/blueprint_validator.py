@@ -62,7 +62,8 @@ class BlueprintValidator:
                 errors.append({"code": "INSUFFICIENT_DISTINCT_FAMILIES", "slot_id": slot.pk})
             elif candidate_count <= slot.quantity * 2:
                 warnings.append({"code": "LOW_CANDIDATE_MARGIN", "slot_id": slot.pk})
-            if scoring_version is not None and slot.question_type not in scoring_types:
+            if (scoring_version is not None and slot.question_type not in scoring_types
+                    and slot.question_type not in {"ESSAY", "PRACTICAL"}):
                 errors.append({
                     "code": "MISSING_SCORING_RULE", "slot_id": slot.pk,
                     "question_type": slot.question_type,
@@ -93,6 +94,8 @@ class BlueprintValidator:
         queryset = BankQuestion.objects.filter(
             is_available=True, current_revision__isnull=False, question_type=slot.question_type,
         )
+        # A ready-for-X workflow state is the authoritative gate.  Physical
+        # STATUS is deliberately not used as a substitute for this condition.
         if slot.curriculum_id:
             queryset = queryset.filter(curriculum_id=slot.curriculum_id)
         if slot.outcome_id:

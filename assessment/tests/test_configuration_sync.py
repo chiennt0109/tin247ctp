@@ -7,6 +7,35 @@ from assessment.services.configuration_sync import MasterConfigurationSync
 
 
 class MasterConfigurationSyncTests(TestCase):
+    def test_pool_report_distinguishes_candidate_margin_from_filled_cells(self):
+        parsed = SimpleNamespace(
+            rows={
+                "BLUEPRINTS": [{
+                    "BLUEPRINT_ID": "BP10", "BLUEPRINT_NAME": "K10", "EXAM_TYPE": "PERIODIC",
+                    "GRADE": 10, "STATUS": "APPROVED",
+                }],
+                "BLUEPRINT_CELLS": [{
+                    "BLUEPRINT_CELL_ID": cell_id, "BLUEPRINT_ID": "BP10", "QUESTION_TYPE": "ESSAY",
+                    "REQUIRED_COUNT": 1, "STATUS": "APPROVED", "CURRICULUM_ID": curriculum,
+                    "OUTCOME_ID": "", "COGNITIVE_LEVEL": "", "DIFFICULTY": None, "COMPETENCY": "",
+                } for cell_id, curriculum in (("E1", "C1"), ("E2", "C2"), ("E3", "C3"))],
+            },
+            questions=[{
+                "question_id": question_id, "question_type": "ESSAY",
+                "process_status": "READY_FOR_PERIODIC", "curriculum_id": curriculum,
+                "outcome_id": "", "cognitive_level": "BIET", "difficulty": 1,
+                "competency": "NLa", "family_id": question_id,
+            } for question_id, curriculum in (("Q1", "C1"), ("Q2", "C1"), ("Q3", "C2"))],
+        )
+
+        report = MasterConfigurationSync().preview(parsed)["blueprint_pool"][0]
+
+        self.assertEqual(report["required"], {"ESSAY": 3})
+        self.assertEqual(report["eligible"], {"ESSAY": 2})
+        self.assertEqual(report["eligible_capacity"], {"ESSAY": 3})
+        self.assertEqual(report["missing_count"], 1)
+        self.assertFalse(report["can_generate"])
+
     def test_approved_regular_grade_blueprints_are_real_and_idempotent(self):
         parsed = SimpleNamespace(rows={
             "BLUEPRINTS": [{
