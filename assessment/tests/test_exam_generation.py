@@ -11,6 +11,7 @@ from assessment.models import (
     ScoringSchemeVersion,
 )
 from assessment.services.exam_generator import ExamGenerationError, ExamGenerator
+from assessment.services.blueprint_validator import BlueprintValidator
 from assessment.services.exam_session import publish_exam_session
 from assessment.services.protected_payload import decrypt_json
 
@@ -100,6 +101,36 @@ class ExamGenerationTests(TestCase):
         with self.assertRaises(ExamGenerationError):
             ExamGenerator().generate_for_attempt(self.create_session(), code="001", seed="family")
         self.assertEqual(GeneratedExam.objects.count(), 0)
+
+    def test_required_nls_metadata_excludes_incompatible_questions(self):
+        self.slot.required_tags = {"NLS_PRIMARY": "NLS-X"}
+        self.slot.quantity = 1
+        self.slot.save(update_fields=("required_tags", "quantity"))
+        BankQuestion.objects.update(source_metadata={"NLS_PRIMARY": "NLS-Y"})
+        report = BlueprintValidator().validate(self.blueprint_version)
+        self.assertEqual(report["availability"][0]["candidates"], 0)
+
+    def test_true_false_statement_order_is_seeded_and_snapshotted(self):
+        self.slot.question_type = "TRUE_FALSE_GROUP"
+        self.slot.quantity = 1
+        self.slot.requires_graduation_eligibility = True
+        self.slot.save(update_fields=("question_type", "quantity", "requires_graduation_eligibility"))
+        BankQuestion.objects.update(question_type="TRUE_FALSE_GROUP")
+        for question in BankQuestion.objects.select_related("current_revision"):
+            revision = question.current_revision
+            revision.statements = [{"label": label, "text": label} for label in "ABCD"]
+            revision.save(update_fields=("statements",))
+        self.blueprint_version.expected_question_count = 1
+        self.blueprint_version.expected_total_score = Decimal("0.250")
+        self.blueprint_version.save(update_fields=("expected_question_count", "expected_total_score"))
+        self.lock_versions()
+        exam = ExamGenerator().generate_for_attempt(self.create_session(), code="tf", seed="stable")
+        item = exam.questions.get()
+        self.assertEqual(sorted(item.statement_order), [0, 1, 2, 3])
+        self.assertEqual(
+            item.statements_snapshot,
+            [item.bank_revision.statements[index] for index in item.statement_order],
+        )
 
     def test_publish_locks_versions_without_pre_generating_exams(self):
         session = self.create_session("publish")
