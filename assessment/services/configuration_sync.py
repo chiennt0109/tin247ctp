@@ -57,7 +57,9 @@ class MasterConfigurationSync:
             exam_type = str(blueprint.get("EXAM_TYPE") or "")
             required_status = PROCESS_STATUS_MAP.get(exam_type, "")
             used_ids, used_families = set(), set()
-            required_by_type, eligible_by_type = defaultdict(int), defaultdict(int)
+            required_by_type = defaultdict(int)
+            eligible_by_type = defaultdict(int)
+            capacity_by_type = defaultdict(int)
             missing = []
             for cell in cells_by_blueprint[str(blueprint.get("BLUEPRINT_ID"))]:
                 qtype = TYPE_MAP.get(str(cell.get("QUESTION_TYPE")), str(cell.get("QUESTION_TYPE")))
@@ -86,8 +88,13 @@ class MasterConfigurationSync:
                         distinct.append(question)
                         local_families.add(family)
                 required_by_type[qtype] += required
-                eligible_by_type[qtype] += len(distinct)
                 selected = distinct[:required]
+                # ``eligible`` means questions that can actually fill cells in
+                # this deterministic simulation, not the sum of raw candidate
+                # margins.  Keeping capacity separately avoids reports such as
+                # "ESSAY eligible: 3" while only two of three cells are filled.
+                eligible_by_type[qtype] += len(selected)
+                capacity_by_type[qtype] += len(distinct)
                 used_ids.update(question["question_id"] for question in selected)
                 used_families.update(
                     question.get("family_id") or f"QUESTION:{question['question_id']}"
@@ -102,6 +109,8 @@ class MasterConfigurationSync:
                 "blueprint": str(blueprint.get("BLUEPRINT_ID")),
                 "name": str(blueprint.get("BLUEPRINT_NAME") or ""),
                 "required": dict(required_by_type), "eligible": dict(eligible_by_type),
+                "eligible_capacity": dict(capacity_by_type),
+                "missing_count": sum(item["missing"] for item in missing),
                 "missing_slots": missing, "can_generate": not missing,
             })
         return reports
