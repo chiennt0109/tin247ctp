@@ -35,6 +35,25 @@ class BankSyncServiceTests(TestCase):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
         self.assertEqual(BankQuestionRevision.objects.filter(question=question).count(), 1)
 
+    def test_needs_review_process_status_is_not_available(self):
+        workbook = load_workbook(self.path)
+        headers = [cell.value for cell in workbook["QUESTIONS"][1]]
+        process_column = headers.index("PROCESS_STATUS") + 1
+        status_column = headers.index("STATUS") + 1
+        workbook["QUESTIONS"].cell(2, process_column, "NEEDS_REVIEW")
+        workbook["QUESTIONS"].cell(2, status_column, "NEEDS_REVIEW")
+        workbook.save(self.path)
+
+        parsed = WorkbookBankImporter().parse(self.path)
+        self.assertFalse(parsed.errors)
+        BankSyncService().apply(parsed)
+
+        question = BankQuestion.objects.get()
+        self.assertFalse(question.is_available)
+        self.assertEqual(question.process_status, "NEEDS_REVIEW")
+        self.assertEqual(question.source_status, "REVIEW")
+        self.assertEqual(question.source_metadata["source_physical_status"], "NEEDS_REVIEW")
+
     def test_existing_database_rows_are_unchanged_not_duplicate_source_keys(self):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
 

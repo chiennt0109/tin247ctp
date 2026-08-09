@@ -32,6 +32,7 @@ class ConfigurationSyncError(ValueError):
 class MasterConfigurationSync:
     def preview(self, parsed):
         approved = [row for row in parsed.rows.get("BLUEPRINTS", []) if str(row.get("STATUS")) == "APPROVED"]
+        pool_report = self._source_pool_report(parsed, approved)
         return {
             "approved_blueprints": len(approved),
             "grades": sorted({int(row["GRADE"]) for row in approved if row.get("GRADE")}),
@@ -39,7 +40,71 @@ class MasterConfigurationSync:
             "blueprint_cells": sum(
                 str(row.get("STATUS")) == "APPROVED" for row in parsed.rows.get("BLUEPRINT_CELLS", [])
             ),
+            "blueprint_pool": pool_report,
         }
+
+    @staticmethod
+    def _source_pool_report(parsed, blueprints):
+        """Evaluate source questions against source cells without writing the database."""
+        cells_by_blueprint = defaultdict(list)
+        for cell in parsed.rows.get("BLUEPRINT_CELLS", []):
+            if str(cell.get("STATUS")) == "APPROVED":
+                cells_by_blueprint[str(cell.get("BLUEPRINT_ID"))].append(cell)
+        reports = []
+        for blueprint in blueprints:
+            if int(blueprint.get("GRADE") or 0) != 10:
+                continue
+            exam_type = str(blueprint.get("EXAM_TYPE") or "")
+            required_status = PROCESS_STATUS_MAP.get(exam_type, "")
+            used_ids, used_families = set(), set()
+            required_by_type, eligible_by_type = defaultdict(int), defaultdict(int)
+            missing = []
+            for cell in cells_by_blueprint[str(blueprint.get("BLUEPRINT_ID"))]:
+                qtype = TYPE_MAP.get(str(cell.get("QUESTION_TYPE")), str(cell.get("QUESTION_TYPE")))
+                required = int(cell.get("REQUIRED_COUNT") or 0)
+                candidates = []
+                for question in getattr(parsed, "questions", ()):
+                    family = question.get("family_id") or f"QUESTION:{question['question_id']}"
+                    if question["question_id"] in used_ids or family in used_families:
+                        continue
+                    filters = (
+                        question["question_type"] == qtype
+                        and (not required_status or question["process_status"] == required_status)
+                        and (not cell.get("CURRICULUM_ID") or str(question["curriculum_id"]) == str(cell["CURRICULUM_ID"]))
+                        and (not cell.get("OUTCOME_ID") or str(question["outcome_id"]) == str(cell["OUTCOME_ID"]))
+                        and (not cell.get("COGNITIVE_LEVEL") or question["cognitive_level"] == str(cell["COGNITIVE_LEVEL"]))
+                        and (not cell.get("DIFFICULTY") or question["difficulty"] == int(cell["DIFFICULTY"]))
+                        and (not cell.get("COMPETENCY") or question.get("competency") == str(cell["COMPETENCY"]))
+                    )
+                    if filters:
+                        candidates.append(question)
+                distinct = []
+                local_families = set()
+                for question in candidates:
+                    family = question.get("family_id") or f"QUESTION:{question['question_id']}"
+                    if family not in local_families:
+                        distinct.append(question)
+                        local_families.add(family)
+                required_by_type[qtype] += required
+                eligible_by_type[qtype] += len(distinct)
+                selected = distinct[:required]
+                used_ids.update(question["question_id"] for question in selected)
+                used_families.update(
+                    question.get("family_id") or f"QUESTION:{question['question_id']}"
+                    for question in selected
+                )
+                if len(selected) < required:
+                    missing.append({
+                        "cell_id": str(cell.get("BLUEPRINT_CELL_ID")), "question_type": qtype,
+                        "required": required, "eligible": len(distinct), "missing": required - len(selected),
+                    })
+            reports.append({
+                "blueprint": str(blueprint.get("BLUEPRINT_ID")),
+                "name": str(blueprint.get("BLUEPRINT_NAME") or ""),
+                "required": dict(required_by_type), "eligible": dict(eligible_by_type),
+                "missing_slots": missing, "can_generate": not missing,
+            })
+        return reports
 
     @transaction.atomic
     def apply(self, parsed, *, actor=None):
