@@ -2,6 +2,8 @@ from collections import Counter
 from decimal import Decimal
 
 from assessment.models import BankQuestion
+from assessment.services.blueprint_feasibility import solve_slot_assignment
+from assessment.services.eligibility import graduation_eligible
 
 
 class BlueprintValidator:
@@ -32,17 +34,10 @@ class BlueprintValidator:
         if scoring_version is not None:
             scoring_types = set(scoring_version.rules.values_list("question_type", flat=True))
 
-        used_question_ids, used_family_keys = set(), set()
         for slot in slot_list:
             raw_candidates = list(self.candidates_for_slot(slot))
-            candidates = []
+            candidates = raw_candidates
             excluded_by_previous_slots = 0
-            for question in raw_candidates:
-                family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
-                if question.pk in used_question_ids or family_key in used_family_keys:
-                    excluded_by_previous_slots += 1
-                    continue
-                candidates.append(question)
             candidate_count = len(candidates)
             # Empty family IDs represent unrelated questions and must each count
             # as a distinct selectable family.
@@ -68,19 +63,10 @@ class BlueprintValidator:
                     "code": "MISSING_SCORING_RULE", "slot_id": slot.pk,
                     "question_type": slot.question_type,
                 })
-            if status not in {"NONE", "INSUFFICIENT"}:
-                selected = []
-                selected_families = set()
-                for question in candidates:
-                    family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
-                    if family_key in selected_families:
-                        continue
-                    selected.append(question)
-                    selected_families.add(family_key)
-                    if len(selected) == slot.quantity:
-                        break
-                used_question_ids.update(question.pk for question in selected)
-                used_family_keys.update(selected_families)
+
+        assignment = solve_slot_assignment(slot_list, self.candidates_for_slot, seed="feasibility")
+        if assignment is None:
+            errors.append({"code": "NO_GLOBAL_DISTINCT_ASSIGNMENT"})
 
         report = {
             "valid": not errors, "question_total": question_total, "score_total": str(score_total),
@@ -122,7 +108,8 @@ class BlueprintValidator:
         This keeps NLS/AI separate from the subject competency field.
         """
         questions = cls._candidate_queryset(slot).order_by("source_question_id")
-        return [question for question in questions if cls._metadata_matches(slot, question)]
+        return [question for question in questions if cls._metadata_matches(slot, question)
+                and (not slot.requires_graduation_eligibility or graduation_eligible(question))]
 
     @staticmethod
     def _metadata_matches(slot, question):

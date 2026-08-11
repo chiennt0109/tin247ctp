@@ -21,6 +21,31 @@ PROCESS_STATUSES = {
     "ANSWER_CHECKED", "CONTENT_REVIEWED", "READY_FOR_PRACTICE", "READY_FOR_PERIODIC",
     "READY_FOR_GRADUATION", "NEEDS_REVIEW", "OUTDATED", "RETIRED",
 }
+
+NLS_AI_TAGS = {
+    "NLS_FRAME", "NLS_LEVEL", "NLS_MAPPING_STATUS", "NLS_PRIMARY", "NLS_COMPONENTS",
+    "TASK_COMPATIBILITY", "GRAD_NLS_TASK", "GRAD_NLS_COMPONENTS", "AI_INTEGRATION",
+    "AI_COMPONENT", "AI_TASK_COMPATIBILITY", "GRAD_AI_TASK", "AI_FRAME",
+    "AI_FRAME_SCOPE", "AI_FRAME_MAPPING_STATUS", "AUTO_USE_GRADUATION_NLS_AI_GATE",
+}
+
+
+def parse_structured_note(note):
+    """Parse known ``KEY=value`` lines and retain non-fatal malformed-tag warnings."""
+    metadata, warnings = {}, []
+    for line_number, raw in enumerate(str(note or "").splitlines(), 1):
+        line = raw.strip().lstrip("-• ")
+        if not line:
+            continue
+        key_candidate = line.split("=", 1)[0].strip().upper()
+        if key_candidate not in NLS_AI_TAGS:
+            continue
+        if "=" not in line or not line.split("=", 1)[1].strip():
+            warnings.append({"code": "INVALID_NLS_AI_TAG", "line": line_number, "tag": key_candidate})
+            continue
+        key, value = line.split("=", 1)
+        metadata[key.strip().upper()] = value.strip()
+    return metadata, warnings
 STATUS_VALUES = {"DRAFT", "PENDING", "REVIEW", "APPROVED", "ACTIVE", "INACTIVE", "REJECTED", "ARCHIVED"}
 PHYSICAL_STATUS_MAP = {
     # The master historically uses the workflow wording in the physical STATUS
@@ -547,6 +572,12 @@ class WorkbookBankImporter:
                 "process_status": row.get("PROCESS_STATUS"), "use_purpose": row.get("USE_PURPOSE"),
                 "shuffle_allowed": shuffle_allowed, "family_id": row.get("FAMILY_ID"),
             }
+            structured_metadata, metadata_warnings = parse_structured_note(row.get("NOTE"))
+            if metadata_warnings:
+                for warning in metadata_warnings:
+                    warnings.append({**warning, "sheet": "QUESTIONS", "question_id": qid})
+            canonical["structured_metadata"] = structured_metadata
+            canonical["import_warnings"] = metadata_warnings
             content_hash = hashlib.sha256(
                 json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
             ).hexdigest()

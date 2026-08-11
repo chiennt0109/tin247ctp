@@ -47,6 +47,8 @@ class ExamGenerationTests(TestCase):
             difficulty=1, source_status="ACTIVE", process_status="READY_FOR_GRADUATION",
             use_purpose="GRADUATION", shuffle_allowed=True, duplicate_family_id=family,
             content_hash=question_id.ljust(64, "0")[:64], is_available=True,
+            nls_frame="TT02_2025", nls_level="NANG_CAO_1", grad_nls_task="PASS",
+            graduation_gate="PASS",
         )
         revision = BankQuestionRevision.objects.create(
             question=question, source_version="1", content_hash=question.content_hash,
@@ -127,6 +129,7 @@ class ExamGenerationTests(TestCase):
         exam = ExamGenerator().generate_for_attempt(self.create_session(), code="tf", seed="stable")
         item = exam.questions.get()
         self.assertEqual(sorted(item.statement_order), [0, 1, 2, 3])
+        self.assertEqual(item.statement_order, [0, 1, 2, 3])
         self.assertEqual(
             item.statements_snapshot,
             [item.bank_revision.statements[index] for index in item.statement_order],
