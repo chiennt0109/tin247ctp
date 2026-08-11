@@ -44,6 +44,7 @@ class BlueprintTests(TestCase):
             source_question_id=question_id, question_type="MCQ_SINGLE",
             cognitive_level="BIET", difficulty=1, source_status="ACTIVE",
             process_status="READY_FOR_GRADUATION", use_purpose="GRADUATION",
+            grad_nls_task="PASS", graduation_gate="PASS",
             content_hash=question_id.ljust(64, "0")[:64], is_available=True,
             duplicate_family_id=family,
         )
