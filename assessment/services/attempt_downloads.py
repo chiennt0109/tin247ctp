@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.conf import settings
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
