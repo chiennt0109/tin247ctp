@@ -28,7 +28,9 @@ def question_is_structurally_eligible(item):
 
 class BankSyncService:
     def preview(self, parsed):
-        existing = {q.source_question_id: q for q in BankQuestion.objects.all()}
+        # Dry-run doubles as the pre-migration diagnostic. Restrict this query
+        # to pre-v2 columns so missing projection columns cannot crash preview.
+        existing = dict(BankQuestion.objects.values_list("source_question_id", "content_hash"))
         source_ids = {item["question_id"] for item in parsed.questions}
         counts = Counter()
         for item in parsed.questions:
@@ -37,7 +39,7 @@ class BankSyncService:
             if current is None:
                 counts["new"] += 1
                 counts[f"{item['question_type'].lower()}_new"] += 1
-            elif current.content_hash != item["content_hash"]:
+            elif current != item["content_hash"]:
                 counts["changed"] += 1
                 counts[f"{item['question_type'].lower()}_changed"] += 1
             else:
