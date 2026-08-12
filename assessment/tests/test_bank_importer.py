@@ -5,7 +5,9 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from openpyxl import Workbook, load_workbook
 
-from assessment.services.bank_importer import BankValidationError, WorkbookBankImporter
+from assessment.services.bank_importer import (
+    BankValidationError, WorkbookBankImporter, parse_structured_note,
+)
 
 
 REQUIRED_HEADERS = {
@@ -78,6 +80,23 @@ class WorkbookFactory:
 
 
 class WorkbookBankImporterTests(SimpleTestCase):
+    def test_structured_nls_ai_note_uses_canonical_semicolon_format(self):
+        metadata, warnings = parse_structured_note(
+            "BATCH=X; NLS_FRAME=TT02_2025; GRAD_NLS_TASK=PASS; "
+            "AI_COMPONENT=6.3; AUTO_USE_GRADUATION_NLS_AI_GATE=PASS"
+        )
+        self.assertFalse(warnings)
+        self.assertEqual(metadata["NLS_FRAME"], "TT02_2025")
+        self.assertEqual(metadata["AI_COMPONENT"], "6.3")
+        self.assertEqual(metadata["AUTO_USE_GRADUATION_NLS_AI_GATE"], "PASS")
+
+    def test_malformed_known_tag_warns_without_opening_gate(self):
+        metadata, warnings = parse_structured_note(
+            "GRAD_NLS_TASK=PASS; AUTO_USE_GRADUATION_NLS_AI_GATE="
+        )
+        self.assertNotIn("AUTO_USE_GRADUATION_NLS_AI_GATE", metadata)
+        self.assertEqual(warnings[0]["code"], "INVALID_NLS_AI_TAG")
+
     def test_parses_valid_question_and_stable_hash(self):
         path = WorkbookFactory.create()
         self.addCleanup(path.unlink)
