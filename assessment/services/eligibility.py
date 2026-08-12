@@ -5,15 +5,14 @@ Only structured data supplied by the bank may open the graduation gate.
 """
 
 GRAD_NLS_ALLOWED = {"PASS", "NOT_APPLICABLE_CONFIRMED"}
-AI_DIRECT_TASKS = {"PASS", "DIRECT", "DIRECT_ASSESSMENT"}
+AI_DIRECT_TASKS = {"PASS", "PASS_DIRECT", "DIRECT", "DIRECT_ASSESSMENT"}
 
 
 def graduation_eligible(question) -> bool:
     if question.process_status != "READY_FOR_GRADUATION":
         return False
-    # Canonical imports require this relation before persistence.  Hand-built
-    # questions (notably isolated validation fixtures) may omit it, so runtime
-    # does not attempt to infer or repair a missing mapping here.
+    if not question.curriculum_id or not question.outcome_id:
+        return False
     if question.grad_nls_task not in GRAD_NLS_ALLOWED:
         return False
     if question.graduation_gate != "PASS" or question.import_warnings:

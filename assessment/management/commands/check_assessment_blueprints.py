@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from assessment.models import ExamBlueprint
 from assessment.services.blueprint_feasibility import solve_slot_assignment
@@ -31,4 +31,4 @@ class Command(BaseCommand):
                 f"NLS/AI gate: enforced for graduation slots\nResult: {result}\n"
             )
         if failures:
-            self.stderr.write(self.style.ERROR(f"{failures} blueprint(s) failed"))
+            raise CommandError(f"{failures} blueprint(s) failed")

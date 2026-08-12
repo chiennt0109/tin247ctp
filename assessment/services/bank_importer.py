@@ -31,19 +31,20 @@ NLS_AI_TAGS = {
 
 
 def parse_structured_note(note):
-    """Parse known ``KEY=value`` lines and retain non-fatal malformed-tag warnings."""
+    """Parse known ``KEY=value`` tokens from semicolon/newline structured notes."""
     metadata, warnings = {}, []
-    for line_number, raw in enumerate(str(note or "").splitlines(), 1):
-        line = raw.strip().lstrip("-• ")
-        if not line:
+    tokens = re.split(r"[;\r\n]+", str(note or ""))
+    for token_number, raw in enumerate(tokens, 1):
+        token = raw.strip().lstrip("-• ")
+        if not token:
             continue
-        key_candidate = line.split("=", 1)[0].strip().upper()
+        key_candidate = token.split("=", 1)[0].strip().upper()
         if key_candidate not in NLS_AI_TAGS:
             continue
-        if "=" not in line or not line.split("=", 1)[1].strip():
-            warnings.append({"code": "INVALID_NLS_AI_TAG", "line": line_number, "tag": key_candidate})
+        if "=" not in token or not token.split("=", 1)[1].strip():
+            warnings.append({"code": "INVALID_NLS_AI_TAG", "token": token_number, "tag": key_candidate})
             continue
-        key, value = line.split("=", 1)
+        key, value = token.split("=", 1)
         metadata[key.strip().upper()] = value.strip()
     return metadata, warnings
 STATUS_VALUES = {"DRAFT", "PENDING", "REVIEW", "APPROVED", "ACTIVE", "INACTIVE", "REJECTED", "ARCHIVED"}

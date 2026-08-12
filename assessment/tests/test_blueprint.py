@@ -4,7 +4,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from assessment.models import (
-    AssessmentAuditLog, BankQuestion, BankQuestionRevision, BlueprintSection, BlueprintSlot, BlueprintVersion, ExamBlueprint,
+    AssessmentAuditLog, BankQuestion, BankQuestionRevision, BlueprintSection, BlueprintSlot, BlueprintVersion,
+    CurriculumNode, CurriculumOutcome, ExamBlueprint,
     ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
 from assessment.services.blueprint_validator import BlueprintValidator
@@ -40,6 +41,18 @@ class BlueprintTests(TestCase):
 
     @staticmethod
     def create_question(question_id, family=""):
+        curriculum, _ = CurriculumNode.objects.get_or_create(
+            source_id="TEST-CURRICULUM", defaults={
+                "grade": 12, "subject": "Tin học", "program_version": "2018",
+                "topic_code": "TEST", "topic_name": "Test", "source_status": "ACTIVE",
+            },
+        )
+        outcome, _ = CurriculumOutcome.objects.get_or_create(
+            source_id="TEST-OUTCOME", defaults={
+                "curriculum": curriculum, "code": "TEST", "text": "Test",
+                "cognitive_level": "BIET", "source_status": "ACTIVE",
+            },
+        )
         question = BankQuestion.objects.create(
             source_question_id=question_id, question_type="MCQ_SINGLE",
             cognitive_level="BIET", difficulty=1, source_status="ACTIVE",
@@ -47,6 +60,7 @@ class BlueprintTests(TestCase):
             grad_nls_task="PASS", graduation_gate="PASS",
             content_hash=question_id.ljust(64, "0")[:64], is_available=True,
             duplicate_family_id=family,
+            curriculum=curriculum, outcome=outcome,
         )
         revision = BankQuestionRevision.objects.create(
             question=question, source_version="1", content_hash=question.content_hash,

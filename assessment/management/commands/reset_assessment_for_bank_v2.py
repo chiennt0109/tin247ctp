@@ -81,10 +81,13 @@ class Command(BaseCommand):
         backup = self._backup(options["backup_dir"])
         try:
             with transaction.atomic():
+                # Break BankQuestion.current_revision -> BankQuestionRevision's
+                # PROTECT cycle before deleting the bank child-first.
+                if self._table_exists(models.BankQuestion):
+                    models.BankQuestion.objects.update(current_revision=None)
                 for model, count in counts:
                     if count is not None:
                         model.objects.all().delete()
         except Exception as exc:
             raise CommandError(f"Purge rolled back. Backup retained at {backup}: {exc}") from exc
         self.stdout.write(self.style.SUCCESS(f"Assessment reset complete. Backup retained at: {backup}"))
-
