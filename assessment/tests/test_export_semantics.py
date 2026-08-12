@@ -5,7 +5,7 @@ from django.test import SimpleTestCase
 
 from assessment.services.attempt_downloads import (
     ExportValidationError, _cognitive_distribution, _order_is_valid,
-    _ordered_statements, _require_golden_templates, _tf_answer_map,
+    _ordered_statements, _tf_answer_map,
 )
 from assessment.services.protected_payload import encrypt_json
 
@@ -34,7 +34,9 @@ class ExportSemanticTests(SimpleTestCase):
         self.assertEqual(_tf_answer_map(question), {"a": "Đ", "b": "S", "c": "Đ", "d": "S"})
         self.assertTrue(_order_is_valid(question))
 
-    def test_missing_golden_templates_is_a_hard_failure(self):
-        with patch("assessment.services.attempt_downloads.Path.is_file", return_value=False):
-            with self.assertRaisesMessage(ExportValidationError, "MISSING_GOLDEN_EXPORT_TEMPLATE"):
-                _require_golden_templates()
+    def test_missing_pdf_renderer_is_a_hard_failure(self):
+        from assessment.services.attempt_downloads import _render_pdf
+
+        with patch("assessment.services.attempt_downloads.shutil.which", return_value=None):
+            with self.assertRaisesMessage(ExportValidationError, "MISSING_PDF_RENDERER"):
+                _render_pdf(b"PK", "document.docx")

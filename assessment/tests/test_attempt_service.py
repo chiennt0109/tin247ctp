@@ -1,6 +1,7 @@
 import io
 import json
 import zipfile
+from unittest.mock import patch
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from django.test.utils import CaptureQueriesContext
 from django.db import connection
 from django.urls import reverse
 from django.utils import timezone
+from openpyxl import load_workbook
 
 from assessment.models import (
     AttemptAnswer, ExamAccessGrant, ExamAttempt, ExamResourcePackage, ExamUsageRecord,
@@ -176,7 +178,7 @@ class AttemptServiceTests(TestCase):
         ) + "?variants=4")
 
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, "MISSING_GOLDEN_EXPORT_TEMPLATE", status_code=400)
+        self.assertContains(response, "MISSING_PDF_RENDERER", status_code=400)
 
 
     def test_full_standard_zip_contains_required_files_without_json_and_preserves_order(self):
@@ -188,11 +190,55 @@ class AttemptServiceTests(TestCase):
             allow_download=True,
         )
 
-        with self.assertRaisesMessage(ExportValidationError, "MISSING_GOLDEN_EXPORT_TEMPLATE"):
+        with self.assertRaisesMessage(ExportValidationError, "MISSING_PDF_RENDERER"):
             build_attempt_download_zip(attempt=attempt, user=user, package="exam_answers", variants=1)
         after = list(attempt.generated_exam.questions.order_by("order").values_list("question_id_snapshot", "order", "option_order"))
 
         self.assertEqual(before, after)
+
+    def test_form_package_succeeds_with_pdf_renderer_and_is_reproducible(self):
+        user, attempt = self.create_attempt("form-download")
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        with patch("assessment.services.attempt_downloads._render_pdf", return_value=b"%PDF-rendered"):
+            first = build_attempt_download_zip(
+                attempt=attempt, user=user, package="exam_answers", variants=1,
+            )
+            second = build_attempt_download_zip(
+                attempt=attempt, user=user, package="exam_answers", variants=1,
+            )
+
+        def semantic_files(payload):
+            with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                result = {}
+                for name in archive.namelist():
+                    short = name.split("/", 1)[1]
+                    data = archive.read(name)
+                    if short.endswith(".docx"):
+                        with zipfile.ZipFile(io.BytesIO(data)) as document:
+                            data = document.read("word/document.xml")
+                    elif short.endswith(".xlsx"):
+                        workbook = load_workbook(io.BytesIO(data), data_only=False)
+                        data = tuple(
+                            (sheet.title, tuple(tuple(cell.value for cell in row) for row in sheet.iter_rows()))
+                            for sheet in workbook.worksheets
+                        )
+                    elif short.endswith(".txt"):
+                        continue
+                    result[short] = data
+                return result
+
+        self.assertEqual(semantic_files(first), semantic_files(second))
+        with zipfile.ZipFile(io.BytesIO(first)) as archive:
+            matrix_name = next(name for name in archive.namelist() if name.endswith(".xlsx") and "MA_TRAN" in name)
+            workbook = load_workbook(io.BytesIO(archive.read(matrix_name)))
+        self.assertEqual(
+            workbook.sheetnames,
+            ["THONG_TIN", "MA_TRAN", "BAN_DAC_TA", "DANH_SACH_CAU", "TINH_TOAN"],
+        )
 
     def test_download_denied_without_grant_or_for_another_user(self):
         user, attempt = self.create_attempt("download-denied-owner")
@@ -252,7 +298,7 @@ class AttemptServiceTests(TestCase):
 
         self.assertEqual(first.pk, second.pk)
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, "MISSING_GOLDEN_EXPORT_TEMPLATE", status_code=400)
+        self.assertContains(response, "MISSING_PDF_RENDERER", status_code=400)
         self.assertEqual(committed_usage_count(user, session), 1)
 
     def test_stale_reservation_cleanup_releases_usage_without_deleting_real_data(self):

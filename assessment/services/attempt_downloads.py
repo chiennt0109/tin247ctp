@@ -3,9 +3,11 @@ import io
 import re
 import zipfile
 from pathlib import Path
+import shutil
+import subprocess
+import tempfile
 from dataclasses import dataclass
 from decimal import Decimal
-from xml.sax.saxutils import escape
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.conf import settings
@@ -19,14 +21,6 @@ from assessment.services.protected_payload import decrypt_json
 MAX_VARIANTS = 8
 VARIANT_CHOICES = {1, 4, 8}
 FULL_PACKAGE = "exam_answers"
-GOLDEN_TEMPLATE_DIR = Path(settings.BASE_DIR) / "assessment" / "export_templates" / "07_EXPORT"
-REQUIRED_GOLDEN_TEMPLATES = (
-    "DE_TNTHPT_TINHOC_2026_CS_001.docx",
-    "MA_TRAN_VA_BAN_DAC_TA_TNTHPT_TINHOC_2026_CS_001.xlsx",
-    "DAP_AN_MA_TRAN_BAN_DAC_TA_TNTHPT_TINHOC_2026_CS_001.docx",
-)
-
-
 class ExportValidationError(ValidationError):
     pass
 
@@ -168,7 +162,6 @@ def _context_from_resource_package(resource_package, *, package, variants, grant
 
 
 def _build_standard_zip(ctx):
-    _require_golden_templates()
     errors = _semantic_validation_errors(ctx)
     if errors:
         raise ExportValidationError(errors)
@@ -189,26 +182,30 @@ def _build_export_files(ctx):
     files = {}
     if include_exam:
         exam_lines = _exam_lines(ctx, include_answers=False)
-        files[f"01_DE_THI_{code}.docx"] = _docx_bytes(f"Đề thi {code}", exam_lines)
-        files[f"01_DE_THI_{code}.pdf"] = _pdf_bytes(exam_lines, landscape=False)
+        exam_docx = _form_docx_bytes(f"Đề thi {code}", exam_lines)
+        files[f"01_DE_THI_{code}.docx"] = exam_docx
+        files[f"01_DE_THI_{code}.pdf"] = _render_pdf(exam_docx, f"01_DE_THI_{code}.docx")
     if include_answers:
         answer_lines = _answer_lines(ctx)
-        files[f"02_DAP_AN_{code}.docx"] = _docx_bytes(f"Đáp án {code}", answer_lines)
-        files[f"02_DAP_AN_{code}.pdf"] = _pdf_bytes(answer_lines, landscape=False)
+        answer_docx = _form_docx_bytes(f"Đáp án {code}", answer_lines)
+        files[f"02_DAP_AN_{code}.docx"] = answer_docx
+        files[f"02_DAP_AN_{code}.pdf"] = _render_pdf(answer_docx, f"02_DAP_AN_{code}.docx")
     if include_blueprint:
         matrix_rows = _matrix_rows(ctx)
         spec_rows = _spec_rows(ctx, public=False)
-        files[f"03_MA_TRAN_{code}.xlsx"] = _xlsx_bytes({"MA_TRAN": matrix_rows})
-        files[f"03_MA_TRAN_{code}.pdf"] = _pdf_bytes(_rows_to_lines(matrix_rows), landscape=True)
-        files[f"04_BAN_DAC_TA_{code}.docx"] = _docx_bytes(f"Bản đặc tả {code}", _rows_to_lines(spec_rows))
-        files[f"04_BAN_DAC_TA_{code}.pdf"] = _pdf_bytes(_rows_to_lines(spec_rows), landscape=True)
+        matrix_xlsx = _form_xlsx_bytes(ctx, matrix_rows, spec_rows)
+        files[f"03_MA_TRAN_{code}.xlsx"] = matrix_xlsx
+        files[f"03_MA_TRAN_{code}.pdf"] = _render_pdf(matrix_xlsx, f"03_MA_TRAN_{code}.xlsx")
+        spec_docx = _form_docx_bytes(f"Bản đặc tả {code}", _rows_to_lines(spec_rows))
+        files[f"04_BAN_DAC_TA_{code}.docx"] = spec_docx
+        files[f"04_BAN_DAC_TA_{code}.pdf"] = _render_pdf(spec_docx, f"04_BAN_DAC_TA_{code}.docx")
     snapshot_sheets = _snapshot_sheets(ctx)
-    files[f"05_SNAPSHOT_{code}.xlsx"] = _xlsx_bytes(snapshot_sheets)
+    files[f"INTERNAL/05_SNAPSHOT_{code}.xlsx"] = _xlsx_bytes(snapshot_sheets)
     validation = _validation_lines(ctx, files)
-    files[f"07_VALIDATION_REPORT_{code}.txt"] = "\n".join(validation).encode("utf-8")
+    files[f"INTERNAL/07_VALIDATION_REPORT_{code}.txt"] = "\n".join(validation).encode("utf-8")
     manifest = _manifest_lines(ctx, files)
-    files[f"06_MANIFEST_{code}.txt"] = "\n".join(manifest).encode("utf-8")
-    files["README.txt"] = "\n".join(_readme_lines(ctx)).encode("utf-8")
+    files[f"INTERNAL/06_MANIFEST_{code}.txt"] = "\n".join(manifest).encode("utf-8")
+    files["INTERNAL/README.txt"] = "\n".join(_readme_lines(ctx)).encode("utf-8")
     return files
 
 
@@ -553,14 +550,6 @@ def _manifest_lines(ctx, files):
     return lines
 
 
-def _require_golden_templates():
-    missing = [name for name in REQUIRED_GOLDEN_TEMPLATES if not (GOLDEN_TEMPLATE_DIR / name).is_file()]
-    if missing:
-        raise ExportValidationError(
-            "MISSING_GOLDEN_EXPORT_TEMPLATE: " + ", ".join(missing)
-        )
-
-
 def _cognitive_distribution(questions):
     result = {"BIET": 0, "HIEU": 0, "VANDUNG": 0}
     for question in questions:
@@ -656,58 +645,6 @@ def _rows_to_lines(rows):
     return [" | ".join(map(str, row)) for row in rows]
 
 
-def _docx_bytes(title, lines):
-    body = [f"<w:p><w:r><w:t>{escape(title)}</w:t></w:r></w:p>"]
-    for line in lines:
-        text = escape(str(line))
-        body.append(f"<w:p><w:r><w:t xml:space=\"preserve\">{text}</w:t></w:r></w:p>")
-    document = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>{''.join(body)}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134"/></w:sectPr></w:body></w:document>"""
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("[Content_Types].xml", """<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>""")
-        zf.writestr("_rels/.rels", """<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>""")
-        zf.writestr("word/document.xml", document.encode("utf-8"))
-    buffer.seek(0)
-    return buffer.getvalue()
-
-
-def _pdf_bytes(lines, *, landscape=False):
-    width, height = (842, 595) if landscape else (595, 842)
-    chunks = []
-    y = height - 40
-    for line in lines[:70]:
-        chunks.append(f"BT /F1 10 Tf 40 {y} Td {_pdf_text(str(line)[:110])} Tj ET")
-        y -= 14
-        if y < 40:
-            break
-    stream = "\n".join(chunks).encode("utf-8")
-    objects = [
-        b"<< /Type /Catalog /Pages 2 0 R >>",
-        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {width} {height}] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>".encode(),
-        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-        b"<< /Length " + str(len(stream)).encode() + b" >>\nstream\n" + stream + b"\nendstream",
-    ]
-    pdf = bytearray(b"%PDF-1.4\n")
-    offsets = []
-    for index, obj in enumerate(objects, start=1):
-        offsets.append(len(pdf))
-        pdf.extend(f"{index} 0 obj\n".encode() + obj + b"\nendobj\n")
-    xref = len(pdf)
-    pdf.extend(f"xref\n0 {len(objects)+1}\n0000000000 65535 f \n".encode())
-    for offset in offsets:
-        pdf.extend(f"{offset:010d} 00000 n \n".encode())
-    pdf.extend(f"trailer << /Size {len(objects)+1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF".encode())
-    return bytes(pdf)
-
-
-def _pdf_text(text):
-    # UTF-16BE hex string keeps Vietnamese bytes in the PDF without embedding fonts.
-    data = ("\ufeff" + text).encode("utf-16-be")
-    return "<" + data.hex().upper() + ">"
-
-
 def _xlsx_bytes(sheets):
     wb = Workbook()
     first = True
@@ -735,3 +672,157 @@ def _xlsx_bytes(sheets):
 def _safe_name(value):
     cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value)).strip("._")
     return cleaned or "EXAM"
+
+
+def _form_docx_bytes(title, lines):
+    """Build the editable assessment form using the approved 07_EXPORT styling."""
+    try:
+        from docx import Document
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+        from docx.shared import Cm, Pt, RGBColor
+    except ImportError as exc:
+        raise ExportValidationError("MISSING_DOCX_RENDERER: install python-docx") from exc
+
+    document = Document()
+    section = document.sections[0]
+    section.top_margin = Cm(1.5)
+    section.bottom_margin = Cm(1.5)
+    section.left_margin = Cm(1.7)
+    section.right_margin = Cm(1.7)
+    normal = document.styles["Normal"]
+    normal.font.name = "Carlito"
+    normal.font.size = Pt(11)
+    normal._element.rPr.rFonts.set(qn("w:eastAsia"), "Carlito")
+
+    heading = document.add_paragraph()
+    heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    heading.paragraph_format.space_after = Pt(10)
+    run = heading.add_run(title.upper())
+    run.bold = True
+    run.font.name = "Carlito"
+    run.font.size = Pt(15)
+    run.font.color.rgb = RGBColor(31, 78, 121)
+    for line in lines:
+        text = str(line)
+        paragraph = document.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(3)
+        paragraph.paragraph_format.line_spacing = 1.05
+        run = paragraph.add_run(text)
+        if text.startswith(("PHẦN ", "I. ", "II. ", "III. ", "IV. ")):
+            run.bold = True
+            run.font.color.rgb = RGBColor(31, 78, 121)
+            paragraph.paragraph_format.keep_with_next = True
+        elif text.startswith("Câu "):
+            run.bold = True
+            paragraph.paragraph_format.keep_with_next = True
+        elif text.startswith(("A. ", "B. ", "C. ", "D. ", "a) ", "b) ", "c) ", "d) ")):
+            paragraph.paragraph_format.left_indent = Cm(0.6)
+
+    footer = section.footer.paragraphs[0]
+    footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    footer.add_run("Trang ")
+    field = OxmlElement("w:fldSimple")
+    field.set(qn("w:instr"), "PAGE")
+    footer._p.append(field)
+    buffer = io.BytesIO()
+    document.save(buffer)
+    return buffer.getvalue()
+
+
+def _style_form_sheet(sheet, *, title=None):
+    dark_blue = "1F4E78"
+    sheet.freeze_panes = "A2"
+    sheet.sheet_view.showGridLines = False
+    sheet.page_setup.orientation = "landscape"
+    sheet.page_setup.fitToWidth = 1
+    sheet.sheet_properties.pageSetUpPr.fitToPage = True
+    sheet.page_margins.left = sheet.page_margins.right = 0.25
+    sheet.page_margins.top = sheet.page_margins.bottom = 0.5
+    for cell in sheet[1]:
+        cell.font = Font(name="Carlito", size=11, bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor=dark_blue)
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    sheet.row_dimensions[1].height = 32
+    for row in sheet.iter_rows(min_row=2):
+        for cell in row:
+            cell.font = Font(name="Carlito", size=11)
+            cell.alignment = Alignment(vertical="center", wrap_text=True)
+            if cell.row % 2 == 0:
+                cell.fill = PatternFill("solid", fgColor="F4F8FB")
+    for column_cells in sheet.columns:
+        letter = get_column_letter(column_cells[0].column)
+        maximum = max((len(str(cell.value or "")) for cell in column_cells), default=10)
+        sheet.column_dimensions[letter].width = min(max(maximum + 2, 10), 45)
+    sheet.auto_filter.ref = sheet.dimensions
+    sheet.print_title_rows = "1:1"
+    sheet.print_area = sheet.dimensions
+
+
+def _form_xlsx_bytes(ctx, matrix_rows, spec_rows):
+    workbook = Workbook()
+    workbook.remove(workbook.active)
+    info = workbook.create_sheet("THONG_TIN")
+    info.append(["Thông tin", "Giá trị"])
+    for key, value in (
+        ("Mã đề", ctx.generated_exam.code),
+        ("Blueprint", ctx.blueprint.source_blueprint_id or str(ctx.blueprint.pk)),
+        ("Phiên bản blueprint", ctx.blueprint_version.version),
+        ("Thời gian (phút)", ctx.session.duration_minutes),
+        ("Tổng lệnh hỏi", _command_count(ctx)),
+        ("Tổng điểm", float(ctx.generated_exam.total_score)),
+        ("Random Seed", ctx.generated_exam.seed),
+    ):
+        info.append([key, value])
+    matrix = workbook.create_sheet("MA_TRAN")
+    for row in matrix_rows:
+        matrix.append(row)
+    spec = workbook.create_sheet("BAN_DAC_TA")
+    for row in spec_rows:
+        spec.append(row)
+    questions = workbook.create_sheet("DANH_SACH_CAU")
+    questions.append([
+        "SLOT_NO", "QUESTION_ID", "VERSION", "TYPE", "COGNITIVE", "CURRICULUM_ID",
+        "OUTCOME_ID", "FAMILY_ID", "STATUS", "SCORE", "ORDER", "SEED", "SHUFFLE",
+        "TIME_SECONDS", "DIFFICULTY", "STEM",
+    ])
+    question_rows = [[
+        q.order, q.question_id_snapshot, q.source_version_snapshot,
+        q.bank_question.question_type, q.bank_question.cognitive_level,
+        q.curriculum_id_snapshot, q.outcome_id_snapshot, q.family_id_snapshot,
+        q.bank_question.process_status, "", ",".join(map(str, q.option_order or q.statement_order)),
+        ctx.generated_exam.seed, q.bank_question.shuffle_allowed,
+        q.bank_question.estimated_time_seconds, q.bank_question.difficulty, q.stem_snapshot,
+    ] for q in ctx.questions]
+    for row in question_rows:
+        questions.append(row)
+    calculations = workbook.create_sheet("TINH_TOAN")
+    calculations.append(["Chỉ số", "Giá trị"])
+    calculations.append(["Tổng nhóm câu", f"=COUNTA(DANH_SACH_CAU!B2:B{len(question_rows) + 1})"])
+    calculations.append(["Tổng lệnh hỏi", _command_count(ctx)])
+    calculations.append(["Tổng điểm", float(ctx.generated_exam.total_score)])
+    for sheet in workbook.worksheets:
+        _style_form_sheet(sheet)
+    buffer = io.BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue()
+
+
+def _render_pdf(document_bytes, filename):
+    executable = shutil.which("soffice") or shutil.which("libreoffice")
+    if not executable:
+        raise ExportValidationError("MISSING_PDF_RENDERER: LibreOffice/soffice is required")
+    with tempfile.TemporaryDirectory(prefix="assessment-export-") as directory:
+        source = Path(directory) / filename
+        source.write_bytes(document_bytes)
+        result = subprocess.run(
+            [executable, "--headless", "--convert-to", "pdf", "--outdir", directory, str(source)],
+            capture_output=True, text=True, timeout=120, check=False,
+        )
+        output = source.with_suffix(".pdf")
+        if result.returncode or not output.is_file() or not output.read_bytes().startswith(b"%PDF"):
+            raise ExportValidationError(
+                "PDF_RENDER_FAILED: " + (result.stderr or result.stdout or "unknown renderer error")
+            )
+        return output.read_bytes()
