@@ -26,6 +26,16 @@ class BankSyncServiceTests(TestCase):
         self.assertEqual(BankQuestion.objects.count(), 0)
         self.assertEqual(QuestionSyncLog.objects.count(), 0)
 
+    def test_preview_fetches_only_pre_v2_columns(self):
+        """Dry-run remains usable while diagnosing an unmigrated v2 schema."""
+        parsed = WorkbookBankImporter().parse(self.path)
+        with self.assertNumQueries(1) as captured:
+            BankSyncService().preview(parsed)
+        sql = captured.captured_queries[0]["sql"].lower()
+        self.assertIn("source_question_id", sql)
+        self.assertIn("content_hash", sql)
+        self.assertNotIn("nls_frame", sql)
+
     def test_apply_creates_projection_and_unchanged_sync_does_not_add_revision(self):
         parsed = WorkbookBankImporter().parse(self.path)
         BankSyncService().apply(parsed)
