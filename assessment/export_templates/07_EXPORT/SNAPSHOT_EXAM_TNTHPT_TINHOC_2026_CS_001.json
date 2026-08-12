@@ -1,0 +1,2911 @@
+{
+  "batch_id": "GRADUATION_EXAM_EXPORT_001",
+  "exam_id": "EXAM_TNTHPT_TINHOC_2026_CS_001",
+  "exam_code": "TNTHPT26-CS-001",
+  "exam_name": "Đề tham khảo thi tốt nghiệp THPT môn Tin học năm 2026 - Định hướng Khoa học máy tính (CS)",
+  "orientation": "CS",
+  "school_year": "2025-2026",
+  "exam_date": "",
+  "duration_min": 50,
+  "total_score": 10.0,
+  "total_questions": 28,
+  "total_commands": 40,
+  "blueprint_id": "BP_TNTHPT_TINHOC_2026_CS_V2",
+  "blueprint_version": 2,
+  "policy_profile_id": "POL_TNTHPT_TINHOC_2026_V1",
+  "random_seed": "TNTHPT2026-CS-001-FIXED",
+  "generated_at": "2026-07-29T09:17:55+07:00",
+  "snapshot_ref": "SNAPSHOT_EXAM_TNTHPT_TINHOC_2026_CS_001.json",
+  "items": [
+    {
+      "slot_no": 1,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_001",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_001",
+      "question_id": "Q_TNT_F0001_D13_003",
+      "question_code": "TNT_F0001_D13_P1_Q03",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Hệ thống gợi ý video trên YouTube sử dụng khả năng học của AI chủ yếu để làm gì?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLa",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_04",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "outcome_text": "Nêu được ví dụ để thấy một hệ thống AI có tri thức, có khả năng suy luận và khả năng học.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Tự động thay đổi giao diện YouTube theo màu yêu thích của người dùng.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Đề xuất các video dựa trên sở thích của người dùng.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Đề xuất các chức năng mới của YouTube.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Đề xuất các video có số lượng xem nhiều.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 2,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_002",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_002",
+      "question_id": "Q_TNT_F0002_002",
+      "question_code": "TNT_F0002_P1_Q02",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Thiết bị nào sau đây thường được tích hợp trợ lí ảo?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_02",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "outcome_text": "Nêu được ví dụ minh hoạ cho một số ứng dụng điển hình của AI.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Máy rút tiền tự động ATM.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Điện thoại thông minh.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Chuông báo cháy.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Máy quét mã vạch.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 3,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_003",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_003",
+      "question_id": "Q_TNT_F0001_D18_002",
+      "question_code": "TNT_F0001_D18_P1_Q02",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Trong giáo dục, AI có thể được sử dụng để làm việc gì sau đây?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_02",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "outcome_text": "Nêu được ví dụ minh hoạ cho một số ứng dụng điển hình của AI.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Chấm bài tự động dựa trên nhận dạng chữ viết tay.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Xây dựng chương trình học bằng cách viết sách giáo khoa.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Thay thế hoàn toàn giáo viên trên lớp.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Giúp học sinh làm bài thi hộ.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 4,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_004",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_004",
+      "question_id": "Q_TNT_F0001_D15_004",
+      "question_code": "TNT_F0001_D15_P1_Q04",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Một hệ thống AI y tế được thiết kế để chẩn đoán bệnh nhân dựa trên dữ liệu hình ảnh và hồ sơ bệnh án. Tuy nhiên, hệ thống này thường xuyên đưa ra chẩn đoán sai đối với bệnh nhân thuộc một nhóm sắc tộc nhất định. Điều này phản ánh thách thức nào trong ứng dụng AI?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLa",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_05",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "outcome_text": "Nêu được một cảnh báo về sự phát triển của AI trong tương lai.",
+      "options": [
+        {
+          "label": "A",
+          "text": "AI thiếu khả năng xử lý dữ liệu lớn và tốc độ phân tích chậm.",
+          "is_correct": false
+        },
+        {
+          "label": "B",
+          "text": "AI gặp vấn đề thiên lệch (bias) do dữ liệu huấn luyện không đa dạng.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "AI không thể thay thế hoàn toàn bác sĩ trong quá trình chẩn đoán bệnh.",
+          "is_correct": false
+        },
+        {
+          "label": "D",
+          "text": "AI có độ chính xác cao nhưng chưa thể tự động cập nhật dữ liệu mới.",
+          "is_correct": false
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 5,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_005",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_005",
+      "question_id": "Q_TNT_F0002_005",
+      "question_code": "TNT_F0002_P1_Q05",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Thiết bị nào sau đây có chức năng chính là để kết nối không dây trong một mạng cục bộ?",
+      "answer_key": "D",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_B_B03",
+      "outcome_id": "TH_12_COMMON_B_B03_YCCD_01",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Một số thiết bị mạng thông dụng",
+      "outcome_text": "Biết được một số thiết bị mạng thông dụng và chức năng của chúng.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Router.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Switch.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Hub.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Access Point.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 6,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_006",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_006",
+      "question_id": "Q_TNT_F0002_006",
+      "question_code": "TNT_F0002_P1_Q06",
+      "question_type": "MCQ_SINGLE",
+      "stem": "LAN là loại mạng nào sau đây?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_10_COMMON_B_B08",
+      "outcome_id": "TH_10_COMMON_B_B08_YCCD_01",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Mạng máy tính trong cuộc sống hiện đại",
+      "outcome_text": "Trình bày được khái niệm và lợi ích của mạng máy tính; phân biệt được mạng LAN, WAN và Internet; nêu được một số dịch vụ Internet thông dụng.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Mạng cục bộ.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Mạng diện rộng.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Mạng toàn cầu.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Mạng thành phố.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 7,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_007",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_007",
+      "question_id": "Q_TNT_F0001_D19_020",
+      "question_code": "TNT_F0001_D19_P1_Q20",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Để chia sẻ một thư mục trên mạng nội bộ, ta cần thực hiện thao tác nào trong Windows?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_B_B05",
+      "outcome_id": "TH_12_COMMON_B_B05_YCCD_01",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Thực hành chia sẻ tài nguyên trên mạng",
+      "outcome_text": "Thực hiện được chia sẻ thư mục, tệp và máy in trong mạng cục bộ trên hệ điều hành Windows; thiết lập được môi trường và quyền chia sẻ phù hợp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Nhấp chuột phải vào thư mục, chọn \"Properties\", sau đó chọn tab \"Sharing\".",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Nhấp chuột phải vào thư mục, chọn \"Delete\".",
+          "is_correct": false
+        },
+        {
+          "label": "C",
+          "text": "Mở thư mục bằng Windows Media Player.",
+          "is_correct": false
+        },
+        {
+          "label": "D",
+          "text": "Nhấp chuột phải vào thư mục, chọn \"Cut\".",
+          "is_correct": false
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 8,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_008",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_005",
+      "question_id": "Q_TNT_F0002_008",
+      "question_code": "TNT_F0002_P1_Q08",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Phương án nào sau đây nêu đúng chức năng chính của Modem?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": "FAM_8E4352D63C",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_B_B03",
+      "outcome_id": "TH_12_COMMON_B_B03_YCCD_01",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Một số thiết bị mạng thông dụng",
+      "outcome_text": "Biết được một số thiết bị mạng thông dụng và chức năng của chúng.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Kết nối có dây hoặc không dây các thiết bị trong mạng diện rộng.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Chuyển đổi tín hiệu hai chiều giữa các thiết bị truy cập Internet và ISP.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Truy cập vào tài nguyên mạng mà không cần sử dụng dây cáp.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Chuyển tiếp dữ liệu giữa các thiết bị trong cùng một mạng LAN.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 9,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_009",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_008",
+      "question_id": "Q_TNT_F0001_D14_023",
+      "question_code": "TNT_F0001_D14_P1_Q23",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Khai báo HTML nào chèn tệp âm thanh “tienquanca.mp3” và hiển thị bộ điều khiển phát?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B11",
+      "outcome_id": "TH_12_COMMON_F_B11_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Chèn tệp tin đa phương tiện và khung nội tuyến vào trang web",
+      "outcome_text": "Chèn được hình ảnh, âm thanh, video và khung nội tuyến vào trang web bằng các phần tử và thuộc tính HTML phù hợp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "<audio url=\"tienquanca.mp3\" control></audio>",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "<audio src=\"tienquanca.mp3\" controls></audio>",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "<audio src=\"tienquanca.mp3\" control></audio>",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "<audio url=\"tienquanca.mp3\" controls></audio>",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 10,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_010",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_009",
+      "question_id": "Q_TNT_F0001_D13_021",
+      "question_code": "TNT_F0001_D13_P1_Q21",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Trong CSS, khai báo nào đổi màu nền của ô dữ liệu trong bảng khi người dùng đưa con trỏ chuột lên ô?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B15",
+      "outcome_id": "TH_12_COMMON_F_B15_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo màu cho chữ và nền",
+      "outcome_text": "Biểu diễn và thiết lập được màu chữ, màu nền, màu khung bằng CSS; sử dụng được một số cách biểu diễn màu và tổ hợp bộ chọn.",
+      "options": [
+        {
+          "label": "A",
+          "text": ".my-table td:hover { background-color: #ceeaff; }",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": ".my-table td:active { background-color: #ceeaff; }",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": ".my-table td:focus { background-color: #ceeaff; }",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": ".my-table td:visited { background-color: #ceeaff; }",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 11,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_011",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_010",
+      "question_id": "Q_TNT_F0002_011",
+      "question_code": "TNT_F0002_P1_Q11",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Phương án nào sau đây nêu đúng cú pháp khai báo CSS ngoài (ngoại tuyến) trong một đoạn mã HTML?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLc",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B13",
+      "outcome_id": "TH_12_COMMON_F_B13_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Khái niệm, vai trò của CSS",
+      "outcome_text": "Giải thích được khái niệm và vai trò của CSS; nhận biết được cấu trúc mẫu định dạng, bộ chọn, thuộc tính, giá trị và ba cách thiết lập CSS.",
+      "options": [
+        {
+          "label": "A",
+          "text": "<link href=\"tentep.css\" rel=\"stylesheet\">",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "<style link=\"tentep.css\" rel=\"stylesheet\">",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "<css link=\"tentep.css\" rel=\"stylesheet\">",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "<link src=\"tentep.css\" rel=\"stylesheet\">",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 12,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_012",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_011",
+      "question_id": "Q_TNT_F0001_D11_013",
+      "question_code": "TNT_F0001_D11_P1_Q13",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Hai tệp trangchu.html và gioithieu.html nằm trong cùng một thư mục. Cú pháp nào tạo liên kết tương đối từ trangchu.html đến gioithieu.html?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B10",
+      "outcome_id": "TH_12_COMMON_F_B10_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo liên kết",
+      "outcome_text": "Tạo được liên kết đến trang web ngoài, trang trong cùng website, vị trí trong trang và địa chỉ thư điện tử; sử dụng được thuộc tính target.",
+      "options": [
+        {
+          "label": "A",
+          "text": "<a href=\"gioithieu.html\">Giới thiệu</a>",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "<a href=\"/gioithieu.html\">Giới thiệu</a>",
+          "is_correct": false
+        },
+        {
+          "label": "C",
+          "text": "<a src=\"gioithieu.html\">Giới thiệu</a>",
+          "is_correct": false
+        },
+        {
+          "label": "D",
+          "text": "<link href=\"gioithieu.html\">Giới thiệu</link>",
+          "is_correct": false
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 13,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_013",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_012",
+      "question_id": "Q_TNT_F0001_D12_020",
+      "question_code": "TNT_F0001_D12_P1_Q20",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Đoạn mã HTML nào tạo một bảng rộng 100%, có đường viền, gồm một hàng với hai ô tiêu đề nền màu cam và nội dung căn phải?",
+      "answer_key": "C",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B09",
+      "outcome_id": "TH_12_COMMON_F_B09_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo danh sách, bảng",
+      "outcome_text": "Tạo và định dạng được danh sách có thứ tự, danh sách không thứ tự và bảng bằng các phần tử HTML phù hợp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "<table border=\"1\" width=100%>\n<td>\n<th bgcolor=\"orange\" align=\"right\">Name 1</th>\n<th bgcolor=\"orange\" align=\"right\">Name 2</th>\n</td>\n</table>",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "<table border=\"1\" width=100%>\n<tr>\n<td bgcolor=\"orange\" align=\"center\">Name 1</td>\n<td bgcolor=\"orange\" align=\"center\">Name 2</td>\n</tr>\n</table>",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "<table border=\"1\" width=100%>\n<tr>\n<th bgcolor=\"orange\" align=\"right\">Name 1</th>\n<th bgcolor=\"orange\" align=\"right\">Name 2</th>\n</tr>\n</table>",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "<table border=\"1\" width=100%>\n<tr>\n<th bgcolor=\"orange\" align=\"center\">Name 1</th>\n<th bgcolor=\"orange\" align=\"center\">Name 2</th>\n</tr>\n</table>",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 14,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_014",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_013",
+      "question_id": "Q_TNT_F0001_D15_011",
+      "question_code": "TNT_F0001_D15_P1_Q11",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Phương án nào sau đây nêu đúng cú pháp khai báo CSS nội tuyến trong HTML?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": "FAM_D6BB7552EF",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B13",
+      "outcome_id": "TH_12_COMMON_F_B13_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Khái niệm, vai trò của CSS",
+      "outcome_text": "Giải thích được khái niệm và vai trò của CSS; nhận biết được cấu trúc mẫu định dạng, bộ chọn, thuộc tính, giá trị và ba cách thiết lập CSS.",
+      "options": [
+        {
+          "label": "A",
+          "text": "<div style=\"color: red;\">Nội dung</div>",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "<div css=\"color: red;\">Nội dung</div>",
+          "is_correct": false
+        },
+        {
+          "label": "C",
+          "text": "<div inline=\"color: red;\">Nội dung</div>",
+          "is_correct": false
+        },
+        {
+          "label": "D",
+          "text": "<div format=\"color: red;\">Nội dung</div>",
+          "is_correct": false
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 15,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_015",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_014",
+      "question_id": "Q_TNT_F0001_D14_019",
+      "question_code": "TNT_F0001_D14_P1_Q19",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Đoạn mã nào tạo danh sách không có thứ tự gồm ba mục ngang cấp: “Trái cây”, “Rau củ”, “Thịt”?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B09",
+      "outcome_id": "TH_12_COMMON_F_B09_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo danh sách, bảng",
+      "outcome_text": "Tạo và định dạng được danh sách có thứ tự, danh sách không thứ tự và bảng bằng các phần tử HTML phù hợp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "<ul>\n  <li>Trái cây</li>\n  <li>Rau củ</li>\n  <li>Thịt</li>\n</ul>",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "<ol>\n  <li>Trái cây</li>\n  <li>Rau củ</li>\n  <li>Thịt</li>\n</ol>",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "<ul>\n  <li>Trái cây</li>\n  <ul><li>Rau củ</li>\n  <li>Thịt</li></ul>\n</ul>",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "<ol>\n  <li>Trái cây</li>\n  <ol><li>Rau củ</li>\n  <li>Thịt</li></ol>\n</ol>",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 16,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_016",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_015",
+      "question_id": "Q_TNT_F0001_D12_019",
+      "question_code": "TNT_F0001_D12_P1_Q19",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Phương án nào mô tả đúng kết quả hiển thị của đoạn mã HTML sau?\n<form>\n<p>Chọn câu lạc bộ bạn đang tham gia:</p>\n<input type=\"checkbox\" id=\"clbbongda\" name=\"caulacbo\">\n<label for=\"clbbongda\">CLB Bóng đá</label>\n<input type=\"checkbox\" id=\"clbvovinam\" name=\"caulacbo\">\n<label for=\"clbvovinam\">CLB Vovinam</label>\n</form>",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B12",
+      "outcome_id": "TH_12_COMMON_F_B12_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo biểu mẫu",
+      "outcome_text": "Tạo được biểu mẫu HTML và sử dụng được các điều khiển thông dụng như label, input, select, textarea và fieldset.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Một dòng hướng dẫn, bên dưới là hai ô chọn độc lập có nhãn “CLB Bóng đá” và “CLB Vovinam”.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Một dòng hướng dẫn, bên dưới là hai nút chọn tròn có nhãn “CLB Bóng đá” và “CLB Vovinam”.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Hai ô chọn độc lập nhưng không hiển thị các nhãn “CLB Bóng đá” và “CLB Vovinam”.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Chỉ hiển thị dòng hướng dẫn, không có điều khiển chọn câu lạc bộ.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 17,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_017",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_016",
+      "question_id": "Q_TNT_F0001_D16_017",
+      "question_code": "TNT_F0001_D16_P1_Q17",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Một trang web liên kết lần lượt ba tệp CSS trong phần <head>: style1.css, style2.css và style3.css. Cả ba tệp đều khai báo màu chữ cho thẻ <p> với cùng độ đặc hiệu: style1.css đặt màu đỏ, style2.css đặt màu xanh dương và style3.css đặt màu xanh lá cây. Màu nào sẽ được áp dụng?",
+      "answer_key": "C",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": "FAM_BBED04DDA0",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_F_B17",
+      "outcome_id": "TH_12_COMMON_F_B17_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Các mức ưu tiên của bộ chọn",
+      "outcome_text": "Giải thích và xác định được mức ưu tiên của các quy tắc CSS, gồm tính kế thừa, cascading, trọng số bộ chọn, pseudo-class, pseudo-element và !important.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Màu đỏ (red) vì nó xuất hiện đầu tiên trong danh sách tệp CSS.",
+          "is_correct": false
+        },
+        {
+          "label": "B",
+          "text": "Màu xanh dương (blue) vì nó được khai báo ở giữa.",
+          "is_correct": false
+        },
+        {
+          "label": "C",
+          "text": "Màu xanh lá cây (green) vì nó nằm trong tệp được tải sau cùng.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Không màu nào được áp dụng vì có xung đột giữa các tệp CSS.",
+          "is_correct": false
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 18,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_018",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_017",
+      "question_id": "Q_TNT_F0002_018",
+      "question_code": "TNT_F0002_P1_Q18",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Chọn một trong hai ngôn ngữ Python hoặc C++ để xem xét đoạn chương trình sau. Python: S = 0; for i in range(1,4): S += i*i; print(S). C++: int S = 0; for (int i = 1; i < 4; i++) S += i*i; cout << S; Phương án nào dưới đây nêu đúng giá trị của S sau khi thực hiện đoạn chương trình trên?",
+      "answer_key": "C",
+      "version": 1,
+      "cognitive_level": "HIEU",
+      "difficulty": 3,
+      "competency": "NLc",
+      "estimated_time_sec": 90,
+      "shuffle_allowed": true,
+      "family_id": "FAM_6998194B0A",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_10_COMMON_F_B20",
+      "outcome_id": "TH_10_COMMON_F_B20_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Câu lệnh lặp for",
+      "outcome_text": "Sử dụng được câu lệnh for và range(start, stop) để giải quyết bài toán lặp với số lần biết trước.",
+      "options": [
+        {
+          "label": "A",
+          "text": "30.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "29.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "14.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "13.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 19,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_019",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_018",
+      "question_id": "Q_TNT_F0002_019",
+      "question_code": "TNT_F0002_P1_Q19",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Hành vi nào sau đây thể hiện tính nhân văn trong giao tiếp trên không gian mạng?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLb",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_D_B06",
+      "outcome_id": "TH_12_COMMON_D_B06_YCCD_01",
+      "topic_code": "D",
+      "topic_name": "D:Đạo đức, pháp luật và văn hoá trong môi trường số",
+      "unit_name": "Giao tiếp và ứng xử trong không gian mạng",
+      "outcome_text": "Nhận biết được cách giữ gìn tính nhân văn trong giao tiếp và ứng xử ở không gian số.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Sử dụng ngôn từ một cách tùy thích khi tham gia bình luận trực tuyến.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Tôn trọng quyền riêng tư của người khác khi chia sẻ thông tin cá nhân.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Chia sẻ thông tin chưa được kiểm chứng để nhằm thu hút lượt tương tác.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Sử dụng không gian mạng để chỉ trích người khác một cách gay gắt.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 20,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_020",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_018",
+      "question_id": "Q_TNT_F0002_020",
+      "question_code": "TNT_F0002_P1_Q20",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Hành vi nào sau đây bị xem là vi phạm pháp luật trên không gian mạng?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLb",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_D_B06",
+      "outcome_id": "TH_12_COMMON_D_B06_YCCD_01",
+      "topic_code": "D",
+      "topic_name": "D:Đạo đức, pháp luật và văn hoá trong môi trường số",
+      "unit_name": "Giao tiếp và ứng xử trong không gian mạng",
+      "outcome_text": "Nhận biết được cách giữ gìn tính nhân văn trong giao tiếp và ứng xử ở không gian số.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Làm tắc nghẽn hệ thống mạng của nhà trường.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Không trả lời tin nhắn ngay lập tức.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Tải phần mềm nguồn mở để sử dụng.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Gửi email cho bạn bè mà không ghi tiêu đề.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 21,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_021",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_018",
+      "question_id": "Q_TNT_F0002_021",
+      "question_code": "TNT_F0002_P1_Q21",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Việc tự ý đăng tải hình ảnh của người khác khi chưa được đồng ý xâm phạm quyền nào sau đây?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLb",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": "FAM_7FAB476482",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_D_B06",
+      "outcome_id": "TH_12_COMMON_D_B06_YCCD_01",
+      "topic_code": "D",
+      "topic_name": "D:Đạo đức, pháp luật và văn hoá trong môi trường số",
+      "unit_name": "Giao tiếp và ứng xử trong không gian mạng",
+      "outcome_text": "Nhận biết được cách giữ gìn tính nhân văn trong giao tiếp và ứng xử ở không gian số.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Tự do ngôn luận.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Quyền đối với hình ảnh và quyền riêng tư.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Sử dụng hình ảnh công khai.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Phản hồi của người tiêu dùng.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 22,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_022",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_019",
+      "question_id": "Q_TNT_F0002_022",
+      "question_code": "TNT_F0002_P1_Q22",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Công việc nào dưới đây thuộc nhóm nghề sửa chữa và bảo trì máy tính?",
+      "answer_key": "B",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_G_B19",
+      "outcome_id": "TH_12_COMMON_G_B19_YCCD_01",
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Dịch vụ sửa chữa và bảo trì máy tính",
+      "outcome_text": "Tìm hiểu được nhóm nghề dịch vụ sửa chữa và bảo trì máy tính để có thêm thông tin định hướng nghề nghiệp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Thiết kế và xây dựng hệ điều hành.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Cài đặt hoặc gỡ bỏ hệ điều hành.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Phát triển phần mềm di động.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Xây dựng các ứng dụng mạng.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 23,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_023",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_020",
+      "question_id": "Q_TNT_F0002_023",
+      "question_code": "TNT_F0002_P1_Q23",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Công việc nào dưới đây thuộc nghề quản trị mạng?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "BIET",
+      "difficulty": 1,
+      "competency": "NLa",
+      "estimated_time_sec": 45,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_G_B20",
+      "outcome_id": "TH_12_COMMON_G_B20_YCCD_01",
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Nhóm nghề quản trị thuộc ngành Công nghệ thông tin",
+      "outcome_text": "Tìm hiểu được nhóm nghề quản trị thuộc ngành Công nghệ thông tin để có thêm thông tin định hướng nghề nghiệp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Bảo đảm hệ thống mạng hoạt động an toàn.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Thiết kế và xây dựng các ứng dụng di động.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Thiết kế cơ sở dữ liệu phân tán trên mạng.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Phát triển phần mềm trò chơi trực tuyến.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 24,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_024",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_021",
+      "question_id": "Q_TNT_F0002_024",
+      "question_code": "TNT_F0002_P1_Q24",
+      "question_type": "MCQ_SINGLE",
+      "stem": "Vì sao việc máy tính được sử dụng ngày càng rộng rãi làm tăng nhu cầu nhân lực sửa chữa và bảo trì máy tính?",
+      "answer_key": "A",
+      "version": 1,
+      "cognitive_level": "HIEU",
+      "difficulty": 2,
+      "competency": "NLa",
+      "estimated_time_sec": 60,
+      "shuffle_allowed": true,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_G_B19",
+      "outcome_id": "TH_12_COMMON_G_B19_YCCD_01",
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Dịch vụ sửa chữa và bảo trì máy tính",
+      "outcome_text": "Tìm hiểu được nhóm nghề dịch vụ sửa chữa và bảo trì máy tính để có thêm thông tin định hướng nghề nghiệp.",
+      "options": [
+        {
+          "label": "A",
+          "text": "Số lượng thiết bị cần cài đặt, bảo dưỡng và khắc phục sự cố tăng.",
+          "is_correct": true
+        },
+        {
+          "label": "B",
+          "text": "Mọi máy tính đều phải thay mới sau một năm sử dụng.",
+          "is_correct": true
+        },
+        {
+          "label": "C",
+          "text": "Người dùng không còn cần cập nhật phần mềm.",
+          "is_correct": true
+        },
+        {
+          "label": "D",
+          "text": "Các hệ thống máy tính không thể kết nối mạng.",
+          "is_correct": true
+        }
+      ],
+      "statements": []
+    },
+    {
+      "slot_no": 25,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_025",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_022",
+      "question_id": "Q_TNT_F0002_025",
+      "question_code": "TNT_F0002_P2_Q01",
+      "question_type": "TRUE_FALSE_GROUP",
+      "stem": "Một trường học có 3 phòng máy tính cần được lắp đặt mạng LAN cho từng phòng. Nhà trường đã đăng ký sử dụng Internet với nhà cung cấp dịch vụ (ISP) và được lắp đặt một Modem có tích hợp cả chức năng của Router và Access Point. Một số bạn học sinh đưa ra các ý kiến sau:",
+      "answer_key": "Đ,Đ,S,S",
+      "version": 1,
+      "cognitive_level": "HIEU",
+      "difficulty": 3,
+      "competency": "NLa",
+      "estimated_time_sec": 180,
+      "shuffle_allowed": false,
+      "family_id": "FAM_FC12F84C6C",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_COMMON_B_B03",
+      "outcome_id": "TH_12_COMMON_B_B03_YCCD_01",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Một số thiết bị mạng thông dụng",
+      "outcome_text": "Biết được một số thiết bị mạng thông dụng và chức năng của chúng.",
+      "options": [],
+      "statements": [
+        {
+          "label": "a",
+          "text": "Để thiết lập mạng LAN cho mỗi phòng máy nên sử dụng thiết bị Switch.",
+          "truth": true,
+          "cognitive_level": "BIET",
+          "difficulty": 1
+        },
+        {
+          "label": "b",
+          "text": "Chức năng Router được tích hợp trong Modem để đảm bảo việc định tuyến tối ưu giữa các mạng LAN của các phòng máy.",
+          "truth": true,
+          "cognitive_level": "BIET",
+          "difficulty": 1
+        },
+        {
+          "label": "c",
+          "text": "Để chia sẻ một thư mục Bài thực hành trên một máy tính với quyền được sửa cho các máy tính khác trong phòng máy, cần phải cấp duy nhất quyền read.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "d",
+          "text": "Nếu Modem không tích hợp chức năng của Router thì cần bổ sung thiết bị Router và thứ tự kết nối các thiết bị như sau: Máy tính → Switch → Modem → Router.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "slot_no": 26,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_026",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_023",
+      "question_id": "Q_TNT_F0001_D15_026",
+      "question_code": "TNT_F0001_D15_P2_Q02",
+      "question_type": "TRUE_FALSE_GROUP",
+      "stem": "Một cửa hàng quản lí bán hàng bằng CSDL quan hệ gồm SANPHAM(MaSP, TenSP, GiaBan), KHACHHANG(MaKH, TenKH, DiaChi, SoDT) và HOADON(MaHD, MaKH, MaSP, SoLuong, NgayLap). MaSP, MaKH và MaHD lần lượt là khóa chính; MaKH và MaSP trong HOADON là khóa ngoài. Xét các nhận định sau.",
+      "answer_key": "Đ,Đ,S,Đ",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 4,
+      "competency": "NLc",
+      "estimated_time_sec": 240,
+      "shuffle_allowed": false,
+      "family_id": "FAM_E73975BBC1",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_11_COMMON_F_B13",
+      "outcome_id": "TH_11_COMMON_F_B13_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Cơ sở dữ liệu quan hệ",
+      "outcome_text": "Phân biệt được các khái niệm bản ghi, trường, khoá, khoá chính, khoá ngoài và liên kết dữ liệu trong cơ sở dữ liệu quan hệ; biết cách chọn một khoá làm khoá chính.",
+      "options": [],
+      "statements": [
+        {
+          "label": "a",
+          "text": "TenKH là một trường tương ứng với một cột của bảng KHACHHANG.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "b",
+          "text": "MaHD là khóa chính của bảng HOADON; MaKH và MaSP trong HOADON là các khóa ngoài.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "c",
+          "text": "Vì cửa hàng chỉ có một địa điểm nên dữ liệu chỉ có thể được lưu trong hệ cơ sở dữ liệu phân tán; hệ cơ sở dữ liệu tập trung không thể sử dụng.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "d",
+          "text": "Câu lệnh SQL sau liệt kê tên khách hàng và tên sản phẩm trong hóa đơn có mã “HD001”:\nSELECT KHACHHANG.TenKH, SANPHAM.TenSP\nFROM KHACHHANG\nINNER JOIN HOADON ON KHACHHANG.MaKH = HOADON.MaKH\nINNER JOIN SANPHAM ON HOADON.MaSP = SANPHAM.MaSP\nWHERE HOADON.MaHD = 'HD001'",
+          "truth": true,
+          "cognitive_level": "VANDUNG",
+          "difficulty": 5
+        }
+      ]
+    },
+    {
+      "slot_no": 27,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_027",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_024",
+      "question_id": "Q_TNT_F0002_027",
+      "question_code": "TNT_F0002_P2_Q03",
+      "question_type": "TRUE_FALSE_GROUP",
+      "stem": "Một ngân hàng thương mại cần phân loại khách hàng thành các nhóm: “tốt”, “bình thường” và “xấu” theo hồ sơ tín dụng để có chính sách lãi suất cho vay phù hợp. Có 2 bạn học sinh đề xuất phương pháp như sau:\nHọc sinh A: Mời các chuyên gia tài chính gán nhãn “tốt”, “bình thường” và “xấu” cho từng khách hàng trong một tập khách hàng được chọn. Máy tính học cách phân loại từ tập dữ liệu đã gán nhãn này để phân loại cho các khách hàng khác.\nHọc sinh B: Máy tính tự động phân cụm toàn bộ tập dữ liệu khách hàng thành 3 cụm. Sau đó các chuyên gia được mời để gán nhãn cho các cụm này là “tốt”, “bình thường” và “xấu”.\nMột số bạn học sinh có ý kiến như sau:",
+      "answer_key": "Đ,Đ,S,S",
+      "version": 1,
+      "cognitive_level": "HIEU",
+      "difficulty": 4,
+      "competency": "NLc",
+      "estimated_time_sec": 240,
+      "shuffle_allowed": false,
+      "family_id": "FAM_A2DAD284A0",
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_12_CS_F_B25",
+      "outcome_id": "TH_12_CS_F_B25_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Làm quen với Học máy",
+      "outcome_text": "Giải thích được sơ lược về khái niệm Học máy.",
+      "options": [],
+      "statements": [
+        {
+          "label": "a",
+          "text": "Phương pháp của bạn học sinh A là theo mô hình học máy có giám sát.",
+          "truth": true,
+          "cognitive_level": "BIET",
+          "difficulty": 1
+        },
+        {
+          "label": "b",
+          "text": "Phương pháp của bạn học sinh B là theo mô hình học máy không giám sát.",
+          "truth": true,
+          "cognitive_level": "BIET",
+          "difficulty": 1
+        },
+        {
+          "label": "c",
+          "text": "Phương pháp phân loại khách hàng của học sinh B tốt hơn của học sinh A.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "d",
+          "text": "Phương pháp thu thập dữ liệu sinh trắc học khuôn mặt có thể giúp ngân hàng giải quyết bài toán phân loại khách hàng thành các nhóm đã nêu.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "slot_no": 28,
+      "slot_id": "BPS_TNTHPT_2026_CS_V2_028",
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_025",
+      "question_id": "Q_TNT_F0001_D03_028",
+      "question_code": "TNT_F0001_D03_P2_Q04",
+      "question_type": "TRUE_FALSE_GROUP",
+      "stem": "Cho hàm tìm kiếm tuần tự sau:\n\ndef find(a, x):\n    for value in a:\n        if value == x:\n            return True\n    return False\n\nXét các nhận định về cách cài đặt, độ phức tạp và kết quả của hàm.",
+      "answer_key": "S,Đ,S,Đ",
+      "version": 1,
+      "cognitive_level": "VANDUNG",
+      "difficulty": 5,
+      "competency": "NLc",
+      "estimated_time_sec": 240,
+      "shuffle_allowed": false,
+      "family_id": null,
+      "process_status": "READY_FOR_GRADUATION",
+      "curriculum_id": "TH_11_CS_F_B19",
+      "outcome_id": "TH_11_CS_F_B19_YCCD_01",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Bài toán tìm kiếm",
+      "outcome_text": "Mô tả và thực hiện được thuật toán tìm kiếm tuần tự và thuật toán tìm kiếm nhị phân.",
+      "options": [],
+      "statements": [
+        {
+          "label": "a",
+          "text": "Hàm find sử dụng lời gọi đệ quy.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "b",
+          "text": "Với cách cài đặt lặp nêu trên, số biến phụ trợ không tăng theo số phần tử của mảng.",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "c",
+          "text": "Trong trường hợp xấu nhất, độ phức tạp thời gian của hàm là O(n²).",
+          "truth": true,
+          "cognitive_level": "HIEU",
+          "difficulty": 2
+        },
+        {
+          "label": "d",
+          "text": "Nếu a = [2, 6, 3, 8] và x = 9 thì hàm trả về False.",
+          "truth": true,
+          "cognitive_level": "VANDUNG",
+          "difficulty": 3
+        }
+      ]
+    }
+  ],
+  "matrix_rows": [
+    {
+      "tt": 1,
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_04",
+      "outcome_text": "Nêu được ví dụ để thấy một hệ thống AI có tri thức, có khả năng suy luận và khả năng học.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C1"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C1"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 2,
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_02",
+      "outcome_text": "Nêu được ví dụ minh hoạ cho một số ứng dụng điển hình của AI.",
+      "mcq": {
+        "BIET": [
+          "C2",
+          "C3"
+        ],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.5,
+      "mcq_BIET": {
+        "count": 2,
+        "positions": [
+          "C2",
+          "C3"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 2,
+      "total_HIEU": 0,
+      "total_VANDUNG": 0,
+      "percent": 5.0
+    },
+    {
+      "tt": 3,
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_05",
+      "outcome_text": "Nêu được một cảnh báo về sự phát triển của AI trong tương lai.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C4"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C4"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 4,
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Một số thiết bị mạng thông dụng",
+      "curriculum_id": "TH_12_COMMON_B_B03",
+      "outcome_id": "TH_12_COMMON_B_B03_YCCD_01",
+      "outcome_text": "Biết được một số thiết bị mạng thông dụng và chức năng của chúng.",
+      "mcq": {
+        "BIET": [
+          "C5",
+          "C8"
+        ],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [
+          "C25a",
+          "C25b"
+        ],
+        "HIEU": [
+          "C25c",
+          "C25d"
+        ],
+        "VANDUNG": []
+      },
+      "score_equiv": 1.5,
+      "mcq_BIET": {
+        "count": 2,
+        "positions": [
+          "C5",
+          "C8"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 2,
+        "positions": [
+          "C25a",
+          "C25b"
+        ]
+      },
+      "tf_HIEU": {
+        "count": 2,
+        "positions": [
+          "C25c",
+          "C25d"
+        ]
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 4,
+      "total_HIEU": 2,
+      "total_VANDUNG": 0,
+      "percent": 15.0
+    },
+    {
+      "tt": 5,
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Mạng máy tính trong cuộc sống hiện đại",
+      "curriculum_id": "TH_10_COMMON_B_B08",
+      "outcome_id": "TH_10_COMMON_B_B08_YCCD_01",
+      "outcome_text": "Trình bày được khái niệm và lợi ích của mạng máy tính; phân biệt được mạng LAN, WAN và Internet; nêu được một số dịch vụ Internet thông dụng.",
+      "mcq": {
+        "BIET": [
+          "C6"
+        ],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 1,
+        "positions": [
+          "C6"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 1,
+      "total_HIEU": 0,
+      "total_VANDUNG": 0,
+      "percent": 2.5
+    },
+    {
+      "tt": 6,
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Thực hành chia sẻ tài nguyên trên mạng",
+      "curriculum_id": "TH_12_COMMON_B_B05",
+      "outcome_id": "TH_12_COMMON_B_B05_YCCD_01",
+      "outcome_text": "Thực hiện được chia sẻ thư mục, tệp và máy in trong mạng cục bộ trên hệ điều hành Windows; thiết lập được môi trường và quyền chia sẻ phù hợp.",
+      "mcq": {
+        "BIET": [
+          "C7"
+        ],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 1,
+        "positions": [
+          "C7"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 1,
+      "total_HIEU": 0,
+      "total_VANDUNG": 0,
+      "percent": 2.5
+    },
+    {
+      "tt": 7,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Chèn tệp tin đa phương tiện và khung nội tuyến vào trang web",
+      "curriculum_id": "TH_12_COMMON_F_B11",
+      "outcome_id": "TH_12_COMMON_F_B11_YCCD_01",
+      "outcome_text": "Chèn được hình ảnh, âm thanh, video và khung nội tuyến vào trang web bằng các phần tử và thuộc tính HTML phù hợp.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C9"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C9"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 8,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo màu cho chữ và nền",
+      "curriculum_id": "TH_12_COMMON_F_B15",
+      "outcome_id": "TH_12_COMMON_F_B15_YCCD_01",
+      "outcome_text": "Biểu diễn và thiết lập được màu chữ, màu nền, màu khung bằng CSS; sử dụng được một số cách biểu diễn màu và tổ hợp bộ chọn.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C10"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C10"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 9,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Khái niệm, vai trò của CSS",
+      "curriculum_id": "TH_12_COMMON_F_B13",
+      "outcome_id": "TH_12_COMMON_F_B13_YCCD_01",
+      "outcome_text": "Giải thích được khái niệm và vai trò của CSS; nhận biết được cấu trúc mẫu định dạng, bộ chọn, thuộc tính, giá trị và ba cách thiết lập CSS.",
+      "mcq": {
+        "BIET": [
+          "C11"
+        ],
+        "HIEU": [],
+        "VANDUNG": [
+          "C14"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.5,
+      "mcq_BIET": {
+        "count": 1,
+        "positions": [
+          "C11"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C14"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 1,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 5.0
+    },
+    {
+      "tt": 10,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo liên kết",
+      "curriculum_id": "TH_12_COMMON_F_B10",
+      "outcome_id": "TH_12_COMMON_F_B10_YCCD_01",
+      "outcome_text": "Tạo được liên kết đến trang web ngoài, trang trong cùng website, vị trí trong trang và địa chỉ thư điện tử; sử dụng được thuộc tính target.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C12"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C12"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 11,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo danh sách, bảng",
+      "curriculum_id": "TH_12_COMMON_F_B09",
+      "outcome_id": "TH_12_COMMON_F_B09_YCCD_01",
+      "outcome_text": "Tạo và định dạng được danh sách có thứ tự, danh sách không thứ tự và bảng bằng các phần tử HTML phù hợp.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C13",
+          "C15"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.5,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 2,
+        "positions": [
+          "C13",
+          "C15"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 2,
+      "percent": 5.0
+    },
+    {
+      "tt": 12,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo biểu mẫu",
+      "curriculum_id": "TH_12_COMMON_F_B12",
+      "outcome_id": "TH_12_COMMON_F_B12_YCCD_01",
+      "outcome_text": "Tạo được biểu mẫu HTML và sử dụng được các điều khiển thông dụng như label, input, select, textarea và fieldset.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C16"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C16"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 13,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Các mức ưu tiên của bộ chọn",
+      "curriculum_id": "TH_12_COMMON_F_B17",
+      "outcome_id": "TH_12_COMMON_F_B17_YCCD_01",
+      "outcome_text": "Giải thích và xác định được mức ưu tiên của các quy tắc CSS, gồm tính kế thừa, cascading, trọng số bộ chọn, pseudo-class, pseudo-element và !important.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": [
+          "C17"
+        ]
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C17"
+        ]
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 0,
+      "total_VANDUNG": 1,
+      "percent": 2.5
+    },
+    {
+      "tt": 14,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Câu lệnh lặp for",
+      "curriculum_id": "TH_10_COMMON_F_B20",
+      "outcome_id": "TH_10_COMMON_F_B20_YCCD_01",
+      "outcome_text": "Sử dụng được câu lệnh for và range(start, stop) để giải quyết bài toán lặp với số lần biết trước.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [
+          "C18"
+        ],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 1,
+        "positions": [
+          "C18"
+        ]
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 0,
+      "total_HIEU": 1,
+      "total_VANDUNG": 0,
+      "percent": 2.5
+    },
+    {
+      "tt": 15,
+      "topic_code": "D",
+      "topic_name": "D:Đạo đức, pháp luật và văn hoá trong môi trường số",
+      "unit_name": "Giao tiếp và ứng xử trong không gian mạng",
+      "curriculum_id": "TH_12_COMMON_D_B06",
+      "outcome_id": "TH_12_COMMON_D_B06_YCCD_01",
+      "outcome_text": "Nhận biết được cách giữ gìn tính nhân văn trong giao tiếp và ứng xử ở không gian số.",
+      "mcq": {
+        "BIET": [
+          "C19",
+          "C20",
+          "C21"
+        ],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.75,
+      "mcq_BIET": {
+        "count": 3,
+        "positions": [
+          "C19",
+          "C20",
+          "C21"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 3,
+      "total_HIEU": 0,
+      "total_VANDUNG": 0,
+      "percent": 7.5
+    },
+    {
+      "tt": 16,
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Dịch vụ sửa chữa và bảo trì máy tính",
+      "curriculum_id": "TH_12_COMMON_G_B19",
+      "outcome_id": "TH_12_COMMON_G_B19_YCCD_01",
+      "outcome_text": "Tìm hiểu được nhóm nghề dịch vụ sửa chữa và bảo trì máy tính để có thêm thông tin định hướng nghề nghiệp.",
+      "mcq": {
+        "BIET": [
+          "C22"
+        ],
+        "HIEU": [
+          "C24"
+        ],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.5,
+      "mcq_BIET": {
+        "count": 1,
+        "positions": [
+          "C22"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 1,
+        "positions": [
+          "C24"
+        ]
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 1,
+      "total_HIEU": 1,
+      "total_VANDUNG": 0,
+      "percent": 5.0
+    },
+    {
+      "tt": 17,
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Nhóm nghề quản trị thuộc ngành Công nghệ thông tin",
+      "curriculum_id": "TH_12_COMMON_G_B20",
+      "outcome_id": "TH_12_COMMON_G_B20_YCCD_01",
+      "outcome_text": "Tìm hiểu được nhóm nghề quản trị thuộc ngành Công nghệ thông tin để có thêm thông tin định hướng nghề nghiệp.",
+      "mcq": {
+        "BIET": [
+          "C23"
+        ],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "score_equiv": 0.25,
+      "mcq_BIET": {
+        "count": 1,
+        "positions": [
+          "C23"
+        ]
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 1,
+      "total_HIEU": 0,
+      "total_VANDUNG": 0,
+      "percent": 2.5
+    },
+    {
+      "tt": 18,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Cơ sở dữ liệu quan hệ",
+      "curriculum_id": "TH_11_COMMON_F_B13",
+      "outcome_id": "TH_11_COMMON_F_B13_YCCD_01",
+      "outcome_text": "Phân biệt được các khái niệm bản ghi, trường, khoá, khoá chính, khoá ngoài và liên kết dữ liệu trong cơ sở dữ liệu quan hệ; biết cách chọn một khoá làm khoá chính.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [
+          "C26a",
+          "C26b",
+          "C26c"
+        ],
+        "VANDUNG": [
+          "C26d"
+        ]
+      },
+      "score_equiv": 1.0,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 3,
+        "positions": [
+          "C26a",
+          "C26b",
+          "C26c"
+        ]
+      },
+      "tf_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C26d"
+        ]
+      },
+      "total_BIET": 0,
+      "total_HIEU": 3,
+      "total_VANDUNG": 1,
+      "percent": 10.0
+    },
+    {
+      "tt": 19,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Làm quen với Học máy",
+      "curriculum_id": "TH_12_CS_F_B25",
+      "outcome_id": "TH_12_CS_F_B25_YCCD_01",
+      "outcome_text": "Giải thích được sơ lược về khái niệm Học máy.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [
+          "C27a",
+          "C27b"
+        ],
+        "HIEU": [
+          "C27c",
+          "C27d"
+        ],
+        "VANDUNG": []
+      },
+      "score_equiv": 1.0,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 2,
+        "positions": [
+          "C27a",
+          "C27b"
+        ]
+      },
+      "tf_HIEU": {
+        "count": 2,
+        "positions": [
+          "C27c",
+          "C27d"
+        ]
+      },
+      "tf_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "total_BIET": 2,
+      "total_HIEU": 2,
+      "total_VANDUNG": 0,
+      "percent": 10.0
+    },
+    {
+      "tt": 20,
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Bài toán tìm kiếm",
+      "curriculum_id": "TH_11_CS_F_B19",
+      "outcome_id": "TH_11_CS_F_B19_YCCD_01",
+      "outcome_text": "Mô tả và thực hiện được thuật toán tìm kiếm tuần tự và thuật toán tìm kiếm nhị phân.",
+      "mcq": {
+        "BIET": [],
+        "HIEU": [],
+        "VANDUNG": []
+      },
+      "tf": {
+        "BIET": [],
+        "HIEU": [
+          "C28a",
+          "C28b",
+          "C28c"
+        ],
+        "VANDUNG": [
+          "C28d"
+        ]
+      },
+      "score_equiv": 1.0,
+      "mcq_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_HIEU": {
+        "count": 0,
+        "positions": []
+      },
+      "mcq_VANDUNG": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_BIET": {
+        "count": 0,
+        "positions": []
+      },
+      "tf_HIEU": {
+        "count": 3,
+        "positions": [
+          "C28a",
+          "C28b",
+          "C28c"
+        ]
+      },
+      "tf_VANDUNG": {
+        "count": 1,
+        "positions": [
+          "C28d"
+        ]
+      },
+      "total_BIET": 0,
+      "total_HIEU": 3,
+      "total_VANDUNG": 1,
+      "percent": 10.0
+    }
+  ],
+  "spec_rows": [
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_001",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_04",
+      "outcome_text": "Nêu được ví dụ để thấy một hệ thống AI có tri thức, có khả năng suy luận và khả năng học.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C1",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_002",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_02",
+      "outcome_text": "Nêu được ví dụ minh hoạ cho một số ứng dụng điển hình của AI.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C2",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_003",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_02",
+      "outcome_text": "Nêu được ví dụ minh hoạ cho một số ứng dụng điển hình của AI.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C3",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_004",
+      "topic_code": "A",
+      "topic_name": "A:Máy tính và xã hội tri thức",
+      "unit_name": "Trí tuệ nhân tạo và ứng dụng",
+      "curriculum_id": "TH_12_COMMON_A_B01",
+      "outcome_id": "TH_12_COMMON_A_B01_YCCD_05",
+      "outcome_text": "Nêu được một cảnh báo về sự phát triển của AI trong tương lai.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C4",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_005",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Một số thiết bị mạng thông dụng",
+      "curriculum_id": "TH_12_COMMON_B_B03",
+      "outcome_id": "TH_12_COMMON_B_B03_YCCD_01",
+      "outcome_text": "Biết được một số thiết bị mạng thông dụng và chức năng của chúng.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 2,
+      "score_per_item": 0.25,
+      "positions": "C5, C8",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_006",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Mạng máy tính trong cuộc sống hiện đại",
+      "curriculum_id": "TH_10_COMMON_B_B08",
+      "outcome_id": "TH_10_COMMON_B_B08_YCCD_01",
+      "outcome_text": "Trình bày được khái niệm và lợi ích của mạng máy tính; phân biệt được mạng LAN, WAN và Internet; nêu được một số dịch vụ Internet thông dụng.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C6",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_007",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Thực hành chia sẻ tài nguyên trên mạng",
+      "curriculum_id": "TH_12_COMMON_B_B05",
+      "outcome_id": "TH_12_COMMON_B_B05_YCCD_01",
+      "outcome_text": "Thực hiện được chia sẻ thư mục, tệp và máy in trong mạng cục bộ trên hệ điều hành Windows; thiết lập được môi trường và quyền chia sẻ phù hợp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C7",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_008",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Chèn tệp tin đa phương tiện và khung nội tuyến vào trang web",
+      "curriculum_id": "TH_12_COMMON_F_B11",
+      "outcome_id": "TH_12_COMMON_F_B11_YCCD_01",
+      "outcome_text": "Chèn được hình ảnh, âm thanh, video và khung nội tuyến vào trang web bằng các phần tử và thuộc tính HTML phù hợp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C9",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_009",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo màu cho chữ và nền",
+      "curriculum_id": "TH_12_COMMON_F_B15",
+      "outcome_id": "TH_12_COMMON_F_B15_YCCD_01",
+      "outcome_text": "Biểu diễn và thiết lập được màu chữ, màu nền, màu khung bằng CSS; sử dụng được một số cách biểu diễn màu và tổ hợp bộ chọn.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C10",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_010",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Khái niệm, vai trò của CSS",
+      "curriculum_id": "TH_12_COMMON_F_B13",
+      "outcome_id": "TH_12_COMMON_F_B13_YCCD_01",
+      "outcome_text": "Giải thích được khái niệm và vai trò của CSS; nhận biết được cấu trúc mẫu định dạng, bộ chọn, thuộc tính, giá trị và ba cách thiết lập CSS.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C11",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_011",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo liên kết",
+      "curriculum_id": "TH_12_COMMON_F_B10",
+      "outcome_id": "TH_12_COMMON_F_B10_YCCD_01",
+      "outcome_text": "Tạo được liên kết đến trang web ngoài, trang trong cùng website, vị trí trong trang và địa chỉ thư điện tử; sử dụng được thuộc tính target.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C12",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_012",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo danh sách, bảng",
+      "curriculum_id": "TH_12_COMMON_F_B09",
+      "outcome_id": "TH_12_COMMON_F_B09_YCCD_01",
+      "outcome_text": "Tạo và định dạng được danh sách có thứ tự, danh sách không thứ tự và bảng bằng các phần tử HTML phù hợp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C13",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_013",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Khái niệm, vai trò của CSS",
+      "curriculum_id": "TH_12_COMMON_F_B13",
+      "outcome_id": "TH_12_COMMON_F_B13_YCCD_01",
+      "outcome_text": "Giải thích được khái niệm và vai trò của CSS; nhận biết được cấu trúc mẫu định dạng, bộ chọn, thuộc tính, giá trị và ba cách thiết lập CSS.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C14",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_014",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo danh sách, bảng",
+      "curriculum_id": "TH_12_COMMON_F_B09",
+      "outcome_id": "TH_12_COMMON_F_B09_YCCD_01",
+      "outcome_text": "Tạo và định dạng được danh sách có thứ tự, danh sách không thứ tự và bảng bằng các phần tử HTML phù hợp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C15",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_015",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Tạo biểu mẫu",
+      "curriculum_id": "TH_12_COMMON_F_B12",
+      "outcome_id": "TH_12_COMMON_F_B12_YCCD_01",
+      "outcome_text": "Tạo được biểu mẫu HTML và sử dụng được các điều khiển thông dụng như label, input, select, textarea và fieldset.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C16",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_016",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Các mức ưu tiên của bộ chọn",
+      "curriculum_id": "TH_12_COMMON_F_B17",
+      "outcome_id": "TH_12_COMMON_F_B17_YCCD_01",
+      "outcome_text": "Giải thích và xác định được mức ưu tiên của các quy tắc CSS, gồm tính kế thừa, cascading, trọng số bộ chọn, pseudo-class, pseudo-element và !important.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C17",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_017",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Câu lệnh lặp for",
+      "curriculum_id": "TH_10_COMMON_F_B20",
+      "outcome_id": "TH_10_COMMON_F_B20_YCCD_01",
+      "outcome_text": "Sử dụng được câu lệnh for và range(start, stop) để giải quyết bài toán lặp với số lần biết trước.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "HIEU",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C18",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_018",
+      "topic_code": "D",
+      "topic_name": "D:Đạo đức, pháp luật và văn hoá trong môi trường số",
+      "unit_name": "Giao tiếp và ứng xử trong không gian mạng",
+      "curriculum_id": "TH_12_COMMON_D_B06",
+      "outcome_id": "TH_12_COMMON_D_B06_YCCD_01",
+      "outcome_text": "Nhận biết được cách giữ gìn tính nhân văn trong giao tiếp và ứng xử ở không gian số.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 3,
+      "score_per_item": 0.25,
+      "positions": "C19, C20, C21",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_019",
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Dịch vụ sửa chữa và bảo trì máy tính",
+      "curriculum_id": "TH_12_COMMON_G_B19",
+      "outcome_id": "TH_12_COMMON_G_B19_YCCD_01",
+      "outcome_text": "Tìm hiểu được nhóm nghề dịch vụ sửa chữa và bảo trì máy tính để có thêm thông tin định hướng nghề nghiệp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C22",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_020",
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Nhóm nghề quản trị thuộc ngành Công nghệ thông tin",
+      "curriculum_id": "TH_12_COMMON_G_B20",
+      "outcome_id": "TH_12_COMMON_G_B20_YCCD_01",
+      "outcome_text": "Tìm hiểu được nhóm nghề quản trị thuộc ngành Công nghệ thông tin để có thêm thông tin định hướng nghề nghiệp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "BIET",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C23",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_021",
+      "topic_code": "G",
+      "topic_name": "G:Hướng nghiệp với tin học",
+      "unit_name": "Dịch vụ sửa chữa và bảo trì máy tính",
+      "curriculum_id": "TH_12_COMMON_G_B19",
+      "outcome_id": "TH_12_COMMON_G_B19_YCCD_01",
+      "outcome_text": "Tìm hiểu được nhóm nghề dịch vụ sửa chữa và bảo trì máy tính để có thêm thông tin định hướng nghề nghiệp.",
+      "question_type": "MCQ_SINGLE",
+      "cognitive_level": "HIEU",
+      "required_count": 1,
+      "score_per_item": 0.25,
+      "positions": "C24",
+      "statement_distribution": ""
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_022",
+      "topic_code": "B",
+      "topic_name": "B:Mạng máy tính và Internet",
+      "unit_name": "Một số thiết bị mạng thông dụng",
+      "curriculum_id": "TH_12_COMMON_B_B03",
+      "outcome_id": "TH_12_COMMON_B_B03_YCCD_01",
+      "outcome_text": "Biết được một số thiết bị mạng thông dụng và chức năng của chúng.",
+      "question_type": "TRUE_FALSE_GROUP",
+      "cognitive_level": "HIEU",
+      "required_count": 1,
+      "score_per_item": 1.0,
+      "positions": "C25",
+      "statement_distribution": "C25: B2-H2-V0"
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_023",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Cơ sở dữ liệu quan hệ",
+      "curriculum_id": "TH_11_COMMON_F_B13",
+      "outcome_id": "TH_11_COMMON_F_B13_YCCD_01",
+      "outcome_text": "Phân biệt được các khái niệm bản ghi, trường, khoá, khoá chính, khoá ngoài và liên kết dữ liệu trong cơ sở dữ liệu quan hệ; biết cách chọn một khoá làm khoá chính.",
+      "question_type": "TRUE_FALSE_GROUP",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 1.0,
+      "positions": "C26",
+      "statement_distribution": "C26: B0-H3-V1"
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_024",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Làm quen với Học máy",
+      "curriculum_id": "TH_12_CS_F_B25",
+      "outcome_id": "TH_12_CS_F_B25_YCCD_01",
+      "outcome_text": "Giải thích được sơ lược về khái niệm Học máy.",
+      "question_type": "TRUE_FALSE_GROUP",
+      "cognitive_level": "HIEU",
+      "required_count": 1,
+      "score_per_item": 1.0,
+      "positions": "C27",
+      "statement_distribution": "C27: B2-H2-V0"
+    },
+    {
+      "cell_id": "BPC_TNTHPT_2026_CS_V2_025",
+      "topic_code": "F",
+      "topic_name": "F:Giải quyết vấn đề với sự trợ giúp của máy tính",
+      "unit_name": "Bài toán tìm kiếm",
+      "curriculum_id": "TH_11_CS_F_B19",
+      "outcome_id": "TH_11_CS_F_B19_YCCD_01",
+      "outcome_text": "Mô tả và thực hiện được thuật toán tìm kiếm tuần tự và thuật toán tìm kiếm nhị phân.",
+      "question_type": "TRUE_FALSE_GROUP",
+      "cognitive_level": "VANDUNG",
+      "required_count": 1,
+      "score_per_item": 1.0,
+      "positions": "C28",
+      "statement_distribution": "C28: B0-H3-V1"
+    }
+  ],
+  "totals": {
+    "mcq": {
+      "BIET": 12,
+      "HIEU": 2,
+      "VANDUNG": 10
+    },
+    "tf": {
+      "BIET": 4,
+      "HIEU": 10,
+      "VANDUNG": 2
+    }
+  },
+  "explanations": {
+    "1": "Hệ thống gợi ý học từ lịch sử xem và tương tác để dự đoán sở thích, từ đó đề xuất video phù hợp.",
+    "2": "Điện thoại thông minh thường tích hợp trợ lí ảo như công cụ điều khiển bằng giọng nói.",
+    "3": "Nhận dạng chữ viết tay là một ứng dụng AI có thể hỗ trợ chấm bài tự động.",
+    "4": "Sai lệch tập trung ở một nhóm sắc tộc cho thấy dữ liệu huấn luyện thiếu đại diện, gây thiên lệch.",
+    "5": "Access Point cung cấp điểm truy cập và kết nối không dây trong mạng LAN.",
+    "6": "LAN là mạng cục bộ, thường giới hạn trong phòng, toà nhà hoặc khuôn viên.",
+    "7": "Trong Windows, thiết lập chia sẻ thư mục nằm tại Properties - Sharing.",
+    "8": "Modem chuyển đổi tín hiệu hai chiều giữa thiết bị/mạng người dùng và hạ tầng của ISP.",
+    "9": "Thuộc tính src chỉ tệp âm thanh; controls hiển thị bộ điều khiển phát.",
+    "10": "Pseudo-class :hover áp dụng định dạng khi con trỏ nằm trên phần tử.",
+    "11": "CSS ngoại tuyến được liên kết bằng thẻ link với href và rel=\"stylesheet\".",
+    "12": "Hai tệp cùng thư mục nên dùng đường dẫn tương đối gioithieu.html trong thuộc tính href.",
+    "13": "Hàng bảng phải dùng tr; ô tiêu đề dùng th; bgcolor=\"orange\" và align=\"right\" đáp ứng yêu cầu.",
+    "14": "CSS nội tuyến được khai báo bằng thuộc tính style ngay trong phần tử HTML.",
+    "15": "Danh sách không thứ tự dùng ul; ba li cùng cấp tạo ba mục ngang cấp.",
+    "16": "type=\"checkbox\" tạo hai ô chọn độc lập; label hiển thị nhãn tương ứng.",
+    "17": "Các quy tắc có cùng độ đặc hiệu thì quy tắc được nạp sau cùng thắng theo cơ chế cascading.",
+    "18": "Vòng lặp cộng 1² + 2² + 3² = 1 + 4 + 9 = 14.",
+    "19": "Tôn trọng quyền riêng tư khi chia sẻ thông tin cá nhân thể hiện giao tiếp có trách nhiệm và nhân văn.",
+    "20": "Cố ý làm tắc nghẽn mạng là hành vi gây cản trở hoạt động hệ thống và có thể vi phạm pháp luật.",
+    "21": "Hình ảnh cá nhân gắn với quyền đối với hình ảnh và quyền riêng tư.",
+    "22": "Cài đặt hoặc gỡ bỏ hệ điều hành thuộc công việc bảo trì, sửa chữa và hỗ trợ máy tính.",
+    "23": "Quản trị mạng bao gồm duy trì tính sẵn sàng, an toàn và ổn định của hệ thống mạng.",
+    "24": "Số thiết bị sử dụng tăng kéo theo nhu cầu cài đặt, bảo dưỡng và khắc phục sự cố tăng."
+  },
+  "tf_explanations": {
+    "25": {
+      "a": "Switch phù hợp để kết nối các máy trong từng LAN phòng máy.",
+      "b": "Router định tuyến lưu lượng giữa các mạng LAN; chức năng này có thể tích hợp trong modem/router.",
+      "c": "Quyền read chỉ cho phép đọc; muốn sửa phải cấp quyền thay đổi/ghi phù hợp.",
+      "d": "Thứ tự hợp lí thường là Internet/ISP - Modem - Router - Switch - Máy tính; phương án nêu đặt Router sau Modem theo chiều từ máy tính nhưng đảo Modem/Router ở điểm kết nối ra Internet."
+    },
+    "26": {
+      "a": "Mỗi trường của bảng quan hệ tương ứng với một cột; TenKH là một trường của KHACHHANG.",
+      "b": "Theo lược đồ đã cho, MaHD là khoá chính HOADON; MaKH và MaSP là khoá ngoài.",
+      "c": "Cửa hàng một địa điểm có thể sử dụng hệ CSDL tập trung; không bắt buộc hệ phân tán.",
+      "d": "Hai phép JOIN nối HOADON với KHACHHANG và SANPHAM đúng theo khoá; WHERE lọc MaHD='HD001'."
+    },
+    "27": {
+      "a": "Dữ liệu đã gán nhãn được dùng để học phân loại là học có giám sát.",
+      "b": "Phân cụm không dùng nhãn ban đầu là học không giám sát.",
+      "c": "Không thể kết luận phương pháp B tốt hơn A nếu chưa có tiêu chí và kết quả đánh giá.",
+      "d": "Dữ liệu khuôn mặt không trực tiếp cung cấp hồ sơ tín dụng cần thiết cho ba nhóm đã nêu."
+    },
+    "28": {
+      "a": "Hàm dùng vòng lặp for, không gọi lại chính nó nên không phải đệ quy.",
+      "b": "Thuật toán chỉ dùng số lượng biến phụ trợ cố định, nên bộ nhớ phụ O(1).",
+      "c": "Tìm kiếm tuần tự có thời gian xấu nhất O(n), không phải O(n²).",
+      "d": "9 không xuất hiện trong [2, 6, 3, 8], vòng lặp kết thúc và trả về False."
+    }
+  },
+  "score_rules": {
+    "mcq": "Mỗi câu trả lời đúng được 0,25 điểm; sai hoặc không trả lời được 0 điểm.",
+    "tf": "Mỗi nhóm có 4 nhận định. Số nhận định đúng 0, 1, 2, 3, 4 được lần lượt 0; 0,1; 0,25; 0,5; 1,0 điểm.",
+    "matrix_equivalent_note": "Trong ma trận, mỗi lệnh hỏi/nhận định được quy đổi tương đương 0,25 điểm để kiểm tra phân bố 40%-30%-30%; chấm thực tế phần đúng/sai tuân theo thang điểm phi tuyến của nhóm."
+  }
+}
