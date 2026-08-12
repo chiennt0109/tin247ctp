@@ -74,6 +74,16 @@ class BankQuestion(models.Model):
     estimated_time_seconds = models.PositiveIntegerField(null=True, blank=True)
     content_hash = models.CharField(max_length=64, db_index=True)
     is_available = models.BooleanField(default=False, db_index=True)
+    # Queryable projections of the structured NLS/AI tags in the canonical
+    # workbook NOTE.  The complete source payload remains in source_metadata.
+    nls_frame = models.CharField(max_length=64, blank=True, db_index=True)
+    nls_level = models.CharField(max_length=64, blank=True, db_index=True)
+    nls_primary = models.CharField(max_length=64, blank=True, db_index=True)
+    grad_nls_task = models.CharField(max_length=64, blank=True, db_index=True)
+    ai_component = models.CharField(max_length=32, blank=True, db_index=True)
+    grad_ai_task = models.CharField(max_length=64, blank=True, db_index=True)
+    graduation_gate = models.CharField(max_length=32, blank=True, db_index=True)
+    import_warnings = models.JSONField(default=list, blank=True)
     source_metadata = models.JSONField(default=dict, blank=True)
     last_synced_at = models.DateTimeField(auto_now=True)
     current_revision = models.ForeignKey(
@@ -322,6 +332,9 @@ class BlueprintSection(models.Model):
 class BlueprintSlot(models.Model):
     section = models.ForeignKey(BlueprintSection, on_delete=models.CASCADE, related_name="slots")
     order = models.PositiveIntegerField(default=0)
+    source_slot_id = models.CharField(max_length=160, blank=True, db_index=True)
+    source_slot_no = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    source_cell_id = models.CharField(max_length=160, blank=True, db_index=True)
     curriculum = models.ForeignKey(
         CurriculumNode, null=True, blank=True, on_delete=models.PROTECT, related_name="blueprint_slots"
     )
@@ -344,6 +357,13 @@ class BlueprintSlot(models.Model):
     shortage_priority = models.PositiveIntegerField(default=0)
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("section", "source_slot_id"),
+                condition=~models.Q(source_slot_id=""),
+                name="assessment_unique_version_source_slot",
+            ),
+        ]
         ordering = ("section__order", "order", "id")
 
     def clean(self):
@@ -641,6 +661,13 @@ class GeneratedExamQuestion(models.Model):
     blueprint_slot = models.ForeignKey(BlueprintSlot, on_delete=models.PROTECT)
     order = models.PositiveIntegerField()
     question_id_snapshot = models.CharField(max_length=160)
+    family_id_snapshot = models.CharField(max_length=160, blank=True)
+    blueprint_id_snapshot = models.CharField(max_length=160, blank=True)
+    blueprint_version_snapshot = models.PositiveIntegerField(default=1)
+    blueprint_slot_id_snapshot = models.CharField(max_length=160, blank=True)
+    blueprint_slot_no_snapshot = models.PositiveIntegerField(null=True, blank=True)
+    curriculum_id_snapshot = models.CharField(max_length=160, blank=True)
+    outcome_id_snapshot = models.CharField(max_length=160, blank=True)
     source_version_snapshot = models.CharField(max_length=64)
     stem_snapshot = models.TextField()
     options_snapshot = models.JSONField(default=list, blank=True)
