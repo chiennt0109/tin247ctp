@@ -379,6 +379,20 @@ class StartAttemptTests(TestCase):
         self.assertFalse(ExamAttempt.objects.exists())
         self.assertFalse(GeneratedExam.objects.exists())
 
+    def test_invalidated_attempt_number_is_never_reused(self):
+        user = get_user_model().objects.create_user("invalidated-number")
+        session = self.open_session()
+        session.max_attempts = 3
+        session.save(update_fields=("max_attempts",))
+        first = start_attempt(user, session)
+        first.status = ExamAttempt.Status.INVALIDATED
+        first.save(update_fields=("status",))
+
+        second = start_attempt(user, session)
+
+        self.assertEqual(first.attempt_number, 1)
+        self.assertEqual(second.attempt_number, 2)
+
     def test_student_attempt_page_never_exposes_protected_answers(self):
         user = get_user_model().objects.create_user("debug")
         attempt = start_attempt(user, self.open_session())

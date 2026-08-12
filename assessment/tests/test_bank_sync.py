@@ -1,4 +1,5 @@
 from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -234,3 +235,12 @@ class BankSyncServiceTests(TestCase):
         self.assertNotIn('"mode": "APPLY_SUCCESS"', output.getvalue())
         self.assertFalse(BankSourceFile.objects.exists())
         self.assertFalse(QuestionSyncLog.objects.exists())
+
+    @override_settings(QUESTION_BANK_SYNC_ENABLED=True)
+    def test_initial_load_refuses_legacy_runtime_data(self):
+        with patch("assessment.management.commands.sync_exam_bank.ExamSession.objects.count", return_value=5):
+            with self.assertRaisesMessage(CommandError, "legacy runtime data remains"):
+                call_command(
+                    "sync_exam_bank", "--source", str(self.path), "--apply", "--initial-load",
+                    verbosity=0,
+                )

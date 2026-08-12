@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from django.core.cache import cache
 from django.db import IntegrityError, transaction
+from django.db.models import Max
 from django.utils import timezone
 
 from assessment.models import AssessmentAuditLog, ExamAttempt, ExamSession, ExamUsageRecord
@@ -121,9 +122,13 @@ def start_attempt(user, exam_session, *, idempotency_key=None):
                 used = committed_usage_count(user, session)
                 if access.max_attempts is not None and used >= access.max_attempts:
                     raise StartAttemptError("Bạn đã sử dụng hết số lượt làm.")
-                attempt_number = ExamAttempt.objects.filter(user=user, session=session).exclude(
-                    status=ExamAttempt.Status.INVALIDATED
-                ).count() + 1
+                # Attempt numbers are immutable audit identities. Counting only
+                # non-invalidated rows re-used an invalidated number and hit the
+                # unconditional (user, session, attempt_number) constraint.
+                attempt_number = (
+                    ExamAttempt.objects.filter(user=user, session=session)
+                    .aggregate(maximum=Max("attempt_number"))["maximum"] or 0
+                ) + 1
                 usage_key = idempotency_key or f"online:{session.pk}:{user.pk}:{attempt_number}"
                 usage, created_usage = reserve_usage(
                     user=user, session=session,
@@ -193,6 +198,12 @@ def start_attempt(user, exam_session, *, idempotency_key=None):
             ).first()
             if existing:
                 return existing
-            raise StartAttemptError("Không thể tạo bài làm do xung đột dữ liệu.") from exc
+            constraint = getattr(getattr(exc, "__cause__", None), "diag", None)
+            constraint_name = getattr(constraint, "constraint_name", None)
+            suffix = f" ({constraint_name})" if constraint_name else ""
+            raise StartAttemptError(
+                "Không thể tạo bài làm do xung đột dữ liệu"
+                f"{suffix}. Quản trị viên hãy kiểm tra attempt/usage cũ của kỳ thi."
+            ) from exc
         except ExamGenerationError as exc:
             raise StartAttemptError(str(exc)) from exc
