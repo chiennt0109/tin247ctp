@@ -74,6 +74,16 @@ class BankQuestion(models.Model):
     estimated_time_seconds = models.PositiveIntegerField(null=True, blank=True)
     content_hash = models.CharField(max_length=64, db_index=True)
     is_available = models.BooleanField(default=False, db_index=True)
+    # Queryable projections of the structured NLS/AI tags in the canonical
+    # workbook NOTE.  The complete source payload remains in source_metadata.
+    nls_frame = models.CharField(max_length=64, blank=True, db_index=True)
+    nls_level = models.CharField(max_length=64, blank=True, db_index=True)
+    nls_primary = models.CharField(max_length=64, blank=True, db_index=True)
+    grad_nls_task = models.CharField(max_length=64, blank=True, db_index=True)
+    ai_component = models.CharField(max_length=32, blank=True, db_index=True)
+    grad_ai_task = models.CharField(max_length=64, blank=True, db_index=True)
+    graduation_gate = models.CharField(max_length=32, blank=True, db_index=True)
+    import_warnings = models.JSONField(default=list, blank=True)
     source_metadata = models.JSONField(default=dict, blank=True)
     last_synced_at = models.DateTimeField(auto_now=True)
     current_revision = models.ForeignKey(
