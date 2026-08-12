@@ -28,7 +28,9 @@ def question_is_structurally_eligible(item):
 
 class BankSyncService:
     def preview(self, parsed):
-        existing = {q.source_question_id: q for q in BankQuestion.objects.all()}
+        # Dry-run doubles as the pre-migration diagnostic. Restrict this query
+        # to pre-v2 columns so missing projection columns cannot crash preview.
+        existing = dict(BankQuestion.objects.values_list("source_question_id", "content_hash"))
         source_ids = {item["question_id"] for item in parsed.questions}
         counts = Counter()
         for item in parsed.questions:
@@ -37,7 +39,7 @@ class BankSyncService:
             if current is None:
                 counts["new"] += 1
                 counts[f"{item['question_type'].lower()}_new"] += 1
-            elif current.content_hash != item["content_hash"]:
+            elif current != item["content_hash"]:
                 counts["changed"] += 1
                 counts[f"{item['question_type'].lower()}_changed"] += 1
             else:
@@ -53,6 +55,13 @@ class BankSyncService:
                 counts[f"{item['question_type'].lower()}_periodic_eligible"] += 1
             if item["process_status"] != "READY_FOR_GRADUATION":
                 counts["not_graduation_eligible"] += 1
+            else:
+                counts["ready_for_graduation"] += 1
+                tags = item.get("structured_metadata") or {}
+                if (tags.get("GRAD_NLS_TASK") in {"PASS", "NOT_APPLICABLE_CONFIRMED"}
+                        and tags.get("AUTO_USE_GRADUATION_NLS_AI_GATE") == "PASS"
+                        and not item.get("import_warnings")):
+                    counts["nls_ai_gate_pass"] += 1
         counts["retired"] = len(set(existing) - source_ids)
         issue_counts = Counter()
         for error in parsed.errors:
@@ -60,6 +69,26 @@ class BankSyncService:
             issue_counts.update(error.get("issues", ()))
         return {
             **counts,
+            "summary": {
+                "Curriculum": len(parsed.rows.get("CURRICULUM", [])),
+                "Outcomes": len(parsed.rows.get("CURRICULUM_OUTCOMES", [])),
+                "Questions": len(parsed.questions),
+                "MCQ options": len(parsed.rows.get("OPTIONS", [])),
+                "TF statements": len(parsed.rows.get("STATEMENTS", [])),
+                "Question curriculum mappings": len(parsed.rows.get("QUESTION_CURRICULUM", [])),
+                "Families": len({q.get("family_id") for q in parsed.questions if q.get("family_id")}),
+                "Policies": len(parsed.rows.get("POLICY_PROFILES", [])),
+                "Score rules": len(parsed.rows.get("SCORE_RULES", [])),
+                "Blueprints": len(parsed.rows.get("BLUEPRINTS", [])),
+                "Blueprint cells": len(parsed.rows.get("BLUEPRINT_CELLS", [])),
+                "Blueprint slots": sum(int(row.get("REQUIRED_COUNT") or 0)
+                                       for row in parsed.rows.get("BLUEPRINT_CELLS", [])),
+                "Ready for graduation": counts["ready_for_graduation"],
+                "NLS/AI gate pass": counts["nls_ai_gate_pass"],
+                "Skipped": len(parsed.errors),
+                "Needs review": sum(q["process_status"] == "NEEDS_REVIEW" for q in parsed.questions),
+                "Errors": len(parsed.errors),
+            },
             "valid_questions": len(parsed.questions),
             "structural_errors": len(parsed.errors),
             "warnings": len(parsed.warnings),
@@ -178,7 +207,17 @@ class BankSyncService:
                                     "source_physical_status": row.get("__source_status__"),
                                     "source_process_status": row.get("__source_process_status__"),
                                     "process_status_derived": bool(row.get("__process_status_derived__")),
-                                    "formula_fields": item["formula_fields"]},
+                                    "formula_fields": item["formula_fields"],
+                                    **(item.get("structured_metadata") or {})},
+                "nls_frame": (item.get("structured_metadata") or {}).get("NLS_FRAME", ""),
+                "nls_level": (item.get("structured_metadata") or {}).get("NLS_LEVEL", ""),
+                "nls_primary": (item.get("structured_metadata") or {}).get("NLS_PRIMARY", ""),
+                "grad_nls_task": (item.get("structured_metadata") or {}).get("GRAD_NLS_TASK", ""),
+                "ai_component": (item.get("structured_metadata") or {}).get("AI_COMPONENT", ""),
+                "grad_ai_task": (item.get("structured_metadata") or {}).get("GRAD_AI_TASK", ""),
+                "graduation_gate": (item.get("structured_metadata") or {}).get(
+                    "AUTO_USE_GRADUATION_NLS_AI_GATE", ""),
+                "import_warnings": item.get("import_warnings") or [],
             },
         )
         protected_answer = {"answer_key": item["answer_key"]}
