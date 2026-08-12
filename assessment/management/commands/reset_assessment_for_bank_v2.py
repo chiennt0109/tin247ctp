@@ -35,6 +35,10 @@ class Command(BaseCommand):
         mode.add_argument("--dry-run", action="store_true")
         mode.add_argument("--apply", action="store_true")
         parser.add_argument("--backup-dir", default="var/backups/assessment")
+        parser.add_argument(
+            "--backup-timeout", type=int, default=900,
+            help="Maximum seconds allowed for pg_dump and pg_restore verification (default: 900)",
+        )
 
     @staticmethod
     def _table_exists(model):
@@ -44,14 +48,32 @@ class Command(BaseCommand):
         return [(model, model.objects.count() if self._table_exists(model) else None)
                 for model in PURGE_MODELS]
 
-    def _backup(self, directory):
+    def _run_backup_process(self, command, *, env, timeout, label):
+        try:
+            return subprocess.run(
+                command, env=env, capture_output=True, text=True, check=False, timeout=timeout,
+            )
+        except FileNotFoundError as exc:
+            raise CommandError(
+                f"{label} executable was not found; no purge was performed."
+            ) from exc
+        except subprocess.TimeoutExpired as exc:
+            detail = (exc.stderr or "").strip() if isinstance(exc.stderr, str) else ""
+            raise CommandError(
+                f"{label} exceeded {timeout} seconds; no purge was performed. {detail}"
+            ) from exc
+
+    def _backup(self, directory, *, timeout):
         db = settings.DATABASES["default"]
         if "postgresql" not in db.get("ENGINE", ""):
             raise CommandError("--apply requires PostgreSQL; no purge was performed")
         directory = Path(directory).expanduser().resolve()
         directory.mkdir(parents=True, exist_ok=True)
         output = directory / f"assessment-bank-v2-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}.dump"
-        command = ["pg_dump", "--format=custom", "--file", str(output)]
+        command = [
+            "pg_dump", "--format=custom", "--no-password",
+            "--lock-wait-timeout=30s", "--file", str(output),
+        ]
         for flag, key in (("--host", "HOST"), ("--port", "PORT"), ("--username", "USER")):
             if db.get(key):
                 command.extend((flag, str(db[key])))
@@ -59,12 +81,23 @@ class Command(BaseCommand):
         env = os.environ.copy()
         if db.get("PASSWORD"):
             env["PGPASSWORD"] = str(db["PASSWORD"])
-        result = subprocess.run(command, env=env, capture_output=True, text=True, check=False)
+        self.stdout.write(f"Creating PostgreSQL backup: {output}")
+        self.stdout.write(
+            f"Backup timeout: {timeout}s; database: {db['NAME']}; "
+            "waiting for pg_dump to finish..."
+        )
+        result = self._run_backup_process(
+            command, env=env, timeout=timeout, label="pg_dump",
+        )
         if result.returncode or not output.is_file() or output.stat().st_size == 0:
             output.unlink(missing_ok=True)
             raise CommandError(f"PostgreSQL backup failed; no purge was performed: {result.stderr.strip()}")
         # pg_restore --list verifies that the custom archive is readable.
-        verify = subprocess.run(["pg_restore", "--list", str(output)], capture_output=True, text=True, check=False)
+        self.stdout.write(f"Backup created ({output.stat().st_size} bytes); verifying archive...")
+        verify = self._run_backup_process(
+            ["pg_restore", "--list", str(output)], env=env,
+            timeout=timeout, label="pg_restore",
+        )
         if verify.returncode:
             raise CommandError(f"Backup verification failed; no purge was performed: {verify.stderr.strip()}")
         self.stdout.write(self.style.SUCCESS(f"Verified PostgreSQL backup: {output}"))
@@ -78,7 +111,10 @@ class Command(BaseCommand):
         if options["dry_run"]:
             self.stdout.write(self.style.SUCCESS("Dry-run only: no backup required and no rows deleted."))
             return
-        backup = self._backup(options["backup_dir"])
+        if options["backup_timeout"] <= 0:
+            raise CommandError("--backup-timeout must be greater than zero; no purge was performed")
+        backup = self._backup(options["backup_dir"], timeout=options["backup_timeout"])
+        self.stdout.write("Backup verified. Starting atomic Assessment purge...")
         try:
             with transaction.atomic():
                 # Break BankQuestion.current_revision -> BankQuestionRevision's
