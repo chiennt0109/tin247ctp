@@ -356,6 +356,34 @@ class WorkbookBankImporterTests(SimpleTestCase):
         self.assertFalse(parsed.errors)
         self.assertEqual(parsed.questions[0]["estimated_time_seconds"], 90)
 
+    def test_configuration_integer_accepts_excel_decimal_string(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        workbook = load_workbook(path)
+        sheet = workbook["BLUEPRINT_CELLS"]
+        sheet.delete_rows(1, sheet.max_row)
+        headers = [
+            "BLUEPRINT_CELL_ID", "BLUEPRINT_ID", "QUESTION_TYPE", "REQUIRED_COUNT",
+            "DIFFICULTY", "SCORE_PER_ITEM", "STATUS",
+        ]
+        sheet.append(headers)
+        sheet.append([{
+            "BLUEPRINT_CELL_ID": "CELL-1", "BLUEPRINT_ID": "BP-1",
+            "QUESTION_TYPE": "MCQ_SINGLE", "REQUIRED_COUNT": "3.0",
+            "DIFFICULTY": "2.0", "SCORE_PER_ITEM": "0.25", "STATUS": "APPROVED",
+        }.get(header) for header in headers])
+        workbook.save(path)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertFalse(parsed.errors)
+        row = next(
+            item for item in parsed.rows["BLUEPRINT_CELLS"]
+            if item.get("BLUEPRINT_CELL_ID") == "CELL-1"
+        )
+        self.assertEqual(row["REQUIRED_COUNT"], 3)
+        self.assertEqual(row["DIFFICULTY"], 2)
+
     def test_estimated_time_rejects_purpose_value_during_dry_run(self):
         path = WorkbookFactory.create(estimated_time="PRACTICE")
         self.addCleanup(path.unlink)
