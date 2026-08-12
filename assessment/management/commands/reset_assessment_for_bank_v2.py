@@ -12,8 +12,8 @@ from django.db import connection, transaction
 from assessment import models
 
 
-# Child-first. Authentication, DMOJ data and global trial/abuse configuration
-# are deliberately absent. Session-scoped grants disappear with their session.
+# Child-first and deliberately limited to models owned by the assessment app.
+# User/auth/problem/submission/contest tables are never selected or cascaded.
 PURGE_MODELS = (
     models.AttemptAnswer, models.GradingResult, models.ExamUsageRecord,
     models.ExamResourcePackage, models.ExamAttempt, models.GeneratedExamAsset,
@@ -23,7 +23,9 @@ PURGE_MODELS = (
     models.ScoringRule, models.ScoringSchemeVersion, models.ScoringScheme,
     models.QuestionAsset, models.BankQuestionRevision, models.BankQuestion,
     models.CurriculumOutcome, models.CurriculumNode, models.BankSourceFile,
-    models.QuestionSyncLog,
+    models.QuestionSyncLog, models.AssessmentAuditLog,
+    models.TrialAuditEvent, models.TrialDevice, models.TrialAccountLink,
+    models.TrialEntitlement,
 )
 
 
@@ -35,6 +37,10 @@ class Command(BaseCommand):
         mode.add_argument("--dry-run", action="store_true")
         mode.add_argument("--apply", action="store_true")
         parser.add_argument("--backup-dir", default="var/backups/assessment")
+        parser.add_argument(
+            "--no-backup", action="store_true",
+            help="Explicitly skip PostgreSQL backup before deleting Assessment data",
+        )
         parser.add_argument(
             "--backup-timeout", type=int, default=900,
             help="Maximum seconds allowed for pg_dump and pg_restore verification (default: 900)",
@@ -111,10 +117,16 @@ class Command(BaseCommand):
         if options["dry_run"]:
             self.stdout.write(self.style.SUCCESS("Dry-run only: no backup required and no rows deleted."))
             return
-        if options["backup_timeout"] <= 0:
-            raise CommandError("--backup-timeout must be greater than zero; no purge was performed")
-        backup = self._backup(options["backup_dir"], timeout=options["backup_timeout"])
-        self.stdout.write("Backup verified. Starting atomic Assessment purge...")
+        backup = None
+        if options["no_backup"]:
+            self.stdout.write(self.style.WARNING(
+                "Backup explicitly skipped (--no-backup). Starting atomic Assessment-only purge..."
+            ))
+        else:
+            if options["backup_timeout"] <= 0:
+                raise CommandError("--backup-timeout must be greater than zero; no purge was performed")
+            backup = self._backup(options["backup_dir"], timeout=options["backup_timeout"])
+            self.stdout.write("Backup verified. Starting atomic Assessment purge...")
         try:
             with transaction.atomic():
                 # Break BankQuestion.current_revision -> BankQuestionRevision's
@@ -125,5 +137,10 @@ class Command(BaseCommand):
                     if count is not None:
                         model.objects.all().delete()
         except Exception as exc:
-            raise CommandError(f"Purge rolled back. Backup retained at {backup}: {exc}") from exc
-        self.stdout.write(self.style.SUCCESS(f"Assessment reset complete. Backup retained at: {backup}"))
+            backup_note = f" Backup retained at {backup}." if backup else " No backup was requested."
+            raise CommandError(f"Purge rolled back.{backup_note} Error: {exc}") from exc
+        if backup:
+            message = f"Assessment reset complete. Backup retained at: {backup}"
+        else:
+            message = "Assessment reset complete. No backup was created (--no-backup)."
+        self.stdout.write(self.style.SUCCESS(message))
