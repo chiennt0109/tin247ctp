@@ -1,4 +1,5 @@
 import json
+import hashlib
 import tempfile
 from pathlib import Path
 
@@ -32,11 +33,10 @@ class Command(BaseCommand):
             raise CommandError("--question-id is only supported with --dry-run")
         source = options.get("source") or getattr(settings, "QUESTION_BANK_SOURCE", "")
         if not source:
-            file_id = getattr(settings, "QUESTION_BANK_FILE_ID", "")
-            if file_id:
-                source = f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx"
-        if not source:
-            raise CommandError("Set --source, QUESTION_BANK_SOURCE, or QUESTION_BANK_FILE_ID")
+            file_id = getattr(settings, "QUESTION_BANK_FILE_ID", "") or (
+                "1kyaIfu7NSA4PQ_b6UXb8rRqJYLCdsUNF3AA8_Cf1BbQ"
+            )
+            source = f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx"
         if options["apply"] and not getattr(settings, "QUESTION_BANK_SYNC_ENABLED", False):
             raise CommandError("Apply is disabled; set QUESTION_BANK_SYNC_ENABLED=true")
         if options["initial_load"] and not options["apply"]:
@@ -71,6 +71,25 @@ class Command(BaseCommand):
                 path = temporary_path
             elif Path(source).suffix.lower() != ".xlsx":
                 raise CommandError("Question-bank source must be an .xlsx file")
+
+            if not source.startswith(("https://", "http://")) and Path(source).name == (
+                "INDEX_NGAN_HANG_DE_TIN_HOC_TOT_NGHIEP_MASTER.xlsx"
+            ):
+                file_id = getattr(settings, "QUESTION_BANK_FILE_ID", "") or (
+                    "1kyaIfu7NSA4PQ_b6UXb8rRqJYLCdsUNF3AA8_Cf1BbQ"
+                )
+                remote = requests.get(
+                    f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx",
+                    timeout=(10, 120), allow_redirects=True,
+                )
+                remote.raise_for_status()
+                local_hash = hashlib.sha256(Path(source).read_bytes()).hexdigest()
+                remote_hash = hashlib.sha256(remote.content).hexdigest()
+                if local_hash != remote_hash:
+                    raise CommandError(
+                        "STALE_BANK_SNAPSHOT: local canonical XLSX hash differs from live Google master; "
+                        "sync using QUESTION_BANK_FILE_ID/HTTPS export."
+                    )
 
             parsed = WorkbookBankImporter().parse(path)
             if options.get("question_id"):

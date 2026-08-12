@@ -2,11 +2,13 @@ import hashlib
 import io
 import re
 import zipfile
+from pathlib import Path
 from dataclasses import dataclass
 from decimal import Decimal
 from xml.sax.saxutils import escape
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.conf import settings
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -17,6 +19,16 @@ from assessment.services.protected_payload import decrypt_json
 MAX_VARIANTS = 8
 VARIANT_CHOICES = {1, 4, 8}
 FULL_PACKAGE = "exam_answers"
+GOLDEN_TEMPLATE_DIR = Path(settings.BASE_DIR) / "assessment" / "export_templates" / "07_EXPORT"
+REQUIRED_GOLDEN_TEMPLATES = (
+    "DE_TNTHPT_TINHOC_2026_CS_001.docx",
+    "MA_TRAN_VA_BAN_DAC_TA_TNTHPT_TINHOC_2026_CS_001.xlsx",
+    "DAP_AN_MA_TRAN_BAN_DAC_TA_TNTHPT_TINHOC_2026_CS_001.docx",
+)
+
+
+class ExportValidationError(ValidationError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -156,6 +168,10 @@ def _context_from_resource_package(resource_package, *, package, variants, grant
 
 
 def _build_standard_zip(ctx):
+    _require_golden_templates()
+    errors = _semantic_validation_errors(ctx)
+    if errors:
+        raise ExportValidationError(errors)
     files = _build_export_files(ctx)
     archive_buffer = io.BytesIO()
     with zipfile.ZipFile(archive_buffer, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
@@ -280,27 +296,13 @@ def _manual_questions(ctx):
 
 
 def _ordered_options(question):
-    options = list(question.options_snapshot or [])
-    order = question.option_order or list(range(len(options)))
-    ordered = []
-    for index in order:
-        try:
-            ordered.append(options[int(index)])
-        except (ValueError, TypeError, IndexError):
-            continue
-    return ordered or options
+    # GeneratedExamQuestion stores the already-displayed snapshot. The order
+    # vector is retained solely to map answers back to canonical bank indexes.
+    return list(question.options_snapshot or [])
 
 
 def _ordered_statements(question):
-    statements = list(question.statements_snapshot or [])
-    order = question.option_order or list(range(len(statements)))
-    ordered = []
-    for index in order:
-        try:
-            ordered.append(statements[int(index)])
-        except (ValueError, TypeError, IndexError):
-            continue
-    return ordered or statements
+    return list(question.statements_snapshot or [])
 
 
 def _mcq_answer_label(question):
@@ -323,7 +325,7 @@ def _tf_answer_map(question):
         values = raw[:4]
     else:
         values = []
-    order = question.option_order or list(range(len(values)))
+    order = question.statement_order or list(range(len(values)))
     result = {}
     for display_index in range(4):
         try:
@@ -376,11 +378,16 @@ def _matrix_rows(ctx):
             "cells": {name: [] for name in header[3:12]},
             "score": Decimal("0"),
         })
-        level = _level_name(slot.cognitive_level or question.bank_question.cognitive_level)
-        qtype = "TNKQ-ĐS" if question.statements_snapshot else "TNKQ-NLC"
-        positions = _positions(question)
-        bucket["cells"].setdefault(f"{qtype}: {level}", []).extend(positions)
-        bucket["cells"].setdefault(f"Tổng: {level}", []).extend(positions)
+        if question.statements_snapshot:
+            for position, statement in zip(_positions(question), _ordered_statements(question), strict=True):
+                level = _level_name(statement.get("cognitive_level") if isinstance(statement, dict) else "")
+                bucket["cells"].setdefault(f"TNKQ-ĐS: {level}", []).append(position)
+                bucket["cells"].setdefault(f"Tổng: {level}", []).append(position)
+        elif question.bank_question.question_type not in {"ESSAY", "PRACTICAL"}:
+            level = _level_name(slot.cognitive_level or question.bank_question.cognitive_level)
+            positions = _positions(question)
+            bucket["cells"].setdefault(f"TNKQ-NLC: {level}", []).extend(positions)
+            bucket["cells"].setdefault(f"Tổng: {level}", []).extend(positions)
         bucket["score"] += Decimal(question.score)
     rows = [header]
     total_score = sum((Decimal(q.score) for q in ctx.questions), Decimal("0")) or Decimal("1")
@@ -469,7 +476,9 @@ def _snapshot_sheets(ctx):
             question.order,
             ("STATEMENT" if question.statements_snapshot else
              "MANUAL" if question.bank_question.question_type in {"ESSAY", "PRACTICAL"} else "OPTION"),
-            ",".join(map(str, question.option_order or [])),
+            ",".join(map(str, (
+                question.statement_order if question.statements_snapshot else question.option_order
+            ) or [])),
         ])
         source_rows.append([
             question.order, question.question_id_snapshot,
@@ -509,36 +518,15 @@ def _scoring_rows(ctx):
 
 
 def _validation_lines(ctx, files):
-    checks = []
-    ids = [q.question_id_snapshot for q in ctx.questions]
-    families = [q.bank_question.duplicate_family_id for q in ctx.questions if q.bank_question.duplicate_family_id]
-    checks.append(("GeneratedExam integrity", bool(ctx.generated_exam.pk and ctx.questions)))
-    checks.append(("Snapshot completeness", all(q.stem_snapshot and q.protected_answer_snapshot for q in ctx.questions)))
-    checks.append(("Blueprint reference", bool(ctx.blueprint_version_id if hasattr(ctx, 'blueprint_version_id') else ctx.blueprint_version.pk)))
-    checks.append(("Question count", len(ctx.questions) == ctx.blueprint_version.expected_question_count))
-    checks.append(("Question_ID uniqueness", len(ids) == len(set(ids))))
-    checks.append(("Family_ID uniqueness", len(families) == len(set(families))))
-    checks.append(("Answer-key consistency", all(bool(decrypt_json(q.protected_answer_snapshot)) for q in ctx.questions)))
-    checks.append(("Option order consistency", all(_order_is_valid(q) for q in ctx.questions if q.options_snapshot)))
-    checks.append(("Statement order consistency", all(_order_is_valid(q) for q in ctx.questions if q.statements_snapshot)))
-    checks.append(("Cognitive distribution", True))
-    checks.append(("Question-type distribution", True))
-    checks.append(("Score total", sum(Decimal(q.score) for q in ctx.questions) == Decimal(ctx.generated_exam.total_score)))
-    checks.append(("Command total", _command_count(ctx) >= len(ctx.questions)))
-    checks.append(("Duration", ctx.session.duration_minutes > 0))
-    checks.append(("DOCX creation", any(name.endswith(".docx") for name in files)))
-    checks.append(("PDF creation", any(name.endswith(".pdf") for name in files)))
-    checks.append(("XLSX creation", any(name.endswith(".xlsx") for name in files)))
-    checks.append(("ZIP creation", True))
-    checks.append(("Reproducibility", True))
-    checks.append(("Download permission", bool(ctx.grant_id)))
-    checks.append(("Usage commit status", True))
-    return [f"{'PASS' if passed else 'FAIL'} | {name}" for name, passed in checks]
+    errors = _semantic_validation_errors(ctx)
+    return ([f"FAIL | {error}" for error in errors] or ["PASS | SEMANTIC_SNAPSHOT_VALIDATION"])
 
 
 def _order_is_valid(question):
     size = len(question.options_snapshot or question.statements_snapshot or [])
-    order = question.option_order or list(range(size))
+    order = (
+        question.statement_order if question.statements_snapshot else question.option_order
+    ) or list(range(size))
     return sorted([int(x) for x in order]) == list(range(size))
 
 
@@ -560,8 +548,97 @@ def _manifest_lines(ctx, files):
     lines.append("")
     lines.append("QUESTIONS:")
     for question in ctx.questions:
-        lines.append(f"- {question.order}: {question.question_id_snapshot}@{question.source_version_snapshot} | order={question.option_order}")
+        order = question.statement_order if question.statements_snapshot else question.option_order
+        lines.append(f"- {question.order}: {question.question_id_snapshot}@{question.source_version_snapshot} | order={order}")
     return lines
+
+
+def _require_golden_templates():
+    missing = [name for name in REQUIRED_GOLDEN_TEMPLATES if not (GOLDEN_TEMPLATE_DIR / name).is_file()]
+    if missing:
+        raise ExportValidationError(
+            "MISSING_GOLDEN_EXPORT_TEMPLATE: " + ", ".join(missing)
+        )
+
+
+def _cognitive_distribution(questions):
+    result = {"BIET": 0, "HIEU": 0, "VANDUNG": 0}
+    for question in questions:
+        if question.statements_snapshot:
+            for statement in _ordered_statements(question):
+                level = str(statement.get("cognitive_level") or "") if isinstance(statement, dict) else ""
+                if level not in result:
+                    continue
+                result[level] += 1
+        else:
+            level = question.blueprint_slot.cognitive_level or question.bank_question.cognitive_level
+            if level in result:
+                result[level] += 1
+    return result
+
+
+def _semantic_validation_errors(ctx):
+    errors = []
+    questions = list(ctx.questions)
+    slots = [
+        slot for section in ctx.blueprint_version.sections.all()
+        for slot in section.slots.all()
+    ]
+    ids = [q.question_id_snapshot for q in questions]
+    families = [q.family_id_snapshot or q.bank_question.duplicate_family_id for q in questions]
+    families = [value for value in families if value]
+    positions = [q.blueprint_slot_no_snapshot or q.blueprint_slot.source_slot_no or q.order for q in questions]
+    if len(ids) != len(set(ids)):
+        errors.append("QUESTION_ID_DUPLICATE")
+    if len(families) != len(set(families)):
+        errors.append("FAMILY_ID_DUPLICATE")
+    if len(positions) != len(set(positions)):
+        errors.append("POSITION_DUPLICATE")
+    if len(questions) != ctx.blueprint_version.expected_question_count:
+        errors.append("QUESTION_GROUP_TOTAL_MISMATCH")
+    expected_types = {}
+    for slot in slots:
+        expected_types[slot.question_type] = expected_types.get(slot.question_type, 0) + slot.quantity
+    actual_types = {}
+    for question in questions:
+        qtype = question.bank_question.question_type
+        actual_types[qtype] = actual_types.get(qtype, 0) + 1
+    if expected_types != actual_types:
+        errors.append("QUESTION_TYPE_DISTRIBUTION_MISMATCH")
+    if sum(Decimal(q.score) for q in questions) != Decimal(ctx.generated_exam.total_score):
+        errors.append("SCORE_TOTAL_MISMATCH")
+    by_slot = {q.blueprint_slot_id: q for q in questions}
+    for slot in slots:
+        question = by_slot.get(slot.pk)
+        if not question:
+            errors.append("BLUEPRINT_SLOT_MISMATCH")
+            continue
+        if question.bank_question.question_type != slot.question_type:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if slot.curriculum_id and question.curriculum_id_snapshot != slot.curriculum.source_id:
+            errors.append("CURRICULUM_MISMATCH")
+        if slot.outcome_id and question.outcome_id_snapshot != slot.outcome.source_id:
+            errors.append("OUTCOME_MISMATCH")
+    for question in questions:
+        if question.statements_snapshot:
+            if not _order_is_valid(question):
+                errors.append("STATEMENT_ORDER_INVALID")
+            if any(not isinstance(s, dict) or not s.get("cognitive_level") for s in question.statements_snapshot):
+                errors.append("STATEMENT_LEVEL_METADATA_MISSING")
+        elif question.options_snapshot and not _order_is_valid(question):
+            errors.append("OPTION_ORDER_INVALID")
+    note = str(ctx.blueprint_version.source_snapshot.get("NOTE") or "")
+    target = re.search(r"TOTAL_COMMANDS=(\d+)", note)
+    if target and _command_count(ctx) != int(target.group(1)):
+        errors.append("COMMAND_TOTAL_MISMATCH")
+    cognitive_target = re.search(
+        r"TOTAL_COMMAND_TARGET=BIET:(\d+),HIEU:(\d+),VANDUNG:(\d+)", note,
+    )
+    if cognitive_target:
+        expected = dict(zip(("BIET", "HIEU", "VANDUNG"), map(int, cognitive_target.groups()), strict=True))
+        if _cognitive_distribution(questions) != expected:
+            errors.append("COGNITIVE_DISTRIBUTION_MISMATCH")
+    return list(dict.fromkeys(errors))
 
 
 def _readme_lines(ctx):

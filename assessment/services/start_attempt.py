@@ -65,7 +65,7 @@ def _group_configuration(session, user):
     candidates = [row for row in rows if row["ready"] and row["version"] is not None]
     if not candidates:
         raise StartAttemptError(
-            "Chưa có ma trận đủ nguồn câu để sinh đề. "
+            "NO_APPROVED_READY_BLUEPRINT: "
             f"Nhóm '{session.blueprint_group}' không có ma trận READY + LOCKED."
         )
 
@@ -151,12 +151,14 @@ def start_attempt(user, exam_session, *, idempotency_key=None):
                 if session.blueprint_group_id:
                     blueprint_version, scoring_version = _group_configuration(session, user)
                 blueprint = blueprint_version.blueprint
-                # Legacy locked sessions used DRAFT as their physical status.
-                # REVIEW is the explicit non-auto-use workflow state; newly
-                # synchronized usable blueprints are persisted as APPROVED.
-                if blueprint.status == blueprint.Status.REVIEW:
+                if (
+                    blueprint.status != blueprint.Status.APPROVED
+                    or not blueprint.is_ready
+                    or not blueprint_version.is_locked
+                ):
                     raise StartAttemptError(
-                        f"Ma trận {blueprint.source_blueprint_id or blueprint.pk} chưa APPROVED."
+                        "NO_APPROVED_READY_BLUEPRINT: "
+                        f"{blueprint.source_blueprint_id or blueprint.pk} is not APPROVED+READY+LOCKED."
                     )
                 if (blueprint.difficulty_profile or {}).get("AUTO_USE") == "BLOCKED":
                     raise StartAttemptError(

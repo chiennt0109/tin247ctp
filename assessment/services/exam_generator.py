@@ -39,11 +39,14 @@ class ExamGenerator:
             ]
             raise ExamGenerationError("Không có nghiệm toàn cục; " + "; ".join(shortages))
 
-        if session.shuffle_questions:
+        # PERIODIC/GRADUATION positions are canonical BLUEPRINT_SLOTS.SLOT_NO.
+        # No source policy currently authorizes a position permutation.
+        if session.shuffle_questions and session.exam_type not in {"PERIODIC", "GRADUATION"}:
             rng.shuffle(selected)
         snapshot_payload = []
         prepared = []
-        for order, (slot, question) in enumerate(selected, 1):
+        for sequence, (slot, question) in enumerate(selected, 1):
+            order = slot.source_slot_no or slot.order or sequence
             revision = question.current_revision
             options = list(revision.options)
             option_order = list(range(len(options)))
@@ -92,6 +95,16 @@ class ExamGenerator:
             exam_question = GeneratedExamQuestion.objects.create(
                 exam=exam, bank_question=question, bank_revision=revision, blueprint_slot=slot,
                 order=order, question_id_snapshot=question.source_question_id,
+                family_id_snapshot=question.duplicate_family_id,
+                blueprint_id_snapshot=(
+                    blueprint_version.blueprint.source_blueprint_id
+                    or str(blueprint_version.blueprint_id)
+                ),
+                blueprint_version_snapshot=blueprint_version.version,
+                blueprint_slot_id_snapshot=slot.source_slot_id,
+                blueprint_slot_no_snapshot=slot.source_slot_no,
+                curriculum_id_snapshot=(question.curriculum.source_id if question.curriculum_id else ""),
+                outcome_id_snapshot=(question.outcome.source_id if question.outcome_id else ""),
                 source_version_snapshot=revision.source_version, stem_snapshot=revision.stem_text,
                 options_snapshot=ordered_options, statements_snapshot=ordered_statements,
                 protected_answer_snapshot=encrypt_json(revision.protected_answer),

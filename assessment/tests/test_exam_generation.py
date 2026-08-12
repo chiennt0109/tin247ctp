@@ -19,7 +19,10 @@ from assessment.services.protected_payload import decrypt_json
 
 class ExamGenerationTests(TestCase):
     def setUp(self):
-        blueprint = ExamBlueprint.objects.create(name="BP", exam_type="GRADUATION", grade=12)
+        blueprint = ExamBlueprint.objects.create(
+            name="BP", exam_type="GRADUATION", grade=12,
+            status=ExamBlueprint.Status.APPROVED, is_ready=True,
+        )
         self.blueprint_version = BlueprintVersion.objects.create(
             blueprint=blueprint, version=1, duration_minutes=50,
             expected_question_count=2, expected_total_score=Decimal("0.500"),
