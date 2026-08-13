@@ -1,5 +1,6 @@
 import hashlib
 import io
+import os
 import re
 import zipfile
 from pathlib import Path
@@ -814,12 +815,46 @@ def _render_pdf(document_bytes, filename):
     if not executable:
         raise ExportValidationError("MISSING_PDF_RENDERER: LibreOffice/soffice is required")
     with tempfile.TemporaryDirectory(prefix="assessment-export-") as directory:
-        source = Path(directory) / filename
+        workdir = Path(directory)
+        source = workdir / filename
+        home = workdir / "home"
+        cache = workdir / "cache"
+        config = workdir / "config"
+        profile = workdir / "libreoffice-profile"
+        for path in (home, cache, config, profile):
+            path.mkdir(mode=0o700)
         source.write_bytes(document_bytes)
-        result = subprocess.run(
-            [executable, "--headless", "--convert-to", "pdf", "--outdir", directory, str(source)],
-            capture_output=True, text=True, timeout=120, check=False,
-        )
+        # Web workers commonly run with HOME=/var/www, which is not writable.
+        # LibreOffice otherwise fails before conversion while creating its user
+        # profile/dconf cache. Give every conversion an isolated writable home
+        # and profile; the unique profile also prevents concurrent downloads
+        # from sharing LibreOffice lock files.
+        environment = os.environ.copy()
+        environment.update({
+            "HOME": str(home),
+            "XDG_CACHE_HOME": str(cache),
+            "XDG_CONFIG_HOME": str(config),
+            "SAL_USE_VCLPLUGIN": "gen",
+        })
+        command = [
+            executable,
+            "--headless",
+            "--nologo",
+            "--nodefault",
+            "--nolockcheck",
+            "--nofirststartwizard",
+            f"-env:UserInstallation={profile.as_uri()}",
+            "--convert-to", "pdf",
+            "--outdir", directory,
+            str(source),
+        ]
+        try:
+            result = subprocess.run(
+                command, capture_output=True, text=True, timeout=120,
+                check=False, env=environment, cwd=directory,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise ExportValidationError("PDF_RENDER_TIMEOUT: LibreOffice exceeded 120 seconds") from exc
         output = source.with_suffix(".pdf")
         if result.returncode or not output.is_file() or not output.read_bytes().startswith(b"%PDF"):
             raise ExportValidationError(

@@ -1,4 +1,6 @@
 from types import SimpleNamespace
+from pathlib import Path
+from subprocess import CompletedProcess, TimeoutExpired
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
@@ -39,4 +41,28 @@ class ExportSemanticTests(SimpleTestCase):
 
         with patch("assessment.services.attempt_downloads.shutil.which", return_value=None):
             with self.assertRaisesMessage(ExportValidationError, "MISSING_PDF_RENDERER"):
+                _render_pdf(b"PK", "document.docx")
+
+    def test_pdf_renderer_uses_an_isolated_writable_profile(self):
+        from assessment.services.attempt_downloads import _render_pdf
+
+        def completed(command, **kwargs):
+            source = Path(command[-1])
+            source.with_suffix(".pdf").write_bytes(b"%PDF-rendered")
+            self.assertTrue(any(arg.startswith("-env:UserInstallation=file://") for arg in command))
+            self.assertNotEqual(kwargs["env"]["HOME"], "/var/www")
+            self.assertEqual(kwargs["env"]["SAL_USE_VCLPLUGIN"], "gen")
+            self.assertEqual(kwargs["cwd"], str(source.parent))
+            return CompletedProcess(command, 0, "", "")
+
+        with patch("assessment.services.attempt_downloads.shutil.which", return_value="/usr/bin/soffice"), \
+                patch("assessment.services.attempt_downloads.subprocess.run", side_effect=completed):
+            self.assertEqual(_render_pdf(b"PK", "document.docx"), b"%PDF-rendered")
+
+    def test_pdf_renderer_timeout_has_a_stable_error_code(self):
+        from assessment.services.attempt_downloads import _render_pdf
+
+        with patch("assessment.services.attempt_downloads.shutil.which", return_value="/usr/bin/soffice"), \
+                patch("assessment.services.attempt_downloads.subprocess.run", side_effect=TimeoutExpired("soffice", 120)):
+            with self.assertRaisesMessage(ExportValidationError, "PDF_RENDER_TIMEOUT"):
                 _render_pdf(b"PK", "document.docx")
