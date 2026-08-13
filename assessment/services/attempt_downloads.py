@@ -357,8 +357,11 @@ def _text(value):
 def _matrix_rows(ctx):
     header = [
         "TT", "Chương/Chủ đề", "Nội dung/Đơn vị kiến thức",
-        "TNKQ-NLC: Biết", "TNKQ-NLC: Hiểu", "TNKQ-NLC: Vận dụng",
-        "TNKQ-ĐS: Biết", "TNKQ-ĐS: Hiểu", "TNKQ-ĐS: Vận dụng",
+        "Trắc nghiệm nhiều lựa chọn (NLC): Biết",
+        "Trắc nghiệm nhiều lựa chọn (NLC): Hiểu",
+        "Trắc nghiệm nhiều lựa chọn (NLC): Vận dụng",
+        "Trắc nghiệm Đúng/Sai: Biết", "Trắc nghiệm Đúng/Sai: Hiểu",
+        "Trắc nghiệm Đúng/Sai: Vận dụng",
         "Tổng: Biết", "Tổng: Hiểu", "Tổng: Vận dụng", "Tỉ lệ % điểm",
     ]
     buckets = {}
@@ -372,19 +375,21 @@ def _matrix_rows(ctx):
         )
         bucket = buckets.setdefault(key, {
             "topic": getattr(curriculum, "topic_name", "NEEDS_REVIEW"),
-            "unit": getattr(outcome, "text", "NEEDS_REVIEW"),
+            # Outcome.text is the required learning outcome, not the knowledge
+            # unit. Keep the taxonomy levels separate in exported forms.
+            "unit": getattr(outcome, "code", "NEEDS_REVIEW"),
             "cells": {name: [] for name in header[3:12]},
             "score": Decimal("0"),
         })
         if question.statements_snapshot:
             for position, statement in zip(_positions(question), _ordered_statements(question), strict=True):
                 level = _level_name(statement.get("cognitive_level") if isinstance(statement, dict) else "")
-                bucket["cells"].setdefault(f"TNKQ-ĐS: {level}", []).append(position)
+                bucket["cells"].setdefault(f"Trắc nghiệm Đúng/Sai: {level}", []).append(position)
                 bucket["cells"].setdefault(f"Tổng: {level}", []).append(position)
-        elif question.bank_question.question_type not in {"ESSAY", "PRACTICAL"}:
+        elif question.bank_question.question_type == "MCQ_SINGLE":
             level = _level_name(slot.cognitive_level or question.bank_question.cognitive_level)
             positions = _positions(question)
-            bucket["cells"].setdefault(f"TNKQ-NLC: {level}", []).extend(positions)
+            bucket["cells"].setdefault(f"Trắc nghiệm nhiều lựa chọn (NLC): {level}", []).extend(positions)
             bucket["cells"].setdefault(f"Tổng: {level}", []).extend(positions)
         bucket["score"] += Decimal(question.score)
     rows = [header]
@@ -407,9 +412,14 @@ def _matrix_rows(ctx):
 
 
 def _positions(question):
+    slot_no = (
+        question.blueprint_slot_no_snapshot
+        or question.blueprint_slot.source_slot_no
+        or question.order
+    )
     if question.statements_snapshot:
-        return [f"Câu {question.order}{chr(97 + i)}" for i, _ in enumerate(_ordered_statements(question))]
-    return [f"Câu {question.order}"]
+        return [f"Câu {slot_no}{chr(97 + i)}" for i, _ in enumerate(_ordered_statements(question))]
+    return [f"Câu {slot_no}"]
 
 
 def _count_cell(positions):
@@ -429,6 +439,15 @@ def _command_count(ctx):
     return sum(len(q.statements_snapshot) if q.statements_snapshot else 1 for q in ctx.questions)
 
 
+def _tf_cognitive_profile(question):
+    counts = {"BIET": 0, "HIEU": 0, "VANDUNG": 0}
+    for statement in _ordered_statements(question):
+        level = str(statement.get("cognitive_level") or "") if isinstance(statement, dict) else ""
+        if level in counts:
+            counts[level] += 1
+    return f"B{counts['BIET']}-H{counts['HIEU']}-V{counts['VANDUNG']}"
+
+
 def _spec_rows(ctx, *, public):
     rows = [[
         "TT", "Chủ đề", "Nội dung/Đơn vị kiến thức", "Curriculum_ID", "Outcome_ID",
@@ -442,15 +461,17 @@ def _spec_rows(ctx, *, public):
         rows.append([
             index,
             getattr(curriculum, "topic_name", "NEEDS_REVIEW"),
-            getattr(outcome, "text", "NEEDS_REVIEW"),
+            getattr(outcome, "code", "NEEDS_REVIEW"),
             getattr(curriculum, "source_id", "NEEDS_REVIEW"),
             getattr(outcome, "source_id", "NEEDS_REVIEW"),
             getattr(outcome, "text", "NEEDS_REVIEW"),
             ({"ESSAY": "Tự luận", "PRACTICAL": "Thực hành"}.get(
                 question.bank_question.question_type,
-                "Đúng/Sai" if question.statements_snapshot else "Nhiều lựa chọn",
+                "Trắc nghiệm Đúng/Sai" if question.statements_snapshot else
+                "Trắc nghiệm nhiều lựa chọn (NLC)",
             )),
-            slot.cognitive_level or question.bank_question.cognitive_level or "NEEDS_REVIEW",
+            (_tf_cognitive_profile(question) if question.statements_snapshot else
+             slot.cognitive_level or question.bank_question.cognitive_level or "NEEDS_REVIEW"),
             slot.competency or question.bank_question.competency or "NEEDS_REVIEW",
             len(question.statements_snapshot) if question.statements_snapshot else 1,
             str(question.score),
@@ -605,10 +626,29 @@ def _semantic_validation_errors(ctx):
             continue
         if question.bank_question.question_type != slot.question_type:
             errors.append("BLUEPRINT_CELL_MISMATCH")
+        expected_slot_no = slot.source_slot_no
+        actual_slot_no = question.blueprint_slot_no_snapshot
+        if expected_slot_no is not None and actual_slot_no != expected_slot_no:
+            errors.append("BLUEPRINT_SLOT_MISMATCH")
+        if slot.source_slot_id and question.blueprint_slot_id_snapshot != slot.source_slot_id:
+            errors.append("BLUEPRINT_SLOT_MISMATCH")
+        if question.blueprint_id_snapshot != (ctx.blueprint.source_blueprint_id or str(ctx.blueprint.pk)):
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if question.blueprint_version_snapshot != ctx.blueprint_version.version:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
         if slot.curriculum_id and question.curriculum_id_snapshot != slot.curriculum.source_id:
             errors.append("CURRICULUM_MISMATCH")
         if slot.outcome_id and question.outcome_id_snapshot != slot.outcome.source_id:
             errors.append("OUTCOME_MISMATCH")
+        if (slot.question_type != "TRUE_FALSE_GROUP" and slot.cognitive_level
+                and question.bank_question.cognitive_level != slot.cognitive_level):
+            errors.append("COGNITIVE_DISTRIBUTION_MISMATCH")
+        if slot.difficulty is not None and question.bank_question.difficulty != slot.difficulty:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if slot.competency and question.bank_question.competency != slot.competency:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if Decimal(question.score) != Decimal(slot.score_per_item):
+            errors.append("SCORE_TOTAL_MISMATCH")
     for question in questions:
         if question.statements_snapshot:
             if not _order_is_valid(question):

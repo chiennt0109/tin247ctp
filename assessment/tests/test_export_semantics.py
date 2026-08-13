@@ -6,8 +6,8 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from assessment.services.attempt_downloads import (
-    ExportValidationError, _cognitive_distribution, _order_is_valid,
-    _ordered_statements, _tf_answer_map,
+    ExportValidationError, _cognitive_distribution, _matrix_rows, _order_is_valid,
+    _ordered_statements, _positions, _tf_answer_map, _tf_cognitive_profile,
 )
 from assessment.services.protected_payload import encrypt_json
 
@@ -35,6 +35,26 @@ class ExportSemanticTests(SimpleTestCase):
         )
         self.assertEqual(_tf_answer_map(question), {"a": "Đ", "b": "S", "c": "Đ", "d": "S"})
         self.assertTrue(_order_is_valid(question))
+        self.assertEqual(_tf_cognitive_profile(question), "B1-H3-V0")
+
+    def test_download_positions_use_canonical_blueprint_slot_number(self):
+        question = SimpleNamespace(
+            statements_snapshot=[{"cognitive_level": "BIET"}] * 4,
+            statement_order=[0, 1, 2, 3], order=99,
+            blueprint_slot_no_snapshot=25,
+            blueprint_slot=SimpleNamespace(source_slot_no=7),
+        )
+
+        self.assertEqual(_positions(question), ["Câu 25a", "Câu 25b", "Câu 25c", "Câu 25d"])
+
+    def test_matrix_uses_nlc_as_multiple_choice_not_multiple_response(self):
+        ctx = SimpleNamespace(
+            questions=[], generated_exam=SimpleNamespace(total_score=0),
+        )
+
+        header = _matrix_rows(ctx)[0]
+        self.assertIn("Trắc nghiệm nhiều lựa chọn (NLC): Biết", header)
+        self.assertFalse(any("nhiều phương án" in value.lower() for value in header))
 
     def test_missing_pdf_renderer_is_a_hard_failure(self):
         from assessment.services.attempt_downloads import _render_pdf
