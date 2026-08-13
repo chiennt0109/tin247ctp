@@ -37,6 +37,13 @@ def validate_equivalence_group(group, *, persist=True):
     rows = []
     reference = None
     for blueprint in group.blueprints.order_by("name"):
+        if blueprint.status != ExamBlueprint.Status.APPROVED or not blueprint.is_ready:
+            rows.append({
+                "blueprint": blueprint, "version": None, "ready": False,
+                "errors": ["NO_APPROVED_READY_BLUEPRINT"], "warnings": [],
+                "coverage": 0, "difficulty_profile": {}, "availability": [],
+            })
+            continue
         version = blueprint.versions.filter(is_locked=True).order_by("-version").first()
         errors, warnings = [], []
         report = None

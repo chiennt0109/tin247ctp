@@ -29,6 +29,22 @@ class ConfigurationSyncError(ValueError):
     pass
 
 
+def _auto_use_allowed(source):
+    note = str(source.get("NOTE") or "").upper()
+    tags = {}
+    for token in note.replace("\n", ";").split(";"):
+        if "=" in token:
+            key, value = token.split("=", 1)
+            tags[key.strip()] = value.strip().rstrip(".")
+    auto_use = tags.get("AUTO_USE", "")
+    return (
+        str(source.get("STATUS")) == "APPROVED"
+        and not auto_use.startswith("BLOCKED")
+        and tags.get("ROLE") != "SOURCE_OBSERVED"
+        and tags.get("SOURCE_MATRIX_ROLE") != "PROVENANCE"
+    )
+
+
 class MasterConfigurationSync:
     def preview(self, parsed):
         approved = [row for row in parsed.rows.get("BLUEPRINTS", []) if str(row.get("STATUS")) == "APPROVED"]
@@ -123,9 +139,35 @@ class MasterConfigurationSync:
             if str(row.get("STATUS")) == "APPROVED":
                 cells[str(row.get("BLUEPRINT_ID"))].append(row)
         score_rows = [row for row in parsed.rows.get("SCORE_RULES", []) if str(row.get("STATUS")) == "APPROVED"]
+        source_blueprints = {
+            str(row.get("BLUEPRINT_ID")): row for row in parsed.rows.get("BLUEPRINTS", [])
+        }
+        source_ids = set(source_blueprints)
+        # Missing/non-operational master rows remain immutable history when FK
+        # protected, but can never participate in new selection.
+        ExamBlueprint.objects.exclude(source_blueprint_id__in=source_ids).update(
+            is_ready=False, status=ExamBlueprint.Status.REVIEW,
+        )
+        for group in ExamBlueprintGroup.objects.all():
+            group.blueprints.remove(*group.blueprints.exclude(source_blueprint_id__in=source_ids))
+        cell_by_id = {
+            str(row.get("BLUEPRINT_CELL_ID")): row
+            for row in parsed.rows.get("BLUEPRINT_CELLS", [])
+        }
+        slots_by_blueprint = defaultdict(list)
+        for row in parsed.rows.get("BLUEPRINT_SLOTS", []):
+            if str(row.get("STATUS")) == "APPROVED":
+                slots_by_blueprint[str(row.get("BLUEPRINT_ID"))].append(row)
         created = updated = 0
         for source in parsed.rows.get("BLUEPRINTS", []):
-            if str(source.get("STATUS")) != "APPROVED":
+            if not _auto_use_allowed(source):
+                existing = ExamBlueprint.objects.filter(source_blueprint_id=str(source.get("BLUEPRINT_ID"))).first()
+                if existing:
+                    existing.is_ready = False
+                    existing.status = ExamBlueprint.Status.REVIEW
+                    existing.save(update_fields=("is_ready", "status", "updated_at"))
+                    for equivalence_group in existing.equivalence_groups.all():
+                        equivalence_group.blueprints.remove(existing)
                 continue
             source_id = str(source["BLUEPRINT_ID"])
             group = None
@@ -177,20 +219,43 @@ class MasterConfigurationSync:
             version.source_snapshot = _json_safe(source)
             version.save()
             version.sections.all().delete()
-            for order, row in enumerate(cells[source_id], 1):
-                question_type = TYPE_MAP.get(str(row["QUESTION_TYPE"]), str(row["QUESTION_TYPE"]))
-                section, _ = BlueprintSection.objects.get_or_create(
-                    version=version, code=question_type,
-                    defaults={"name": question_type, "order": order},
+            source_slots = sorted(
+                slots_by_blueprint[source_id], key=lambda row: int(row.get("SLOT_NO") or 0),
+            )
+            if len(source_slots) != int(source["TOTAL_QUESTIONS"]):
+                raise ConfigurationSyncError(
+                    f"Blueprint {source_id} declares {source['TOTAL_QUESTIONS']} groups but has "
+                    f"{len(source_slots)} APPROVED BLUEPRINT_SLOTS"
                 )
-                curriculum = CurriculumNode.objects.filter(source_id=str(row.get("CURRICULUM_ID"))).first()
-                outcome = CurriculumOutcome.objects.filter(source_id=str(row.get("OUTCOME_ID"))).first()
+            section_cache = {}
+            for row in source_slots:
+                cell_id = str(row.get("BLUEPRINT_CELL_ID") or "")
+                cell = cell_by_id.get(cell_id)
+                if not cell or str(cell.get("BLUEPRINT_ID")) != source_id:
+                    raise ConfigurationSyncError(
+                        f"BLUEPRINT_SLOT {row.get('BLUEPRINT_SLOT_ID')} references invalid cell {cell_id}"
+                    )
+                question_type = TYPE_MAP.get(
+                    str(cell["QUESTION_TYPE"]), str(cell["QUESTION_TYPE"]),
+                )
+                section = section_cache.get(question_type)
+                if section is None:
+                    section = BlueprintSection.objects.create(
+                        version=version, code=question_type, name=question_type,
+                        order=len(section_cache) + 1,
+                    )
+                    section_cache[question_type] = section
+                curriculum = CurriculumNode.objects.filter(source_id=str(cell.get("CURRICULUM_ID"))).first()
+                outcome = CurriculumOutcome.objects.filter(source_id=str(cell.get("OUTCOME_ID"))).first()
                 BlueprintSlot.objects.create(
-                    section=section, order=order, curriculum=curriculum, outcome=outcome,
-                    question_type=question_type, cognitive_level=str(row.get("COGNITIVE_LEVEL") or ""),
-                    difficulty=int(row["DIFFICULTY"]) if row.get("DIFFICULTY") else None,
-                    competency=str(row.get("COMPETENCY") or ""), quantity=int(row["REQUIRED_COUNT"]),
-                    score_per_item=Decimal(str(row["SCORE_PER_ITEM"])),
+                    section=section, order=int(row["SLOT_NO"]),
+                    source_slot_id=str(row["BLUEPRINT_SLOT_ID"]),
+                    source_slot_no=int(row["SLOT_NO"]), source_cell_id=cell_id,
+                    curriculum=curriculum, outcome=outcome,
+                    question_type=question_type, cognitive_level=str(cell.get("COGNITIVE_LEVEL") or ""),
+                    difficulty=int(cell["DIFFICULTY"]) if cell.get("DIFFICULTY") else None,
+                    competency=str(cell.get("COMPETENCY") or ""), quantity=1,
+                    score_per_item=Decimal(str(cell["SCORE_PER_ITEM"])),
                     required_process_status=PROCESS_STATUS_MAP.get(str(source["EXAM_TYPE"]), ""),
                     requires_graduation_eligibility=str(source["EXAM_TYPE"]) == "GRADUATION",
                 )
@@ -223,4 +288,15 @@ class MasterConfigurationSync:
                     )
             created += was_created
             updated += not was_created
+            from assessment.services.blueprint_validator import BlueprintValidator
+            validation = BlueprintValidator().validate(version, scoring_version=scoring)
+            ready = bool(validation["valid"])
+            BlueprintVersion.objects.filter(pk=version.pk).update(
+                validation_report=validation, is_locked=ready,
+            )
+            ScoringSchemeVersion.objects.filter(pk=scoring.pk).update(is_locked=ready)
+            ExamBlueprint.objects.filter(pk=blueprint.pk).update(
+                is_locked=ready, is_ready=ready,
+                status=ExamBlueprint.Status.APPROVED,
+            )
         return {**report, "created": created, "updated": updated}

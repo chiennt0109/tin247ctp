@@ -52,6 +52,11 @@ class MasterConfigurationSyncTests(TestCase):
                 "COGNITIVE_LEVEL": "BIET", "REQUIRED_COUNT": 1, "SCORE_PER_ITEM": "1",
                 "STATUS": "APPROVED", "DIFFICULTY": None, "COMPETENCY": "",
             } for grade in (10, 11, 12)],
+            "BLUEPRINT_SLOTS": [{
+                "BLUEPRINT_SLOT_ID": f"SLOT-{grade}", "BLUEPRINT_ID": f"TX-{grade}",
+                "SLOT_NO": 1, "BLUEPRINT_CELL_ID": f"CELL-{grade}",
+                "QUESTION_ID": "", "STATUS": "APPROVED", "NOTE": "",
+            } for grade in (10, 11, 12)],
             "SCORE_RULES": [{
                 "POLICY_PROFILE_ID": "TX", "QUESTION_TYPE": "MCQ_SINGLE",
                 "RULE_CODE": "TX-MCQ", "MAX_SCORE": "1", "STATUS": "APPROVED",
