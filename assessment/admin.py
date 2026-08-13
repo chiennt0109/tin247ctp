@@ -115,9 +115,13 @@ class ReadOnlyProjectionAdmin(admin.ModelAdmin):
 class BankQuestionAdmin(ReadOnlyProjectionAdmin):
     list_display = (
         "source_question_id", "question_type", "cognitive_level", "difficulty",
-        "process_status", "is_available", "last_synced_at",
+        "process_status", "nls_primary", "ai_component", "graduation_gate",
+        "duplicate_family_id", "is_available", "last_synced_at",
     )
-    list_filter = ("question_type", "cognitive_level", "difficulty", "process_status", "is_available")
+    list_filter = (
+        "question_type", "cognitive_level", "difficulty", "process_status",
+        "nls_level", "ai_component", "graduation_gate", "is_available",
+    )
     search_fields = ("source_question_id", "source_code", "duplicate_family_id")
     list_select_related = ("curriculum", "outcome", "current_revision")
 

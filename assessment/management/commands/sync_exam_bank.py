@@ -1,4 +1,5 @@
 import json
+import hashlib
 import tempfile
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from django.db import transaction
 from assessment.services.bank_importer import BankValidationError, WorkbookBankImporter
 from assessment.services.bank_sync import BankSyncService
 from assessment.services.configuration_sync import MasterConfigurationSync
+from assessment.models import ExamAttempt, ExamSession, GeneratedExam
 
 
 class Command(BaseCommand):
@@ -21,19 +23,36 @@ class Command(BaseCommand):
         mode.add_argument("--apply", action="store_true", help="Apply a previously validated source atomically")
         parser.add_argument("--source", help="Local XLSX path or HTTPS XLSX URL")
         parser.add_argument("--question-id", help="Restrict report to one QUESTION_ID (apply is prohibited)")
+        parser.add_argument(
+            "--initial-load", action="store_true",
+            help="Require an empty runtime after reset before the canonical first apply",
+        )
 
     def handle(self, *args, **options):
         if options["apply"] and options.get("question_id"):
             raise CommandError("--question-id is only supported with --dry-run")
         source = options.get("source") or getattr(settings, "QUESTION_BANK_SOURCE", "")
         if not source:
-            file_id = getattr(settings, "QUESTION_BANK_FILE_ID", "")
-            if file_id:
-                source = f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx"
-        if not source:
-            raise CommandError("Set --source, QUESTION_BANK_SOURCE, or QUESTION_BANK_FILE_ID")
+            file_id = getattr(settings, "QUESTION_BANK_FILE_ID", "") or (
+                "1kyaIfu7NSA4PQ_b6UXb8rRqJYLCdsUNF3AA8_Cf1BbQ"
+            )
+            source = f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx"
         if options["apply"] and not getattr(settings, "QUESTION_BANK_SYNC_ENABLED", False):
             raise CommandError("Apply is disabled; set QUESTION_BANK_SYNC_ENABLED=true")
+        if options["initial_load"] and not options["apply"]:
+            raise CommandError("--initial-load must be used together with --apply")
+        if options["initial_load"]:
+            runtime = {
+                "ExamSession": ExamSession.objects.count(),
+                "GeneratedExam": GeneratedExam.objects.count(),
+                "ExamAttempt": ExamAttempt.objects.count(),
+            }
+            if any(runtime.values()):
+                detail = ", ".join(f"{name}={count}" for name, count in runtime.items())
+                raise CommandError(
+                    "Initial bank load refused because legacy runtime data remains: "
+                    f"{detail}. Run reset_assessment_for_bank_v2 --dry-run, then --apply."
+                )
 
         temporary_path = None
         try:
@@ -52,6 +71,25 @@ class Command(BaseCommand):
                 path = temporary_path
             elif Path(source).suffix.lower() != ".xlsx":
                 raise CommandError("Question-bank source must be an .xlsx file")
+
+            if not source.startswith(("https://", "http://")) and Path(source).name == (
+                "INDEX_NGAN_HANG_DE_TIN_HOC_TOT_NGHIEP_MASTER.xlsx"
+            ):
+                file_id = getattr(settings, "QUESTION_BANK_FILE_ID", "") or (
+                    "1kyaIfu7NSA4PQ_b6UXb8rRqJYLCdsUNF3AA8_Cf1BbQ"
+                )
+                remote = requests.get(
+                    f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx",
+                    timeout=(10, 120), allow_redirects=True,
+                )
+                remote.raise_for_status()
+                local_hash = hashlib.sha256(Path(source).read_bytes()).hexdigest()
+                remote_hash = hashlib.sha256(remote.content).hexdigest()
+                if local_hash != remote_hash:
+                    raise CommandError(
+                        "STALE_BANK_SNAPSHOT: local canonical XLSX hash differs from live Google master; "
+                        "sync using QUESTION_BANK_FILE_ID/HTTPS export."
+                    )
 
             parsed = WorkbookBankImporter().parse(path)
             if options.get("question_id"):

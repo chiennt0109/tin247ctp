@@ -21,6 +21,32 @@ PROCESS_STATUSES = {
     "ANSWER_CHECKED", "CONTENT_REVIEWED", "READY_FOR_PRACTICE", "READY_FOR_PERIODIC",
     "READY_FOR_GRADUATION", "NEEDS_REVIEW", "OUTDATED", "RETIRED",
 }
+
+NLS_AI_TAGS = {
+    "NLS_FRAME", "NLS_LEVEL", "NLS_MAPPING_STATUS", "NLS_PRIMARY", "NLS_COMPONENTS",
+    "TASK_COMPATIBILITY", "GRAD_NLS_TASK", "GRAD_NLS_COMPONENTS", "AI_INTEGRATION",
+    "AI_COMPONENT", "AI_TASK_COMPATIBILITY", "GRAD_AI_TASK", "AI_FRAME",
+    "AI_FRAME_SCOPE", "AI_FRAME_MAPPING_STATUS", "AUTO_USE_GRADUATION_NLS_AI_GATE",
+}
+
+
+def parse_structured_note(note):
+    """Parse known ``KEY=value`` tokens from semicolon/newline structured notes."""
+    metadata, warnings = {}, []
+    tokens = re.split(r"[;\r\n]+", str(note or ""))
+    for token_number, raw in enumerate(tokens, 1):
+        token = raw.strip().lstrip("-• ")
+        if not token:
+            continue
+        key_candidate = token.split("=", 1)[0].strip().upper()
+        if key_candidate not in NLS_AI_TAGS:
+            continue
+        if "=" not in token or not token.split("=", 1)[1].strip():
+            warnings.append({"code": "INVALID_NLS_AI_TAG", "token": token_number, "tag": key_candidate})
+            continue
+        key, value = token.split("=", 1)
+        metadata[key.strip().upper()] = value.strip()
+    return metadata, warnings
 STATUS_VALUES = {"DRAFT", "PENDING", "REVIEW", "APPROVED", "ACTIVE", "INACTIVE", "REJECTED", "ARCHIVED"}
 PHYSICAL_STATUS_MAP = {
     # The master historically uses the workflow wording in the physical STATUS
@@ -43,14 +69,21 @@ INTEGER_FIELDS = {
     "QUESTIONS": ("VERSION", "DIFFICULTY", "ESTIMATED_TIME_SEC"),
     "OPTIONS": ("ORDER_NO",),
     "STATEMENTS": ("ORDER_NO", "DIFFICULTY"),
+    "BLUEPRINTS": ("GRADE", "TOTAL_QUESTIONS", "DURATION_MIN", "VERSION"),
+    "BLUEPRINT_CELLS": ("REQUIRED_COUNT", "DIFFICULTY"),
+    "BLUEPRINT_SLOTS": ("SLOT_NO",),
 }
 DECIMAL_FIELDS = {
     "QUESTION_CURRICULUM": ("WEIGHT",),
+    "BLUEPRINTS": ("TOTAL_SCORE",),
+    "BLUEPRINT_CELLS": ("SCORE_PER_ITEM",),
+    "SCORE_RULES": ("MAX_SCORE",),
 }
 BOOLEAN_FIELDS = {
     "QUESTIONS": ("SHUFFLE_ALLOWED",),
     "OPTIONS": ("IS_CORRECT",),
     "STATEMENTS": ("TRUTH_VALUE",),
+    "SCORE_RULES": ("PARTIAL_SCORE_ALLOWED",),
 }
 DATE_FIELDS = {
     "QUESTIONS": ("CREATED_AT", "UPDATED_AT"),
@@ -547,6 +580,12 @@ class WorkbookBankImporter:
                 "process_status": row.get("PROCESS_STATUS"), "use_purpose": row.get("USE_PURPOSE"),
                 "shuffle_allowed": shuffle_allowed, "family_id": row.get("FAMILY_ID"),
             }
+            structured_metadata, metadata_warnings = parse_structured_note(row.get("NOTE"))
+            if metadata_warnings:
+                for warning in metadata_warnings:
+                    warnings.append({**warning, "sheet": "QUESTIONS", "question_id": qid})
+            canonical["structured_metadata"] = structured_metadata
+            canonical["import_warnings"] = metadata_warnings
             content_hash = hashlib.sha256(
                 json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
             ).hexdigest()
