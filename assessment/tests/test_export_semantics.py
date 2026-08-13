@@ -51,11 +51,15 @@ class ExportSemanticTests(SimpleTestCase):
             source.with_suffix(".pdf").write_bytes(b"%PDF-rendered")
             self.assertTrue(any(arg.startswith("-env:UserInstallation=file://") for arg in command))
             self.assertNotEqual(kwargs["env"]["HOME"], "/var/www")
-            self.assertEqual(kwargs["env"]["SAL_USE_VCLPLUGIN"], "gen")
+            self.assertEqual(kwargs["env"]["SAL_USE_VCLPLUGIN"], "svp")
+            self.assertNotIn("DISPLAY", kwargs["env"])
+            self.assertNotIn("WAYLAND_DISPLAY", kwargs["env"])
             self.assertEqual(kwargs["cwd"], str(source.parent))
             return CompletedProcess(command, 0, "", "")
 
-        with patch("assessment.services.attempt_downloads.shutil.which", return_value="/usr/bin/soffice"), \
+        with patch.dict("assessment.services.attempt_downloads.os.environ", {
+                "DISPLAY": ":99", "WAYLAND_DISPLAY": "wayland-0",
+        }), patch("assessment.services.attempt_downloads.shutil.which", return_value="/usr/bin/soffice"), \
                 patch("assessment.services.attempt_downloads.subprocess.run", side_effect=completed):
             self.assertEqual(_render_pdf(b"PK", "document.docx"), b"%PDF-rendered")
 

@@ -830,11 +830,16 @@ def _render_pdf(document_bytes, filename):
         # and profile; the unique profile also prevents concurrent downloads
         # from sharing LibreOffice lock files.
         environment = os.environ.copy()
+        # `gen` is an X11 VCL plugin despite its generic-sounding name. On a
+        # server without an X display it produces "Can't open display" even
+        # with --headless. `svp` is LibreOffice's genuinely headless plugin.
+        environment.pop("DISPLAY", None)
+        environment.pop("WAYLAND_DISPLAY", None)
         environment.update({
             "HOME": str(home),
             "XDG_CACHE_HOME": str(cache),
             "XDG_CONFIG_HOME": str(config),
-            "SAL_USE_VCLPLUGIN": "gen",
+            "SAL_USE_VCLPLUGIN": "svp",
         })
         command = [
             executable,
