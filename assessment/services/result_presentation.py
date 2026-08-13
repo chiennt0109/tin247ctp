@@ -3,7 +3,7 @@ from assessment.services.protected_payload import decrypt_json
 
 
 PARTS = (
-    ("MCQ_SINGLE", "Phần I — Trắc nghiệm nhiều phương án"),
+    ("MCQ_SINGLE", "Phần I — Trắc nghiệm nhiều lựa chọn (NLC)"),
     ("TRUE_FALSE_GROUP", "Phần II — Trắc nghiệm Đúng/Sai"),
 )
 
