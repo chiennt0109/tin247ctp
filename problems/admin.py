@@ -190,10 +190,29 @@ class UploadTestZipForm(forms.Form):
     )
 
 
+class SampleTestCaseInlineForm(forms.ModelForm):
+    """Inline form that can only create or update sample test cases."""
+
+    class Meta:
+        model = TestCase
+        fields = ("is_sample", "input_data", "expected_output")
+        widgets = {"is_sample": forms.HiddenInput()}
+
+    def clean_is_sample(self):
+        return True
+
+
 class TestCaseInline(admin.TabularInline):
     model = TestCase
+    form = SampleTestCaseInlineForm
     extra = 1
     fields = ("is_sample", "input_data", "expected_output")
+
+    def get_queryset(self, request):
+        # Real judging data can be very large. It is managed through the
+        # dedicated test viewer/uploader and must never be included in the
+        # Problem change form POST body.
+        return super().get_queryset(request).filter(is_sample=True)
 
 
 # ========== USER PROGRESS ==========
