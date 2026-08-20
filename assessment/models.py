@@ -74,6 +74,16 @@ class BankQuestion(models.Model):
     estimated_time_seconds = models.PositiveIntegerField(null=True, blank=True)
     content_hash = models.CharField(max_length=64, db_index=True)
     is_available = models.BooleanField(default=False, db_index=True)
+    # Queryable projections of the structured NLS/AI tags in the canonical
+    # workbook NOTE.  The complete source payload remains in source_metadata.
+    nls_frame = models.CharField(max_length=64, blank=True, db_index=True)
+    nls_level = models.CharField(max_length=64, blank=True, db_index=True)
+    nls_primary = models.CharField(max_length=64, blank=True, db_index=True)
+    grad_nls_task = models.CharField(max_length=64, blank=True, db_index=True)
+    ai_component = models.CharField(max_length=32, blank=True, db_index=True)
+    grad_ai_task = models.CharField(max_length=64, blank=True, db_index=True)
+    graduation_gate = models.CharField(max_length=32, blank=True, db_index=True)
+    import_warnings = models.JSONField(default=list, blank=True)
     source_metadata = models.JSONField(default=dict, blank=True)
     last_synced_at = models.DateTimeField(auto_now=True)
     current_revision = models.ForeignKey(
@@ -200,6 +210,7 @@ class AssessmentAuditLog(models.Model):
 class ExamBlueprint(models.Model):
     class Status(models.TextChoices):
         DRAFT = "DRAFT", "Nháp"
+        REVIEW = "REVIEW", "Đang rà soát"
         APPROVED = "APPROVED", "Đã duyệt"
         LOCKED = "LOCKED", "Đã khóa"
 
@@ -321,6 +332,9 @@ class BlueprintSection(models.Model):
 class BlueprintSlot(models.Model):
     section = models.ForeignKey(BlueprintSection, on_delete=models.CASCADE, related_name="slots")
     order = models.PositiveIntegerField(default=0)
+    source_slot_id = models.CharField(max_length=160, blank=True, db_index=True)
+    source_slot_no = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    source_cell_id = models.CharField(max_length=160, blank=True, db_index=True)
     curriculum = models.ForeignKey(
         CurriculumNode, null=True, blank=True, on_delete=models.PROTECT, related_name="blueprint_slots"
     )
@@ -343,6 +357,13 @@ class BlueprintSlot(models.Model):
     shortage_priority = models.PositiveIntegerField(default=0)
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("section", "source_slot_id"),
+                condition=~models.Q(source_slot_id=""),
+                name="assessment_unique_version_source_slot",
+            ),
+        ]
         ordering = ("section__order", "order", "id")
 
     def clean(self):
@@ -491,6 +512,10 @@ class ExamSession(models.Model):
     allow_blueprint_download = models.BooleanField(default=False)
     allow_review = models.BooleanField(default=False)
     allow_retry_after_answers = models.BooleanField(default=False)
+    allow_signup_trial = models.BooleanField(
+        default=False,
+        help_text="Tự động cấp quyền 3 lượt cho tài khoản mới đủ điều kiện dùng thử.",
+    )
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.DRAFT, db_index=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
@@ -528,6 +553,10 @@ class ExamAccessGrant(models.Model):
         VALIDITY = "VALIDITY", "Theo thời gian hiệu lực"
         BOTH = "BOTH", "Theo số lượt và thời gian hiệu lực"
 
+    class GrantSource(models.TextChoices):
+        ADMIN = "ADMIN", "Quản trị viên"
+        AUTO_TRIAL = "AUTO_TRIAL", "Dùng thử tự động"
+
     session = models.ForeignKey(
         ExamSession, on_delete=models.CASCADE, related_name="access_grants",
     )
@@ -546,6 +575,10 @@ class ExamAccessGrant(models.Model):
     valid_from = models.DateTimeField(null=True, blank=True)
     valid_until = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    grant_source = models.CharField(
+        max_length=16, choices=GrantSource.choices, default=GrantSource.ADMIN,
+        help_text="Nguồn tạo quyền; không tham gia tính hoặc giới hạn số lượt.",
+    )
     allow_download = models.BooleanField(
         default=False,
         help_text=(
@@ -580,8 +613,8 @@ class ExamAccessGrant(models.Model):
         if bool(self.user_id) == bool(self.group_id):
             errors["user"] = "Chọn đúng một người dùng hoặc một nhóm người dùng."
         if self.limit_mode in {self.LimitMode.ATTEMPTS, self.LimitMode.BOTH}:
-            if not self.max_attempts:
-                errors["max_attempts"] = "Số lượt làm phải lớn hơn 0."
+            if self.max_attempts is None:
+                errors["max_attempts"] = "Cần nhập số lượt làm (có thể là 0)."
         elif self.max_attempts is not None:
             errors["max_attempts"] = "Chế độ thời gian không sử dụng giới hạn số lượt."
         if self.limit_mode in {self.LimitMode.VALIDITY, self.LimitMode.BOTH}:
@@ -628,12 +661,20 @@ class GeneratedExamQuestion(models.Model):
     blueprint_slot = models.ForeignKey(BlueprintSlot, on_delete=models.PROTECT)
     order = models.PositiveIntegerField()
     question_id_snapshot = models.CharField(max_length=160)
+    family_id_snapshot = models.CharField(max_length=160, blank=True)
+    blueprint_id_snapshot = models.CharField(max_length=160, blank=True)
+    blueprint_version_snapshot = models.PositiveIntegerField(default=1)
+    blueprint_slot_id_snapshot = models.CharField(max_length=160, blank=True)
+    blueprint_slot_no_snapshot = models.PositiveIntegerField(null=True, blank=True)
+    curriculum_id_snapshot = models.CharField(max_length=160, blank=True)
+    outcome_id_snapshot = models.CharField(max_length=160, blank=True)
     source_version_snapshot = models.CharField(max_length=64)
     stem_snapshot = models.TextField()
     options_snapshot = models.JSONField(default=list, blank=True)
     statements_snapshot = models.JSONField(default=list, blank=True)
     protected_answer_snapshot = models.TextField()
     option_order = models.JSONField(default=list, blank=True)
+    statement_order = models.JSONField(default=list, blank=True)
     score = models.DecimalField(max_digits=8, decimal_places=3)
     content_hash_snapshot = models.CharField(max_length=64)
 
@@ -725,6 +766,58 @@ class ExamUsageRecord(models.Model):
         ]
         indexes = [models.Index(fields=("user", "exam_session", "status"), name="assessment_usage_quota_idx")]
         ordering = ("-created_at",)
+
+
+class TrialEntitlement(models.Model):
+    """Privacy-preserving signup eligibility; runtime quota remains in access grants."""
+
+    class Status(models.TextChoices):
+        ACTIVE = "ACTIVE", "Bình thường"
+        REVIEW_REQUIRED = "REVIEW_REQUIRED", "Cần xem xét"
+        REVOKED = "REVOKED", "Đã thu hồi"
+
+    status = models.CharField(max_length=24, choices=Status.choices, default=Status.ACTIVE, db_index=True)
+    created_reason = models.CharField(max_length=32, default="SIGNUP")
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="reviewed_trial_entitlements",
+    )
+
+class TrialDevice(models.Model):
+    entitlement = models.ForeignKey(TrialEntitlement, on_delete=models.PROTECT, related_name="devices")
+    device_hash = models.CharField(max_length=64, unique=True)
+    first_seen_at = models.DateTimeField(auto_now_add=True)
+    last_seen_at = models.DateTimeField(auto_now=True)
+
+
+class TrialAccountLink(models.Model):
+    entitlement = models.ForeignKey(TrialEntitlement, on_delete=models.PROTECT, related_name="account_links")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="general_it_trial_link",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class TrialAuditEvent(models.Model):
+    entitlement = models.ForeignKey(
+        TrialEntitlement, null=True, blank=True, on_delete=models.PROTECT, related_name="audit_events",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="trial_audit_events",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="authored_trial_audit_events",
+    )
+    event_type = models.CharField(max_length=40, db_index=True)
+    device_hash = models.CharField(max_length=64, blank=True)
+    ip_hash = models.CharField(max_length=64, blank=True, db_index=True)
+    details = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
 
 class ExamAttempt(models.Model):

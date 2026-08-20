@@ -1,6 +1,7 @@
 import io
 import json
 import zipfile
+from unittest.mock import patch
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
@@ -10,6 +11,7 @@ from django.test.utils import CaptureQueriesContext
 from django.db import connection
 from django.urls import reverse
 from django.utils import timezone
+from openpyxl import load_workbook
 
 from assessment.models import (
     AttemptAnswer, ExamAccessGrant, ExamAttempt, ExamResourcePackage, ExamUsageRecord,
@@ -18,7 +20,7 @@ from assessment.services.attempt_service import (
     AttemptStateError, StaleAttemptVersion, save_answers, submit_attempt,
 )
 from assessment.services.resource_packages import create_resource_package
-from assessment.services.attempt_downloads import build_attempt_download_zip
+from assessment.services.attempt_downloads import ExportValidationError, build_attempt_download_zip
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.admin_workflow import close_exam_session
 from assessment.services.usage_ledger import committed_usage_count
@@ -136,6 +138,27 @@ class AttemptServiceTests(TestCase):
         self.assertContains(visible, "Ma trận + đặc tả")
         self.assertNotContains(visible, "Đề + đáp án")
 
+    def test_my_resources_hides_redownload_actions_without_current_permission(self):
+        user, attempt = self.create_attempt("resources-download-ui")
+        self.client.force_login(user)
+        attempt_exam_url = reverse(
+            "assessment:attempt_download", args=(attempt.pk, "exam"),
+        )
+
+        hidden = self.client.get(reverse("assessment:my_resources"))
+
+        self.assertEqual(hidden.status_code, 200)
+        self.assertNotContains(hidden, attempt_exam_url)
+
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        visible = self.client.get(reverse("assessment:my_resources"))
+
+        self.assertContains(visible, attempt_exam_url)
+
     def test_download_exam_zip_is_bounded_and_uses_generated_snapshot(self):
         user, attempt = self.create_attempt("download-zip")
         ExamAccessGrant.objects.create(
@@ -154,23 +177,8 @@ class AttemptServiceTests(TestCase):
             "assessment:attempt_download", args=(attempt.pk, "exam"),
         ) + "?variants=4")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/zip")
-        with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
-            names = set(archive.namelist())
-            root = f"GOI_DE_{attempt.generated_exam.code}"
-            self.assertIn(f"{root}/01_DE_THI_{attempt.generated_exam.code}.docx", names)
-            self.assertIn(f"{root}/01_DE_THI_{attempt.generated_exam.code}.pdf", names)
-            self.assertIn(f"{root}/05_SNAPSHOT_{attempt.generated_exam.code}.xlsx", names)
-            self.assertIn(f"{root}/06_MANIFEST_{attempt.generated_exam.code}.txt", names)
-            self.assertFalse(any(name.endswith(".json") for name in names))
-            docx_payload = archive.read(f"{root}/01_DE_THI_{attempt.generated_exam.code}.docx")
-            pdf_payload = archive.read(f"{root}/01_DE_THI_{attempt.generated_exam.code}.pdf")
-            manifest_text = archive.read(f"{root}/06_MANIFEST_{attempt.generated_exam.code}.txt").decode()
-        self.assertTrue(docx_payload.startswith(b"PK"))
-        self.assertTrue(pdf_payload.startswith(b"%PDF"))
-        self.assertIn(attempt.session.name, manifest_text)
-        self.assertNotIn("answer_key", manifest_text)
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "MISSING_PDF_RENDERER", status_code=400)
 
 
     def test_full_standard_zip_contains_required_files_without_json_and_preserves_order(self):
@@ -182,35 +190,55 @@ class AttemptServiceTests(TestCase):
             allow_download=True,
         )
 
-        payload = build_attempt_download_zip(attempt=attempt, user=user, package="exam_answers", variants=1)
+        with self.assertRaisesMessage(ExportValidationError, "MISSING_PDF_RENDERER"):
+            build_attempt_download_zip(attempt=attempt, user=user, package="exam_answers", variants=1)
         after = list(attempt.generated_exam.questions.order_by("order").values_list("question_id_snapshot", "order", "option_order"))
 
         self.assertEqual(before, after)
-        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
-            names = set(archive.namelist())
-            root = f"GOI_DE_{attempt.generated_exam.code}"
-            required = {
-                f"{root}/01_DE_THI_{attempt.generated_exam.code}.docx",
-                f"{root}/01_DE_THI_{attempt.generated_exam.code}.pdf",
-                f"{root}/02_DAP_AN_{attempt.generated_exam.code}.docx",
-                f"{root}/02_DAP_AN_{attempt.generated_exam.code}.pdf",
-                f"{root}/03_MA_TRAN_{attempt.generated_exam.code}.xlsx",
-                f"{root}/03_MA_TRAN_{attempt.generated_exam.code}.pdf",
-                f"{root}/04_BAN_DAC_TA_{attempt.generated_exam.code}.docx",
-                f"{root}/04_BAN_DAC_TA_{attempt.generated_exam.code}.pdf",
-                f"{root}/05_SNAPSHOT_{attempt.generated_exam.code}.xlsx",
-                f"{root}/06_MANIFEST_{attempt.generated_exam.code}.txt",
-                f"{root}/07_VALIDATION_REPORT_{attempt.generated_exam.code}.txt",
-                f"{root}/README.txt",
-            }
-            self.assertTrue(required.issubset(names))
-            self.assertFalse(any(name.endswith(".json") for name in names))
-            answer_docx = archive.read(f"{root}/02_DAP_AN_{attempt.generated_exam.code}.docx")
-            matrix_xlsx = archive.read(f"{root}/03_MA_TRAN_{attempt.generated_exam.code}.xlsx")
-            report = archive.read(f"{root}/07_VALIDATION_REPORT_{attempt.generated_exam.code}.txt").decode()
-        self.assertGreater(len(answer_docx), 100)
-        self.assertTrue(matrix_xlsx.startswith(b"PK"))
-        self.assertIn("PASS | GeneratedExam integrity", report)
+
+    def test_form_package_succeeds_with_pdf_renderer_and_is_reproducible(self):
+        user, attempt = self.create_attempt("form-download")
+        ExamAccessGrant.objects.create(
+            session=attempt.session, user=user,
+            limit_mode=ExamAccessGrant.LimitMode.ATTEMPTS, max_attempts=2,
+            allow_download=True,
+        )
+        with patch("assessment.services.attempt_downloads._render_pdf", return_value=b"%PDF-rendered"):
+            first = build_attempt_download_zip(
+                attempt=attempt, user=user, package="exam_answers", variants=1,
+            )
+            second = build_attempt_download_zip(
+                attempt=attempt, user=user, package="exam_answers", variants=1,
+            )
+
+        def semantic_files(payload):
+            with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                result = {}
+                for name in archive.namelist():
+                    short = name.split("/", 1)[1]
+                    data = archive.read(name)
+                    if short.endswith(".docx"):
+                        with zipfile.ZipFile(io.BytesIO(data)) as document:
+                            data = document.read("word/document.xml")
+                    elif short.endswith(".xlsx"):
+                        workbook = load_workbook(io.BytesIO(data), data_only=False)
+                        data = tuple(
+                            (sheet.title, tuple(tuple(cell.value for cell in row) for row in sheet.iter_rows()))
+                            for sheet in workbook.worksheets
+                        )
+                    elif short.endswith(".txt"):
+                        continue
+                    result[short] = data
+                return result
+
+        self.assertEqual(semantic_files(first), semantic_files(second))
+        with zipfile.ZipFile(io.BytesIO(first)) as archive:
+            matrix_name = next(name for name in archive.namelist() if name.endswith(".xlsx") and "MA_TRAN" in name)
+            workbook = load_workbook(io.BytesIO(archive.read(matrix_name)))
+        self.assertEqual(
+            workbook.sheetnames,
+            ["THONG_TIN", "MA_TRAN", "BAN_DAC_TA", "DANH_SACH_CAU", "TINH_TOAN"],
+        )
 
     def test_download_denied_without_grant_or_for_another_user(self):
         user, attempt = self.create_attempt("download-denied-owner")
@@ -269,7 +297,8 @@ class AttemptServiceTests(TestCase):
         ) + "?variants=1")
 
         self.assertEqual(first.pk, second.pk)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "MISSING_PDF_RENDERER", status_code=400)
         self.assertEqual(committed_usage_count(user, session), 1)
 
     def test_stale_reservation_cleanup_releases_usage_without_deleting_real_data(self):

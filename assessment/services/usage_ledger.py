@@ -19,6 +19,11 @@ def usage_breakdown(user, session):
 
 
 def reserve_usage(*, user, session, usage_type, idempotency_key):
+    existing = ExamUsageRecord.objects.filter(
+        user=user, exam_session=session, idempotency_key=idempotency_key,
+    ).first()
+    if existing:
+        return existing, False
     record, created = ExamUsageRecord.objects.get_or_create(
         user=user, exam_session=session, idempotency_key=idempotency_key,
         defaults={"usage_type": usage_type, "status": ExamUsageRecord.Status.RESERVED},

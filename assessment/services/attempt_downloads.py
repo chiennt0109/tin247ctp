@@ -1,12 +1,17 @@
 import hashlib
 import io
+import os
 import re
 import zipfile
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
 from dataclasses import dataclass
 from decimal import Decimal
-from xml.sax.saxutils import escape
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.conf import settings
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -17,6 +22,8 @@ from assessment.services.protected_payload import decrypt_json
 MAX_VARIANTS = 8
 VARIANT_CHOICES = {1, 4, 8}
 FULL_PACKAGE = "exam_answers"
+class ExportValidationError(ValidationError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -156,6 +163,9 @@ def _context_from_resource_package(resource_package, *, package, variants, grant
 
 
 def _build_standard_zip(ctx):
+    errors = _semantic_validation_errors(ctx)
+    if errors:
+        raise ExportValidationError(errors)
     files = _build_export_files(ctx)
     archive_buffer = io.BytesIO()
     with zipfile.ZipFile(archive_buffer, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
@@ -173,26 +183,30 @@ def _build_export_files(ctx):
     files = {}
     if include_exam:
         exam_lines = _exam_lines(ctx, include_answers=False)
-        files[f"01_DE_THI_{code}.docx"] = _docx_bytes(f"Đề thi {code}", exam_lines)
-        files[f"01_DE_THI_{code}.pdf"] = _pdf_bytes(exam_lines, landscape=False)
+        exam_docx = _form_docx_bytes(f"Đề thi {code}", exam_lines)
+        files[f"01_DE_THI_{code}.docx"] = exam_docx
+        files[f"01_DE_THI_{code}.pdf"] = _render_pdf(exam_docx, f"01_DE_THI_{code}.docx")
     if include_answers:
         answer_lines = _answer_lines(ctx)
-        files[f"02_DAP_AN_{code}.docx"] = _docx_bytes(f"Đáp án {code}", answer_lines)
-        files[f"02_DAP_AN_{code}.pdf"] = _pdf_bytes(answer_lines, landscape=False)
+        answer_docx = _form_docx_bytes(f"Đáp án {code}", answer_lines)
+        files[f"02_DAP_AN_{code}.docx"] = answer_docx
+        files[f"02_DAP_AN_{code}.pdf"] = _render_pdf(answer_docx, f"02_DAP_AN_{code}.docx")
     if include_blueprint:
         matrix_rows = _matrix_rows(ctx)
         spec_rows = _spec_rows(ctx, public=False)
-        files[f"03_MA_TRAN_{code}.xlsx"] = _xlsx_bytes({"MA_TRAN": matrix_rows})
-        files[f"03_MA_TRAN_{code}.pdf"] = _pdf_bytes(_rows_to_lines(matrix_rows), landscape=True)
-        files[f"04_BAN_DAC_TA_{code}.docx"] = _docx_bytes(f"Bản đặc tả {code}", _rows_to_lines(spec_rows))
-        files[f"04_BAN_DAC_TA_{code}.pdf"] = _pdf_bytes(_rows_to_lines(spec_rows), landscape=True)
+        matrix_xlsx = _form_xlsx_bytes(ctx, matrix_rows, spec_rows)
+        files[f"03_MA_TRAN_{code}.xlsx"] = matrix_xlsx
+        files[f"03_MA_TRAN_{code}.pdf"] = _render_pdf(matrix_xlsx, f"03_MA_TRAN_{code}.xlsx")
+        spec_docx = _form_docx_bytes(f"Bản đặc tả {code}", _rows_to_lines(spec_rows))
+        files[f"04_BAN_DAC_TA_{code}.docx"] = spec_docx
+        files[f"04_BAN_DAC_TA_{code}.pdf"] = _render_pdf(spec_docx, f"04_BAN_DAC_TA_{code}.docx")
     snapshot_sheets = _snapshot_sheets(ctx)
-    files[f"05_SNAPSHOT_{code}.xlsx"] = _xlsx_bytes(snapshot_sheets)
+    files[f"INTERNAL/05_SNAPSHOT_{code}.xlsx"] = _xlsx_bytes(snapshot_sheets)
     validation = _validation_lines(ctx, files)
-    files[f"07_VALIDATION_REPORT_{code}.txt"] = "\n".join(validation).encode("utf-8")
+    files[f"INTERNAL/07_VALIDATION_REPORT_{code}.txt"] = "\n".join(validation).encode("utf-8")
     manifest = _manifest_lines(ctx, files)
-    files[f"06_MANIFEST_{code}.txt"] = "\n".join(manifest).encode("utf-8")
-    files["README.txt"] = "\n".join(_readme_lines(ctx)).encode("utf-8")
+    files[f"INTERNAL/06_MANIFEST_{code}.txt"] = "\n".join(manifest).encode("utf-8")
+    files["INTERNAL/README.txt"] = "\n".join(_readme_lines(ctx)).encode("utf-8")
     return files
 
 
@@ -216,6 +230,11 @@ def _exam_lines(ctx, *, include_answers):
     lines.extend(["", "PHẦN II — TRẮC NGHIỆM ĐÚNG/SAI"])
     for question in _tf_questions(ctx):
         lines.extend(_question_exam_lines(question, include_answers=include_answers))
+    manual = _manual_questions(ctx)
+    if manual:
+        lines.extend(["", "PHẦN III — TỰ LUẬN/THỰC HÀNH"])
+        for question in manual:
+            lines.extend(_question_exam_lines(question, include_answers=include_answers))
     return lines
 
 
@@ -252,6 +271,13 @@ def _answer_lines(ctx):
         for question in tf:
             answer = _tf_answer_map(question)
             lines.append(f"{question.order} | {answer.get('a', 'NEEDS_REVIEW')} | {answer.get('b', 'NEEDS_REVIEW')} | {answer.get('c', 'NEEDS_REVIEW')} | {answer.get('d', 'NEEDS_REVIEW')}")
+    manual = _manual_questions(ctx)
+    if manual:
+        lines.extend(["", "PHẦN III — HƯỚNG DẪN CHẤM TỰ LUẬN/THỰC HÀNH"])
+        for question in manual:
+            payload = decrypt_json(question.protected_answer_snapshot)
+            guide = payload.get("answer_guide") or payload.get("answer_key") or "NEEDS_REVIEW"
+            lines.extend([f"Câu {question.order} ({question.score} điểm)", str(guide), ""])
     return lines
 
 
@@ -263,28 +289,18 @@ def _tf_questions(ctx):
     return [q for q in ctx.questions if q.statements_snapshot]
 
 
+def _manual_questions(ctx):
+    return [q for q in ctx.questions if q.bank_question.question_type in {"ESSAY", "PRACTICAL"}]
+
+
 def _ordered_options(question):
-    options = list(question.options_snapshot or [])
-    order = question.option_order or list(range(len(options)))
-    ordered = []
-    for index in order:
-        try:
-            ordered.append(options[int(index)])
-        except (ValueError, TypeError, IndexError):
-            continue
-    return ordered or options
+    # GeneratedExamQuestion stores the already-displayed snapshot. The order
+    # vector is retained solely to map answers back to canonical bank indexes.
+    return list(question.options_snapshot or [])
 
 
 def _ordered_statements(question):
-    statements = list(question.statements_snapshot or [])
-    order = question.option_order or list(range(len(statements)))
-    ordered = []
-    for index in order:
-        try:
-            ordered.append(statements[int(index)])
-        except (ValueError, TypeError, IndexError):
-            continue
-    return ordered or statements
+    return list(question.statements_snapshot or [])
 
 
 def _mcq_answer_label(question):
@@ -307,7 +323,7 @@ def _tf_answer_map(question):
         values = raw[:4]
     else:
         values = []
-    order = question.option_order or list(range(len(values)))
+    order = question.statement_order or list(range(len(values)))
     result = {}
     for display_index in range(4):
         try:
@@ -341,8 +357,11 @@ def _text(value):
 def _matrix_rows(ctx):
     header = [
         "TT", "Chương/Chủ đề", "Nội dung/Đơn vị kiến thức",
-        "TNKQ-NLC: Biết", "TNKQ-NLC: Hiểu", "TNKQ-NLC: Vận dụng",
-        "TNKQ-ĐS: Biết", "TNKQ-ĐS: Hiểu", "TNKQ-ĐS: Vận dụng",
+        "Trắc nghiệm nhiều lựa chọn (NLC): Biết",
+        "Trắc nghiệm nhiều lựa chọn (NLC): Hiểu",
+        "Trắc nghiệm nhiều lựa chọn (NLC): Vận dụng",
+        "Trắc nghiệm Đúng/Sai: Biết", "Trắc nghiệm Đúng/Sai: Hiểu",
+        "Trắc nghiệm Đúng/Sai: Vận dụng",
         "Tổng: Biết", "Tổng: Hiểu", "Tổng: Vận dụng", "Tỉ lệ % điểm",
     ]
     buckets = {}
@@ -356,15 +375,22 @@ def _matrix_rows(ctx):
         )
         bucket = buckets.setdefault(key, {
             "topic": getattr(curriculum, "topic_name", "NEEDS_REVIEW"),
-            "unit": getattr(outcome, "text", "NEEDS_REVIEW"),
+            # Outcome.text is the required learning outcome, not the knowledge
+            # unit. Keep the taxonomy levels separate in exported forms.
+            "unit": getattr(outcome, "code", "NEEDS_REVIEW"),
             "cells": {name: [] for name in header[3:12]},
             "score": Decimal("0"),
         })
-        level = _level_name(slot.cognitive_level or question.bank_question.cognitive_level)
-        qtype = "TNKQ-ĐS" if question.statements_snapshot else "TNKQ-NLC"
-        positions = _positions(question)
-        bucket["cells"].setdefault(f"{qtype}: {level}", []).extend(positions)
-        bucket["cells"].setdefault(f"Tổng: {level}", []).extend(positions)
+        if question.statements_snapshot:
+            for position, statement in zip(_positions(question), _ordered_statements(question), strict=True):
+                level = _level_name(statement.get("cognitive_level") if isinstance(statement, dict) else "")
+                bucket["cells"].setdefault(f"Trắc nghiệm Đúng/Sai: {level}", []).append(position)
+                bucket["cells"].setdefault(f"Tổng: {level}", []).append(position)
+        elif question.bank_question.question_type == "MCQ_SINGLE":
+            level = _level_name(slot.cognitive_level or question.bank_question.cognitive_level)
+            positions = _positions(question)
+            bucket["cells"].setdefault(f"Trắc nghiệm nhiều lựa chọn (NLC): {level}", []).extend(positions)
+            bucket["cells"].setdefault(f"Tổng: {level}", []).extend(positions)
         bucket["score"] += Decimal(question.score)
     rows = [header]
     total_score = sum((Decimal(q.score) for q in ctx.questions), Decimal("0")) or Decimal("1")
@@ -386,9 +412,14 @@ def _matrix_rows(ctx):
 
 
 def _positions(question):
+    slot_no = (
+        question.blueprint_slot_no_snapshot
+        or question.blueprint_slot.source_slot_no
+        or question.order
+    )
     if question.statements_snapshot:
-        return [f"Câu {question.order}{chr(97 + i)}" for i, _ in enumerate(_ordered_statements(question))]
-    return [f"Câu {question.order}"]
+        return [f"Câu {slot_no}{chr(97 + i)}" for i, _ in enumerate(_ordered_statements(question))]
+    return [f"Câu {slot_no}"]
 
 
 def _count_cell(positions):
@@ -408,6 +439,15 @@ def _command_count(ctx):
     return sum(len(q.statements_snapshot) if q.statements_snapshot else 1 for q in ctx.questions)
 
 
+def _tf_cognitive_profile(question):
+    counts = {"BIET": 0, "HIEU": 0, "VANDUNG": 0}
+    for statement in _ordered_statements(question):
+        level = str(statement.get("cognitive_level") or "") if isinstance(statement, dict) else ""
+        if level in counts:
+            counts[level] += 1
+    return f"B{counts['BIET']}-H{counts['HIEU']}-V{counts['VANDUNG']}"
+
+
 def _spec_rows(ctx, *, public):
     rows = [[
         "TT", "Chủ đề", "Nội dung/Đơn vị kiến thức", "Curriculum_ID", "Outcome_ID",
@@ -421,12 +461,17 @@ def _spec_rows(ctx, *, public):
         rows.append([
             index,
             getattr(curriculum, "topic_name", "NEEDS_REVIEW"),
-            getattr(outcome, "text", "NEEDS_REVIEW"),
+            getattr(outcome, "code", "NEEDS_REVIEW"),
             getattr(curriculum, "source_id", "NEEDS_REVIEW"),
             getattr(outcome, "source_id", "NEEDS_REVIEW"),
             getattr(outcome, "text", "NEEDS_REVIEW"),
-            "Đúng/Sai" if question.statements_snapshot else "Nhiều lựa chọn",
-            slot.cognitive_level or question.bank_question.cognitive_level or "NEEDS_REVIEW",
+            ({"ESSAY": "Tự luận", "PRACTICAL": "Thực hành"}.get(
+                question.bank_question.question_type,
+                "Trắc nghiệm Đúng/Sai" if question.statements_snapshot else
+                "Trắc nghiệm nhiều lựa chọn (NLC)",
+            )),
+            (_tf_cognitive_profile(question) if question.statements_snapshot else
+             slot.cognitive_level or question.bank_question.cognitive_level or "NEEDS_REVIEW"),
             slot.competency or question.bank_question.competency or "NEEDS_REVIEW",
             len(question.statements_snapshot) if question.statements_snapshot else 1,
             str(question.score),
@@ -447,7 +492,12 @@ def _snapshot_sheets(ctx):
             question.blueprint_slot_id, str(question.score), question.content_hash_snapshot,
         ])
         order_rows.append([
-            question.order, "STATEMENT" if question.statements_snapshot else "OPTION", ",".join(map(str, question.option_order or [])),
+            question.order,
+            ("STATEMENT" if question.statements_snapshot else
+             "MANUAL" if question.bank_question.question_type in {"ESSAY", "PRACTICAL"} else "OPTION"),
+            ",".join(map(str, (
+                question.statement_order if question.statements_snapshot else question.option_order
+            ) or [])),
         ])
         source_rows.append([
             question.order, question.question_id_snapshot,
@@ -487,36 +537,15 @@ def _scoring_rows(ctx):
 
 
 def _validation_lines(ctx, files):
-    checks = []
-    ids = [q.question_id_snapshot for q in ctx.questions]
-    families = [q.bank_question.duplicate_family_id for q in ctx.questions if q.bank_question.duplicate_family_id]
-    checks.append(("GeneratedExam integrity", bool(ctx.generated_exam.pk and ctx.questions)))
-    checks.append(("Snapshot completeness", all(q.stem_snapshot and q.protected_answer_snapshot for q in ctx.questions)))
-    checks.append(("Blueprint reference", bool(ctx.blueprint_version_id if hasattr(ctx, 'blueprint_version_id') else ctx.blueprint_version.pk)))
-    checks.append(("Question count", len(ctx.questions) == ctx.blueprint_version.expected_question_count))
-    checks.append(("Question_ID uniqueness", len(ids) == len(set(ids))))
-    checks.append(("Family_ID uniqueness", len(families) == len(set(families))))
-    checks.append(("Answer-key consistency", all(bool(decrypt_json(q.protected_answer_snapshot)) for q in ctx.questions)))
-    checks.append(("Option order consistency", all(_order_is_valid(q) for q in ctx.questions if q.options_snapshot)))
-    checks.append(("Statement order consistency", all(_order_is_valid(q) for q in ctx.questions if q.statements_snapshot)))
-    checks.append(("Cognitive distribution", True))
-    checks.append(("Question-type distribution", True))
-    checks.append(("Score total", sum(Decimal(q.score) for q in ctx.questions) == Decimal(ctx.generated_exam.total_score)))
-    checks.append(("Command total", _command_count(ctx) >= len(ctx.questions)))
-    checks.append(("Duration", ctx.session.duration_minutes > 0))
-    checks.append(("DOCX creation", any(name.endswith(".docx") for name in files)))
-    checks.append(("PDF creation", any(name.endswith(".pdf") for name in files)))
-    checks.append(("XLSX creation", any(name.endswith(".xlsx") for name in files)))
-    checks.append(("ZIP creation", True))
-    checks.append(("Reproducibility", True))
-    checks.append(("Download permission", bool(ctx.grant_id)))
-    checks.append(("Usage commit status", True))
-    return [f"{'PASS' if passed else 'FAIL'} | {name}" for name, passed in checks]
+    errors = _semantic_validation_errors(ctx)
+    return ([f"FAIL | {error}" for error in errors] or ["PASS | SEMANTIC_SNAPSHOT_VALIDATION"])
 
 
 def _order_is_valid(question):
     size = len(question.options_snapshot or question.statements_snapshot or [])
-    order = question.option_order or list(range(size))
+    order = (
+        question.statement_order if question.statements_snapshot else question.option_order
+    ) or list(range(size))
     return sorted([int(x) for x in order]) == list(range(size))
 
 
@@ -538,8 +567,108 @@ def _manifest_lines(ctx, files):
     lines.append("")
     lines.append("QUESTIONS:")
     for question in ctx.questions:
-        lines.append(f"- {question.order}: {question.question_id_snapshot}@{question.source_version_snapshot} | order={question.option_order}")
+        order = question.statement_order if question.statements_snapshot else question.option_order
+        lines.append(f"- {question.order}: {question.question_id_snapshot}@{question.source_version_snapshot} | order={order}")
     return lines
+
+
+def _cognitive_distribution(questions):
+    result = {"BIET": 0, "HIEU": 0, "VANDUNG": 0}
+    for question in questions:
+        if question.statements_snapshot:
+            for statement in _ordered_statements(question):
+                level = str(statement.get("cognitive_level") or "") if isinstance(statement, dict) else ""
+                if level not in result:
+                    continue
+                result[level] += 1
+        else:
+            level = question.blueprint_slot.cognitive_level or question.bank_question.cognitive_level
+            if level in result:
+                result[level] += 1
+    return result
+
+
+def _semantic_validation_errors(ctx):
+    errors = []
+    questions = list(ctx.questions)
+    slots = [
+        slot for section in ctx.blueprint_version.sections.all()
+        for slot in section.slots.all()
+    ]
+    ids = [q.question_id_snapshot for q in questions]
+    families = [q.family_id_snapshot or q.bank_question.duplicate_family_id for q in questions]
+    families = [value for value in families if value]
+    positions = [q.blueprint_slot_no_snapshot or q.blueprint_slot.source_slot_no or q.order for q in questions]
+    if len(ids) != len(set(ids)):
+        errors.append("QUESTION_ID_DUPLICATE")
+    if len(families) != len(set(families)):
+        errors.append("FAMILY_ID_DUPLICATE")
+    if len(positions) != len(set(positions)):
+        errors.append("POSITION_DUPLICATE")
+    if len(questions) != ctx.blueprint_version.expected_question_count:
+        errors.append("QUESTION_GROUP_TOTAL_MISMATCH")
+    expected_types = {}
+    for slot in slots:
+        expected_types[slot.question_type] = expected_types.get(slot.question_type, 0) + slot.quantity
+    actual_types = {}
+    for question in questions:
+        qtype = question.bank_question.question_type
+        actual_types[qtype] = actual_types.get(qtype, 0) + 1
+    if expected_types != actual_types:
+        errors.append("QUESTION_TYPE_DISTRIBUTION_MISMATCH")
+    if sum(Decimal(q.score) for q in questions) != Decimal(ctx.generated_exam.total_score):
+        errors.append("SCORE_TOTAL_MISMATCH")
+    by_slot = {q.blueprint_slot_id: q for q in questions}
+    for slot in slots:
+        question = by_slot.get(slot.pk)
+        if not question:
+            errors.append("BLUEPRINT_SLOT_MISMATCH")
+            continue
+        if question.bank_question.question_type != slot.question_type:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        expected_slot_no = slot.source_slot_no
+        actual_slot_no = question.blueprint_slot_no_snapshot
+        if expected_slot_no is not None and actual_slot_no != expected_slot_no:
+            errors.append("BLUEPRINT_SLOT_MISMATCH")
+        if slot.source_slot_id and question.blueprint_slot_id_snapshot != slot.source_slot_id:
+            errors.append("BLUEPRINT_SLOT_MISMATCH")
+        if question.blueprint_id_snapshot != (ctx.blueprint.source_blueprint_id or str(ctx.blueprint.pk)):
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if question.blueprint_version_snapshot != ctx.blueprint_version.version:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if slot.curriculum_id and question.curriculum_id_snapshot != slot.curriculum.source_id:
+            errors.append("CURRICULUM_MISMATCH")
+        if slot.outcome_id and question.outcome_id_snapshot != slot.outcome.source_id:
+            errors.append("OUTCOME_MISMATCH")
+        if (slot.question_type != "TRUE_FALSE_GROUP" and slot.cognitive_level
+                and question.bank_question.cognitive_level != slot.cognitive_level):
+            errors.append("COGNITIVE_DISTRIBUTION_MISMATCH")
+        if slot.difficulty is not None and question.bank_question.difficulty != slot.difficulty:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if slot.competency and question.bank_question.competency != slot.competency:
+            errors.append("BLUEPRINT_CELL_MISMATCH")
+        if Decimal(question.score) != Decimal(slot.score_per_item):
+            errors.append("SCORE_TOTAL_MISMATCH")
+    for question in questions:
+        if question.statements_snapshot:
+            if not _order_is_valid(question):
+                errors.append("STATEMENT_ORDER_INVALID")
+            if any(not isinstance(s, dict) or not s.get("cognitive_level") for s in question.statements_snapshot):
+                errors.append("STATEMENT_LEVEL_METADATA_MISSING")
+        elif question.options_snapshot and not _order_is_valid(question):
+            errors.append("OPTION_ORDER_INVALID")
+    note = str(ctx.blueprint_version.source_snapshot.get("NOTE") or "")
+    target = re.search(r"TOTAL_COMMANDS=(\d+)", note)
+    if target and _command_count(ctx) != int(target.group(1)):
+        errors.append("COMMAND_TOTAL_MISMATCH")
+    cognitive_target = re.search(
+        r"TOTAL_COMMAND_TARGET=BIET:(\d+),HIEU:(\d+),VANDUNG:(\d+)", note,
+    )
+    if cognitive_target:
+        expected = dict(zip(("BIET", "HIEU", "VANDUNG"), map(int, cognitive_target.groups()), strict=True))
+        if _cognitive_distribution(questions) != expected:
+            errors.append("COGNITIVE_DISTRIBUTION_MISMATCH")
+    return list(dict.fromkeys(errors))
 
 
 def _readme_lines(ctx):
@@ -555,58 +684,6 @@ def _readme_lines(ctx):
 
 def _rows_to_lines(rows):
     return [" | ".join(map(str, row)) for row in rows]
-
-
-def _docx_bytes(title, lines):
-    body = [f"<w:p><w:r><w:t>{escape(title)}</w:t></w:r></w:p>"]
-    for line in lines:
-        text = escape(str(line))
-        body.append(f"<w:p><w:r><w:t xml:space=\"preserve\">{text}</w:t></w:r></w:p>")
-    document = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>{''.join(body)}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134"/></w:sectPr></w:body></w:document>"""
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("[Content_Types].xml", """<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>""")
-        zf.writestr("_rels/.rels", """<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>""")
-        zf.writestr("word/document.xml", document.encode("utf-8"))
-    buffer.seek(0)
-    return buffer.getvalue()
-
-
-def _pdf_bytes(lines, *, landscape=False):
-    width, height = (842, 595) if landscape else (595, 842)
-    chunks = []
-    y = height - 40
-    for line in lines[:70]:
-        chunks.append(f"BT /F1 10 Tf 40 {y} Td {_pdf_text(str(line)[:110])} Tj ET")
-        y -= 14
-        if y < 40:
-            break
-    stream = "\n".join(chunks).encode("utf-8")
-    objects = [
-        b"<< /Type /Catalog /Pages 2 0 R >>",
-        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {width} {height}] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>".encode(),
-        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-        b"<< /Length " + str(len(stream)).encode() + b" >>\nstream\n" + stream + b"\nendstream",
-    ]
-    pdf = bytearray(b"%PDF-1.4\n")
-    offsets = []
-    for index, obj in enumerate(objects, start=1):
-        offsets.append(len(pdf))
-        pdf.extend(f"{index} 0 obj\n".encode() + obj + b"\nendobj\n")
-    xref = len(pdf)
-    pdf.extend(f"xref\n0 {len(objects)+1}\n0000000000 65535 f \n".encode())
-    for offset in offsets:
-        pdf.extend(f"{offset:010d} 00000 n \n".encode())
-    pdf.extend(f"trailer << /Size {len(objects)+1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF".encode())
-    return bytes(pdf)
-
-
-def _pdf_text(text):
-    # UTF-16BE hex string keeps Vietnamese bytes in the PDF without embedding fonts.
-    data = ("\ufeff" + text).encode("utf-16-be")
-    return "<" + data.hex().upper() + ">"
 
 
 def _xlsx_bytes(sheets):
@@ -636,3 +713,196 @@ def _xlsx_bytes(sheets):
 def _safe_name(value):
     cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(value)).strip("._")
     return cleaned or "EXAM"
+
+
+def _form_docx_bytes(title, lines):
+    """Build the editable assessment form using the approved 07_EXPORT styling."""
+    try:
+        from docx import Document
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+        from docx.shared import Cm, Pt, RGBColor
+    except ImportError as exc:
+        raise ExportValidationError("MISSING_DOCX_RENDERER: install python-docx") from exc
+
+    document = Document()
+    section = document.sections[0]
+    section.top_margin = Cm(1.5)
+    section.bottom_margin = Cm(1.5)
+    section.left_margin = Cm(1.7)
+    section.right_margin = Cm(1.7)
+    normal = document.styles["Normal"]
+    normal.font.name = "Carlito"
+    normal.font.size = Pt(11)
+    normal._element.rPr.rFonts.set(qn("w:eastAsia"), "Carlito")
+
+    heading = document.add_paragraph()
+    heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    heading.paragraph_format.space_after = Pt(10)
+    run = heading.add_run(title.upper())
+    run.bold = True
+    run.font.name = "Carlito"
+    run.font.size = Pt(15)
+    run.font.color.rgb = RGBColor(31, 78, 121)
+    for line in lines:
+        text = str(line)
+        paragraph = document.add_paragraph()
+        paragraph.paragraph_format.space_after = Pt(3)
+        paragraph.paragraph_format.line_spacing = 1.05
+        run = paragraph.add_run(text)
+        if text.startswith(("PHẦN ", "I. ", "II. ", "III. ", "IV. ")):
+            run.bold = True
+            run.font.color.rgb = RGBColor(31, 78, 121)
+            paragraph.paragraph_format.keep_with_next = True
+        elif text.startswith("Câu "):
+            run.bold = True
+            paragraph.paragraph_format.keep_with_next = True
+        elif text.startswith(("A. ", "B. ", "C. ", "D. ", "a) ", "b) ", "c) ", "d) ")):
+            paragraph.paragraph_format.left_indent = Cm(0.6)
+
+    footer = section.footer.paragraphs[0]
+    footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    footer.add_run("Trang ")
+    field = OxmlElement("w:fldSimple")
+    field.set(qn("w:instr"), "PAGE")
+    footer._p.append(field)
+    buffer = io.BytesIO()
+    document.save(buffer)
+    return buffer.getvalue()
+
+
+def _style_form_sheet(sheet, *, title=None):
+    dark_blue = "1F4E78"
+    sheet.freeze_panes = "A2"
+    sheet.sheet_view.showGridLines = False
+    sheet.page_setup.orientation = "landscape"
+    sheet.page_setup.fitToWidth = 1
+    sheet.sheet_properties.pageSetUpPr.fitToPage = True
+    sheet.page_margins.left = sheet.page_margins.right = 0.25
+    sheet.page_margins.top = sheet.page_margins.bottom = 0.5
+    for cell in sheet[1]:
+        cell.font = Font(name="Carlito", size=11, bold=True, color="FFFFFF")
+        cell.fill = PatternFill("solid", fgColor=dark_blue)
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    sheet.row_dimensions[1].height = 32
+    for row in sheet.iter_rows(min_row=2):
+        for cell in row:
+            cell.font = Font(name="Carlito", size=11)
+            cell.alignment = Alignment(vertical="center", wrap_text=True)
+            if cell.row % 2 == 0:
+                cell.fill = PatternFill("solid", fgColor="F4F8FB")
+    for column_cells in sheet.columns:
+        letter = get_column_letter(column_cells[0].column)
+        maximum = max((len(str(cell.value or "")) for cell in column_cells), default=10)
+        sheet.column_dimensions[letter].width = min(max(maximum + 2, 10), 45)
+    sheet.auto_filter.ref = sheet.dimensions
+    sheet.print_title_rows = "1:1"
+    sheet.print_area = sheet.dimensions
+
+
+def _form_xlsx_bytes(ctx, matrix_rows, spec_rows):
+    workbook = Workbook()
+    workbook.remove(workbook.active)
+    info = workbook.create_sheet("THONG_TIN")
+    info.append(["Thông tin", "Giá trị"])
+    for key, value in (
+        ("Mã đề", ctx.generated_exam.code),
+        ("Blueprint", ctx.blueprint.source_blueprint_id or str(ctx.blueprint.pk)),
+        ("Phiên bản blueprint", ctx.blueprint_version.version),
+        ("Thời gian (phút)", ctx.session.duration_minutes),
+        ("Tổng lệnh hỏi", _command_count(ctx)),
+        ("Tổng điểm", float(ctx.generated_exam.total_score)),
+        ("Random Seed", ctx.generated_exam.seed),
+    ):
+        info.append([key, value])
+    matrix = workbook.create_sheet("MA_TRAN")
+    for row in matrix_rows:
+        matrix.append(row)
+    spec = workbook.create_sheet("BAN_DAC_TA")
+    for row in spec_rows:
+        spec.append(row)
+    questions = workbook.create_sheet("DANH_SACH_CAU")
+    questions.append([
+        "SLOT_NO", "QUESTION_ID", "VERSION", "TYPE", "COGNITIVE", "CURRICULUM_ID",
+        "OUTCOME_ID", "FAMILY_ID", "STATUS", "SCORE", "ORDER", "SEED", "SHUFFLE",
+        "TIME_SECONDS", "DIFFICULTY", "STEM",
+    ])
+    question_rows = [[
+        q.order, q.question_id_snapshot, q.source_version_snapshot,
+        q.bank_question.question_type, q.bank_question.cognitive_level,
+        q.curriculum_id_snapshot, q.outcome_id_snapshot, q.family_id_snapshot,
+        q.bank_question.process_status, "", ",".join(map(str, q.option_order or q.statement_order)),
+        ctx.generated_exam.seed, q.bank_question.shuffle_allowed,
+        q.bank_question.estimated_time_seconds, q.bank_question.difficulty, q.stem_snapshot,
+    ] for q in ctx.questions]
+    for row in question_rows:
+        questions.append(row)
+    calculations = workbook.create_sheet("TINH_TOAN")
+    calculations.append(["Chỉ số", "Giá trị"])
+    calculations.append(["Tổng nhóm câu", f"=COUNTA(DANH_SACH_CAU!B2:B{len(question_rows) + 1})"])
+    calculations.append(["Tổng lệnh hỏi", _command_count(ctx)])
+    calculations.append(["Tổng điểm", float(ctx.generated_exam.total_score)])
+    for sheet in workbook.worksheets:
+        _style_form_sheet(sheet)
+    buffer = io.BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue()
+
+
+def _render_pdf(document_bytes, filename):
+    executable = shutil.which("soffice") or shutil.which("libreoffice")
+    if not executable:
+        raise ExportValidationError("MISSING_PDF_RENDERER: LibreOffice/soffice is required")
+    with tempfile.TemporaryDirectory(prefix="assessment-export-") as directory:
+        workdir = Path(directory)
+        source = workdir / filename
+        home = workdir / "home"
+        cache = workdir / "cache"
+        config = workdir / "config"
+        profile = workdir / "libreoffice-profile"
+        for path in (home, cache, config, profile):
+            path.mkdir(mode=0o700)
+        source.write_bytes(document_bytes)
+        # Web workers commonly run with HOME=/var/www, which is not writable.
+        # LibreOffice otherwise fails before conversion while creating its user
+        # profile/dconf cache. Give every conversion an isolated writable home
+        # and profile; the unique profile also prevents concurrent downloads
+        # from sharing LibreOffice lock files.
+        environment = os.environ.copy()
+        # `gen` is an X11 VCL plugin despite its generic-sounding name. On a
+        # server without an X display it produces "Can't open display" even
+        # with --headless. `svp` is LibreOffice's genuinely headless plugin.
+        environment.pop("DISPLAY", None)
+        environment.pop("WAYLAND_DISPLAY", None)
+        environment.update({
+            "HOME": str(home),
+            "XDG_CACHE_HOME": str(cache),
+            "XDG_CONFIG_HOME": str(config),
+            "SAL_USE_VCLPLUGIN": "svp",
+        })
+        command = [
+            executable,
+            "--headless",
+            "--nologo",
+            "--nodefault",
+            "--nolockcheck",
+            "--nofirststartwizard",
+            f"-env:UserInstallation={profile.as_uri()}",
+            "--convert-to", "pdf",
+            "--outdir", directory,
+            str(source),
+        ]
+        try:
+            result = subprocess.run(
+                command, capture_output=True, text=True, timeout=120,
+                check=False, env=environment, cwd=directory,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise ExportValidationError("PDF_RENDER_TIMEOUT: LibreOffice exceeded 120 seconds") from exc
+        output = source.with_suffix(".pdf")
+        if result.returncode or not output.is_file() or not output.read_bytes().startswith(b"%PDF"):
+            raise ExportValidationError(
+                "PDF_RENDER_FAILED: " + (result.stderr or result.stdout or "unknown renderer error")
+            )
+        return output.read_bytes()

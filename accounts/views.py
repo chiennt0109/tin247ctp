@@ -1,12 +1,12 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
+from .forms import SecureSignupForm
 
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = SecureSignupForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save(request)
             return redirect('account_login')
     else:
-        form = UserCreationForm()
+        form = SecureSignupForm()
     return render(request, 'account/signup.html', {'form': form})

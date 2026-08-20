@@ -21,7 +21,45 @@ PROCESS_STATUSES = {
     "ANSWER_CHECKED", "CONTENT_REVIEWED", "READY_FOR_PRACTICE", "READY_FOR_PERIODIC",
     "READY_FOR_GRADUATION", "NEEDS_REVIEW", "OUTDATED", "RETIRED",
 }
+
+NLS_AI_TAGS = {
+    "NLS_FRAME", "NLS_LEVEL", "NLS_MAPPING_STATUS", "NLS_PRIMARY", "NLS_COMPONENTS",
+    "TASK_COMPATIBILITY", "GRAD_NLS_TASK", "GRAD_NLS_COMPONENTS", "AI_INTEGRATION",
+    "AI_COMPONENT", "AI_TASK_COMPATIBILITY", "GRAD_AI_TASK", "AI_FRAME",
+    "AI_FRAME_SCOPE", "AI_FRAME_MAPPING_STATUS", "AUTO_USE_GRADUATION_NLS_AI_GATE",
+}
+
+
+def parse_structured_note(note):
+    """Parse known ``KEY=value`` tokens from semicolon/newline structured notes."""
+    metadata, warnings = {}, []
+    tokens = re.split(r"[;\r\n]+", str(note or ""))
+    for token_number, raw in enumerate(tokens, 1):
+        token = raw.strip().lstrip("-• ")
+        if not token:
+            continue
+        key_candidate = token.split("=", 1)[0].strip().upper()
+        if key_candidate not in NLS_AI_TAGS:
+            continue
+        if "=" not in token or not token.split("=", 1)[1].strip():
+            warnings.append({"code": "INVALID_NLS_AI_TAG", "token": token_number, "tag": key_candidate})
+            continue
+        key, value = token.split("=", 1)
+        metadata[key.strip().upper()] = value.strip()
+    return metadata, warnings
 STATUS_VALUES = {"DRAFT", "PENDING", "REVIEW", "APPROVED", "ACTIVE", "INACTIVE", "REJECTED", "ARCHIVED"}
+PHYSICAL_STATUS_MAP = {
+    # The master historically uses the workflow wording in the physical STATUS
+    # column.  Keep PROCESS_STATUS untouched, but project that one value onto
+    # the model's canonical physical status vocabulary.
+    "NEEDS_REVIEW": "REVIEW",
+}
+READY_STATUS_BY_PURPOSE = {
+    "PRACTICE": "READY_FOR_PRACTICE",
+    "PERIODIC": "READY_FOR_PERIODIC",
+    "GRADUATION": "READY_FOR_GRADUATION",
+}
+ANSWER_GUIDE_FIELDS = ("ANSWER_GUIDE", "MARKING_GUIDE", "HUONG_DAN_CHAM")
 USE_PURPOSES = {"PRACTICE", "PERIODIC", "GRADUATION", "NONE", "REVIEW_ONLY"}
 
 # Types used by either validation or persistence. Normalization happens once in
@@ -31,14 +69,21 @@ INTEGER_FIELDS = {
     "QUESTIONS": ("VERSION", "DIFFICULTY", "ESTIMATED_TIME_SEC"),
     "OPTIONS": ("ORDER_NO",),
     "STATEMENTS": ("ORDER_NO", "DIFFICULTY"),
+    "BLUEPRINTS": ("GRADE", "TOTAL_QUESTIONS", "DURATION_MIN", "VERSION"),
+    "BLUEPRINT_CELLS": ("REQUIRED_COUNT", "DIFFICULTY"),
+    "BLUEPRINT_SLOTS": ("SLOT_NO",),
 }
 DECIMAL_FIELDS = {
     "QUESTION_CURRICULUM": ("WEIGHT",),
+    "BLUEPRINTS": ("TOTAL_SCORE",),
+    "BLUEPRINT_CELLS": ("SCORE_PER_ITEM",),
+    "SCORE_RULES": ("MAX_SCORE",),
 }
 BOOLEAN_FIELDS = {
     "QUESTIONS": ("SHUFFLE_ALLOWED",),
     "OPTIONS": ("IS_CORRECT",),
     "STATEMENTS": ("TRUTH_VALUE",),
+    "SCORE_RULES": ("PARTIAL_SCORE_ALLOWED",),
 }
 DATE_FIELDS = {
     "QUESTIONS": ("CREATED_AT", "UPDATED_AT"),
@@ -215,7 +260,7 @@ class WorkbookBankImporter:
         raw_rows = {name: _sheet_rows(raw, name) for name in ("QUESTIONS",)}
         errors, warnings = [], []
         key_rows = self._validate_unique_keys(rows, errors)
-        self._normalize_and_validate_types(rows, errors)
+        self._normalize_and_validate_types(rows, errors, warnings)
         self._normalize_file_metadata(rows)
         self._validate_model_field_lengths(rows, errors)
         self._validate_file_checksums(rows, errors)
@@ -337,7 +382,35 @@ class WorkbookBankImporter:
                 })
 
     @staticmethod
-    def _normalize_and_validate_types(rows, errors):
+    def _normalize_and_validate_types(rows, errors, warnings):
+        for row in rows.get("QUESTIONS", ()):
+            raw_status = row.get("STATUS")
+            normalized = str(raw_status).strip().upper() if raw_status not in (None, "") else raw_status
+            row["__source_status__"] = raw_status
+            row["STATUS"] = PHYSICAL_STATUS_MAP.get(normalized, normalized)
+            raw_process_status = row.get("PROCESS_STATUS")
+            row["__source_process_status__"] = raw_process_status
+            if raw_process_status in (None, ""):
+                # Some current-bank rows predate the physical PROCESS_STATUS
+                # projection.  Derive it only when the independent physical
+                # approval gate and the explicit use purpose agree.  Draft,
+                # pending, inactive and otherwise ambiguous rows remain invalid.
+                if row["STATUS"] in {"ACTIVE", "APPROVED"}:
+                    derived = READY_STATUS_BY_PURPOSE.get(str(row.get("USE_PURPOSE") or "").strip().upper())
+                elif row["STATUS"] == "REVIEW":
+                    derived = "NEEDS_REVIEW"
+                else:
+                    derived = None
+                if derived:
+                    row["PROCESS_STATUS"] = derived
+                    row["__process_status_derived__"] = True
+                    warnings.append({
+                        "code": "DERIVED_PROCESS_STATUS", "sheet": "QUESTIONS",
+                        "row": row.get("__row__"), "question_id": str(row.get("QUESTION_ID")),
+                        "source_status": raw_status, "use_purpose": row.get("USE_PURPOSE"),
+                        "derived_value": derived,
+                    })
+
         specs = (
             (INTEGER_FIELDS, _optional_integer, "integer"),
             (DECIMAL_FIELDS, _optional_decimal, "decimal"),
@@ -424,7 +497,14 @@ class WorkbookBankImporter:
                 qerrors.append("INVALID_COGNITIVE_LEVEL")
             if not str(row.get("STEM_TEXT") or "").strip():
                 qerrors.append("MISSING_STEM")
-            if row.get("ANSWER_KEY") in (None, ""):
+            answer_guide = next(
+                (row.get(field) for field in ANSWER_GUIDE_FIELDS if row.get(field) not in (None, "")),
+                None,
+            )
+            answer_value = row.get("ANSWER_KEY")
+            if qtype in {"ESSAY", "PRACTICAL"}:
+                answer_value = answer_guide if answer_guide not in (None, "") else answer_value
+            if answer_value in (None, ""):
                 qerrors.append("MISSING_ANSWER")
             if str(row.get("PROCESS_STATUS") or "") not in PROCESS_STATUSES:
                 qerrors.append("INVALID_PROCESS_STATUS")
@@ -465,7 +545,16 @@ class WorkbookBankImporter:
                     if row.get(field) is None:
                         qerrors.append(f"MISSING_CACHED_{field}")
             if qerrors:
-                errors.append({"code": "INVALID_QUESTION", "question_id": qid, "issues": qerrors})
+                error = {"code": "INVALID_QUESTION", "question_id": qid, "issues": qerrors}
+                if "INVALID_PROCESS_STATUS" in qerrors:
+                    error["process_status_context"] = {
+                        "source_value": row.get("__source_process_status__"),
+                        "normalized_value": row.get("PROCESS_STATUS"),
+                        "physical_status": row.get("STATUS"),
+                        "use_purpose": row.get("USE_PURPOSE"),
+                        "cell": row.get("__cells__", {}).get("PROCESS_STATUS"),
+                    }
+                errors.append(error)
                 continue
             normalized_options = [
                 {"label": item.get("OPTION_LABEL"), "text": item.get("OPTION_TEXT"),
@@ -483,6 +572,7 @@ class WorkbookBankImporter:
                 "question_id": qid, "question_code": row.get("QUESTION_CODE"), "question_type": qtype,
                 "cognitive_level": row.get("COGNITIVE_LEVEL"), "stem_text": row.get("STEM_TEXT"),
                 "answer_key": row.get("ANSWER_KEY"), "source_version": str(row.get("VERSION")),
+                "answer_guide": answer_guide,
                 "options": normalized_options, "statements": normalized_statements,
                 "curriculum_id": mapping.get("CURRICULUM_ID"), "outcome_id": mapping.get("OUTCOME_ID"),
                 "difficulty": difficulty, "competency": row.get("COMPETENCY"),
@@ -490,6 +580,12 @@ class WorkbookBankImporter:
                 "process_status": row.get("PROCESS_STATUS"), "use_purpose": row.get("USE_PURPOSE"),
                 "shuffle_allowed": shuffle_allowed, "family_id": row.get("FAMILY_ID"),
             }
+            structured_metadata, metadata_warnings = parse_structured_note(row.get("NOTE"))
+            if metadata_warnings:
+                for warning in metadata_warnings:
+                    warnings.append({**warning, "sheet": "QUESTIONS", "question_id": qid})
+            canonical["structured_metadata"] = structured_metadata
+            canonical["import_warnings"] = metadata_warnings
             content_hash = hashlib.sha256(
                 json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
             ).hexdigest()

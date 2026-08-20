@@ -14,6 +14,7 @@ from assessment.models import (
     BlueprintSection, BlueprintSlot, BlueprintVersion, CurriculumNode, CurriculumOutcome,
     ExamAccessGrant, ExamAttempt, ExamBlueprint, ExamBlueprintGroup, ExamResourcePackage,
     ExamSession, ExamUsageRecord, GeneratedExam, GeneratedExamQuestion,
+    TrialAccountLink, TrialAuditEvent, TrialDevice, TrialEntitlement,
     GradingResult,
     QuestionAsset, QuestionSyncLog, ScoringRule, ScoringScheme, ScoringSchemeVersion,
 )
@@ -27,6 +28,7 @@ from assessment.services.configuration_sync import MasterConfigurationSync
 from assessment.services.admin_workflow import (
     close_exam_session, open_exam_session, prepare_blueprint, validate_session_ready,
 )
+from assessment.services.general_it_trial import grant_initial_trial
 from assessment.admin_blueprint_groups import (
     BlueprintGroupForm, ExamBlueprintGroupAdmin, register_blueprint_group_admin,
 )
@@ -113,9 +115,13 @@ class ReadOnlyProjectionAdmin(admin.ModelAdmin):
 class BankQuestionAdmin(ReadOnlyProjectionAdmin):
     list_display = (
         "source_question_id", "question_type", "cognitive_level", "difficulty",
-        "process_status", "is_available", "last_synced_at",
+        "process_status", "nls_primary", "ai_component", "graduation_gate",
+        "duplicate_family_id", "is_available", "last_synced_at",
     )
-    list_filter = ("question_type", "cognitive_level", "difficulty", "process_status", "is_available")
+    list_filter = (
+        "question_type", "cognitive_level", "difficulty", "process_status",
+        "nls_level", "ai_component", "graduation_gate", "is_available",
+    )
     search_fields = ("source_question_id", "source_code", "duplicate_family_id")
     list_select_related = ("curriculum", "outcome", "current_revision")
 
@@ -387,8 +393,9 @@ class ExamAccessGrantInline(admin.TabularInline):
     verbose_name_plural = "Quyền và lượt làm riêng"
     fields = (
         "user", "group", "limit_mode", "max_attempts", "valid_from", "valid_until",
-        "is_active", "allow_download",
+        "is_active", "allow_download", "grant_source",
     )
+    readonly_fields = ("grant_source",)
     autocomplete_fields = ("user", "group")
 
 
@@ -404,6 +411,7 @@ class ExamSessionAdminForm(forms.ModelForm):
         fields = (
             "name", "blueprint_group", "blueprint", "opens_at", "closes_at",
             "duration_minutes", "max_attempts", "access_mode", "access_groups", "access_grades",
+            "allow_signup_trial",
             "score_release_mode", "score_release_at", "answer_release_mode", "answer_release_at",
         )
 
@@ -489,12 +497,28 @@ class ExamSessionAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.status != ExamSession.Status.DRAFT:
             return tuple(
-                field for field in ExamSessionAdminForm.Meta.fields if field != "blueprint"
+                field for field in ExamSessionAdminForm.Meta.fields
+                if field not in {"blueprint", "allow_signup_trial"}
             ) + ("status",)
         return self.readonly_fields
 
     def save_formset(self, request, form, formset, change):
-        formset.save()
+        if formset.model is ExamAccessGrant:
+            if hasattr(formset, "deleted_objects"):
+                instances = formset.save(commit=False)
+                for deleted in formset.deleted_objects:
+                    deleted.delete()
+                for grant in instances:
+                    # Once an administrator changes an automatic row, it is an
+                    # explicit administrator decision and trial review/revocation
+                    # must never alter it again.
+                    grant.grant_source = ExamAccessGrant.GrantSource.ADMIN
+                    grant.save()
+                formset.save_m2m()
+            else:
+                formset.save()
+        else:
+            formset.save()
         if formset.model is ExamAccessGrant and form.instance.access_grants.filter(is_active=True).exists():
             ExamSession.objects.filter(pk=form.instance.pk).update(
                 access_mode=ExamSession.AccessMode.ACCESS_GRANTS,
@@ -627,6 +651,118 @@ class ExamResourcePackageAdmin(admin.ModelAdmin):
         "user", "session", "generated_exam", "blueprint", "blueprint_version",
         "seed", "question_snapshot", "answer_snapshot", "scoring_snapshot",
         "manifest", "content_hash", "status", "created_at", "last_downloaded_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(TrialEntitlement)
+class TrialEntitlementAdmin(admin.ModelAdmin):
+    list_display = (
+        "id", "status", "account_count",
+        "is_verified", "created_reason", "created_at",
+    )
+    list_filter = ("status", "is_verified", "created_reason")
+    search_fields = ("account_links__user__username", "account_links__user__email")
+    readonly_fields = ("created_at",)
+    actions = ("mark_verified", "revoke")
+
+    def save_model(self, request, obj, form, change):
+        old = TrialEntitlement.objects.filter(pk=obj.pk).first() if change else None
+        super().save_model(request, obj, form, change)
+        if old and any(
+            getattr(old, field) != getattr(obj, field)
+            for field in ("status", "is_verified")
+        ):
+            self._audit(request, obj, "ADMIN_ENTITLEMENT_CHANGED", {
+                "status_from": old.status, "status_to": obj.status,
+            })
+
+    @admin.display(description="Số tài khoản")
+    def account_count(self, obj):
+        return obj.account_links.count()
+
+    def _audit(self, request, obj, event_type, details=None):
+        TrialAuditEvent.objects.create(
+            entitlement=obj, actor=request.user, event_type=event_type, details=details or {},
+        )
+
+    @admin.action(description="Đánh dấu hợp lệ")
+    def mark_verified(self, request, queryset):
+        for obj in queryset:
+            obj.status = TrialEntitlement.Status.ACTIVE
+            obj.is_verified = True
+            obj.reviewed_by = request.user
+            obj.save(update_fields=("status", "is_verified", "reviewed_by"))
+            self._audit(request, obj, "ADMIN_VERIFIED")
+
+    @admin.action(description="Thu hồi trial")
+    def revoke(self, request, queryset):
+        for obj in queryset:
+            obj.status = TrialEntitlement.Status.REVOKED
+            obj.reviewed_by = request.user
+            obj.save(update_fields=("status", "reviewed_by"))
+            grant_ids = obj.audit_events.filter(
+                event_type="TRIAL_ACCESS_GRANT_CREATED",
+            ).values_list("details__grant_id", flat=True)
+            ExamAccessGrant.objects.filter(
+                pk__in=list(grant_ids),
+                grant_source=ExamAccessGrant.GrantSource.AUTO_TRIAL,
+            ).update(is_active=False)
+            self._audit(request, obj, "ADMIN_REVOKED")
+
+
+@admin.register(TrialAccountLink)
+class TrialAccountLinkAdmin(admin.ModelAdmin):
+    list_display = ("user", "entitlement", "created_at")
+    search_fields = ("user__username", "user__email")
+    autocomplete_fields = ("user", "entitlement")
+    list_select_related = ("user", "entitlement")
+    actions = ("grant_trial_access",)
+
+    @admin.action(description="Cấp quyền dùng thử bằng cơ chế quyền kỳ thi hiện tại")
+    def grant_trial_access(self, request, queryset):
+        for link in queryset.select_related("user", "entitlement"):
+            if not link.user:
+                continue
+            grants = grant_initial_trial(
+                link.user, actor=request.user, entitlement=link.entitlement,
+            )
+            if grants:
+                link.entitlement.status = TrialEntitlement.Status.ACTIVE
+                link.entitlement.is_verified = True
+                link.entitlement.reviewed_by = request.user
+                link.entitlement.save(update_fields=("status", "is_verified", "reviewed_by"))
+
+    def save_model(self, request, obj, form, change):
+        old = TrialAccountLink.objects.filter(pk=obj.pk).first() if change else None
+        super().save_model(request, obj, form, change)
+        if old and old.entitlement_id != obj.entitlement_id:
+            TrialAuditEvent.objects.create(
+                entitlement=obj.entitlement, user=obj.user, actor=request.user,
+                event_type="ADMIN_ACCOUNT_RELINKED",
+                details={"from": old.entitlement_id, "to": obj.entitlement_id},
+            )
+
+
+@admin.register(TrialDevice)
+class TrialDeviceAdmin(admin.ModelAdmin):
+    list_display = ("short_hash", "entitlement", "first_seen_at", "last_seen_at")
+    readonly_fields = ("device_hash", "entitlement", "first_seen_at", "last_seen_at")
+
+    @admin.display(description="Device hash")
+    def short_hash(self, obj):
+        return f"{obj.device_hash[:12]}…"
+
+
+@admin.register(TrialAuditEvent)
+class TrialAuditEventAdmin(admin.ModelAdmin):
+    list_display = ("event_type", "entitlement", "user", "actor", "created_at")
+    list_filter = ("event_type", "created_at")
+    search_fields = ("user__username", "entitlement__account_links__user__username")
+    readonly_fields = (
+        "entitlement", "user", "actor", "event_type", "device_hash", "ip_hash", "details", "created_at",
     )
 
     def has_add_permission(self, request):

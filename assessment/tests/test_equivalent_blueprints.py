@@ -42,6 +42,7 @@ class EquivalentBlueprintAttemptTests(TestCase):
     def _second_blueprint(self):
         blueprint = ExamBlueprint.objects.create(
             name="BP tương đương 2", exam_type="GRADUATION", grade=12,
+            status=ExamBlueprint.Status.APPROVED, is_ready=True,
         )
         self.group.blueprints.add(blueprint)
         version = BlueprintVersion.objects.create(
@@ -142,7 +143,7 @@ class EquivalentBlueprintAttemptTests(TestCase):
     def test_no_ready_blueprint_rolls_back_cleanly(self):
         BankQuestion.objects.update(is_available=False)
         user = get_user_model().objects.create_user("no-ready")
-        with self.assertRaisesMessage(StartAttemptError, "Chưa có ma trận đủ nguồn câu để sinh đề"):
+        with self.assertRaisesMessage(StartAttemptError, "NO_APPROVED_READY_BLUEPRINT"):
             start_attempt(user, self.session)
         self.assertFalse(ExamAttempt.objects.exists())
         self.assertFalse(GeneratedExam.objects.exists())

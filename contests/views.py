@@ -114,8 +114,7 @@ def contest_detail(request, contest_id):
 
     # Danh sách bài
     problems = list(contest.problems.all().order_by("code"))
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    problem_letters = [letters[i] for i in range(len(problems))]
+    problem_letters = list(range(1, len(problems) + 1))
     problems_with_letters = list(zip(problem_letters, problems))
 
     # Xác định trạng thái
@@ -334,8 +333,7 @@ def contest_practice(request, contest_id):
     # Danh sách bài
     # ============================================
     problems = contest.problems.all().order_by("code")
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    problems_with_letters = list(zip([letters[i] for i in range(len(problems))], problems))
+    problems_with_letters = list(zip(range(1, len(problems) + 1), problems))
 
     return render(request, "contests/practice.html", {
         "contest": contest,
@@ -455,8 +453,7 @@ def contest_rank(request, contest_id):
 
     rankings = participants.order_by("-score", "penalty", "last_submit")
 
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    problem_letters = [letters[i] for i in range(len(contest_problems))]
+    problem_letters = list(range(1, len(contest_problems) + 1))
 
     return render(request, "contests/rank.html", {
         "contest": contest,
@@ -508,8 +505,7 @@ def practice_rank(request, contest_id):
 
     # Danh sách bài
     problems = list(contest.problems.all().order_by("code"))
-    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    problems_with_letters = list(zip([letters[i] for i in range(len(problems))], problems))
+    problems_with_letters = list(zip(range(1, len(problems) + 1), problems))
 
     # ============================================================
     # ⭐ TÍNH ĐIỂM GIỐNG CONTEST

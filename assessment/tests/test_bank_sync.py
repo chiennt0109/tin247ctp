@@ -1,4 +1,5 @@
 from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -26,6 +27,16 @@ class BankSyncServiceTests(TestCase):
         self.assertEqual(BankQuestion.objects.count(), 0)
         self.assertEqual(QuestionSyncLog.objects.count(), 0)
 
+    def test_preview_fetches_only_pre_v2_columns(self):
+        """Dry-run remains usable while diagnosing an unmigrated v2 schema."""
+        parsed = WorkbookBankImporter().parse(self.path)
+        with self.assertNumQueries(1) as captured:
+            BankSyncService().preview(parsed)
+        sql = captured.captured_queries[0]["sql"].lower()
+        self.assertIn("source_question_id", sql)
+        self.assertIn("content_hash", sql)
+        self.assertNotIn("nls_frame", sql)
+
     def test_apply_creates_projection_and_unchanged_sync_does_not_add_revision(self):
         parsed = WorkbookBankImporter().parse(self.path)
         BankSyncService().apply(parsed)
@@ -34,6 +45,25 @@ class BankSyncServiceTests(TestCase):
         self.assertEqual(question.current_revision.protected_answer, {"answer_key": "A"})
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
         self.assertEqual(BankQuestionRevision.objects.filter(question=question).count(), 1)
+
+    def test_needs_review_process_status_is_not_available(self):
+        workbook = load_workbook(self.path)
+        headers = [cell.value for cell in workbook["QUESTIONS"][1]]
+        process_column = headers.index("PROCESS_STATUS") + 1
+        status_column = headers.index("STATUS") + 1
+        workbook["QUESTIONS"].cell(2, process_column, "NEEDS_REVIEW")
+        workbook["QUESTIONS"].cell(2, status_column, "NEEDS_REVIEW")
+        workbook.save(self.path)
+
+        parsed = WorkbookBankImporter().parse(self.path)
+        self.assertFalse(parsed.errors)
+        BankSyncService().apply(parsed)
+
+        question = BankQuestion.objects.get()
+        self.assertFalse(question.is_available)
+        self.assertEqual(question.process_status, "NEEDS_REVIEW")
+        self.assertEqual(question.source_status, "REVIEW")
+        self.assertEqual(question.source_metadata["source_physical_status"], "NEEDS_REVIEW")
 
     def test_existing_database_rows_are_unchanged_not_duplicate_source_keys(self):
         BankSyncService().apply(WorkbookBankImporter().parse(self.path))
@@ -205,3 +235,12 @@ class BankSyncServiceTests(TestCase):
         self.assertNotIn('"mode": "APPLY_SUCCESS"', output.getvalue())
         self.assertFalse(BankSourceFile.objects.exists())
         self.assertFalse(QuestionSyncLog.objects.exists())
+
+    @override_settings(QUESTION_BANK_SYNC_ENABLED=True)
+    def test_initial_load_refuses_legacy_runtime_data(self):
+        with patch("assessment.management.commands.sync_exam_bank.ExamSession.objects.count", return_value=5):
+            with self.assertRaisesMessage(CommandError, "legacy runtime data remains"):
+                call_command(
+                    "sync_exam_bank", "--source", str(self.path), "--apply", "--initial-load",
+                    verbosity=0,
+                )

@@ -37,6 +37,8 @@ CHECKER_CUSTOM = "custom"
 SANDBOX_ROOT = "/srv/judge/testcases"
 IN_EXTS = {".in", ".inp", ".txt"}
 OUT_EXTS = {".out", ".ans", ".txt"}
+MAX_ZIP_FILES = 2000
+MAX_ZIP_UNCOMPRESSED = 100 * 1024 * 1024
 
 
 # ========== HELPER FUNCTIONS ==========
@@ -52,6 +54,20 @@ def _looks_like_test_dir(dirname: str) -> bool:
 def _read_text(path: str) -> str:
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return f.read().strip()
+
+
+def _safe_extract_zip(archive: zipfile.ZipFile, destination: str) -> None:
+    """Reject traversal, symlinks and zip bombs before extracting admin uploads."""
+    members = archive.infolist()
+    if len(members) > MAX_ZIP_FILES or sum(item.file_size for item in members) > MAX_ZIP_UNCOMPRESSED:
+        raise forms.ValidationError("File ZIP quá lớn hoặc chứa quá nhiều tệp.")
+    root = os.path.realpath(destination)
+    for item in members:
+        target = os.path.realpath(os.path.join(root, item.filename))
+        is_symlink = (item.external_attr >> 16) & 0o170000 == 0o120000
+        if is_symlink or not (target == root or target.startswith(root + os.sep)):
+            raise forms.ValidationError("File ZIP chứa đường dẫn không an toàn.")
+    archive.extractall(root)
 
 def _collect_pairs(root_tmp: str) -> Dict[str, Tuple[Optional[str], Optional[str]]]:
     """Gom cặp input/output từ zip."""
@@ -119,7 +135,7 @@ def _import_tests_and_checker(problem, zip_file, checker_upload=None):
                 f.write(chunk)
 
         with zipfile.ZipFile(tmp_zip) as z:
-            z.extractall(tmpdir)
+            _safe_extract_zip(z, tmpdir)
 
         pairs = _collect_pairs(tmpdir)
         sandbox_dir = os.path.join(SANDBOX_ROOT, problem.code)
@@ -138,7 +154,10 @@ def _import_tests_and_checker(problem, zip_file, checker_upload=None):
                 continue
             in_data = _read_text(inp)
             out_data = _read_text(outp)
-            TestCase.objects.create(problem=problem, input_data=in_data, expected_output=out_data)
+            TestCase.objects.create(
+                problem=problem, input_data=in_data, expected_output=out_data,
+                is_sample=_k.startswith(("sample", "example", "vidu")),
+            )
             with open(os.path.join(in_dir, f"{i:02d}.inp"), "w", encoding="utf-8") as fi:
                 fi.write(in_data + "\n")
             with open(os.path.join(out_dir, f"{i:02d}.out"), "w", encoding="utf-8") as fo:
@@ -171,9 +190,29 @@ class UploadTestZipForm(forms.Form):
     )
 
 
+class SampleTestCaseInlineForm(forms.ModelForm):
+    """Inline form that can only create or update sample test cases."""
+
+    class Meta:
+        model = TestCase
+        fields = ("is_sample", "input_data", "expected_output")
+        widgets = {"is_sample": forms.HiddenInput()}
+
+    def clean_is_sample(self):
+        return True
+
+
 class TestCaseInline(admin.TabularInline):
     model = TestCase
-    extra = 0
+    form = SampleTestCaseInlineForm
+    extra = 1
+    fields = ("is_sample", "input_data", "expected_output")
+
+    def get_queryset(self, request):
+        # Real judging data can be very large. It is managed through the
+        # dedicated test viewer/uploader and must never be included in the
+        # Problem change form POST body.
+        return super().get_queryset(request).filter(is_sample=True)
 
 
 # ========== USER PROGRESS ==========
@@ -200,6 +239,7 @@ def problem_in_running_contest(problem):
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     form = ProblemAdminForm
+    inlines = (TestCaseInline,)
     filter_horizontal = ("tags",)
     list_per_page = 50
 
@@ -278,7 +318,7 @@ class ProblemAdmin(admin.ModelAdmin):
                     for chunk in zip_file.chunks():
                         f.write(chunk)
                 with zipfile.ZipFile(tmp_zip) as z:
-                    z.extractall(tmpdir)
+                    _safe_extract_zip(z, tmpdir)
                 pairs = _collect_pairs(tmpdir)
                 sandbox_dir = os.path.join(SANDBOX_ROOT, problem.code)
                 in_dir, out_dir = [os.path.join(sandbox_dir, sub) for sub in ("in", "out")]
@@ -296,7 +336,10 @@ class ProblemAdmin(admin.ModelAdmin):
                         continue
                     in_data = _read_text(inp)
                     out_data = _read_text(outp)
-                    TestCase.objects.create(problem=problem, input_data=in_data, expected_output=out_data)
+                    TestCase.objects.create(
+                        problem=problem, input_data=in_data, expected_output=out_data,
+                        is_sample=k.startswith(("sample", "example", "vidu")),
+                    )
                     with open(os.path.join(in_dir, f"{i:02d}.inp"), "w", encoding="utf-8") as fi:
                         fi.write(in_data + "\n")
                     with open(os.path.join(out_dir, f"{i:02d}.out"), "w", encoding="utf-8") as fo:

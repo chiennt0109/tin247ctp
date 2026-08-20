@@ -8,6 +8,7 @@ from assessment.models import (
     AssessmentAuditLog, GeneratedExam, GeneratedExamAsset, GeneratedExamQuestion,
 )
 from assessment.services.blueprint_validator import BlueprintValidator
+from assessment.services.blueprint_feasibility import solve_slot_assignment
 from assessment.services.protected_payload import encrypt_json
 
 
@@ -26,56 +27,47 @@ class ExamGenerator:
             raise ExamGenerationError("Blueprint and scoring versions must be locked before generation")
 
         rng = random.Random(str(seed))
-        selected = []
-        used_question_ids, used_family_keys = set(), set()
         sections = blueprint_version.sections.prefetch_related(
             "slots__curriculum", "slots__outcome"
         ).all()
-        for section in sections:
-            for slot in section.slots.all():
-                candidates = list(
-                    BlueprintValidator._candidate_queryset(slot)
-                    .filter(current_revision__isnull=False)
-                    .select_related("current_revision")
-                    .prefetch_related("assets__source_file")
-                    .order_by("source_question_id")
-                )
-                slot_selected = []
-                for question in candidates:
-                    family_key = question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
-                    if question.pk in used_question_ids or family_key in used_family_keys:
-                        continue
-                    slot_selected.append(question)
-                    used_question_ids.add(question.pk)
-                    used_family_keys.add(family_key)
-                    if len(slot_selected) == slot.quantity:
-                        break
-                if len(slot_selected) != slot.quantity:
-                    raise ExamGenerationError(
-                        f"Slot {slot.pk} requires {slot.quantity} questions but only "
-                        f"{len(slot_selected)} distinct candidates are selectable"
-                    )
-                selected.extend((slot, question) for question in slot_selected)
+        slots = [slot for section in sections for slot in section.slots.all()]
+        selected = solve_slot_assignment(slots, BlueprintValidator.candidates_for_slot, seed=seed)
+        if selected is None:
+            shortages = [
+                f"slot {slot.pk}: cần {slot.quantity}, pool {len(BlueprintValidator.candidates_for_slot(slot))}"
+                for slot in slots
+            ]
+            raise ExamGenerationError("Không có nghiệm toàn cục; " + "; ".join(shortages))
 
-        if session.shuffle_questions:
+        # PERIODIC/GRADUATION positions are canonical BLUEPRINT_SLOTS.SLOT_NO.
+        # No source policy currently authorizes a position permutation.
+        if session.shuffle_questions and session.exam_type not in {"PERIODIC", "GRADUATION"}:
             rng.shuffle(selected)
         snapshot_payload = []
         prepared = []
-        for order, (slot, question) in enumerate(selected, 1):
+        for sequence, (slot, question) in enumerate(selected, 1):
+            order = slot.source_slot_no or slot.order or sequence
             revision = question.current_revision
             options = list(revision.options)
             option_order = list(range(len(options)))
             if session.shuffle_options and question.shuffle_allowed:
                 rng.shuffle(option_order)
             ordered_options = [options[index] for index in option_order]
+            statement_order = list(range(len(revision.statements)))
+            if (session.shuffle_options and question.shuffle_allowed
+                    and question.question_type != "TRUE_FALSE_GROUP"):
+                rng.shuffle(statement_order)
+            ordered_statements = [revision.statements[index] for index in statement_order]
             item = {
                 "order": order, "question_id": question.source_question_id,
                 "source_version": revision.source_version, "content_hash": revision.content_hash,
                 "slot_id": slot.pk, "option_order": option_order,
+                "statement_order": statement_order,
                 "score": str(slot.score_per_item),
             }
             snapshot_payload.append(item)
-            prepared.append((slot, question, revision, order, ordered_options, option_order))
+            prepared.append((slot, question, revision, order, ordered_options, option_order,
+                             ordered_statements, statement_order))
 
         exam_hash = hashlib.sha256(json.dumps(
             {"session": str(session.pk), "code": code, "seed": str(seed), "items": snapshot_payload},
@@ -84,7 +76,11 @@ class ExamGenerator:
         report = {
             "valid": True, "question_count": len(prepared),
             "expected_question_count": blueprint_version.expected_question_count,
-            "distinct_questions": len(used_question_ids), "distinct_families": len(used_family_keys),
+            "distinct_questions": len({question.pk for _, question in selected}),
+            "distinct_families": len({
+                question.duplicate_family_id or f"QUESTION:{question.source_question_id}"
+                for _, question in selected
+            }),
         }
         if len(prepared) != blueprint_version.expected_question_count:
             raise ExamGenerationError("Generated question total does not match blueprint")
@@ -94,14 +90,26 @@ class ExamGenerator:
             total_score=blueprint_version.expected_total_score,
             validation_report=report, exam_hash=exam_hash, generated_by=actor,
         )
-        for slot, question, revision, order, ordered_options, option_order in prepared:
+        for (slot, question, revision, order, ordered_options, option_order,
+             ordered_statements, statement_order) in prepared:
             exam_question = GeneratedExamQuestion.objects.create(
                 exam=exam, bank_question=question, bank_revision=revision, blueprint_slot=slot,
                 order=order, question_id_snapshot=question.source_question_id,
+                family_id_snapshot=question.duplicate_family_id,
+                blueprint_id_snapshot=(
+                    blueprint_version.blueprint.source_blueprint_id
+                    or str(blueprint_version.blueprint_id)
+                ),
+                blueprint_version_snapshot=blueprint_version.version,
+                blueprint_slot_id_snapshot=slot.source_slot_id,
+                blueprint_slot_no_snapshot=slot.source_slot_no,
+                curriculum_id_snapshot=(question.curriculum.source_id if question.curriculum_id else ""),
+                outcome_id_snapshot=(question.outcome.source_id if question.outcome_id else ""),
                 source_version_snapshot=revision.source_version, stem_snapshot=revision.stem_text,
-                options_snapshot=ordered_options, statements_snapshot=revision.statements,
+                options_snapshot=ordered_options, statements_snapshot=ordered_statements,
                 protected_answer_snapshot=encrypt_json(revision.protected_answer),
-                option_order=option_order, score=slot.score_per_item,
+                option_order=option_order, statement_order=statement_order,
+                score=slot.score_per_item,
                 content_hash_snapshot=revision.content_hash,
             )
             for asset in question.assets.select_related("source_file").all():

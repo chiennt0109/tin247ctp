@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -12,6 +12,7 @@ from assessment.services.exam_generator import ExamGenerationError
 from assessment.services.start_attempt import StartAttemptError, start_attempt
 from assessment.services.scoring_versioning import lock_scoring_version
 from assessment.services.admin_workflow import close_exam_session
+from assessment.services.general_it_trial import provision_signup_trial
 from assessment.tests.test_exam_generation import ExamGenerationTests
 
 
@@ -42,6 +43,107 @@ class StartAttemptTests(TestCase):
         self.assertEqual(ExamAttempt.objects.count(), 1)
         self.assertEqual(GeneratedExam.objects.count(), 1)
         self.assertEqual(first.generated_exam.questions.count(), 2)
+
+    def test_eligible_signup_receives_existing_per_session_grant(self):
+        user = get_user_model().objects.create_user("trial-eligible")
+        session = self.open_session()
+        request = RequestFactory().get(
+            "/accounts/signup/", REMOTE_ADDR="203.0.113.20",
+            HTTP_COOKIE="trial_device_id=ec14d06c-ea64-44d0-af9c-652abc3eed18",
+        )
+        request.trial_device_id = "ec14d06c-ea64-44d0-af9c-652abc3eed18"
+        provision_signup_trial(user, request)
+        grant = ExamAccessGrant.objects.get(user=user, session=session)
+        self.assertEqual(grant.max_attempts, 3)
+        self.assertEqual(grant.limit_mode, ExamAccessGrant.LimitMode.ATTEMPTS)
+        self.assertEqual(grant.grant_source, ExamAccessGrant.GrantSource.AUTO_TRIAL)
+
+    def test_admin_values_are_never_overwritten_by_trial_reconciliation(self):
+        user = get_user_model().objects.create_user("trial-admin-override")
+        session = self.open_session()
+        grant = ExamAccessGrant.objects.create(
+            user=user, session=session, max_attempts=0,
+            grant_source=ExamAccessGrant.GrantSource.ADMIN,
+        )
+        request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.22")
+        request.trial_device_id = "8dc75226-afab-42f0-982f-97390d7c0f66"
+
+        provision_signup_trial(user, request)
+        grant.refresh_from_db()
+
+        self.assertEqual(grant.max_attempts, 0)
+        self.assertEqual(grant.grant_source, ExamAccessGrant.GrantSource.ADMIN)
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
+            start_attempt(user, session)
+
+    def test_inactive_explicit_admin_grant_denies_legacy_public_access(self):
+        user = get_user_model().objects.create_user("explicitly-disabled")
+        session = self.open_session()
+        ExamAccessGrant.objects.create(
+            user=user, session=session, max_attempts=3, is_active=False,
+        )
+
+        with self.assertRaisesMessage(StartAttemptError, "chưa được cấp quyền"):
+            start_attempt(user, session)
+
+    def test_admin_attempt_and_time_changes_are_effective_without_trial_cap(self):
+        user = get_user_model().objects.create_user("trial-admin-window")
+        session = self.open_session()
+        request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.23")
+        request.trial_device_id = "304d8831-8131-41e4-a38a-e3cc31f2b4fd"
+        provision_signup_trial(user, request)
+        grant = ExamAccessGrant.objects.get(user=user, session=session)
+
+        grant.max_attempts = 10
+        grant.save(update_fields=("max_attempts",))
+        for _ in range(4):
+            attempt = start_attempt(user, session)
+            attempt.status = ExamAttempt.Status.GRADED
+            attempt.save(update_fields=("status",))
+
+        grant.limit_mode = ExamAccessGrant.LimitMode.BOTH
+        grant.max_attempts = 1
+        grant.valid_from = timezone.now() - timedelta(minutes=1)
+        grant.valid_until = timezone.now() + timedelta(minutes=1)
+        grant.save()
+        with self.assertRaisesMessage(StartAttemptError, "hết số lượt"):
+            start_attempt(user, session)
+
+    def test_exam_list_repairs_grant_when_session_opens_after_signup(self):
+        user = get_user_model().objects.create_user("trial-before-session")
+        device = "975ceef3-baa6-4811-8644-1cc4bce5e876"
+        signup_request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.21")
+        signup_request.COOKIES = {"trial_device_id": device}
+        signup_request.trial_device_id = device
+        provision_signup_trial(user, signup_request)
+        session = self.open_session()
+        self.assertFalse(ExamAccessGrant.objects.filter(user=user, session=session).exists())
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("assessment:exam_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(ExamAccessGrant.objects.filter(
+            user=user, session=session, max_attempts=3, is_active=True,
+        ).exists())
+        self.assertContains(response, session.name)
+
+    def test_second_account_on_same_device_gets_no_second_trial_grant(self):
+        first_user = get_user_model().objects.create_user("trial-first")
+        second_user = get_user_model().objects.create_user("trial-second")
+        session = self.open_session()
+        device = "5082af47-1c76-4e8d-93a7-c47016467e86"
+        for user in (first_user, second_user):
+            request = RequestFactory().get("/accounts/signup/", REMOTE_ADDR="203.0.113.30")
+            request.COOKIES = {"trial_device_id": device}
+            request.trial_device_id = device
+            provision_signup_trial(user, request)
+        self.assertTrue(ExamAccessGrant.objects.filter(user=first_user, session=session).exists())
+        self.assertFalse(ExamAccessGrant.objects.filter(user=second_user, session=session).exists())
+        self.assertEqual(
+            first_user.general_it_trial_link.entitlement_id,
+            second_user.general_it_trial_link.entitlement_id,
+        )
 
     def test_closed_session_rejects_existing_and_new_attempts(self):
         user = get_user_model().objects.create_user("closed-session-user")
@@ -276,6 +378,20 @@ class StartAttemptTests(TestCase):
                 start_attempt(user, session)
         self.assertFalse(ExamAttempt.objects.exists())
         self.assertFalse(GeneratedExam.objects.exists())
+
+    def test_invalidated_attempt_number_is_never_reused(self):
+        user = get_user_model().objects.create_user("invalidated-number")
+        session = self.open_session()
+        session.max_attempts = 3
+        session.save(update_fields=("max_attempts",))
+        first = start_attempt(user, session)
+        first.status = ExamAttempt.Status.INVALIDATED
+        first.save(update_fields=("status",))
+
+        second = start_attempt(user, session)
+
+        self.assertEqual(first.attempt_number, 1)
+        self.assertEqual(second.attempt_number, 2)
 
     def test_student_attempt_page_never_exposes_protected_answers(self):
         user = get_user_model().objects.create_user("debug")

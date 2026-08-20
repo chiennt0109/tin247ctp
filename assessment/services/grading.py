@@ -123,11 +123,25 @@ def grade_attempt(attempt_id, *, actor=None, reason="Nộp bài", allow_regrade=
     rules = {rule.question_type: rule for rule in exam.scoring_version.rules.all()}
     answers = {answer.exam_question_id: answer for answer in attempt.answers.all()}
     details, total = [], Decimal("0")
+    manual_score_required = False
     counts = {"CORRECT": 0, "INCORRECT": 0, "BLANK": 0}
     questions = exam.questions.select_related(
         "bank_question__curriculum", "bank_question__outcome", "blueprint_slot__section",
     ).order_by("order")
     for question in questions:
+        if question.bank_question.question_type in {"ESSAY", "PRACTICAL"}:
+            manual_score_required = True
+            submitted = _value(answers.get(question.pk).answer) if answers.get(question.pk) else None
+            details.append({
+                "exam_question_id": question.pk, "order": question.order,
+                "question_id": question.question_id_snapshot,
+                "submitted_answer": submitted, "outcome": "PENDING_MANUAL",
+                "score": None, "max_score": str(question.score),
+                "manual_score_required": True,
+                "answer_guide": decrypt_json(question.protected_answer_snapshot).get("answer_guide")
+                    or decrypt_json(question.protected_answer_snapshot).get("answer_key"),
+            })
+            continue
         rule = rules.get(question.bank_question.question_type)
         if not rule:
             raise GradingError(f"Thiếu quy tắc chấm cho {question.bank_question.question_type}.")
@@ -171,8 +185,11 @@ def grade_attempt(attempt_id, *, actor=None, reason="Nộp bài", allow_regrade=
         incorrect_count=counts["INCORRECT"], blank_count=counts["BLANK"], detail=details,
         graded_by=actor, reason=reason,
     )
-    attempt.score = total
-    attempt.graded_at = timezone.now()
-    attempt.status = ExamAttempt.Status.GRADED
-    attempt.save(update_fields=("score", "graded_at", "status"))
+    # An auto-grader must never finalize a mixed/manual paper.  The MCQ subtotal
+    # remains auditable in GradingResult while the attempt awaits a teacher.
+    if not manual_score_required:
+        attempt.score = total
+        attempt.graded_at = timezone.now()
+        attempt.status = ExamAttempt.Status.GRADED
+        attempt.save(update_fields=("score", "graded_at", "status"))
     return result
