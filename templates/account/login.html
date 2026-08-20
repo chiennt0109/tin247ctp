@@ -31,7 +31,14 @@
         <button class="w-full rounded-xl bg-blue-600 px-4 py-3 font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200" type="submit">Đăng nhập an toàn</button>
       </form>
       <div class="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400"><span class="h-px flex-1 bg-slate-200"></span>hoặc<span class="h-px flex-1 bg-slate-200"></span></div>
-      <a href="{% provider_login_url 'google' %}" class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 px-4 py-3 font-semibold text-slate-700 transition hover:bg-slate-50">G&nbsp; Tiếp tục với Google</a>
+      {# OAuth must start with POST when SOCIALACCOUNT_LOGIN_ON_GET=False. #}
+      <form method="post" action="{% provider_login_url 'google' %}">
+        {% csrf_token %}
+        <button type="submit" class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 px-4 py-3 font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-blue-100">
+          <span aria-hidden="true" class="text-lg font-bold text-blue-600">G</span>
+          Tiếp tục với Google
+        </button>
+      </form>
       <p class="mt-7 text-center text-sm text-slate-600">Chưa có tài khoản? <a href="{% url 'account_signup' %}" class="font-bold text-blue-600 hover:underline">Đăng ký ngay</a></p>
     </div>
   </div>
