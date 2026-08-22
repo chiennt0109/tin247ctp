@@ -20,7 +20,10 @@ class ProblemAdminForm(forms.ModelForm):
     test_zip_file = forms.FileField(
         required=False,
         label="Upload test ZIP (optional)",
-        help_text="Có thể upload test ngay khi tạo bài mới.",
+        help_text=(
+            "Có thể upload test ngay khi tạo bài mới; hỗ trợ tối đa 1 GB "
+            "dữ liệu sau giải nén."
+        ),
     )
     checker_source_file = forms.FileField(
         required=False,
