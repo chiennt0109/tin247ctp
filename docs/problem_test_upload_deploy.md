@@ -21,6 +21,20 @@ trong RAM. Trước khi giải nén, ứng dụng kiểm tra kích thước khai
 
 ## Áp dụng trên máy chủ Ubuntu/nginx
 
+### Cách tự động (khuyến nghị)
+
+Sau khi `git pull`, chạy đúng **một lệnh** sau từ thư mục repository:
+
+```bash
+sudo bash deploy/nginx/install-problem-test-upload.sh
+```
+
+Script cài giới hạn hữu hạn 260 MiB tại nginx `http` scope, chạy `nginx -t`,
+tự hoàn tác nếu cấu hình lỗi, reload nginx và xác nhận cấu hình thực sự đang
+hoạt động. Không cần biết tên systemd service của Django để sửa lỗi 413 nginx.
+
+### Cách thủ công cho riêng virtual host
+
 1. Mở file `server` HTTPS hiện tại của `tin247ctp.com` (thường nằm tại
    `/etc/nginx/sites-available/tin247ctp`).
 2. Bên trong khối `server { ... }`, thêm:
@@ -35,18 +49,29 @@ trong RAM. Trước khi giải nén, ứng dụng kiểm tra kích thước khai
    ```bash
    sudo nginx -t
    sudo systemctl reload nginx
-   sudo systemctl restart tin247ctp
    ```
 
-   Dịch vụ systemd chạy Gunicorn cũng cần `--timeout 300`. Ví dụ dòng
+   **Không chạy** `systemctl restart tin247ctp` nếu unit đó không tồn tại.
+   Việc reload nginx đã đủ để sửa lỗi 413. Có thể tìm đúng tên service bằng:
+
+   ```bash
+   systemctl list-units --type=service --all | grep -Ei 'tin247|gunicorn|daphne|uwsgi'
+   ```
+
+   Dịch vụ systemd chạy Gunicorn nên có `--timeout 300`. Ví dụ dòng
    `ExecStart` phải chứa `gunicorn --timeout 300 --graceful-timeout 30 ...`;
-   sau khi sửa unit, chạy `sudo systemctl daemon-reload` trước khi restart.
+   chỉ sau khi sửa unit mới chạy `sudo systemctl daemon-reload` và restart
+   **đúng tên unit vừa tìm được**.
 
 4. Xác nhận cấu hình nginx thực tế đã nhận giới hạn:
 
    ```bash
-   sudo nginx -T | grep -n "client_max_body_size 260m"
+   sudo nginx -T 2>&1 | grep -Fn -- "client_max_body_size 260m;"
    ```
+
+Không dán nhiều lệnh có chuỗi ký tự `\n` trên cùng một dòng. Trong log ở trên,
+`grep: invalid option -- 't'` xuất hiện vì lệnh `grep` và `sudo nginx -t` bị
+nối liền; đó không phải kết quả xác nhận giới hạn đã hoạt động.
 
 Không đặt `client_max_body_size 0` vì sẽ loại bỏ lớp bảo vệ ở reverse proxy.
 Nếu thay đổi giới hạn bằng biến môi trường Django, phải đồng bộ giới hạn nginx;
