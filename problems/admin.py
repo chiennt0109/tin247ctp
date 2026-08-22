@@ -5,6 +5,7 @@
 import os
 import io
 import re
+import shutil
 import zipfile
 import tempfile
 import subprocess
@@ -69,6 +70,15 @@ def _safe_extract_zip(archive: zipfile.ZipFile, destination: str) -> None:
         max_size_mb = max_size // (1024 * 1024)
         raise forms.ValidationError(
             f"Dữ liệu sau giải nén quá lớn (tối đa {max_size_mb} MB)."
+        )
+    available = shutil.disk_usage(destination).free
+    required = total_size + settings.PROBLEM_TEST_ZIP_MIN_FREE_SPACE
+    if available < required:
+        required_mb = required // (1024 * 1024)
+        available_mb = available // (1024 * 1024)
+        raise forms.ValidationError(
+            "Máy chủ không đủ dung lượng trống an toàn để giải nén "
+            f"(cần {required_mb} MB, còn {available_mb} MB)."
         )
     root = os.path.realpath(destination)
     for item in members:
@@ -200,6 +210,16 @@ class UploadTestZipForm(forms.Form):
         label="checker.cpp (nếu dùng Custom Checker)",
         required=False,
     )
+
+    def clean_zip_file(self):
+        upload = self.cleaned_data["zip_file"]
+        max_size = settings.PROBLEM_TEST_ZIP_MAX_UPLOAD_SIZE
+        if upload.size > max_size:
+            max_size_mb = max_size // (1024 * 1024)
+            raise forms.ValidationError(
+                f"File ZIP tải lên vượt quá giới hạn {max_size_mb} MB."
+            )
+        return upload
 
 
 class SampleTestCaseInlineForm(forms.ModelForm):

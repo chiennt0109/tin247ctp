@@ -3,6 +3,7 @@
 # =====================================================
 
 from django import forms
+from django.conf import settings
 from django.http import QueryDict
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from .models import Problem, Tag, CheckerType
@@ -92,3 +93,15 @@ class ProblemAdminForm(forms.ModelForm):
         if checker_type == CheckerType.CUSTOM and not checker_file:
             self.add_error("checker_file", "Custom Checker yêu cầu checker.cpp (checker_file).")
         return cleaned
+
+    def clean_test_zip_file(self):
+        upload = self.cleaned_data.get("test_zip_file")
+        if not upload:
+            return upload
+        max_size = settings.PROBLEM_TEST_ZIP_MAX_UPLOAD_SIZE
+        if upload.size > max_size:
+            max_size_mb = max_size // (1024 * 1024)
+            raise forms.ValidationError(
+                f"File ZIP tải lên vượt quá giới hạn {max_size_mb} MB."
+            )
+        return upload
