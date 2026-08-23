@@ -39,3 +39,12 @@ class ContestAdminProblemSelectorTests(TestCase):
         self.assertContains(response, 'data-is-stacked="0"')
         self.assertContains(response, "/static/admin/js/SelectFilter2.js")
         self.assertContains(response, "SEARCH01 - Bài tìm kiếm nhanh")
+
+    def test_allowed_users_field_uses_two_panel_filter_widget(self):
+        response = self.client.get(reverse("admin:contests_contest_add"))
+        field = response.context["adminform"].form.fields["allowed_users"]
+        widget = field.widget.widget
+
+        self.assertEqual(widget.__class__.__name__, "FilteredSelectMultiple")
+        self.assertFalse(widget.is_stacked)
+        self.assertIn("Để trống", field.help_text)
