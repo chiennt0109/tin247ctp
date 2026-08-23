@@ -1,11 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models import Q
 
 
 # ============================================================
 # CONTEST
 # ============================================================
+
+class ContestQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        """Return contests visible to the given user."""
+        if getattr(user, "is_staff", False):
+            return self
+        if not getattr(user, "is_authenticated", False):
+            return self.filter(allowed_users__isnull=True)
+        return self.filter(
+            Q(allowed_users__isnull=True) | Q(allowed_users=user)
+        ).distinct()
+
 
 class Contest(models.Model):
     name = models.CharField(max_length=100)
@@ -16,6 +29,16 @@ class Contest(models.Model):
     # Quan trọng: TRÁNH IMPORT VÒNG LẶP
     problems = models.ManyToManyField("problems.Problem")
 
+    allowed_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="visible_contests",
+        help_text=(
+            "Để trống: tất cả tài khoản đều nhìn thấy. Khi chọn người dùng: "
+            "chỉ các tài khoản đã chọn mới nhìn thấy contest."
+        ),
+    )
+
     is_public = models.BooleanField(default=True)
 
     practice_time = models.PositiveIntegerField(
@@ -23,6 +46,18 @@ class Contest(models.Model):
         help_text="Thời gian Practice (giây)"
     )
     practice_open = models.BooleanField(default=True)
+
+    objects = ContestQuerySet.as_manager()
+
+    def is_visible_to(self, user):
+        if getattr(user, "is_staff", False):
+            return True
+        if not self.allowed_users.exists():
+            return True
+        return bool(
+            getattr(user, "is_authenticated", False)
+            and self.allowed_users.filter(pk=user.pk).exists()
+        )
 
     def __str__(self):
         return self.name

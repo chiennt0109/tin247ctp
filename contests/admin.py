@@ -29,6 +29,24 @@ class BulkContestEditorialForm(forms.Form):
     )
 
 
+class ContestAdminForm(forms.ModelForm):
+    """Make selecting problems in the contest admin quick and explicit."""
+
+    class Meta:
+        model = Contest
+        fields = "__all__"
+        help_texts = {
+            "problems": (
+                "Tìm nhanh theo mã hoặc tên bài, sau đó dùng các nút mũi tên "
+                "để thêm bài vào hoặc bớt bài khỏi contest."
+            ),
+            "allowed_users": (
+                "Để trống để mọi tài khoản nhìn thấy contest. Nếu chọn ít nhất "
+                "một tài khoản, contest chỉ hiển thị cho các tài khoản đã chọn."
+            ),
+        }
+
+
 # ============================================================
 # 2) ADMIN CHO BULK APPLY RULE (KHÔNG XOÁ CHỨC NĂNG OLD)
 # ============================================================
@@ -108,6 +126,8 @@ class ContestEditorialAccessAdmin(admin.ModelAdmin):
 
 @admin.register(Contest)
 class ContestAdmin(admin.ModelAdmin):
+    form = ContestAdminForm
+    filter_horizontal = ("problems", "allowed_users")
     list_display = ("name", "start_time", "end_time", "practice_time", "practice_open")
     list_editable = ("practice_time", "practice_open")
     search_fields = ("name",)
@@ -115,6 +135,14 @@ class ContestAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Thông tin contest", {
             "fields": ("name", "description", "start_time", "end_time", "problems", "is_public")
+        }),
+        ("Tài khoản được phép nhìn thấy", {
+            "fields": ("allowed_users",),
+            "description": (
+                "Mặc định để trống: mọi tài khoản đều nhìn thấy. "
+                "Khi thêm tài khoản: chỉ các tài khoản trong cửa sổ bên phải "
+                "mới nhìn thấy contest."
+            ),
         }),
         ("Practice mode", {
             "fields": ("practice_time", "practice_open"),
