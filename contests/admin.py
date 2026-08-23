@@ -1,11 +1,19 @@
 # contests/admin.py
-from django.contrib import admin
-from django.shortcuts import redirect, render
 from django import forms
+from django.contrib import admin, messages
+from django.contrib.admin.utils import unquote
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import path, reverse
+from django.utils.translation import gettext_lazy as _
 
 from . import models
 from .models import ContestEditorialAccess
 from problems.models import Problem
+from submissions.models import Submission
 
 Contest = models.Contest
 Participation = models.Participation
@@ -127,6 +135,7 @@ class ContestEditorialAccessAdmin(admin.ModelAdmin):
 @admin.register(Contest)
 class ContestAdmin(admin.ModelAdmin):
     form = ContestAdminForm
+    change_form_template = "admin/contests/contest/change_form.html"
     filter_horizontal = ("problems", "allowed_users")
     list_display = ("name", "start_time", "end_time", "practice_time", "practice_open")
     list_editable = ("practice_time", "practice_open")
@@ -156,6 +165,54 @@ class ContestAdmin(admin.ModelAdmin):
             "fields": ()
         }),
     )
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                "<path:object_id>/reset/",
+                self.admin_site.admin_view(self.reset_contest_view),
+                name="contests_contest_reset",
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def reset_contest_view(self, request, object_id):
+        """Remove all attempts and ranking data while preserving the contest."""
+        contest = get_object_or_404(Contest, pk=unquote(object_id))
+        if not self.has_change_permission(request, contest):
+            raise PermissionDenied
+
+        contest_submissions = Submission.objects.filter(
+            Q(contest=contest) | Q(practice_session__contest=contest)
+        ).distinct()
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "original": contest,
+            "title": _("Reset contest: %(name)s") % {"name": contest.name},
+            "submission_count": contest_submissions.count(),
+            "participation_count": Participation.objects.filter(contest=contest).count(),
+            "practice_session_count": PracticeSession.objects.filter(contest=contest).count(),
+        }
+
+        if request.method == "POST":
+            with transaction.atomic():
+                # Delete submissions first because their foreign keys use SET_NULL.
+                deleted_submissions = contest_submissions.delete()[0]
+                Participation.objects.filter(contest=contest).delete()
+                PracticeSession.objects.filter(contest=contest).delete()
+
+            self.message_user(
+                request,
+                f"Đã reset contest '{contest.name}' và xóa {deleted_submissions} lượt nộp. "
+                "Danh sách bài tập được giữ nguyên.",
+                messages.SUCCESS,
+            )
+            return HttpResponseRedirect(
+                reverse("admin:contests_contest_change", args=[contest.pk])
+            )
+
+        return render(request, "admin/contests/contest/reset_confirmation.html", context)
 
     def render_change_form(self, request, context, *args, **kwargs):
         obj = context.get("original")
