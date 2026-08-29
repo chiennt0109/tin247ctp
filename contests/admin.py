@@ -1,10 +1,11 @@
 # contests/admin.py
-from django.contrib import admin
+from django.contrib import admin as django_admin
 from django.shortcuts import redirect, render
 from django import forms
+from django.db.models import Case, IntegerField, Value, When
 
 from . import models
-from .models import ContestEditorialAccess
+from .models import ContestEditorialAccess, ContestProblemOrder
 from problems.models import Problem
 
 Contest = models.Contest
@@ -29,18 +30,54 @@ class BulkContestEditorialForm(forms.Form):
     )
 
 
+class ContestAdminForm(forms.ModelForm):
+    """Make selecting problems in the contest admin quick and explicit."""
+
+    class Meta:
+        model = Contest
+        fields = "__all__"
+        help_texts = {
+            "problems": (
+                "Tìm nhanh theo mã hoặc tên bài, sau đó dùng các nút mũi tên "
+                "để thêm hoặc bớt bài. Bài sẽ hiển thị trong contest đúng theo "
+                "thứ tự ở cửa sổ Chosen problems; có thể bớt rồi thêm lại để "
+                "đưa một bài xuống cuối."
+            ),
+            "allowed_users": (
+                "Để trống để mọi tài khoản nhìn thấy contest. Nếu chọn ít nhất "
+                "một tài khoản, contest chỉ hiển thị cho các tài khoản đã chọn."
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk:
+            return
+        positions = self.instance.problem_display_orders.values_list(
+            "problem_id", "position"
+        )
+        ordering = Case(
+            *(When(pk=problem_id, then=Value(position)) for problem_id, position in positions),
+            default=Value(1_000_000),
+            output_field=IntegerField(),
+        )
+        self.fields["problems"].queryset = Problem.objects.annotate(
+            contest_position=ordering
+        ).order_by("contest_position", "code")
+
+
 # ============================================================
 # 2) ADMIN CHO BULK APPLY RULE (KHÔNG XOÁ CHỨC NĂNG OLD)
 # ============================================================
 
-@admin.register(ContestEditorialAccess)
-class ContestEditorialAccessAdmin(admin.ModelAdmin):
+@django_admin.register(ContestEditorialAccess)
+class ContestEditorialAccessAdmin(django_admin.ModelAdmin):
 
     list_display = ("contest", "problem", "mode")
     list_filter = (
         "mode",
-        ("contest", admin.RelatedOnlyFieldListFilter),
-        ("problem", admin.RelatedOnlyFieldListFilter),
+        ("contest", django_admin.RelatedOnlyFieldListFilter),
+        ("problem", django_admin.RelatedOnlyFieldListFilter),
     )
     search_fields = (
         "contest__name",
@@ -106,15 +143,44 @@ class ContestEditorialAccessAdmin(admin.ModelAdmin):
 # 3) CONTEST ADMIN – vẫn tạo contest mới bình thường
 # ============================================================
 
-@admin.register(Contest)
-class ContestAdmin(admin.ModelAdmin):
+@django_admin.register(Contest)
+class ContestAdmin(django_admin.ModelAdmin):
+    form = ContestAdminForm
+    filter_horizontal = ("problems", "allowed_users")
     list_display = ("name", "start_time", "end_time", "practice_time", "practice_open")
     list_editable = ("practice_time", "practice_open")
     search_fields = ("name",)
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        selected_ids = {
+            str(pk)
+            for pk in form.cleaned_data["problems"].values_list("pk", flat=True)
+        }
+        ordered_ids = [
+            int(pk) for pk in request.POST.getlist("problems") if pk in selected_ids
+        ]
+        ContestProblemOrder.objects.filter(contest=form.instance).delete()
+        ContestProblemOrder.objects.bulk_create(
+            ContestProblemOrder(
+                contest=form.instance,
+                problem_id=problem_id,
+                position=position,
+            )
+            for position, problem_id in enumerate(ordered_ids, start=1)
+        )
+
     fieldsets = (
         ("Thông tin contest", {
             "fields": ("name", "description", "start_time", "end_time", "problems", "is_public")
+        }),
+        ("Tài khoản được phép nhìn thấy", {
+            "fields": ("allowed_users",),
+            "description": (
+                "Mặc định để trống: mọi tài khoản đều nhìn thấy. "
+                "Khi thêm tài khoản: chỉ các tài khoản trong cửa sổ bên phải "
+                "mới nhìn thấy contest."
+            ),
         }),
         ("Practice mode", {
             "fields": ("practice_time", "practice_open"),
@@ -157,8 +223,8 @@ class ContestAdmin(admin.ModelAdmin):
 # 4) Participation admin
 # ============================================================
 
-@admin.register(Participation)
-class ParticipationAdmin(admin.ModelAdmin):
+@django_admin.register(Participation)
+class ParticipationAdmin(django_admin.ModelAdmin):
     list_display = ("contest", "user", "score", "penalty", "last_submit")
     list_filter = ("contest",)
     search_fields = ("user__username",)
@@ -168,8 +234,8 @@ class ParticipationAdmin(admin.ModelAdmin):
 # 5) PracticeSession admin
 # ============================================================
 
-@admin.register(PracticeSession)
-class PracticeSessionAdmin(admin.ModelAdmin):
+@django_admin.register(PracticeSession)
+class PracticeSessionAdmin(django_admin.ModelAdmin):
     list_display = (
         "contest",
         "user",

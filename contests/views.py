@@ -11,6 +11,10 @@ from problems.models import Problem
 from datetime import timezone as dt_timezone
 
 
+def get_visible_contest_or_404(request, contest_id):
+    return get_object_or_404(Contest.objects.visible_to(request.user), pk=contest_id)
+
+
 # ============================================================
 # 🔥 PREVENT SUBMIT IN CONTEST OR PRACTICE
 # ============================================================
@@ -28,7 +32,7 @@ def contest_guard(request, problem_id):
     if not contest_id:
         return None
 
-    contest = get_object_or_404(Contest, pk=contest_id)
+    contest = get_visible_contest_or_404(request, contest_id)
     now = timezone.now()
      # ===============================
     # 🚫 CHẶN TRUY CẬP KHI CHƯA DIỄN RA
@@ -90,7 +94,7 @@ def contest_guard(request, problem_id):
 # LIST OF CONTESTS
 # ============================================================
 def contest_list(request):
-    contests = Contest.objects.all().order_by("-start_time")
+    contests = Contest.objects.visible_to(request.user).order_by("-start_time")
     now = timezone.now()
     return render(request, "contests/list.html", {
         "contests": contests,
@@ -102,7 +106,7 @@ def contest_list(request):
 # CONTEST DETAIL
 # ============================================================
 def contest_detail(request, contest_id):
-    contest = get_object_or_404(Contest, pk=contest_id)
+    contest = get_visible_contest_or_404(request, contest_id)
     now = timezone.now()
 
     # 🚫 CHẶN TRUY CẬP KHI CHƯA DIỄN RA
@@ -113,7 +117,7 @@ def contest_detail(request, contest_id):
             })
 
     # Danh sách bài
-    problems = list(contest.problems.all().order_by("code"))
+    problems = contest.ordered_problems()
     problem_letters = list(range(1, len(problems) + 1))
     problems_with_letters = list(zip(problem_letters, problems))
 
@@ -218,7 +222,7 @@ def contest_detail(request, contest_id):
 
 
 def contest_practice(request, contest_id):
-    contest = get_object_or_404(Contest, pk=contest_id)
+    contest = get_visible_contest_or_404(request, contest_id)
 
     # Chỉ practice khi contest đã kết thúc
     if contest.status != "finished":
@@ -332,7 +336,7 @@ def contest_practice(request, contest_id):
     # ============================================
     # Danh sách bài
     # ============================================
-    problems = contest.problems.all().order_by("code")
+    problems = contest.ordered_problems()
     problems_with_letters = list(zip(range(1, len(problems) + 1), problems))
 
     return render(request, "contests/practice.html", {
@@ -350,13 +354,13 @@ def contest_practice(request, contest_id):
 # RANKING (giữ nguyên code cũ)
 # ============================================================
 def contest_rank(request, contest_id):
-    contest = get_object_or_404(Contest, pk=contest_id)
+    contest = get_visible_contest_or_404(request, contest_id)
 
     freeze_minutes = 30
     freeze_time = contest.end_time - timedelta(minutes=freeze_minutes)
     is_frozen = freeze_time <= timezone.now() < contest.end_time
 
-    contest_problems = list(contest.problems.all().order_by("code"))
+    contest_problems = contest.ordered_problems()
     start_time = contest.start_time
     problem_stats = {}
 
@@ -471,7 +475,7 @@ def contest_rank(request, contest_id):
 # JSON RANK (giữ nguyên)
 # ============================================================
 def contest_rank_json(request, contest_id):
-    contest = get_object_or_404(Contest, pk=contest_id)
+    contest = get_visible_contest_or_404(request, contest_id)
 
     ranks = []
     for part in Participation.objects.filter(contest=contest).order_by("-score", "penalty"):
@@ -484,7 +488,7 @@ def contest_rank_json(request, contest_id):
     return JsonResponse({"rankings": ranks})
 
 def practice_rank(request, contest_id):
-    contest = get_object_or_404(Contest, pk=contest_id)
+    contest = get_visible_contest_or_404(request, contest_id)
 
     # lấy session đang practice (mới nhất của từng user)
     sessions = (
@@ -504,7 +508,7 @@ def practice_rank(request, contest_id):
     sessions = list(latest.values())
 
     # Danh sách bài
-    problems = list(contest.problems.all().order_by("code"))
+    problems = contest.ordered_problems()
     problems_with_letters = list(zip(range(1, len(problems) + 1), problems))
 
     # ============================================================
