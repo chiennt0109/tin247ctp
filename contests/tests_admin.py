@@ -7,10 +7,14 @@ from django.utils import timezone
 
 from problems.models import Problem
 
+from . import admin as contests_admin
 from .models import Contest, ContestProblemOrder
 
 
 class ContestAdminProblemSelectorTests(TestCase):
+    def test_admin_url_path_helper_is_imported(self):
+        self.assertTrue(callable(contests_admin.path))
+
     @classmethod
     def setUpTestData(cls):
         cls.admin = User.objects.create_superuser(

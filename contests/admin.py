@@ -1,6 +1,7 @@
 # contests/admin.py
 from django.contrib import admin as django_admin
 from django.shortcuts import redirect, render
+from django.urls import path  # Used by deployed/custom ContestAdmin.get_urls extensions.
 from django import forms
 from django.db.models import Case, IntegerField, Value, When
 
