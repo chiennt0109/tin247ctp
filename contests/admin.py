@@ -1,4 +1,6 @@
 # contests/admin.py
+from django.contrib import admin as django_admin
+from django.shortcuts import redirect, render
 from django import forms
 from django.db.models import Case, IntegerField, Value, When
 
@@ -69,14 +71,14 @@ class ContestAdminForm(forms.ModelForm):
 # 2) ADMIN CHO BULK APPLY RULE (KHÔNG XOÁ CHỨC NĂNG OLD)
 # ============================================================
 
-@admin.register(ContestEditorialAccess)
-class ContestEditorialAccessAdmin(admin.ModelAdmin):
+@django_admin.register(ContestEditorialAccess)
+class ContestEditorialAccessAdmin(django_admin.ModelAdmin):
 
     list_display = ("contest", "problem", "mode")
     list_filter = (
         "mode",
-        ("contest", admin.RelatedOnlyFieldListFilter),
-        ("problem", admin.RelatedOnlyFieldListFilter),
+        ("contest", django_admin.RelatedOnlyFieldListFilter),
+        ("problem", django_admin.RelatedOnlyFieldListFilter),
     )
     search_fields = (
         "contest__name",
@@ -142,8 +144,8 @@ class ContestEditorialAccessAdmin(admin.ModelAdmin):
 # 3) CONTEST ADMIN – vẫn tạo contest mới bình thường
 # ============================================================
 
-@admin.register(Contest)
-class ContestAdmin(admin.ModelAdmin):
+@django_admin.register(Contest)
+class ContestAdmin(django_admin.ModelAdmin):
     form = ContestAdminForm
     filter_horizontal = ("problems", "allowed_users")
     list_display = ("name", "start_time", "end_time", "practice_time", "practice_open")
@@ -270,8 +272,8 @@ class ContestAdmin(admin.ModelAdmin):
 # 4) Participation admin
 # ============================================================
 
-@admin.register(Participation)
-class ParticipationAdmin(admin.ModelAdmin):
+@django_admin.register(Participation)
+class ParticipationAdmin(django_admin.ModelAdmin):
     list_display = ("contest", "user", "score", "penalty", "last_submit")
     list_filter = ("contest",)
     search_fields = ("user__username",)
@@ -281,8 +283,8 @@ class ParticipationAdmin(admin.ModelAdmin):
 # 5) PracticeSession admin
 # ============================================================
 
-@admin.register(PracticeSession)
-class PracticeSessionAdmin(admin.ModelAdmin):
+@django_admin.register(PracticeSession)
+class PracticeSessionAdmin(django_admin.ModelAdmin):
     list_display = (
         "contest",
         "user",
