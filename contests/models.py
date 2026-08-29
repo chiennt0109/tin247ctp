@@ -59,6 +59,17 @@ class Contest(models.Model):
             and self.allowed_users.filter(pk=user.pk).exists()
         )
 
+    def ordered_problems(self):
+        """Return problems in the same order as the admin's Chosen list."""
+        problems = list(self.problems.all())
+        positions = dict(
+            self.problem_display_orders.values_list("problem_id", "position")
+        )
+        return sorted(
+            problems,
+            key=lambda problem: (positions.get(problem.pk, len(problems)), problem.code),
+        )
+
     def __str__(self):
         return self.name
 
@@ -83,6 +94,29 @@ class Contest(models.Model):
     @property
     def practice_minutes(self):
         return self.practice_time // 60
+
+
+class ContestProblemOrder(models.Model):
+    contest = models.ForeignKey(
+        Contest,
+        on_delete=models.CASCADE,
+        related_name="problem_display_orders",
+    )
+    problem = models.ForeignKey("problems.Problem", on_delete=models.CASCADE)
+    position = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ("position",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("contest", "problem"),
+                name="unique_contest_problem_display_order",
+            ),
+            models.UniqueConstraint(
+                fields=("contest", "position"),
+                name="unique_contest_problem_position",
+            ),
+        ]
 
 
 # ============================================================

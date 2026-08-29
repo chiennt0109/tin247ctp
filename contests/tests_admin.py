@@ -1,11 +1,13 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from contests.models import Contest, Participation, PracticeSession
 from problems.models import Problem
-from submissions.models import Submission
+
+from .models import Contest, ContestProblemOrder
 
 
 class ContestAdminProblemSelectorTests(TestCase):
@@ -52,70 +54,46 @@ class ContestAdminProblemSelectorTests(TestCase):
         self.assertFalse(widget.is_stacked)
         self.assertIn("Để trống", field.help_text)
 
-
-class ContestAdminResetTests(TestCase):
-    def setUp(self):
-        self.admin = User.objects.create_superuser(
-            username="reset-admin",
-            email="reset-admin@example.com",
-            password="password",
-        )
-        self.competitor = User.objects.create_user(username="competitor")
-        self.problem = Problem.objects.create(
-            code="RESET01", title="Bài giữ lại", statement="Statement"
+    def test_chosen_problem_order_is_saved_for_contest_display(self):
+        second_problem = Problem.objects.create(
+            code="AAA-FIRST-BY-CODE",
+            title="Second chosen",
+            statement="Statement",
         )
         now = timezone.now()
-        self.contest = Contest.objects.create(
-            name="Contest cần reset", start_time=now, end_time=now
-        )
-        self.contest.problems.add(self.problem)
-        self.participation = Participation.objects.create(
-            contest=self.contest, user=self.competitor, score=100
-        )
-        self.practice_session = PracticeSession.objects.create(
-            contest=self.contest, user=self.competitor, score=1
-        )
-        Submission.objects.create(
-            user=self.competitor,
-            problem=self.problem,
-            language="python",
-            source_code="print(1)",
-            contest=self.contest,
-        )
-        Submission.objects.create(
-            user=self.competitor,
-            problem=self.problem,
-            language="python",
-            source_code="print(2)",
-            practice_session=self.practice_session,
-        )
-        self.reset_url = reverse(
-            "admin:contests_contest_reset", args=[self.contest.pk]
-        )
-        self.client.force_login(self.admin)
-
-    def test_change_page_has_reset_link(self):
-        response = self.client.get(
-            reverse("admin:contests_contest_change", args=[self.contest.pk])
+        contest = Contest.objects.create(
+            name="Ordered contest",
+            start_time=now,
+            end_time=now + timedelta(hours=1),
         )
 
-        self.assertContains(response, self.reset_url)
-        self.assertContains(response, "Reset contest")
-
-    def test_reset_requires_confirmation_and_preserves_problems(self):
-        response = self.client.get(self.reset_url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "2 lượt nộp bài")
-        self.assertEqual(Submission.objects.count(), 2)
-
-        response = self.client.post(self.reset_url, follow=True)
-
-        self.assertRedirects(
-            response,
-            reverse("admin:contests_contest_change", args=[self.contest.pk]),
+        response = self.client.post(
+            reverse("admin:contests_contest_change", args=[contest.pk]),
+            {
+                "name": contest.name,
+                "description": "",
+                "start_time_0": now.date().isoformat(),
+                "start_time_1": now.time().strftime("%H:%M:%S"),
+                "end_time_0": (now + timedelta(hours=1)).date().isoformat(),
+                "end_time_1": (now + timedelta(hours=1)).time().strftime("%H:%M:%S"),
+                "problems": [str(self.problem.pk), str(second_problem.pk)],
+                "is_public": "on",
+                "practice_time": "10800",
+                "practice_open": "on",
+                "_save": "Save",
+            },
         )
-        self.assertFalse(Participation.objects.filter(contest=self.contest).exists())
-        self.assertFalse(PracticeSession.objects.filter(contest=self.contest).exists())
-        self.assertFalse(Submission.objects.exists())
-        self.assertEqual(list(self.contest.problems.all()), [self.problem])
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            list(
+                ContestProblemOrder.objects.filter(contest=contest).values_list(
+                    "problem_id", flat=True
+                )
+            ),
+            [self.problem.pk, second_problem.pk],
+        )
+        self.assertEqual(
+            [problem.pk for problem in contest.ordered_problems()],
+            [self.problem.pk, second_problem.pk],
+        )

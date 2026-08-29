@@ -117,7 +117,7 @@ def contest_detail(request, contest_id):
             })
 
     # Danh sách bài
-    problems = list(contest.problems.all().order_by("code"))
+    problems = contest.ordered_problems()
     problem_letters = list(range(1, len(problems) + 1))
     problems_with_letters = list(zip(problem_letters, problems))
 
@@ -336,7 +336,7 @@ def contest_practice(request, contest_id):
     # ============================================
     # Danh sách bài
     # ============================================
-    problems = contest.problems.all().order_by("code")
+    problems = contest.ordered_problems()
     problems_with_letters = list(zip(range(1, len(problems) + 1), problems))
 
     return render(request, "contests/practice.html", {
@@ -360,7 +360,7 @@ def contest_rank(request, contest_id):
     freeze_time = contest.end_time - timedelta(minutes=freeze_minutes)
     is_frozen = freeze_time <= timezone.now() < contest.end_time
 
-    contest_problems = list(contest.problems.all().order_by("code"))
+    contest_problems = contest.ordered_problems()
     start_time = contest.start_time
     problem_stats = {}
 
@@ -508,7 +508,7 @@ def practice_rank(request, contest_id):
     sessions = list(latest.values())
 
     # Danh sách bài
-    problems = list(contest.problems.all().order_by("code"))
+    problems = contest.ordered_problems()
     problems_with_letters = list(zip(range(1, len(problems) + 1), problems))
 
     # ============================================================
