@@ -1,0 +1,13 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+  {% if change and has_change_permission %}
+    <li>
+      <a href="{% url 'admin:contests_contest_reset' original.pk|admin_urlquote %}" class="deletelink">
+        Reset contest
+      </a>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
