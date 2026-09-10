@@ -16,6 +16,10 @@ class ContestAdminProblemSelectorTests(TestCase):
     def test_admin_url_path_helper_is_imported(self):
         self.assertTrue(callable(contests_admin.path))
         self.assertTrue(callable(contests_admin.unquote))
+        self.assertEqual(
+            contests_admin.Q(contest_id=14),
+            contests_admin.Q(("contest_id", 14)),
+        )
 
     @classmethod
     def setUpTestData(cls):
