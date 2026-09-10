@@ -201,9 +201,12 @@ def submission_create(request, problem_id):
     contest = None
     if contest_id:
         try:
-            contest = Contest.objects.get(id=contest_id)
+            contest = Contest.objects.visible_to(request.user).get(id=contest_id)
         except Contest.DoesNotExist:
-            contest = None
+            return JsonResponse(
+                {"ok": False, "error": "Bạn không có quyền truy cập cuộc thi này."},
+                status=403,
+            )
 
     # =====================================================
     # 🎯 GUARD CHO CONTEST CHÍNH
