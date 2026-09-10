@@ -4,8 +4,11 @@ from django.contrib import admin as django_admin, messages
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Case, IntegerField, Value, When
+from django.http import HttpResponse
+from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import path  # Used by deployed/custom ContestAdmin.get_urls extensions.
+from django.urls import path, reverse
+from django.utils.html import format_html
 
 from . import models
 from .models import ContestEditorialAccess, ContestProblemOrder
@@ -190,14 +193,35 @@ class ContestAdmin(django_admin.ModelAdmin):
             )
             return redirect("admin:contests_contest_change", contest.pk)
 
-        context = {
-            **self.admin_site.each_context(request),
-            "opts": self.model._meta,
-            "original": contest,
-            "contest": contest,
-            "title": f"Xác nhận reset contest: {contest.name}",
-        }
-        return render(request, "admin/contests/contest/reset_confirmation.html", context)
+        # Keep this confirmation self-contained. Some VPS deployments copy only
+        # Python files and previously returned HTTP 500 when the custom template
+        # had not been deployed alongside contests/admin.py.
+        cancel_url = reverse("admin:contests_contest_change", args=[contest.pk])
+        csrf_token = get_token(request)
+        content = format_html(
+            """<!doctype html>
+            <html lang="vi"><head><meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Xác nhận reset contest</title>
+            <style>
+              body{{font-family:Arial,sans-serif;margin:40px;max-width:760px}}
+              .warning{{padding:20px;border:1px solid #ba2121;background:#fff4f4}}
+              button,.button{{display:inline-block;margin-top:16px;padding:10px 16px;
+                border:0;border-radius:4px;text-decoration:none;cursor:pointer}}
+              button{{background:#ba2121;color:white}} .button{{background:#eee;color:#333}}
+            </style></head><body>
+            <h1>Xác nhận reset contest</h1><div class="warning">
+            <p>Thao tác này sẽ xóa toàn bộ lượt nộp và kết quả xếp hạng của
+            <strong>{}</strong>.</p>
+            <p>Bài tập, cấu hình contest và dữ liệu Practice không bị xóa.</p>
+            <form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="{}">
+            <button type="submit">Xác nhận reset</button>
+            <a class="button" href="{}">Hủy</a></form></div></body></html>""",
+            contest.name,
+            csrf_token,
+            cancel_url,
+        )
+        return HttpResponse(content)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
