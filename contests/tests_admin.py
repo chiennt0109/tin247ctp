@@ -6,9 +6,10 @@ from django.urls import reverse
 from django.utils import timezone
 
 from problems.models import Problem
+from submissions.models import Submission
 
 from . import admin as contests_admin
-from .models import Contest, ContestProblemOrder
+from .models import Contest, ContestProblemOrder, Participation
 
 
 class ContestAdminProblemSelectorTests(TestCase):
@@ -101,3 +102,48 @@ class ContestAdminProblemSelectorTests(TestCase):
             [problem.pk for problem in contest.ordered_problems()],
             [self.problem.pk, second_problem.pk],
         )
+
+    def test_reset_contest_requires_confirmation_and_deletes_only_contest_results(self):
+        now = timezone.now()
+        contest = Contest.objects.create(
+            name="Contest to reset",
+            start_time=now,
+            end_time=now + timedelta(hours=1),
+        )
+        other_contest = Contest.objects.create(
+            name="Contest to keep",
+            start_time=now,
+            end_time=now + timedelta(hours=1),
+        )
+        Participation.objects.create(contest=contest, user=self.admin)
+        submission = Submission.objects.create(
+            contest=contest,
+            user=self.admin,
+            problem=self.problem,
+            language="python",
+            source_code="print(1)",
+        )
+        kept_submission = Submission.objects.create(
+            contest=other_contest,
+            user=self.admin,
+            problem=self.problem,
+            language="python",
+            source_code="print(2)",
+        )
+        reset_url = reverse("admin:contests_contest_reset", args=[contest.pk])
+
+        confirmation = self.client.get(reset_url)
+
+        self.assertEqual(confirmation.status_code, 200)
+        self.assertContains(confirmation, "Xác nhận reset")
+        self.assertTrue(Submission.objects.filter(pk=submission.pk).exists())
+
+        response = self.client.post(reset_url)
+
+        self.assertRedirects(
+            response,
+            reverse("admin:contests_contest_change", args=[contest.pk]),
+        )
+        self.assertFalse(Submission.objects.filter(pk=submission.pk).exists())
+        self.assertFalse(Participation.objects.filter(contest=contest).exists())
+        self.assertTrue(Submission.objects.filter(pk=kept_submission.pk).exists())

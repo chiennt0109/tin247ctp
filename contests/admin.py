@@ -1,9 +1,11 @@
 # contests/admin.py
-from django.contrib import admin as django_admin
-from django.shortcuts import redirect, render
-from django.urls import path  # Used by deployed/custom ContestAdmin.get_urls extensions.
 from django import forms
+from django.contrib import admin as django_admin, messages
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.db.models import Case, IntegerField, Value, When
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import path  # Used by deployed/custom ContestAdmin.get_urls extensions.
 
 from . import models
 from .models import ContestEditorialAccess, ContestProblemOrder
@@ -148,10 +150,54 @@ class ContestEditorialAccessAdmin(django_admin.ModelAdmin):
 @django_admin.register(Contest)
 class ContestAdmin(django_admin.ModelAdmin):
     form = ContestAdminForm
+    change_form_template = "admin/contests/contest/change_form.html"
     filter_horizontal = ("problems", "allowed_users")
     list_display = ("name", "start_time", "end_time", "practice_time", "practice_open")
     list_editable = ("practice_time", "practice_open")
     search_fields = ("name",)
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                "<path:object_id>/reset/",
+                self.admin_site.admin_view(self.reset_contest_view),
+                name="contests_contest_reset",
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def reset_contest_view(self, request, object_id):
+        contest = get_object_or_404(Contest, pk=object_id)
+        if not self.has_change_permission(request, contest):
+            raise PermissionDenied
+
+        if request.method == "POST":
+            with transaction.atomic():
+                submission_count, _ = Submission.objects.filter(
+                    contest=contest
+                ).delete()
+                participation_count, _ = Participation.objects.filter(
+                    contest=contest
+                ).delete()
+            self.message_user(
+                request,
+                (
+                    f"Đã reset contest '{contest.name}': xóa "
+                    f"{submission_count} lượt nộp và "
+                    f"{participation_count} kết quả."
+                ),
+                level=messages.SUCCESS,
+            )
+            return redirect("admin:contests_contest_change", contest.pk)
+
+        context = {
+            **self.admin_site.each_context(request),
+            "opts": self.model._meta,
+            "original": contest,
+            "contest": contest,
+            "title": f"Xác nhận reset contest: {contest.name}",
+        }
+        return render(request, "admin/contests/contest/reset_confirmation.html", context)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

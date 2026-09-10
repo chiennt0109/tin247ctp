@@ -2,11 +2,10 @@
 {% load i18n admin_urls %}
 
 {% block object-tools-items %}
-  {% if change and has_change_permission %}
+  {% if change and not is_popup %}
     <li>
-      <a href="{% url 'admin:contests_contest_reset' original.pk|admin_urlquote %}" class="deletelink">
-        Reset contest
-      </a>
+      <a href="{% url 'admin:contests_contest_reset' original.pk|admin_urlquote %}"
+         class="deletelink">Reset contest</a>
     </li>
   {% endif %}
   {{ block.super }}
