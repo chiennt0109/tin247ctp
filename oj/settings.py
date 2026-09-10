@@ -18,8 +18,9 @@ JUDGE_TOKEN = os.environ.get("JUDGE_TOKEN")
 
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
-#DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
-DEBUG = True
+# Debug pages expose internal URL patterns, view names, settings and stack traces.
+# Keep them disabled by default; development environments must opt in explicitly.
+DEBUG = os.environ.get("DEBUG", "False").strip().lower() in {"1", "true", "yes", "on"}
 ALLOWED_HOSTS = ["*"]
 
 
