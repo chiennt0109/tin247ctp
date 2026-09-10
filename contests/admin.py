@@ -1,10 +1,11 @@
 # contests/admin.py
+import logging
+
 from django import forms
 from django.contrib import admin as django_admin, messages
 from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
-from django.db.models import Case, IntegerField, Q, Value, When
+from django.db.models import Case, IntegerField, Value, When
 from django.http import HttpResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,7 +15,9 @@ from django.utils.html import format_html
 from . import models
 from .models import ContestEditorialAccess, ContestProblemOrder
 from problems.models import Problem
-from submissions.models import Submission
+from .services import reset_contest_results
+
+logger = logging.getLogger(__name__)
 
 Contest = models.Contest
 Participation = models.Participation
@@ -176,19 +179,23 @@ class ContestAdmin(django_admin.ModelAdmin):
             raise PermissionDenied
 
         if request.method == "POST":
-            with transaction.atomic():
-                submission_count, _ = Submission.objects.filter(
-                    contest=contest
-                ).delete()
-                participation_count, _ = Participation.objects.filter(
-                    contest=contest
-                ).delete()
+            try:
+                result = reset_contest_results(contest)
+            except Exception:
+                logger.exception("Unable to reset contest %s", contest.pk)
+                self.message_user(
+                    request,
+                    "Không thể reset contest. Dữ liệu đã được hoàn tác; vui lòng kiểm tra log.",
+                    level=messages.ERROR,
+                )
+                return redirect("admin:contests_contest_change", contest.pk)
             self.message_user(
                 request,
                 (
                     f"Đã reset contest '{contest.name}': xóa "
-                    f"{submission_count} lượt nộp và "
-                    f"{participation_count} kết quả."
+                    f"{result.submissions} lượt nộp, "
+                    f"{result.participations} kết quả và "
+                    f"{result.practice_sessions} phiên Practice."
                 ),
                 level=messages.SUCCESS,
             )
@@ -214,7 +221,8 @@ class ContestAdmin(django_admin.ModelAdmin):
             <h1>Xác nhận reset contest</h1><div class="warning">
             <p>Thao tác này sẽ xóa toàn bộ lượt nộp và kết quả xếp hạng của
             <strong>{}</strong>.</p>
-            <p>Bài tập, cấu hình contest và dữ liệu Practice không bị xóa.</p>
+            <p>Bài tập và cấu hình contest không bị xóa. Các phiên Practice của
+            contest này cũng sẽ được reset.</p>
             <form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="{}">
             <button type="submit">Xác nhận reset</button>
             <a class="button" href="{}">Hủy</a></form></div></body></html>""",

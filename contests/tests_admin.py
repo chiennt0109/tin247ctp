@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -9,17 +10,13 @@ from problems.models import Problem
 from submissions.models import Submission
 
 from . import admin as contests_admin
-from .models import Contest, ContestProblemOrder, Participation
+from .models import Contest, ContestProblemOrder, Participation, PracticeSession
 
 
 class ContestAdminProblemSelectorTests(TestCase):
     def test_admin_url_path_helper_is_imported(self):
         self.assertTrue(callable(contests_admin.path))
         self.assertTrue(callable(contests_admin.unquote))
-        self.assertEqual(
-            contests_admin.Q(contest_id=14),
-            contests_admin.Q(("contest_id", 14)),
-        )
 
     @classmethod
     def setUpTestData(cls):
@@ -121,6 +118,10 @@ class ContestAdminProblemSelectorTests(TestCase):
             end_time=now + timedelta(hours=1),
         )
         Participation.objects.create(contest=contest, user=self.admin)
+        practice_session = PracticeSession.objects.create(
+            contest=contest,
+            user=self.admin,
+        )
         submission = Submission.objects.create(
             contest=contest,
             user=self.admin,
@@ -134,6 +135,13 @@ class ContestAdminProblemSelectorTests(TestCase):
             problem=self.problem,
             language="python",
             source_code="print(2)",
+        )
+        practice_submission = Submission.objects.create(
+            practice_session=practice_session,
+            user=self.admin,
+            problem=self.problem,
+            language="python",
+            source_code="print(3)",
         )
         reset_url = reverse("admin:contests_contest_reset", args=[contest.pk])
 
@@ -150,5 +158,31 @@ class ContestAdminProblemSelectorTests(TestCase):
             reverse("admin:contests_contest_change", args=[contest.pk]),
         )
         self.assertFalse(Submission.objects.filter(pk=submission.pk).exists())
+        self.assertFalse(
+            Submission.objects.filter(pk=practice_submission.pk).exists()
+        )
         self.assertFalse(Participation.objects.filter(contest=contest).exists())
+        self.assertFalse(PracticeSession.objects.filter(contest=contest).exists())
         self.assertTrue(Submission.objects.filter(pk=kept_submission.pk).exists())
+
+    @patch("contests.admin.reset_contest_results", side_effect=RuntimeError("boom"))
+    def test_reset_failure_redirects_with_error_instead_of_http_500(self, reset):
+        now = timezone.now()
+        contest = Contest.objects.create(
+            name="Failed reset",
+            start_time=now,
+            end_time=now + timedelta(hours=1),
+        )
+
+        with self.assertLogs("contests.admin", level="ERROR"):
+            response = self.client.post(
+                reverse("admin:contests_contest_reset", args=[contest.pk])
+            )
+
+        self.assertRedirects(
+            response,
+            reverse("admin:contests_contest_change", args=[contest.pk]),
+        )
+        messages = list(response.wsgi_request._messages)
+        self.assertIn("Không thể reset contest", str(messages[0]))
+        reset.assert_called_once_with(contest)
