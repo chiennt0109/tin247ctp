@@ -145,6 +145,25 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Test packages can contain dozens of large input/output files. Keep uploads on
+# disk while streaming and allow up to 1 GiB after ZIP extraction. The latter
+# remains configurable so deployments can tune it to their available storage.
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.environ.get("FILE_UPLOAD_MAX_MEMORY_SIZE", 5 * 1024 * 1024)
+)
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.environ.get("DATA_UPLOAD_MAX_MEMORY_SIZE", 1024 * 1024 * 1024)
+)
+PROBLEM_TEST_ZIP_MAX_UNCOMPRESSED_SIZE = int(
+    os.environ.get("PROBLEM_TEST_ZIP_MAX_UNCOMPRESSED_SIZE", 1024 * 1024 * 1024)
+)
+PROBLEM_TEST_ZIP_MAX_UPLOAD_SIZE = int(
+    os.environ.get("PROBLEM_TEST_ZIP_MAX_UPLOAD_SIZE", 256 * 1024 * 1024)
+)
+PROBLEM_TEST_ZIP_MIN_FREE_SPACE = int(
+    os.environ.get("PROBLEM_TEST_ZIP_MIN_FREE_SPACE", 2 * 1024 * 1024 * 1024)
+)
+
 # =====================
 # 
 # =====================
