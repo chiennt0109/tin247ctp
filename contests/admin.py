@@ -1,6 +1,7 @@
 # contests/admin.py
 from django import forms
 from django.contrib import admin as django_admin, messages
+from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Case, IntegerField, Value, When
@@ -170,7 +171,7 @@ class ContestAdmin(django_admin.ModelAdmin):
         return custom_urls + super().get_urls()
 
     def reset_contest_view(self, request, object_id):
-        contest = get_object_or_404(Contest, pk=object_id)
+        contest = get_object_or_404(Contest, pk=unquote(object_id))
         if not self.has_change_permission(request, contest):
             raise PermissionDenied
 

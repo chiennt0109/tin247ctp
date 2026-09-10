@@ -15,6 +15,7 @@ from .models import Contest, ContestProblemOrder, Participation
 class ContestAdminProblemSelectorTests(TestCase):
     def test_admin_url_path_helper_is_imported(self):
         self.assertTrue(callable(contests_admin.path))
+        self.assertTrue(callable(contests_admin.unquote))
 
     @classmethod
     def setUpTestData(cls):
