@@ -5,6 +5,7 @@
 import os
 import io
 import re
+import shutil
 import zipfile
 import tempfile
 import subprocess
@@ -12,6 +13,7 @@ from typing import Dict, Tuple, Optional
 
 from django import forms
 from django.contrib import admin, messages
+from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import path, reverse
@@ -38,7 +40,6 @@ SANDBOX_ROOT = "/srv/judge/testcases"
 IN_EXTS = {".in", ".inp", ".txt"}
 OUT_EXTS = {".out", ".ans", ".txt"}
 MAX_ZIP_FILES = 2000
-MAX_ZIP_UNCOMPRESSED = 100 * 1024 * 1024
 
 
 # ========== HELPER FUNCTIONS ==========
@@ -59,8 +60,26 @@ def _read_text(path: str) -> str:
 def _safe_extract_zip(archive: zipfile.ZipFile, destination: str) -> None:
     """Reject traversal, symlinks and zip bombs before extracting admin uploads."""
     members = archive.infolist()
-    if len(members) > MAX_ZIP_FILES or sum(item.file_size for item in members) > MAX_ZIP_UNCOMPRESSED:
-        raise forms.ValidationError("File ZIP quá lớn hoặc chứa quá nhiều tệp.")
+    total_size = sum(item.file_size for item in members)
+    max_size = settings.PROBLEM_TEST_ZIP_MAX_UNCOMPRESSED_SIZE
+    if len(members) > MAX_ZIP_FILES:
+        raise forms.ValidationError(
+            f"File ZIP chứa quá nhiều tệp (tối đa {MAX_ZIP_FILES} tệp)."
+        )
+    if total_size > max_size:
+        max_size_mb = max_size // (1024 * 1024)
+        raise forms.ValidationError(
+            f"Dữ liệu sau giải nén quá lớn (tối đa {max_size_mb} MB)."
+        )
+    available = shutil.disk_usage(destination).free
+    required = total_size + settings.PROBLEM_TEST_ZIP_MIN_FREE_SPACE
+    if available < required:
+        required_mb = required // (1024 * 1024)
+        available_mb = available // (1024 * 1024)
+        raise forms.ValidationError(
+            "Máy chủ không đủ dung lượng trống an toàn để giải nén "
+            f"(cần {required_mb} MB, còn {available_mb} MB)."
+        )
     root = os.path.realpath(destination)
     for item in members:
         target = os.path.realpath(os.path.join(root, item.filename))
@@ -183,11 +202,24 @@ def _import_tests_and_checker(problem, zip_file, checker_upload=None):
 
 
 class UploadTestZipForm(forms.Form):
-    zip_file = forms.FileField(label="Chọn file .zip chứa test cases")
+    zip_file = forms.FileField(
+        label="Chọn file .zip chứa test cases",
+        help_text="Hỗ trợ gói test lớn, tối đa 1 GB dữ liệu sau giải nén.",
+    )
     checker_file = forms.FileField(
         label="checker.cpp (nếu dùng Custom Checker)",
         required=False,
     )
+
+    def clean_zip_file(self):
+        upload = self.cleaned_data["zip_file"]
+        max_size = settings.PROBLEM_TEST_ZIP_MAX_UPLOAD_SIZE
+        if upload.size > max_size:
+            max_size_mb = max_size // (1024 * 1024)
+            raise forms.ValidationError(
+                f"File ZIP tải lên vượt quá giới hạn {max_size_mb} MB."
+            )
+        return upload
 
 
 class SampleTestCaseInlineForm(forms.ModelForm):
