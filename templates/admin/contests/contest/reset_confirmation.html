@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:contests_contest_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url 'admin:contests_contest_change' original.pk|admin_urlquote %}">{{ original }}</a>
+  &rsaquo; Reset
+</div>
+{% endblock %}
+
+{% block content %}
+<p>
+  Thao tác này sẽ xóa toàn bộ lượt nộp trong contest và kết quả xếp hạng của
+  <strong>{{ contest }}</strong>. Bài tập, cấu hình contest và dữ liệu Practice
+  không bị xóa.
+</p>
+<form method="post">
+  {% csrf_token %}
+  <div class="submit-row">
+    <input type="submit" value="Xác nhận reset" class="deletelink">
+    <a href="{% url 'admin:contests_contest_change' original.pk|admin_urlquote %}" class="button cancel-link">Hủy</a>
+  </div>
+</form>
+{% endblock %}
