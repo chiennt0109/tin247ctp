@@ -5,7 +5,7 @@ from django import forms
 from django.contrib import admin as django_admin, messages
 from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
-from django.db.models import Case, IntegerField, Value, When
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import HttpResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect, render
@@ -15,6 +15,7 @@ from django.utils.html import format_html
 from . import models
 from .models import ContestEditorialAccess, ContestProblemOrder
 from problems.models import Problem
+from submissions.models import Submission
 from .services import reset_contest_results
 
 logger = logging.getLogger(__name__)
