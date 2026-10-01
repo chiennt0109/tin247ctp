@@ -526,10 +526,20 @@ class WorkbookBankImporter:
             else:
                 mapping = mappings[qid]
                 curriculum_id = str(mapping.get("CURRICULUM_ID"))
-                outcome_id = str(mapping.get("OUTCOME_ID"))
+                outcome_id = str(mapping.get("OUTCOME_ID") or "").strip()
+                mapping_note = str(mapping.get("NOTE") or "").strip()
+                topic_context_only = (
+                    "TOPIC_CONTEXT_ONLY=TRUE" in mapping_note
+                    and "EXACT_YCCD=NOT_APPLICABLE" in mapping_note
+                )
+                is_practice_question = row.get("PROCESS_STATUS") == "READY_FOR_PRACTICE"
                 if curriculum_id not in curriculum_ids:
                     qerrors.append("UNKNOWN_CURRICULUM")
-                if outcome_id not in outcomes or outcomes.get(outcome_id) != curriculum_id:
+                if outcome_id and (
+                    outcome_id not in outcomes or outcomes.get(outcome_id) != curriculum_id
+                ):
+                    qerrors.append("INVALID_OUTCOME_LINK")
+                elif not outcome_id and not (is_practice_question and topic_context_only):
                     qerrors.append("INVALID_OUTCOME_LINK")
             if not sources[qid]:
                 qerrors.append("MISSING_SOURCE")
