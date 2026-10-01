@@ -24,9 +24,13 @@ class MasterConfigurationSyncTests(TestCase):
                 "question_id": question_id, "question_type": "ESSAY",
                 "process_status": "READY_FOR_PERIODIC", "curriculum_id": curriculum,
                 "outcome_id": "", "cognitive_level": "BIET", "difficulty": 1,
-                "competency": "NLa", "family_id": question_id,
+                "competency": "NLa", "family_id": question_id, "row": {"STATUS": "ACTIVE"},
             } for question_id, curriculum in (("Q1", "C1"), ("Q2", "C1"), ("Q3", "C2"))],
         )
+        parsed.rows["QUESTION_CURRICULUM"] = [{
+            "QUESTION_ID": question_id, "CURRICULUM_ID": curriculum,
+            "OUTCOME_ID": "", "STATUS": "APPROVED",
+        } for question_id, curriculum in (("Q1", "C1"), ("Q2", "C1"), ("Q3", "C2"))]
 
         report = MasterConfigurationSync().preview(parsed)["blueprint_pool"][0]
 
@@ -35,6 +39,46 @@ class MasterConfigurationSyncTests(TestCase):
         self.assertEqual(report["eligible_capacity"], {"ESSAY": 3})
         self.assertEqual(report["missing_count"], 1)
         self.assertFalse(report["can_generate"])
+
+    def test_grade_12_practice_blueprint_uses_practice_topic_pool(self):
+        blueprint_ids = (
+            "BP_G12_PRACTICE_AI_IOAI_2026_CS_50Q_V1",
+            "BP_G12_PRACTICE_AI_IOAI_2026_CS_V1",
+        )
+        parsed = SimpleNamespace(
+            rows={
+                "BLUEPRINTS": [{
+                    "BLUEPRINT_ID": blueprint_id, "BLUEPRINT_NAME": "IOAI practice",
+                    "EXAM_TYPE": "PRACTICE", "GRADE": 12, "STATUS": "APPROVED",
+                } for blueprint_id in blueprint_ids],
+                "BLUEPRINT_CELLS": [{
+                    "BLUEPRINT_CELL_ID": f"PRACTICE-CELL-{index}",
+                    "BLUEPRINT_ID": blueprint_id,
+                    "QUESTION_TYPE": "MCQ_SINGLE", "REQUIRED_COUNT": 1,
+                    "STATUS": "APPROVED", "CURRICULUM_ID": "C1", "OUTCOME_ID": "",
+                    "COGNITIVE_LEVEL": "BIET", "DIFFICULTY": 1, "COMPETENCY": "NLa",
+                } for index, blueprint_id in enumerate(blueprint_ids, 1)],
+                "QUESTION_CURRICULUM": [{
+                    "QUESTION_ID": "Q1", "CURRICULUM_ID": "C1", "OUTCOME_ID": "",
+                    "STATUS": "APPROVED",
+                }],
+            },
+            questions=[{
+                "question_id": "Q1", "question_type": "MCQ_SINGLE",
+                "process_status": "READY_FOR_PRACTICE", "cognitive_level": "BIET",
+                "difficulty": 1, "competency": "NLa", "family_id": "Q1",
+                "row": {"STATUS": "ACTIVE"},
+            }],
+        )
+
+        preview = MasterConfigurationSync().preview(parsed)
+
+        self.assertEqual(preview["approved_blueprints"], 2)
+        self.assertEqual(preview["grades"], [12])
+        self.assertEqual(
+            {report["blueprint"] for report in preview["blueprint_pool"]}, set(blueprint_ids),
+        )
+        self.assertTrue(all(report["can_generate"] for report in preview["blueprint_pool"]))
 
     def test_approved_regular_grade_blueprints_are_real_and_idempotent(self):
         parsed = SimpleNamespace(rows={

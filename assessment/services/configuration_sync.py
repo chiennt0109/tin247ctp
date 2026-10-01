@@ -15,9 +15,15 @@ TYPE_MAP = {
     "TN_4_LUA_CHON": "MCQ_SINGLE", "MCQ": "MCQ_SINGLE",
     "DUNG_SAI": "TRUE_FALSE_GROUP", "TRA_LOI_NGAN": "SHORT_ANSWER",
 }
-PROCESS_STATUS_MAP = {
-    "REGULAR": "READY_FOR_PERIODIC", "THUONG_XUYEN": "READY_FOR_PERIODIC",
-    "PERIODIC": "READY_FOR_PERIODIC", "GRADUATION": "READY_FOR_GRADUATION",
+SUPPORTED_EXAM_TYPES = {"PRACTICE", "PERIODIC", "GRADUATION"}
+ELIGIBLE_PROCESS_STATUS = {
+    "PRACTICE": "READY_FOR_PRACTICE",
+    "PERIODIC": "READY_FOR_PERIODIC",
+    "GRADUATION": "READY_FOR_GRADUATION",
+}
+LEGACY_PROCESS_STATUS = {
+    "REGULAR": "READY_FOR_PERIODIC",
+    "THUONG_XUYEN": "READY_FOR_PERIODIC",
 }
 
 
@@ -27,6 +33,36 @@ def _json_safe(value):
 
 class ConfigurationSyncError(ValueError):
     pass
+
+
+def _question_matches_cell(question, mappings, cell):
+    for link in mappings.get(str(question["question_id"]), ()):
+        if str(link.get("STATUS")) != "APPROVED":
+            continue
+        if str(link.get("CURRICULUM_ID")) != str(cell.get("CURRICULUM_ID")):
+            continue
+        if cell.get("OUTCOME_ID") and str(link.get("OUTCOME_ID") or "") != str(cell["OUTCOME_ID"]):
+            continue
+        return True
+    return False
+
+
+def _eligible_for_cell(question, cell, exam_type, mappings):
+    required_process_status = ELIGIBLE_PROCESS_STATUS[exam_type]
+    if str(question.get("row", {}).get("STATUS")) != "ACTIVE":
+        return False
+    if question.get("process_status") != required_process_status:
+        return False
+    qtype = TYPE_MAP.get(str(cell.get("QUESTION_TYPE")), str(cell.get("QUESTION_TYPE")))
+    if question.get("question_type") != qtype:
+        return False
+    if cell.get("COGNITIVE_LEVEL") and question.get("cognitive_level") != str(cell["COGNITIVE_LEVEL"]):
+        return False
+    if cell.get("DIFFICULTY") and str(question.get("difficulty")) != str(cell["DIFFICULTY"]):
+        return False
+    if cell.get("COMPETENCY") and question.get("competency") != str(cell["COMPETENCY"]):
+        return False
+    return _question_matches_cell(question, mappings, cell)
 
 
 def _auto_use_allowed(source):
@@ -47,7 +83,11 @@ def _auto_use_allowed(source):
 
 class MasterConfigurationSync:
     def preview(self, parsed):
-        approved = [row for row in parsed.rows.get("BLUEPRINTS", []) if str(row.get("STATUS")) == "APPROVED"]
+        approved = [
+            row for row in parsed.rows.get("BLUEPRINTS", [])
+            if str(row.get("STATUS")) == "APPROVED"
+            and str(row.get("EXAM_TYPE")) in SUPPORTED_EXAM_TYPES
+        ]
         pool_report = self._source_pool_report(parsed, approved)
         return {
             "approved_blueprints": len(approved),
@@ -66,12 +106,12 @@ class MasterConfigurationSync:
         for cell in parsed.rows.get("BLUEPRINT_CELLS", []):
             if str(cell.get("STATUS")) == "APPROVED":
                 cells_by_blueprint[str(cell.get("BLUEPRINT_ID"))].append(cell)
+        mappings = defaultdict(list)
+        for link in parsed.rows.get("QUESTION_CURRICULUM", []):
+            mappings[str(link.get("QUESTION_ID"))].append(link)
         reports = []
         for blueprint in blueprints:
-            if int(blueprint.get("GRADE") or 0) != 10:
-                continue
             exam_type = str(blueprint.get("EXAM_TYPE") or "")
-            required_status = PROCESS_STATUS_MAP.get(exam_type, "")
             used_ids, used_families = set(), set()
             required_by_type = defaultdict(int)
             eligible_by_type = defaultdict(int)
@@ -85,16 +125,7 @@ class MasterConfigurationSync:
                     family = question.get("family_id") or f"QUESTION:{question['question_id']}"
                     if question["question_id"] in used_ids or family in used_families:
                         continue
-                    filters = (
-                        question["question_type"] == qtype
-                        and (not required_status or question["process_status"] == required_status)
-                        and (not cell.get("CURRICULUM_ID") or str(question["curriculum_id"]) == str(cell["CURRICULUM_ID"]))
-                        and (not cell.get("OUTCOME_ID") or str(question["outcome_id"]) == str(cell["OUTCOME_ID"]))
-                        and (not cell.get("COGNITIVE_LEVEL") or question["cognitive_level"] == str(cell["COGNITIVE_LEVEL"]))
-                        and (not cell.get("DIFFICULTY") or question["difficulty"] == int(cell["DIFFICULTY"]))
-                        and (not cell.get("COMPETENCY") or question.get("competency") == str(cell["COMPETENCY"]))
-                    )
-                    if filters:
+                    if _eligible_for_cell(question, cell, exam_type, mappings):
                         candidates.append(question)
                 distinct = []
                 local_families = set()
@@ -256,7 +287,10 @@ class MasterConfigurationSync:
                     difficulty=int(cell["DIFFICULTY"]) if cell.get("DIFFICULTY") else None,
                     competency=str(cell.get("COMPETENCY") or ""), quantity=1,
                     score_per_item=Decimal(str(cell["SCORE_PER_ITEM"])),
-                    required_process_status=PROCESS_STATUS_MAP.get(str(source["EXAM_TYPE"]), ""),
+                    required_process_status=(
+                        ELIGIBLE_PROCESS_STATUS.get(str(source["EXAM_TYPE"]))
+                        or LEGACY_PROCESS_STATUS.get(str(source["EXAM_TYPE"]), "")
+                    ),
                     requires_graduation_eligibility=str(source["EXAM_TYPE"]) == "GRADUATION",
                 )
             policy_id = str(source.get("POLICY_PROFILE_ID") or f"BLUEPRINT:{source_id}")
