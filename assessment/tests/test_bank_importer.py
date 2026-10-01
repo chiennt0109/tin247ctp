@@ -111,6 +111,75 @@ class WorkbookBankImporterTests(SimpleTestCase):
         parsed = WorkbookBankImporter().parse(path)
         self.assertIn("MISSING_ANSWER", parsed.errors[0]["issues"])
 
+    def test_practice_topic_context_question_allows_blank_outcome(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        workbook = load_workbook(path)
+        mapping = workbook["QUESTION_CURRICULUM"]
+        headers = [cell.value for cell in mapping[1]]
+        mapping.cell(2, headers.index("OUTCOME_ID") + 1).value = None
+        mapping.cell(2, headers.index("NOTE") + 1).value = (
+            "TOPIC_CONTEXT_ONLY=TRUE; EXACT_YCCD=NOT_APPLICABLE"
+        )
+        workbook.save(path)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertFalse(parsed.errors)
+        self.assertIsNone(parsed.questions[0]["outcome_id"])
+
+    def test_non_practice_topic_context_question_requires_outcome(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        workbook = load_workbook(path)
+        question = workbook["QUESTIONS"]
+        question_headers = [cell.value for cell in question[1]]
+        question.cell(2, question_headers.index("PROCESS_STATUS") + 1).value = "CONTENT_REVIEWED"
+        mapping = workbook["QUESTION_CURRICULUM"]
+        mapping_headers = [cell.value for cell in mapping[1]]
+        mapping.cell(2, mapping_headers.index("OUTCOME_ID") + 1).value = None
+        mapping.cell(2, mapping_headers.index("NOTE") + 1).value = (
+            "TOPIC_CONTEXT_ONLY=TRUE; EXACT_YCCD=NOT_APPLICABLE"
+        )
+        workbook.save(path)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        error = next(item for item in parsed.errors if item.get("question_id") == "Q1")
+        self.assertIn("INVALID_OUTCOME_LINK", error["issues"])
+
+    def test_practice_question_without_topic_context_markers_requires_outcome(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        workbook = load_workbook(path)
+        mapping = workbook["QUESTION_CURRICULUM"]
+        headers = [cell.value for cell in mapping[1]]
+        mapping.cell(2, headers.index("OUTCOME_ID") + 1).value = None
+        mapping.cell(2, headers.index("NOTE") + 1).value = "TOPIC_CONTEXT_ONLY=TRUE"
+        workbook.save(path)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        error = next(item for item in parsed.errors if item.get("question_id") == "Q1")
+        self.assertIn("INVALID_OUTCOME_LINK", error["issues"])
+
+    def test_topic_context_markers_do_not_allow_unknown_explicit_outcome(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        workbook = load_workbook(path)
+        mapping = workbook["QUESTION_CURRICULUM"]
+        headers = [cell.value for cell in mapping[1]]
+        mapping.cell(2, headers.index("OUTCOME_ID") + 1).value = "UNKNOWN"
+        mapping.cell(2, headers.index("NOTE") + 1).value = (
+            "TOPIC_CONTEXT_ONLY=TRUE; EXACT_YCCD=NOT_APPLICABLE"
+        )
+        workbook.save(path)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        error = next(item for item in parsed.errors if item.get("question_id") == "Q1")
+        self.assertIn("INVALID_OUTCOME_LINK", error["issues"])
+
     def test_imports_periodic_essay_without_options_and_maps_physical_review_status(self):
         path = WorkbookFactory.create()
         workbook = load_workbook(path)
