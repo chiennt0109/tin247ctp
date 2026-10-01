@@ -180,6 +180,26 @@ class WorkbookBankImporterTests(SimpleTestCase):
         error = next(item for item in parsed.errors if item.get("question_id") == "Q1")
         self.assertIn("INVALID_OUTCOME_LINK", error["issues"])
 
+    def test_explicit_outcome_only_needs_to_exist(self):
+        path = WorkbookFactory.create()
+        self.addCleanup(path.unlink)
+        workbook = load_workbook(path)
+        workbook["CURRICULUM"].append(
+            ["C2", 12, "Tin học", "GDPT2018", "B", "Other topic", 2, "REVIEW", ""]
+        )
+        workbook["CURRICULUM_OUTCOMES"].append(
+            ["O2", "C2", "YCCD_02", "Other outcome", "BIET", "REVIEW", ""]
+        )
+        mapping = workbook["QUESTION_CURRICULUM"]
+        headers = [cell.value for cell in mapping[1]]
+        mapping.cell(2, headers.index("OUTCOME_ID") + 1).value = "O2"
+        workbook.save(path)
+
+        parsed = WorkbookBankImporter().parse(path)
+
+        self.assertFalse(parsed.errors)
+        self.assertEqual(parsed.questions[0]["outcome_id"], "O2")
+
     def test_imports_periodic_essay_without_options_and_maps_physical_review_status(self):
         path = WorkbookFactory.create()
         workbook = load_workbook(path)
