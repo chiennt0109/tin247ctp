@@ -80,6 +80,15 @@ class BlueprintTests(TestCase):
         self.assertEqual(report["score_total"], "0.500")
         self.assertEqual(report["availability"][0]["status"], "TIGHT")
 
+    def test_validator_honors_fixed_source_question_binding(self):
+        self.create_question("Q1")
+        self.create_question("Q2")
+        self.slot.quantity = 1
+        self.slot.required_tags = {"SOURCE_QUESTION_ID": "Q2"}
+        self.slot.save(update_fields=("quantity", "required_tags"))
+        candidates = BlueprintValidator.candidates_for_slot(self.slot)
+        self.assertEqual([question.source_question_id for question in candidates], ["Q2"])
+
     def test_validator_rejects_duplicate_family_capacity(self):
         self.create_question("Q1", family="FAMILY-A")
         self.create_question("Q2", family="FAMILY-A")
