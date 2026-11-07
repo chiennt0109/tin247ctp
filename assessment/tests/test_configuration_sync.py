@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 from django.test import TestCase
 
-from assessment.models import ExamBlueprint, ExamBlueprintGroup
+from assessment.models import BlueprintSlot, ExamBlueprint, ExamBlueprintGroup
 from assessment.services.configuration_sync import MasterConfigurationSync
 
 
@@ -117,3 +117,34 @@ class MasterConfigurationSyncTests(TestCase):
         self.assertEqual(ExamBlueprintGroup.objects.count(), 1)
         self.assertEqual(ExamBlueprintGroup.objects.get().blueprints.count(), 3)
         self.assertFalse(ExamBlueprint.objects.filter(name__startswith="[DEMO]").exists())
+
+    def test_apply_preserves_fixed_question_binding_from_source_slot(self):
+        parsed = SimpleNamespace(rows={
+            "BLUEPRINTS": [{
+                "BLUEPRINT_ID": "BP-FIXED", "BLUEPRINT_NAME": "Fixed",
+                "EXAM_TYPE": "PERIODIC", "GRADE": 12, "SUBJECT": "Tin học",
+                "TOTAL_QUESTIONS": 1, "TOTAL_SCORE": "1", "DURATION_MIN": 45,
+                "VERSION": 1, "STATUS": "APPROVED", "SEMESTER": "HK1",
+                "POLICY_PROFILE_ID": "POL-FIXED", "NOTE": "SOURCE_LOCK=TRUE",
+            }],
+            "BLUEPRINT_CELLS": [{
+                "BLUEPRINT_CELL_ID": "CELL-FIXED", "BLUEPRINT_ID": "BP-FIXED",
+                "CURRICULUM_ID": "", "OUTCOME_ID": "", "QUESTION_TYPE": "MCQ_SINGLE",
+                "COGNITIVE_LEVEL": "HIEU", "REQUIRED_COUNT": 1, "SCORE_PER_ITEM": "1",
+                "STATUS": "APPROVED", "DIFFICULTY": 2, "COMPETENCY": "",
+            }],
+            "BLUEPRINT_SLOTS": [{
+                "BLUEPRINT_SLOT_ID": "SLOT-FIXED", "BLUEPRINT_ID": "BP-FIXED",
+                "SLOT_NO": 1, "BLUEPRINT_CELL_ID": "CELL-FIXED",
+                "QUESTION_ID": "Q-FIXED-001", "STATUS": "APPROVED", "NOTE": "",
+            }],
+            "SCORE_RULES": [{
+                "POLICY_PROFILE_ID": "POL-FIXED", "QUESTION_TYPE": "MCQ_SINGLE",
+                "RULE_CODE": "FIXED-MCQ", "MAX_SCORE": "1", "STATUS": "APPROVED",
+            }],
+        })
+
+        MasterConfigurationSync().apply(parsed)
+
+        slot = BlueprintSlot.objects.get(source_slot_id="SLOT-FIXED")
+        self.assertEqual(slot.required_tags, {"SOURCE_QUESTION_ID": "Q-FIXED-001"})
