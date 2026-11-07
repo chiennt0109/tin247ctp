@@ -107,7 +107,13 @@ class BlueprintValidator:
         question's ``tags`` metadata) or ``{"NLS_PRIMARY": "..."}`` style gates.
         This keeps NLS/AI separate from the subject competency field.
         """
-        questions = cls._candidate_queryset(slot).order_by("source_question_id")
+        questions = cls._candidate_queryset(slot)
+        required = slot.required_tags or []
+        if isinstance(required, dict) and required.get("SOURCE_QUESTION_ID"):
+            questions = questions.filter(
+                source_question_id=str(required["SOURCE_QUESTION_ID"])
+            )
+        questions = questions.order_by("source_question_id")
         return [question for question in questions if cls._metadata_matches(slot, question)
                 and (not slot.requires_graduation_eligibility or graduation_eligible(question))]
 
@@ -118,7 +124,11 @@ class BlueprintValidator:
         excluded = slot.excluded_tags or []
         tags = set(metadata.get("tags") or metadata.get("TAGS") or [])
         if isinstance(required, dict):
-            if any(metadata.get(key) != value for key, value in required.items()):
+            metadata_required = {
+                key: value for key, value in required.items()
+                if key != "SOURCE_QUESTION_ID"
+            }
+            if any(metadata.get(key) != value for key, value in metadata_required.items()):
                 return False
         elif any(tag not in tags for tag in required):
             return False
