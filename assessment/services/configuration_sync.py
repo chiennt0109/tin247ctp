@@ -291,6 +291,11 @@ class MasterConfigurationSync:
                         ELIGIBLE_PROCESS_STATUS.get(str(source["EXAM_TYPE"]))
                         or LEGACY_PROCESS_STATUS.get(str(source["EXAM_TYPE"]), "")
                     ),
+                    required_tags=(
+                        {"SOURCE_QUESTION_ID": str(row.get("QUESTION_ID"))}
+                        if str(row.get("QUESTION_ID") or "").strip()
+                        else []
+                    ),
                     requires_graduation_eligibility=str(source["EXAM_TYPE"]) == "GRADUATION",
                 )
             policy_id = str(source.get("POLICY_PROFILE_ID") or f"BLUEPRINT:{source_id}")
