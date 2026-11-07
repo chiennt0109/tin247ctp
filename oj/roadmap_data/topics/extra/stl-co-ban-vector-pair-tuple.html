@@ -1,19 +1,237 @@
-<article class="roadmap-extra-topic">
-  <h1>STL cơ bản: vector, pair, tuple</h1>
-  <section>
-    <h2>Mục tiêu</h2>
-    <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
-    </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
-    <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
-    </ol>
-  </section>
-</article>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.stl-page{font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);position:relative;width:calc(100vw - 24px);max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}.stl-page *{box-sizing:border-box}.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1100px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}.card{width:100%;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:900px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.vector-view{display:flex;flex-wrap:wrap;gap:9px;min-height:100px;padding:12px;border:1px dashed #bfdbfe;border-radius:16px;background:#f8fafc}.vec-cell{min-width:74px;padding:10px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}.vec-cell small{display:block;color:#64748b;font-size:.72rem}.vec-cell.active{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:translateY(-4px)}
+.vec-cell.found{background:#dcfce7;border-color:#22c55e;color:#166534}
+.vec-cell.range-mark{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}
+.func-grid{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:10px}
+.func-grid label{font-weight:800;color:#334155}
+.function-result{margin-top:12px;padding:12px;border:1px solid #c7d2fe;border-radius:14px;background:#eef2ff;color:#312e81;font-family:Consolas,monospace}
+.mini-code{display:block;margin-top:7px;padding:8px 10px;border-radius:10px;background:#0f172a;color:#f8fafc;white-space:pre-wrap;font:13px/1.55 Consolas,monospace}.capacity{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.slot{width:48px;height:42px;border:2px dashed #cbd5e1;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-weight:800}.slot.used{border-style:solid;background:#dcfce7;border-color:#22c55e;color:#166534}.pair-grid,.tuple-grid{display:grid;gap:8px}.pair-row{display:grid;grid-template-columns:55px 1fr 1fr;gap:8px}.tuple-row{display:grid;grid-template-columns:55px 1fr 1fr 1fr;gap:8px}.head,.dcell{padding:8px;border-radius:10px;text-align:center}.head{font-weight:900;color:#312e81;background:#eef2ff}.dcell{border:1px solid #cbd5e1;background:#f8fafc}.log{min-height:120px;max-height:330px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}.stl-page pre{margin:0;padding:20px;max-height:650px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.stl-page p code,.stl-page li code,.stl-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.func-grid{grid-template-columns:1fr}.stl-page{width:100%;margin:0;padding:12px}.hero{border-radius:20px}}
+</style>
+<div class="stl-page">
+<div class="hero"><span class="badge">C++ Standard Template Library</span><h1>🧰 STL cơ bản: vector, pair và tuple</h1><p>Ba công cụ nền tảng giúp lưu dãy động và gom nhiều dữ liệu liên quan thành một đối tượng. Bài học tập trung vào cách chọn kiểu dữ liệu, thao tác thường dùng, sắp xếp và structured binding.</p><div class="stats"><div class="stat"><b>vector</b><span>Mảng động, truy cập O(1)</span></div><div class="stat"><b>pair</b><span>Gom đúng hai giá trị</span></div><div class="stat"><b>tuple</b><span>Gom từ ba giá trị</span></div><div class="stat"><b>sort</b><span>Sắp xếp từ điển</span></div></div></div>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav"><a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#vector">Vector</a><a href="#vector-functions">Hàm vector</a><a href="#pair">Pair</a><a href="#tuple">Tuple</a><a href="#compare">So sánh</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a></div></div>
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2"><div class="box"><h3>Cần hiểu</h3><ul><li>Vì sao cần vector thay cho mảng cố định.</li><li>Các thao tác thêm, chèn, xóa, truy cập, duyệt và sắp xếp.</li><li>Biết dùng <code>insert</code>, <code>erase</code>, <code>find</code>, <code>resize</code>, <code>reverse</code> và remove–erase.</li><li>Khi nào dùng pair và tuple.</li><li>Cách dùng first, second, get, tie và structured binding.</li></ul></div><div class="box"><h3>Ứng dụng</h3><ul><li>Lưu danh sách cạnh đồ thị.</li><li>Lưu điểm và mã học sinh.</li><li>Priority queue chứa khoảng cách và đỉnh.</li><li>Trả về nhiều kết quả từ một hàm.</li></ul></div></div></section>
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2><div class="call"><b>Bài toán mở đầu.</b><br>Chương trình đọc số lượng phần tử chưa biết trước. Mỗi phần tử có thể là một số, một cặp <code>(điểm, mã)</code> hoặc một bộ ba <code>(điểm, thời gian, mã)</code>. Cần thêm dữ liệu trong lúc chạy, sắp xếp và truy cập từng trường.</div><h3>1.1. Hạn chế của mảng thường</h3><p>Mảng như <code>int a[1000]</code> cần biết trước giới hạn. Khi dữ liệu thay đổi, ta phải tự quản lý số phần tử và dễ vượt kích thước.</p><h3>1.2. Hạn chế của nhiều mảng song song</h3><p>Nếu một bản ghi có nhiều trường, dùng nhiều mảng riêng dễ làm dữ liệu lệch nhau khi sắp xếp.</p><div class="table-wrap"><table class="tbl"><tr><th>Nhu cầu</th><th>Cách thủ công</th><th>STL phù hợp</th></tr><tr><td>Dãy có kích thước thay đổi</td><td>Mảng lớn + biến đếm</td><td><code>vector&lt;T&gt;</code></td></tr><tr><td>Gom hai giá trị</td><td>Hai biến riêng</td><td><code>pair&lt;A,B&gt;</code></td></tr><tr><td>Gom nhiều giá trị</td><td>Nhiều biến riêng</td><td><code>tuple&lt;A,B,C,...&gt;</code></td></tr></table></div><div class="call ok"><b>Kết luận:</b> vector quản lý số lượng phần tử; pair/tuple quản lý cấu trúc của từng phần tử.</div></section>
+<section class="card" id="vector"><h2>2. vector – mảng động</h2><div class="g2"><div class="box"><h3>Khai báo</h3><p><code>vector&lt;int&gt; a;</code></p><p><code>vector&lt;int&gt; a(n);</code></p><p><code>vector&lt;int&gt; a(n,0);</code></p><p><code>vector&lt;vector&lt;int&gt;&gt; adj(n+1);</code></p></div><div class="box"><h3>Thao tác chính</h3><ul><li><code>push_back(x)</code>, <code>emplace_back(...)</code>.</li><li><code>pop_back()</code>, <code>clear()</code>.</li><li><code>size()</code>, <code>empty()</code>.</li><li><code>front()</code>, <code>back()</code>, <code>a[i]</code>.</li><li><code>sort(a.begin(),a.end())</code>.</li></ul></div></div><h3>2.1. Mô phỏng vector</h3><div class="g2"><div class="visual"><label>Giá trị</label><input class="input" id="vecValue" value="7"><div class="controls"><button class="btn" id="pushBtn">push_back</button><button class="btn orange" id="popBtn">pop_back</button><button class="btn green" id="sortBtn">sort</button><button class="btn alt" id="clearBtn">clear</button></div><h3>Phần tử</h3><div class="vector-view" id="vectorView"></div><h3>Capacity minh họa</h3><div class="capacity" id="capacityView"></div></div><div class="log" id="vectorLog"></div></div><div class="call warn"><b>size khác capacity:</b> size là số phần tử đang có; capacity là số ô đã cấp phát. Khi hết capacity, vector có thể tái cấp phát vùng nhớ mới.</div><div class="table-wrap"><table class="tbl"><tr><th>Thao tác</th><th>Độ phức tạp</th><th>Ghi chú</th></tr><tr><td>Truy cập a[i]</td><td>O(1)</td><td>Không tự kiểm tra biên.</td></tr><tr><td>push_back</td><td>O(1) trung bình khấu hao</td><td>Đôi lúc O(n) khi tái cấp phát.</td></tr><tr><td>pop_back</td><td>O(1)</td><td>Không trả về phần tử bị xóa.</td></tr><tr><td>Chèn/xóa giữa</td><td>O(n)</td><td>Các phần tử phía sau phải dịch.</td></tr></table></div></section>
+
+<section class="card" id="vector-functions">
+<h2>3. Các hàm thường dùng với vector</h2>
+<div class="call"><b>Mục tiêu:</b> vector còn hỗ trợ chèn, xóa theo vị trí, xóa một đoạn, thay đổi kích thước, tìm kiếm và đảo thứ tự.</div>
+
+<div class="table-wrap"><table class="tbl">
+<tr><th>Hàm / thuật toán</th><th>Ví dụ</th><th>Tác dụng</th><th>Độ phức tạp</th></tr>
+<tr><td><code>insert</code></td><td><code>a.insert(a.begin()+pos,x);</code></td><td>Chèn x trước vị trí pos.</td><td>O(n)</td></tr>
+<tr><td><code>erase</code> một phần tử</td><td><code>a.erase(a.begin()+pos);</code></td><td>Xóa phần tử tại pos.</td><td>O(n)</td></tr>
+<tr><td><code>erase</code> một đoạn</td><td><code>a.erase(a.begin()+L,a.begin()+R);</code></td><td>Xóa đoạn <code>[L,R)</code>.</td><td>O(n)</td></tr>
+<tr><td><code>find</code></td><td><code>find(a.begin(),a.end(),x)</code></td><td>Tìm lần xuất hiện đầu tiên.</td><td>O(n)</td></tr>
+<tr><td><code>remove</code> + <code>erase</code></td><td><code>a.erase(remove(a.begin(),a.end(),x),a.end());</code></td><td>Xóa mọi phần tử bằng x.</td><td>O(n)</td></tr>
+<tr><td><code>resize</code></td><td><code>a.resize(n,0);</code></td><td>Đổi size; phần tử mới nhận 0.</td><td>O(|size mới-size cũ|)</td></tr>
+<tr><td><code>assign</code></td><td><code>a.assign(n,value);</code></td><td>Thay toàn bộ vector.</td><td>O(n)</td></tr>
+<tr><td><code>reverse</code></td><td><code>reverse(a.begin(),a.end());</code></td><td>Đảo thứ tự.</td><td>O(n)</td></tr>
+<tr><td><code>lower_bound</code></td><td><code>lower_bound(a.begin(),a.end(),x)</code></td><td>Tìm phần tử đầu tiên ≥ x; vector phải tăng dần.</td><td>O(log n)</td></tr>
+<tr><td><code>swap</code></td><td><code>a.swap(b);</code></td><td>Đổi nội dung hai vector.</td><td>Thường O(1)</td></tr>
+</table></div>
+
+<h3>3.1. Mô phỏng insert, erase, resize, reverse và find</h3>
+<div class="g2">
+<div class="visual">
+  <div class="func-grid">
+    <label>Vị trí pos<input class="input" id="funcPos" type="number" value="2" min="0"></label>
+    <label>Giá trị x<input class="input" id="funcValue" type="number" value="99"></label>
+    <label>Đầu đoạn L<input class="input" id="funcL" type="number" value="1" min="0"></label>
+    <label>Cuối đoạn R<input class="input" id="funcR" type="number" value="3" min="0"></label>
+    <label>Size mới<input class="input" id="funcSize" type="number" value="7" min="0"></label>
+    <label>Giá trị phần tử mới<input class="input" id="funcFill" type="number" value="0"></label>
+  </div>
+  <div class="controls">
+    <button class="btn" id="insertPosBtn">insert(pos,x)</button>
+    <button class="btn orange" id="erasePosBtn">erase(pos)</button>
+    <button class="btn red" id="eraseRangeBtn">erase [L,R)</button>
+    <button class="btn green" id="findValueBtn">find(x)</button>
+    <button class="btn" id="resizeBtn">resize</button>
+    <button class="btn orange" id="reverseBtn">reverse</button>
+    <button class="btn red" id="eraseValueBtn">xóa mọi x</button>
+    <button class="btn alt" id="funcResetBtn">Làm lại</button>
+  </div>
+  <h3>Vector đang mô phỏng</h3>
+  <div class="vector-view" id="functionVectorView"></div>
+  <div class="function-result" id="functionCodePreview"></div>
+</div>
+<div class="log" id="functionLog"></div>
+</div>
+
+<div class="g2">
+<div class="call warn"><b>Đoạn xóa là nửa mở:</b> <code>erase(begin()+L, begin()+R)</code> xóa từ L đến R−1, không xóa R.</div>
+<div class="call bad"><b>Kiểm tra biên:</b> insert cần <code>0 ≤ pos ≤ size</code>; erase cần <code>0 ≤ pos &lt; size</code>.</div>
+</div>
+
+<h3>3.2. Ví dụ xóa theo giá trị</h3>
+<pre><code>vector&lt;int&gt; a = {2, 5, 2, 7, 2, 9};
+int x = 2;
+
+a.erase(
+    remove(a.begin(), a.end(), x),
+    a.end()
+);
+
+// a = {5, 7, 9}</code></pre>
+<div class="call ok"><b>Ghi nhớ:</b> <code>remove</code> chỉ dồn phần tử, không làm giảm <code>size()</code>. Phải kết hợp với <code>erase</code>.</div>
+</section>
+
+<section class="card" id="pair"><h2>4. pair – gom hai giá trị</h2><div class="g2"><div class="box"><h3>Truy cập</h3><ul><li><code>p.first</code></li><li><code>p.second</code></li><li><code>auto [x,y]=p;</code> từ C++17</li></ul></div><div class="box"><h3>Ứng dụng</h3><ul><li><code>{weight,vertex}</code>.</li><li><code>{score,id}</code>.</li><li><code>{value,index}</code>.</li></ul></div></div><h3>4.1. Sắp xếp vector&lt;pair&gt;</h3><div class="g2"><div class="visual"><div class="pair-grid" id="pairGrid"></div><div class="controls"><button class="btn" id="pairSortBtn">Sắp xếp</button><button class="btn alt" id="pairResetBtn">Làm lại</button></div></div><div class="log" id="pairLog"></div></div><div class="call ok"><b>Quy tắc:</b> so sánh first trước; nếu bằng nhau mới so sánh second.</div></section>
+<section class="card" id="tuple"><h2>5. tuple – gom nhiều giá trị</h2><div class="g2"><div class="box"><h3>Truy cập</h3><ul><li><code>get&lt;0&gt;(t)</code>, <code>get&lt;1&gt;(t)</code>.</li><li><code>auto [a,b,c]=t;</code></li><li><code>tie(a,b,c)=t;</code></li><li><code>ignore</code> để bỏ qua trường.</li></ul></div><div class="box"><h3>Khi nào dùng?</h3><ul><li>Dữ liệu nhỏ, dùng cục bộ.</li><li>Trả về nhiều giá trị.</li><li>State 3–4 trường.</li><li>Sắp xếp nhiều khóa.</li></ul></div></div><div class="call warn"><b>Nên dùng struct</b> nếu dữ liệu có ý nghĩa lâu dài hoặc nhiều trường, vì tên trường dễ đọc hơn get&lt;i&gt;.</div><h3>5.1. Sắp xếp tuple</h3><div class="g2"><div class="visual"><div class="tuple-grid" id="tupleGrid"></div><div class="controls"><button class="btn" id="tupleSortBtn">Sắp xếp</button><button class="btn alt" id="tupleResetBtn">Làm lại</button></div></div><div class="log" id="tupleLog"></div></div></section>
+<section class="card" id="compare"><h2>6. Chọn vector, pair, tuple hay struct?</h2><div class="table-wrap"><table class="tbl"><tr><th>Công cụ</th><th>Mục đích</th><th>Ưu điểm</th><th>Hạn chế</th></tr><tr><td>vector</td><td>Lưu nhiều phần tử cùng kiểu</td><td>Kích thước động</td><td>Chèn/xóa giữa chậm</td></tr><tr><td>pair</td><td>Gom hai trường</td><td>Ngắn gọn</td><td>first/second thiếu ý nghĩa</td></tr><tr><td>tuple</td><td>Gom nhiều trường nhỏ</td><td>Structured binding tiện</td><td>Khó đọc khi nhiều trường</td></tr><tr><td>struct</td><td>Dữ liệu có tên trường rõ</td><td>Dễ đọc, dễ mở rộng</td><td>Dài hơn</td></tr></table></div></section>
+<section class="card" id="code"><h2>7. Code mẫu</h2><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="vecCode">Vector</button><button class="tab-btn" data-tab="editVecCode">Insert / Erase</button><button class="tab-btn" data-tab="pairCode">Pair</button><button class="tab-btn" data-tab="tupleCode">Tuple</button><button class="tab-btn" data-tab="sortCode">Comparator</button></div>
+<div class="panel active" id="vecCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; a;
+    a.reserve(100);
+
+    a.push_back(5);
+    a.push_back(2);
+    a.emplace_back(8);
+
+    sort(a.begin(), a.end());
+
+    for (int x : a) cout &lt;&lt; x &lt;&lt; ' ';
+
+    if (!a.empty()) a.pop_back();
+}</code></pre></div>
+<div class="panel" id="editVecCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; a = {10, 20, 30, 40, 50};
+
+    a.insert(a.begin() + 2, 99);
+    // {10, 20, 99, 30, 40, 50}
+
+    a.erase(a.begin() + 3);
+    // {10, 20, 99, 40, 50}
+
+    a.erase(a.begin() + 1, a.begin() + 3);
+    // Xóa đoạn [1,3): {10, 40, 50}
+
+    a.erase(
+        remove(a.begin(), a.end(), 40),
+        a.end()
+    );
+    // {10, 50}
+
+    auto it = find(a.begin(), a.end(), 50);
+
+    if (it != a.end()) {
+        int position = it - a.begin();
+        cout &lt;&lt; position;
+    }
+}</code></pre></div>
+<div class="panel" id="pairCode"><button class="copy">Sao chép</button><pre><code>vector&lt;pair&lt;int,string&gt;&gt; students;
+students.push_back({9, "An"});
+students.emplace_back(7, "Binh");
+students.emplace_back(9, "Chi");
+
+sort(students.begin(), students.end());
+
+for (const auto&amp; [score, name] : students) {
+    cout &lt;&lt; score &lt;&lt; ' ' &lt;&lt; name &lt;&lt; '\n';
+}</code></pre></div>
+<div class="panel" id="tupleCode"><button class="copy">Sao chép</button><pre><code>tuple&lt;int,int,int&gt; getMinMaxSum(const vector&lt;int&gt;&amp; a) {
+    int mn = *min_element(a.begin(), a.end());
+    int mx = *max_element(a.begin(), a.end());
+    int sum = accumulate(a.begin(), a.end(), 0);
+    return {mn, mx, sum};
+}
+
+auto [mn, mx, sum] = getMinMaxSum(a);</code></pre></div>
+<div class="panel" id="sortCode"><button class="copy">Sao chép</button><pre><code>sort(students.begin(), students.end(),
+    [](const Student&amp; a, const Student&amp; b) {
+        if (a.score != b.score) return a.score &gt; b.score;
+        if (a.name != b.name) return a.name &lt; b.name;
+        return a.id &lt; b.id;
+    }
+);</code></pre></div></div></section>
+<section class="card" id="explain"><h2>8. Giải thích code</h2><h3>8.1. Vì sao push_back là O(1) trung bình?</h3><p>Phần lớn lần thêm chỉ ghi vào ô tiếp theo. Khi hết capacity, vector cấp phát vùng mới và chuyển các phần tử, nên có lần O(n). Tính trung bình nhiều lần là O(1) khấu hao.</p><h3>8.2. reserve khác resize</h3><div class="call warn"><code>reserve(n)</code> chỉ tăng capacity, không tạo n phần tử. <code>resize(n)</code> thay đổi size và tạo/xóa phần tử.</div><h3>8.3. Vì sao dùng const auto&amp;?</h3><p>Tránh sao chép phần tử và không cho phép sửa dữ liệu gốc.</p><h3>8.4. Structured binding có sao chép không?</h3><p><code>auto [x,y]=p</code> tạo bản sao. Muốn tham chiếu, dùng <code>auto&amp; [x,y]=p</code> hoặc <code>const auto&amp; [x,y]=p</code>.</p><h3>8.5. emplace_back có luôn nhanh hơn?</h3><p>Không. Nó hữu ích khi dựng đối tượng trực tiếp từ đối số. Với kiểu đơn giản như int, khác biệt không đáng kể.</p><h3>8.6. insert và erase ảnh hưởng đến phần tử phía sau thế nào?</h3><p>Vector lưu dữ liệu liên tiếp. Khi chèn hoặc xóa ở giữa, các phần tử phía sau phải dịch chuyển, nên thao tác thường là O(n).</p>
+<h3>8.7. Vì sao erase nhận iterator?</h3><p>Muốn xóa vị trí <code>pos</code>, chuyển chỉ số thành iterator bằng <code>a.begin()+pos</code>.</p>
+<h3>8.8. erase trả về gì?</h3><p><code>erase</code> trả về iterator tới phần tử đứng ngay sau phần tử hoặc đoạn vừa bị xóa. Điều này hữu ích khi vừa duyệt vừa xóa.</p>
+<h3>8.9. Khi nào dùng lower_bound?</h3><p>Đoạn dữ liệu phải được sắp xếp theo cùng thứ tự so sánh. Nếu vector chưa sắp xếp, kết quả không có ý nghĩa như tìm kiếm nhị phân.</p></section>
+<section class="card" id="mistakes"><h2>9. Lỗi thường gặp</h2><ul><li>Truy cập a[0] hoặc pop_back khi vector rỗng.</li><li>Duyệt <code>i &lt;= a.size()</code>.</li><li>Nhầm reserve với resize.</li><li>Giữ pointer/reference rồi push_back làm vector tái cấp phát.</li><li>Dùng <code>auto [x,y]</code> rồi tưởng sửa được pair gốc.</li><li>Nhớ sai thứ tự trường trong tuple.</li><li>Dùng tuple quá dài thay vì struct.</li>
+<li>Gọi <code>insert</code> hoặc <code>erase</code> với vị trí vượt biên.</li>
+<li>Nhầm đoạn xóa <code>[L,R)</code> thành <code>[L,R]</code>.</li>
+<li>Dùng <code>remove</code> nhưng quên gọi <code>erase</code>.</li>
+<li>Tiếp tục dùng iterator/reference cũ sau khi insert hoặc erase làm chúng mất hiệu lực.</li></ul></section>
+<section class="card" id="quiz"><h2>10. Quiz và bài tập</h2><div class="quiz" data-answer="b"><b>Câu 1.</b> Hàm thêm cuối vector?<div class="answers"><button class="answer" data-choice="a">insert_front</button><button class="answer" data-choice="b">push_back</button><button class="answer" data-choice="c">append_front</button></div><div class="feedback"></div></div><div class="quiz" data-answer="c"><b>Câu 2.</b> Pair được so sánh thế nào?<div class="answers"><button class="answer" data-choice="a">second trước</button><button class="answer" data-choice="b">Tổng hai trường</button><button class="answer" data-choice="c">first trước, rồi second</button></div><div class="feedback"></div></div><div class="quiz" data-answer="a"><b>Câu 3.</b> reserve(100) làm gì?<div class="answers"><button class="answer" data-choice="a">Dự trữ capacity ít nhất 100, không đổi size</button><button class="answer" data-choice="b">Tạo 100 phần tử</button><button class="answer" data-choice="c">Xóa vector</button></div><div class="feedback"></div></div><div class="quiz" data-answer="b"><b>Câu 4.</b> <code>a.erase(a.begin()+1,a.begin()+4)</code> xóa các chỉ số nào?<div class="answers"><button class="answer" data-choice="a">1, 2, 3, 4</button><button class="answer" data-choice="b">1, 2, 3</button><button class="answer" data-choice="c">Chỉ số 4</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="c"><b>Câu 5.</b> Muốn xóa mọi phần tử bằng x khỏi vector, cách chuẩn là gì?<div class="answers"><button class="answer" data-choice="a">Chỉ gọi remove</button><button class="answer" data-choice="b">Chỉ gọi pop_back</button><button class="answer" data-choice="c">Dùng remove rồi erase</button></div><div class="feedback"></div></div><div class="g2"><div class="box"><h3>Cơ bản</h3><ol><li>Nhập vector, in ngược.</li><li>Tìm max/min bằng STL.</li><li>Sắp xếp tăng/giảm.</li><li>Chèn x vào vị trí pos.</li><li>Xóa phần tử hoặc đoạn chỉ số.</li><li>Xóa mọi phần tử bằng x.</li></ol></div><div class="box"><h3>Trung bình</h3><ol><li>Sắp xếp vector&lt;pair&gt;.</li><li>Lưu cạnh đồ thị.</li><li>Trả về min/max/sum bằng tuple.</li></ol></div></div></section>
+</div>
+<script>
+(function(){'use strict';const $=(s,r)=> (r||document).querySelector(s), $$=(s,r)=>Array.from((r||document).querySelectorAll(s));let vec=[5,2,9],cap=4;let functionVec=[10,20,30,40,50],functionHighlight={type:'',indexes:[]};const po=[[9,3],[7,1],[9,1],[8,4],[7,2]],to=[[9,120,3],[7,90,1],[9,110,1],[8,95,4],[9,110,2]];let pairs=[],tuples=[];
+function rv(msg,active=-1){$('#vectorView').innerHTML=vec.length?vec.map((v,i)=>'<div class="vec-cell '+(i===active?'active':'')+'"><small>index '+i+'</small>'+v+'</div>').join(''):'<span>vector đang rỗng</span>';let s='';for(let i=0;i<cap;i++)s+='<div class="slot '+(i<vec.length?'used':'')+'">'+(i<vec.length?vec[i]:'trống')+'</div>';$('#capacityView').innerHTML=s;$('#vectorLog').innerHTML=msg+'<br><b>size='+vec.length+', capacity minh họa='+cap+'</b>'}
+function renderFunctionVec(msg,code){
+  const marks=new Set(functionHighlight.indexes||[]);
+  $('#functionVectorView').innerHTML=functionVec.length?functionVec.map((v,i)=>{
+    let cls='';
+    if(functionHighlight.type==='found'&&marks.has(i))cls='found';
+    if(functionHighlight.type==='range'&&marks.has(i))cls='range-mark';
+    if(functionHighlight.type==='active'&&marks.has(i))cls='active';
+    return '<div class="vec-cell '+cls+'"><small>index '+i+'</small>'+v+'</div>';
+  }).join(''):'<span>vector đang rỗng</span>';
+  $('#functionLog').innerHTML=msg+'<br><b>size = '+functionVec.length+'</b>';
+  $('#functionCodePreview').innerHTML='<b>Lệnh tương ứng</b><span class="mini-code">'+code+'</span>';
+}
+function readInt(id,def=0){let v=Number($(id).value);return Number.isFinite(v)?Math.trunc(v):def}
+function resetFunctionVec(){functionVec=[10,20,30,40,50];functionHighlight={type:'',indexes:[]};renderFunctionVec('Dữ liệu mẫu ban đầu.','vector&lt;int&gt; a = {10, 20, 30, 40, 50};')}
+function insertAtPosition(){
+  let pos=readInt('#funcPos'),x=readInt('#funcValue');
+  if(pos<0||pos>functionVec.length)return renderFunctionVec('Vị trí insert không hợp lệ. Cần 0 ≤ pos ≤ size.','// Không thực hiện vì pos vượt biên');
+  functionVec.splice(pos,0,x);functionHighlight={type:'active',indexes:[pos]};
+  renderFunctionVec('Đã chèn '+x+' trước vị trí '+pos+'.','a.insert(a.begin() + '+pos+', '+x+');');
+}
+function eraseAtPosition(){
+  let pos=readInt('#funcPos');
+  if(pos<0||pos>=functionVec.length)return renderFunctionVec('Vị trí erase không hợp lệ. Cần 0 ≤ pos < size.','// Không thực hiện vì pos vượt biên');
+  let removed=functionVec[pos];functionVec.splice(pos,1);functionHighlight={type:'active',indexes:pos<functionVec.length?[pos]:[]};
+  renderFunctionVec('Đã xóa a['+pos+'] = '+removed+'.','a.erase(a.begin() + '+pos+');');
+}
+function eraseRange(){
+  let L=readInt('#funcL'),R=readInt('#funcR');
+  if(L<0||R<L||R>functionVec.length)return renderFunctionVec('Đoạn xóa không hợp lệ. Cần 0 ≤ L ≤ R ≤ size.','// Không thực hiện vì [L,R) không hợp lệ');
+  let removed=functionVec.slice(L,R);functionVec.splice(L,R-L);functionHighlight={type:'active',indexes:L<functionVec.length?[L]:[]};
+  renderFunctionVec('Đã xóa đoạn ['+L+','+R+'): ['+removed.join(', ')+'].','a.erase(a.begin() + '+L+', a.begin() + '+R+');');
+}
+function findValue(){
+  let x=readInt('#funcValue'),pos=functionVec.indexOf(x);functionHighlight={type:'found',indexes:pos===-1?[]:[pos]};
+  renderFunctionVec(pos===-1?'Không tìm thấy '+x+'.':'Tìm thấy '+x+' lần đầu tại index '+pos+'.','auto it = find(a.begin(), a.end(), '+x+');');
+}
+function resizeVector(){
+  let newSize=Math.max(0,readInt('#funcSize')),fill=readInt('#funcFill'),oldSize=functionVec.length;
+  if(newSize<oldSize)functionVec.length=newSize;else while(functionVec.length<newSize)functionVec.push(fill);
+  functionHighlight={type:'range',indexes:Array.from({length:Math.max(0,newSize-oldSize)},(_,k)=>oldSize+k)};
+  renderFunctionVec('Đã đổi size từ '+oldSize+' thành '+newSize+'.','a.resize('+newSize+', '+fill+');');
+}
+function reverseVector(){functionVec.reverse();functionHighlight={type:'range',indexes:functionVec.map((_,i)=>i)};renderFunctionVec('Đã đảo ngược thứ tự vector.','reverse(a.begin(), a.end());')}
+function eraseAllValue(){
+  let x=readInt('#funcValue'),before=functionVec.length;functionVec=functionVec.filter(v=>v!==x);functionHighlight={type:'',indexes:[]};
+  renderFunctionVec('Đã xóa '+(before-functionVec.length)+' phần tử bằng '+x+'.','a.erase(remove(a.begin(), a.end(), '+x+'), a.end());');
+}
+function rp(msg=''){let s='<div class="pair-row"><div class="head">#</div><div class="head">first</div><div class="head">second</div></div>';pairs.forEach((p,i)=>s+='<div class="pair-row"><div class="dcell">'+i+'</div><div class="dcell">'+p[0]+'</div><div class="dcell">'+p[1]+'</div></div>');$('#pairGrid').innerHTML=s;$('#pairLog').innerHTML=msg||'So sánh first trước, rồi second.'}
+function rt(msg=''){let s='<div class="tuple-row"><div class="head">#</div><div class="head">score</div><div class="head">time</div><div class="head">id</div></div>';tuples.forEach((t,i)=>s+='<div class="tuple-row"><div class="dcell">'+i+'</div><div class="dcell">'+t[0]+'</div><div class="dcell">'+t[1]+'</div><div class="dcell">'+t[2]+'</div></div>');$('#tupleGrid').innerHTML=s;$('#tupleLog').innerHTML=msg||'So sánh lần lượt từ trường 0 đến trường cuối.'}
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();
+$('#insertPosBtn').onclick=insertAtPosition;
+$('#erasePosBtn').onclick=eraseAtPosition;
+$('#eraseRangeBtn').onclick=eraseRange;
+$('#findValueBtn').onclick=findValue;
+$('#resizeBtn').onclick=resizeVector;
+$('#reverseBtn').onclick=reverseVector;
+$('#eraseValueBtn').onclick=eraseAllValue;
+$('#funcResetBtn').onclick=resetFunctionVec;
+$('#pushBtn').onclick=()=>{let v=Number($('#vecValue').value);if(!Number.isFinite(v))return;if(vec.length===cap)cap=Math.max(1,cap*2);vec.push(v);rv('Đã push_back('+v+').',vec.length-1)};$('#popBtn').onclick=()=>{if(!vec.length)return rv('Không thể pop_back vì vector rỗng.');let x=vec.pop();rv('Đã xóa '+x+'.')};$('#sortBtn').onclick=()=>{vec.sort((a,b)=>a-b);rv('Đã sort tăng dần.')};$('#clearBtn').onclick=()=>{vec=[];rv('Đã clear: size=0, capacity thường giữ nguyên.')};$('#pairSortBtn').onclick=()=>{pairs.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);rp('Đã sort từ điển.')};$('#pairResetBtn').onclick=()=>{pairs=po.map(x=>x.slice());rp('Dữ liệu ban đầu.')};$('#tupleSortBtn').onclick=()=>{tuples.sort((a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2]);rt('Đã sort theo score, time, id.')};$('#tupleResetBtn').onclick=()=>{tuples=to.map(x=>x.slice());rt('Dữ liệu ban đầu.')};rv('Vector mẫu ban đầu.');resetFunctionVec();$('#pairResetBtn').click();$('#tupleResetBtn').click();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}})})();
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

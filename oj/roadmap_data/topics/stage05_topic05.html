@@ -1,36 +1,354 @@
-<article class="space-y-6">
-  <nav aria-label="Breadcrumb" class="text-sm text-gray-500">
-    <a class="text-indigo-600 font-semibold hover:underline" href="/#roadmap">Roadmap</a>
-    <span class="mx-2">/</span>
-    <a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/5/">Chương 5</a>
-    <span class="mx-2">/</span>
-    <span>5.5</span>
-  </nav>
 
-  <header>
-    <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Mục 5.5</p>
-    <h1 class="text-3xl font-bold text-gray-900 mt-2">Meet-in-the-Middle và tìm kiếm hai phía</h1>
-    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 mt-4">Đang biên soạn</span>
-  </header>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.lesson-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;
+margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1180px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1040px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.state{padding:10px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff;text-align:center}.state b{display:block;color:#312e81}.state strong{font-size:1.25rem}.state.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.state.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.state.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.array-row{display:flex;gap:8px;overflow:auto;padding:10px 0}.cell{min-width:78px;padding:10px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900}.cell.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.cell.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}.cell small{display:block;color:#64748b;font-size:.72rem}
+.tree-area{min-height:320px;padding:14px;border:2px dashed #bfdbfe;border-radius:16px;background:#f8fafc;overflow:auto}.tree-level{display:flex;justify-content:center;gap:10px;margin:12px 0}.tree-node{min-width:112px;padding:9px 12px;border:2px solid #c7d2fe;border-radius:12px;background:#eef2ff;text-align:center;font-weight:900;color:#312e81}.tree-node.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.tree-node.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.tree-node.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}.tree-node small{display:block;color:#64748b;font-size:.72rem}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}
+.log{min-height:130px;max-height:420px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.lesson-page pre{margin:0;padding:20px;max-height:760px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.lesson-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.lesson-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.tree-level{justify-content:flex-start}}
+</style>
 
-  <section class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-gray-700">
-    <p>Nội dung bài học đang được biên soạn. Trang này được tạo tạm để bảo đảm liên kết trong lộ trình hoạt động.</p>
-  </section>
+<div class="lesson-page">
+<div class="hero">
+  <span class="badge">Chương 5.5 • Split Search Space</span>
+  <h1>🤝 Meet-in-the-Middle và tìm kiếm hai phía</h1>
+  <p>Meet-in-the-Middle chia không gian trạng thái thành hai nửa, sinh kết quả từng nửa rồi ghép bằng sort, binary search hoặc two pointers. Tìm kiếm hai phía cũng mở rộng đồng thời từ điểm đầu và điểm đích để giảm độ sâu hiệu dụng.</p>
+  <div class="stats">
+    <div class="stat"><b>2ⁿ → 2·2ⁿ⧸²</b><span>Giảm số trạng thái</span></div>
+    <div class="stat"><b>Sort + Search</b><span>Ghép hai nửa</span></div>
+    <div class="stat"><b>Four Sum</b><span>Ghép tổng hai cặp</span></div>
+    <div class="stat"><b>Bi-BFS</b><span>Tìm từ hai đầu</span></div>
+  </div>
+</div>
 
-  <section>
-    <h2 class="text-xl font-semibold text-gray-800 mb-3">Nội dung dự kiến</h2>
-    <ul class="list-disc pl-6 space-y-2 text-gray-700">
-      <li>Chia tập thành hai nửa</li>
-      <li>Sinh hai tập trạng thái</li>
-      <li>Sort và binary search</li>
-      <li>Two pointers</li>
-      <li>Subset Sum</li>
-      <li>Four Sum</li>
-      <li>Bidirectional BFS</li>
-    </ul>
-  </section>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav">
+<a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#mitm">MITM</a><a href="#subset-sim">Mô phỏng Subset Sum</a><a href="#combine">Sort/Binary Search</a><a href="#four">Four Sum</a><a href="#bibfs">Bidirectional BFS</a><a href="#bibfs-sim">Mô phỏng Bi-BFS</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+</div></div>
 
-  <p>
-    <a class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700" href="/roadmap/stage/5/">⬅️ Quay lại Chương 5</a>
-  </p>
-</article>
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2">
+<div class="box"><h3>Cần hiểu</h3><ul><li>Vì sao chia n thành n/2 làm giảm không gian hàm mũ.</li><li>Cách sinh hai tập trạng thái.</li><li>Ghép bằng sort + lower_bound/upper_bound.</li><li>Ghép bằng two pointers.</li><li>Nguyên lý Bidirectional BFS.</li></ul></div>
+<div class="box"><h3>Cần làm được</h3><ul><li>Giải Subset Sum n≈40.</li><li>Tìm tổng lớn nhất không vượt S.</li><li>Đếm số tập con có tổng bằng S.</li><li>Giải Four Sum bằng tổng cặp.</li><li>Viết Bidirectional BFS trên đồ thị không trọng số.</li></ul></div>
+</div></section>
+
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2>
+<div class="call"><b>Bài toán mở đầu – Subset Sum.</b><br>Cho n≤40 số nguyên dương và S. Hãy tìm tổng lớn nhất không vượt S có thể tạo bởi một tập con.</div>
+<p>Duyệt 2⁴⁰ trạng thái là quá lớn. Nhưng nếu chia thành hai nửa khoảng 20 phần tử:</p>
+<ul><li>Mỗi nửa chỉ có khoảng 2²⁰ ≈ 1 triệu tổng.</li><li>Sinh danh sách tổng trái và tổng phải.</li><li>Với mỗi tổng trái x, tìm tổng phải lớn nhất ≤ S−x.</li></ul>
+<div class="formula">O(2ⁿ⧸² · log 2ⁿ⧸²) thay cho O(2ⁿ)</div>
+<div class="call ok"><b>Tư duy chung:</b> khi toàn bộ không gian quá lớn nhưng trạng thái có thể tách thành hai phần gần độc lập, hãy sinh và ghép hai nửa.</div>
+</section>
+
+<section class="card" id="mitm"><h2>2. Meet-in-the-Middle</h2>
+<div class="g3">
+<div class="box"><h3>1. Chia</h3><p>Chia dữ liệu thành nửa trái L và nửa phải R.</p></div>
+<div class="box"><h3>2. Sinh</h3><p>Sinh mọi trạng thái hoặc tổng có thể của từng nửa.</p></div>
+<div class="box"><h3>3. Ghép</h3><p>Sort một phía rồi dùng binary search/two pointers.</p></div>
+</div>
+<div class="call warn"><b>MITM không phải chia để trị thông thường.</b> Ta thường sinh toàn bộ trạng thái mỗi nửa rồi phối hợp, thay vì đệ quy giải hai bài toán độc lập và ghép kết quả duy nhất.</div>
+</section>
+
+<section class="card" id="subset-sim"><h2>3. Mô phỏng MITM cho Subset Sum</h2>
+<div class="g2">
+<div class="visual">
+<label><b>Dãy số</b></label><input class="input" id="mitmInput" value="3 5 6 7 9 11">
+<label><b>Giới hạn S</b></label><input class="input" id="mitmTarget" value="24">
+<div class="controls"><button class="btn" id="mitmPrepare">Chia và sinh tổng</button><button class="btn" id="mitmNext">Ghép bước tiếp</button><button class="btn orange" id="mitmAuto">Tự chạy</button><button class="btn green" id="mitmSolve">Chạy đến cuối</button><button class="btn alt" id="mitmReset">Làm lại</button></div>
+<div class="state-grid"><div class="state" id="leftCount"><b>Left sums</b><strong>0</strong></div><div class="state" id="rightCount"><b>Right sums</b><strong>0</strong></div><div class="state active" id="leftCurrent"><b>x bên trái</b><strong>0</strong></div><div class="state ok" id="mitmBest"><b>best ≤ S</b><strong>0</strong></div></div>
+<h3>Tổng nửa trái</h3><div class="array-row" id="leftSums"></div>
+<h3>Tổng nửa phải đã sort</h3><div class="array-row" id="rightSums"></div>
+</div>
+<div class="log" id="mitmLog"></div>
+</div>
+</section>
+
+<section class="card" id="combine"><h2>4. Ghép hai nửa</h2>
+<div class="table-wrap"><table class="tbl">
+<tr><th>Mục tiêu</th><th>Cách ghép</th><th>Công cụ</th></tr>
+<tr><td>Tổng lớn nhất ≤ S</td><td>Với x ở L, tìm y lớn nhất ≤ S−x</td><td><code>upper_bound(R, S-x)-1</code></td></tr>
+<tr><td>Đếm tổng đúng S</td><td>Đếm số y = S−x</td><td><code>equal_range</code> hoặc lower/upper</td></tr>
+<tr><td>Kiểm tra tồn tại</td><td>Tìm S−x trong R</td><td><code>binary_search</code></td></tr>
+<tr><td>Hai danh sách đã sort</td><td>Một đầu tăng, một đầu giảm</td><td>Two pointers</td></tr>
+</table></div>
+<div class="call warn">Nếu số âm xuất hiện, vẫn dùng được MITM; nhưng cần cẩn thận khi lọc tổng và khi chọn “lớn nhất không vượt S”.</div>
+</section>
+
+<section class="card" id="four"><h2>5. Four Sum bằng tổng cặp</h2>
+<p>Cho bốn nhóm A, B, C, D, cần đếm số bộ có <code>a+b+c+d=0</code>. Sinh:</p>
+<div class="formula">AB = mọi a+b; CD = mọi c+d; đếm số cặp AB + CD = 0</div>
+<div class="g2">
+<div class="box"><h3>Binary search</h3><p>Sort CD. Với mỗi x trong AB, đếm số lần −x xuất hiện trong CD.</p></div>
+<div class="box"><h3>Two pointers</h3><p>Sort AB tăng và CD tăng; đặt i đầu AB, j cuối CD rồi dịch theo tổng.</p></div>
+</div>
+</section>
+
+<section class="card" id="bibfs"><h2>6. Bidirectional BFS</h2>
+<p>BFS một phía tới khoảng cách d mở rộng xấp xỉ bᵈ node. Tìm từ hai phía chỉ cần đi khoảng d/2 từ mỗi phía, gần bᵈ⧸² mỗi phía.</p>
+<div class="g2">
+<div class="box"><h3>Điều kiện phù hợp</h3><ul><li>Đồ thị không trọng số hoặc mọi cạnh cùng chi phí.</li><li>Biết rõ start và target.</li><li>Có thể sinh cạnh ngược hoặc đồ thị vô hướng.</li></ul></div>
+<div class="box"><h3>Nguyên tắc</h3><ul><li>Duy trì hai frontier.</li><li>Thường mở rộng frontier nhỏ hơn.</li><li>Dừng khi hai vùng đã thăm gặp nhau.</li></ul></div>
+</div>
+<div class="call bad">Không cộng đơn giản hai khoảng cách nếu cách đánh dấu/gặp nhau sai. Cần xác định node hoặc cạnh giao nhau và dùng distStart + distTarget.</div>
+</section>
+
+<section class="card" id="bibfs-sim"><h2>7. Mô phỏng Bidirectional BFS</h2>
+<div class="g2">
+<div class="visual">
+<label><b>Start</b></label><select class="select" id="biStart"><option>A</option><option>B</option><option>C</option></select>
+<label><b>Target</b></label><select class="select" id="biTarget"><option>J</option><option>I</option><option>H</option></select>
+<div class="controls"><button class="btn" id="biNext">Mở rộng bước tiếp</button><button class="btn orange" id="biAuto">Tự chạy</button><button class="btn alt" id="biReset">Làm lại</button></div>
+<div class="state-grid"><div class="state" id="frontS"><b>Frontier start</b><strong>A</strong></div><div class="state" id="frontT"><b>Frontier target</b><strong>J</strong></div><div class="state ok" id="meetNode"><b>Meet</b><strong>?</strong></div></div>
+</div>
+<div class="log" id="biLog"></div>
+</div>
+<div class="tree-area" id="biGraph"></div>
+</section>
+
+<section class="card" id="analysis"><h2>8. Phân tích thuật toán</h2>
+<div class="table-wrap"><table class="tbl">
+<tr><th>Bài toán</th><th>Brute force</th><th>MITM / hai phía</th><th>Bộ nhớ</th></tr>
+<tr><td>Subset Sum n phần tử</td><td>O(2ⁿ)</td><td>O(2ⁿ⧸² log 2ⁿ⧸²)</td><td>O(2ⁿ⧸²)</td></tr>
+<tr><td>Four Sum n phần tử mỗi nhóm</td><td>O(n⁴)</td><td>O(n² log n) hoặc O(n²)</td><td>O(n²)</td></tr>
+<tr><td>BFS độ sâu d, branching b</td><td>O(bᵈ)</td><td>Xấp xỉ O(bᵈ⧸²)</td><td>Hai frontier và hai bảng khoảng cách</td></tr>
+</table></div>
+<div class="call warn"><b>Đánh đổi chính:</b> MITM giảm thời gian bằng cách dùng nhiều bộ nhớ để lưu trạng thái của hai nửa.</div>
+</section>
+
+<section class="card" id="code"><h2>9. Code mẫu</h2>
+<div class="tabs"><div class="tab-head">
+<button class="tab-btn active" data-tab="subsetCode">Subset Sum max ≤ S</button><button class="tab-btn" data-tab="countCode">Đếm tổng bằng S</button><button class="tab-btn" data-tab="fourCode">Four Sum</button><button class="tab-btn" data-tab="bibfsCode">Bidirectional BFS</button>
+</div>
+<div class="panel active" id="subsetCode"><button class="copy">Sao chép</button><pre><code>vector&lt;long long&gt; generateSums(
+    const vector&lt;long long&gt;&amp; values
+) {
+    int n = values.size();
+    vector&lt;long long&gt; sums;
+    sums.reserve(1ULL &lt;&lt; n);
+
+    for (int mask = 0; mask &lt; (1 &lt;&lt; n); mask++) {
+        long long sum = 0;
+
+        for (int bit = 0; bit &lt; n; bit++) {
+            if (mask &amp; (1 &lt;&lt; bit)) {
+                sum += values[bit];
+            }
+        }
+
+        sums.push_back(sum);
+    }
+
+    return sums;
+}
+
+long long bestSubsetSum(
+    const vector&lt;long long&gt;&amp; a,
+    long long limit
+) {
+    int middle = a.size() / 2;
+
+    vector&lt;long long&gt; left(
+        a.begin(),
+        a.begin() + middle
+    );
+
+    vector&lt;long long&gt; right(
+        a.begin() + middle,
+        a.end()
+    );
+
+    vector&lt;long long&gt; leftSums
+        = generateSums(left);
+
+    vector&lt;long long&gt; rightSums
+        = generateSums(right);
+
+    sort(rightSums.begin(), rightSums.end());
+
+    long long answer = LLONG_MIN;
+
+    for (long long x : leftSums) {
+        auto iterator = upper_bound(
+            rightSums.begin(),
+            rightSums.end(),
+            limit - x
+        );
+
+        if (iterator == rightSums.begin()) {
+            continue;
+        }
+
+        --iterator;
+        answer = max(answer, x + *iterator);
+    }
+
+    return answer;
+}</code></pre></div>
+<div class="panel" id="countCode"><button class="copy">Sao chép</button><pre><code>long long countSubsetsWithSum(
+    vector&lt;long long&gt; leftSums,
+    vector&lt;long long&gt; rightSums,
+    long long target
+) {
+    sort(rightSums.begin(), rightSums.end());
+
+    long long answer = 0;
+
+    for (long long x : leftSums) {
+        auto range = equal_range(
+            rightSums.begin(),
+            rightSums.end(),
+            target - x
+        );
+
+        answer += range.second - range.first;
+    }
+
+    return answer;
+}</code></pre></div>
+<div class="panel" id="fourCode"><button class="copy">Sao chép</button><pre><code>vector&lt;long long&gt; ab;
+vector&lt;long long&gt; cd;
+
+for (long long a : A)
+    for (long long b : B)
+        ab.push_back(a + b);
+
+for (long long c : C)
+    for (long long d : D)
+        cd.push_back(c + d);
+
+sort(cd.begin(), cd.end());
+
+long long answer = 0;
+
+for (long long x : ab) {
+    auto range = equal_range(
+        cd.begin(),
+        cd.end(),
+        -x
+    );
+
+    answer += range.second - range.first;
+}</code></pre></div>
+<div class="panel" id="bibfsCode"><button class="copy">Sao chép</button><pre><code>int bidirectionalBfs(
+    int start,
+    int target
+) {
+    if (start == target) return 0;
+
+    queue&lt;int&gt; fromStart;
+    queue&lt;int&gt; fromTarget;
+
+    vector&lt;int&gt; distStart(n, -1);
+    vector&lt;int&gt; distTarget(n, -1);
+
+    fromStart.push(start);
+    fromTarget.push(target);
+
+    distStart[start] = 0;
+    distTarget[target] = 0;
+
+    while (!fromStart.empty()
+           &amp;&amp; !fromTarget.empty()) {
+        if (fromStart.size()
+            &lt;= fromTarget.size()) {
+            int layerSize = fromStart.size();
+
+            while (layerSize--) {
+                int u = fromStart.front();
+                fromStart.pop();
+
+                for (int v : adj[u]) {
+                    if (distStart[v] == -1) {
+                        distStart[v] = distStart[u] + 1;
+                        fromStart.push(v);
+                    }
+
+                    if (distTarget[v] != -1) {
+                        return distStart[v]
+                             + distTarget[v];
+                    }
+                }
+            }
+        } else {
+            // Mở rộng một lớp từ target tương tự.
+        }
+    }
+
+    return -1;
+}</code></pre></div>
+</div></section>
+
+<section class="card" id="explain"><h2>10. Giải thích code</h2>
+<h3>10.1. Vì sao chỉ sort rightSums?</h3><p>Chỉ cần một phía được sort để binary search cho từng tổng phía còn lại. Sort cả hai chỉ cần khi dùng two pointers.</p>
+<h3>10.2. Vì sao dùng upper_bound(limit-x) rồi lùi một bước?</h3><p>upper_bound trả về phần tử đầu tiên lớn hơn giới hạn. Phần tử ngay trước đó là giá trị lớn nhất không vượt giới hạn.</p>
+<h3>10.3. Vì sao cần equal_range khi đếm?</h3><p>Cùng một tổng có thể xuất hiện nhiều lần từ các tập con khác nhau. equal_range cho cả đoạn có giá trị cần tìm.</p>
+<h3>10.4. Vì sao Bi-BFS mở rộng frontier nhỏ hơn?</h3><p>Giảm số node sinh ra trong bước tiếp theo và cân bằng hai phía.</p>
+</section>
+
+<section class="card" id="mistakes"><h2>11. Lỗi thường gặp</h2><ul>
+<li>Vẫn sinh 2ⁿ trạng thái thay vì hai nửa.</li><li>Quên sort trước binary search.</li><li>Dùng lower_bound thay upper_bound khi cần giá trị lớn nhất ≤ giới hạn.</li><li>Không tính multiplicity khi đếm tổng.</li><li>Dùng int cho tổng lớn.</li><li>Bi-BFS trên đồ thị có trọng số không đều.</li><li>Không có cạnh ngược khi tìm từ target trên đồ thị có hướng.</li><li>Dừng khi frontier “gần nhau” nhưng chưa thật sự giao.</li>
+</ul></section>
+
+<section class="card" id="quiz"><h2>12. Quiz và bài tập</h2>
+<div class="quiz" data-answer="c"><b>Câu 1.</b> MITM cho Subset Sum n≈40 sinh khoảng bao nhiêu trạng thái mỗi nửa?<div class="answers"><button class="answer" data-choice="a">n²</button><button class="answer" data-choice="b">2ⁿ</button><button class="answer" data-choice="c">2ⁿ⧸²</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="b"><b>Câu 2.</b> Tìm y lớn nhất ≤ K trong mảng tăng dùng gì?<div class="answers"><button class="answer" data-choice="a">lower_bound(K)+1</button><button class="answer" data-choice="b">upper_bound(K)-1</button><button class="answer" data-choice="c">front()</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="a"><b>Câu 3.</b> Bidirectional BFS phù hợp nhất với?</div><div class="answers"><button class="answer" data-choice="a">Đồ thị không trọng số, biết start và target</button><button class="answer" data-choice="b">Mọi đồ thị âm</button><button class="answer" data-choice="c">Chỉ cây nhị phân</button></div><div class="feedback"></div>
+<div class="g2"><div class="box"><h3>📘 Cơ bản</h3><ol><li>Subset Sum n≤40.</li><li>Đếm tập con tổng S.</li><li>Ghép hai danh sách tổng.</li></ol></div><div class="box"><h3>📙 Nâng cao</h3><ol><li>Four Sum.</li><li>Closest Subsequence Sum.</li><li>Bidirectional BFS trên biến đổi xâu.</li></ol></div></div>
+</section>
+</div>
+<script>
+(function(){
+'use strict';
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,900)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+/* MITM */
+let mm={a:[],S:0,L:[],R:[],i:0,best:0,timer:null,ready:false};
+function sums(a){let r=[];for(let m=0;m<(1<<a.length);m++){let s=0;for(let i=0;i<a.length;i++)if((m>>i)&1)s+=a[i];r.push(s)}return r}
+function prepMitm(){if(mm.timer){clearInterval(mm.timer);mm.timer=null}mm.a=$('#mitmInput').value.trim().split(/\s+/).map(Number).filter(Number.isFinite);mm.S=Number($('#mitmTarget').value)||0;let mid=Math.floor(mm.a.length/2);mm.L=sums(mm.a.slice(0,mid));mm.R=sums(mm.a.slice(mid)).sort((a,b)=>a-b);mm.i=0;mm.best=-Infinity;mm.ready=true;$('#mitmAuto').textContent='Tự chạy';renderMitm('Đã chia dãy và sinh hai tập tổng.')}
+function upperIndex(a,x){let l=0,r=a.length;while(l<r){let m=(l+r)>>1;if(a[m]<=x)l=m+1;else r=m}return l-1}
+function renderMitm(msg){$('#leftCount strong').textContent=mm.L.length;$('#rightCount strong').textContent=mm.R.length;$('#leftCurrent strong').textContent=mm.ready&&mm.i<mm.L.length?mm.L[mm.i]:'-';$('#mitmBest strong').textContent=Number.isFinite(mm.best)?mm.best:'-';
+$('#leftSums').innerHTML=mm.L.slice(0,64).map((x,i)=>'<div class="cell '+(i===mm.i?'active':'')+'"><small>#'+i+'</small>'+x+'</div>').join('');
+$('#rightSums').innerHTML=mm.R.slice(0,64).map(x=>'<div class="cell">'+x+'</div>').join('');
+$('#mitmLog').innerHTML=msg+'<br><b>i='+mm.i+', best='+(Number.isFinite(mm.best)?mm.best:'chưa có')+'</b>'}
+function stepMitm(){if(!mm.ready)return prepMitm();if(mm.i>=mm.L.length)return renderMitm('Đã xét hết tổng phía trái.');let x=mm.L[mm.i],j=upperIndex(mm.R,mm.S-x);if(j>=0)mm.best=Math.max(mm.best,x+mm.R[j]);renderMitm('Với x='+x+', tìm y lớn nhất ≤ '+(mm.S-x)+(j>=0?' → y='+mm.R[j]+'.':' → không có.'));mm.i++}
+function autoMitm(){if(mm.timer){clearInterval(mm.timer);mm.timer=null;$('#mitmAuto').textContent='Tự chạy';return}$('#mitmAuto').textContent='Tạm dừng';mm.timer=setInterval(()=>{if(mm.i>=mm.L.length){clearInterval(mm.timer);mm.timer=null;$('#mitmAuto').textContent='Tự chạy'}else stepMitm()},450)}
+function solveMitm(){while(mm.i<mm.L.length)stepMitm();renderMitm('Đã chạy đến cuối.')}
+
+/* Bi-BFS */
+const graph={A:['B','C'],B:['A','D','E'],C:['A','F'],D:['B','G'],E:['B','G','H'],F:['C','H'],G:['D','E','I'],H:['E','F','I','J'],I:['G','H','J'],J:['H','I']};
+let bi={qs:[],qt:[],ds:{},dt:{},turn:'s',meet:null,timer:null};
+function resetBi(){if(bi.timer){clearInterval(bi.timer);bi.timer=null}let s=$('#biStart').value,t=$('#biTarget').value;bi={qs:[s],qt:[t],ds:{[s]:0},dt:{[t]:0},turn:'s',meet:s===t?s:null,timer:null};$('#biAuto').textContent='Tự chạy';renderBi('Khởi tạo hai frontier.')}
+function renderBi(msg){$('#frontS strong').textContent=bi.qs.join(',')||'∅';$('#frontT strong').textContent=bi.qt.join(',')||'∅';$('#meetNode strong').textContent=bi.meet||'?';$('#biLog').innerHTML=msg+'<br><b>visited start='+Object.keys(bi.ds).join(',')+' | target='+Object.keys(bi.dt).join(',')+'</b>';
+let levels=[['A','B','C','D','E'],['F','G','H','I','J']];$('#biGraph').innerHTML=levels.map(l=>'<div class="tree-level">'+l.map(u=>'<div class="tree-node '+(bi.meet===u?'ok':u in bi.ds&&u in bi.dt?'ok':u in bi.ds?'active':u in bi.dt?'cut':'')+'"><small>dS='+(bi.ds[u]??'-')+', dT='+(bi.dt[u]??'-')+'</small>'+u+'</div>').join('')+'</div>').join('')}
+function expand(queue,own,other,label){if(!queue.length)return;let size=queue.length;while(size--&&!bi.meet){let u=queue.shift();for(const v of graph[u]){if(!(v in own)){own[v]=own[u]+1;queue.push(v)}if(v in other){bi.meet=v;break}}}renderBi(bi.meet?'Hai phía gặp nhau tại '+bi.meet+', khoảng cách='+(bi.ds[bi.meet]+bi.dt[bi.meet])+'.':'Đã mở rộng một lớp từ '+label+'.')}
+function stepBi(){if(bi.meet)return renderBi('Đã tìm thấy đường đi.');if(!bi.qs.length||!bi.qt.length)return renderBi('Không còn frontier, không có đường đi.');if(bi.qs.length<=bi.qt.length)expand(bi.qs,bi.ds,bi.dt,'start');else expand(bi.qt,bi.dt,bi.ds,'target')}
+function autoBi(){if(bi.timer){clearInterval(bi.timer);bi.timer=null;$('#biAuto').textContent='Tự chạy';return}$('#biAuto').textContent='Tạm dừng';bi.timer=setInterval(()=>{stepBi();if(bi.meet){clearInterval(bi.timer);bi.timer=null;$('#biAuto').textContent='Tự chạy'}},650)}
+
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();$('#mitmPrepare').onclick=prepMitm;$('#mitmNext').onclick=stepMitm;$('#mitmAuto').onclick=autoMitm;$('#mitmSolve').onclick=solveMitm;$('#mitmReset').onclick=prepMitm;$('#biNext').onclick=stepBi;$('#biAuto').onclick=autoBi;$('#biReset').onclick=resetBi;$('#biStart').onchange=resetBi;$('#biTarget').onchange=resetBi;prepMitm();resetBi();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true})});
+})();
+</script>

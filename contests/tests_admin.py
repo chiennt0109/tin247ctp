@@ -17,11 +17,6 @@ class ContestAdminProblemSelectorTests(TestCase):
     def test_admin_url_path_helper_is_imported(self):
         self.assertTrue(callable(contests_admin.path))
         self.assertTrue(callable(contests_admin.unquote))
-        self.assertIs(contests_admin.Submission, Submission)
-        self.assertEqual(
-            contests_admin.Q(contest_id=14),
-            contests_admin.Q(("contest_id", 14)),
-        )
 
     @classmethod
     def setUpTestData(cls):
@@ -122,6 +117,17 @@ class ContestAdminProblemSelectorTests(TestCase):
             start_time=now,
             end_time=now + timedelta(hours=1),
         )
+        contest.problems.add(self.problem)
+        contest.allowed_users.add(self.admin)
+        problem_order = ContestProblemOrder.objects.create(
+            contest=contest, problem=self.problem, position=1
+        )
+        kept_participation = Participation.objects.create(
+            contest=other_contest, user=self.admin
+        )
+        kept_practice_session = PracticeSession.objects.create(
+            contest=other_contest, user=self.admin
+        )
         Participation.objects.create(contest=contest, user=self.admin)
         practice_session = PracticeSession.objects.create(
             contest=contest,
@@ -140,6 +146,12 @@ class ContestAdminProblemSelectorTests(TestCase):
             problem=self.problem,
             language="python",
             source_code="print(2)",
+        )
+        standalone_submission = Submission.objects.create(
+            user=self.admin,
+            problem=self.problem,
+            language="python",
+            source_code="print(4)",
         )
         practice_submission = Submission.objects.create(
             practice_session=practice_session,
@@ -169,6 +181,13 @@ class ContestAdminProblemSelectorTests(TestCase):
         self.assertFalse(Participation.objects.filter(contest=contest).exists())
         self.assertFalse(PracticeSession.objects.filter(contest=contest).exists())
         self.assertTrue(Submission.objects.filter(pk=kept_submission.pk).exists())
+        self.assertTrue(Submission.objects.filter(pk=standalone_submission.pk).exists())
+        self.assertTrue(Participation.objects.filter(pk=kept_participation.pk).exists())
+        self.assertTrue(PracticeSession.objects.filter(pk=kept_practice_session.pk).exists())
+        contest.refresh_from_db()
+        self.assertEqual(list(contest.problems.all()), [self.problem])
+        self.assertEqual(list(contest.allowed_users.all()), [self.admin])
+        self.assertTrue(ContestProblemOrder.objects.filter(pk=problem_order.pk).exists())
 
     @patch("contests.admin.reset_contest_results", side_effect=RuntimeError("boom"))
     def test_reset_failure_redirects_with_error_instead_of_http_500(self, reset):

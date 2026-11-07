@@ -1,617 +1,554 @@
 <style>
-:root {
-  --blue-main: #2563eb;
-  --blue-dark: #1e3a8a;
-  --text-color: #1e293b;
-  --slate-100:#f1f5f9;
-  --slate-200:#e2e8f0;
-  --slate-600:#475569;
-}
-
-/* ====== PAGE STYLES ====== */
-h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
-h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
-h3 { color: #334155; margin-top: 25px; }
-p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
-ul { margin-left: 1.5rem; }
-code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
-pre {
-  background: #f1f5f9;
-  border-left: 4px solid var(--blue-main);
-  padding: 14px 18px;
-  font-size: 15px;
-  border-radius: 8px;
-  overflow-x: auto;
-}
-table {
-  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
-}
-th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
-th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
-
-/* ====== STACK ANIMATION (giới thiệu) ====== */
-.stack-demo {
-  display: flex; flex-direction: column-reverse; align-items: center;
-  height: 320px; width: 240px; background: #fff;
-  border: 2px solid var(--blue-main); border-radius: 10px;
-  margin: 25px auto; padding: 10px; position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-.block {
-  width: 170px; height: 42px; background: var(--blue-main); color: #fff;
-  font-weight: bold; text-align: center; line-height: 42px;
-  margin: 4px 0; border-radius: 6px; opacity: 0; transform: translateY(80px);
-  animation: pushUp 0.9s ease forwards;
-}
-.block:nth-child(2){animation-delay:1s;}
-.block:nth-child(3){animation-delay:2s;}
-.block:nth-child(4){animation-delay:3s;}
-.stack-label {
-  position: absolute; bottom: -40px; font-weight: bold; color: var(--blue-main);
-  text-transform: uppercase;
-}
-@keyframes pushUp {
-  from {opacity:0;transform:translateY(80px);}
-  to {opacity:1;transform:translateY(0);}
-}
-
-/* ====== DETAILS / LOCK ====== */
-details {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin: 16px 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size: 16px; }
-.locked { color: #6b7280; font-style: italic; text-align: center; padding: 10px; }
-
-/* ====== MÔ PHỎNG STACK – HÌNH ẢNH + TỪNG DÒNG LỆNH ====== */
-.sim-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
-@media (max-width: 900px){ .sim-grid{ grid-template-columns: 1fr; } }
-
-.stack-visual {
-  height: 360px; width: 280px; background: #fff; border: 2px dashed var(--blue-main);
-  border-radius: 12px; margin: 10px auto; padding: 12px; position: relative;
-  display:flex; flex-direction: column-reverse; align-items: center; overflow-y: auto;
-}
-.stack-visual .item {
-  width: 190px; height: 44px; border-radius: 8px; color:#fff; background: var(--blue-main);
-  line-height: 44px; text-align: center; margin: 6px 0; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.08);
-}
-.stack-visual .item.top { outline: 3px solid #22c55e; }
-.badge {
-  position:absolute; top: -10px; right: -10px; background:#111827; color:#fff;
-  font-size:12px; padding:3px 8px; border-radius: 999px;
-}
-.op-panel { background:#fff; border:1px solid var(--slate-200); border-radius: 10px; padding: 12px; }
-.op-panel .row { display:flex; gap:10px; flex-wrap: wrap; align-items:center; }
-.op-panel input[type="text"]{
-  padding:8px 10px; border:1px solid var(--slate-200); border-radius:8px; min-width:120px;
-}
-button.btn {
-  border:none; background: var(--blue-main); color:#fff; padding:9px 12px; border-radius:8px; cursor:pointer;
-  font-weight:600; box-shadow:0 2px 4px rgba(0,0,0,.06);
-}
-button.btn.secondary { background:#0ea5e9; }
-button.btn.ghost { background:#e5e7eb; color:#111827; }
-button.btn:disabled { opacity:.5; cursor:not-allowed; }
-
-.codebox {
-  background: var(--slate-100); border-left: 4px solid var(--blue-main);
-  border-radius: 8px; padding: 10px; font-family: Consolas, monospace; font-size: 14px;
-  max-height: 360px; overflow:auto; position: relative;
-}
-.codebox .line { padding: 3px 6px; border-radius: 6px; }
-.codebox .line.hl { background: #dbeafe; }
-#trace {
-  background:#fff; border:1px solid var(--slate-200); border-radius:10px; padding:10px; height:120px; overflow:auto; font-family:Consolas, monospace; font-size:13px;
-}
-
-/* ====== CALLOUT ====== */
-.callout {
-  border-left: 6px solid #10b981; background: #ecfeff; padding: 10px 12px; border-radius:8px; margin: 12px 0;
-}
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.stack-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+border-radius:0;box-sizing:border-box;position:relative;width:calc(100vw - 24px);
+max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.stack-page *{box-sizing:border-box}.stack-page h1,.stack-page h2,.stack-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:980px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.stack-view{height:360px;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;gap:7px;padding:16px;border:2px dashed #60a5fa;border-radius:18px;background:#f8fafc;overflow:auto}
+.st-item{width:min(230px,90%);min-height:48px;border-radius:11px;background:#4f46e5;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;position:relative;box-shadow:0 6px 14px rgba(79,70,229,.2)}
+.st-item.top{outline:3px solid #22c55e}.st-item.top::after{content:"TOP";position:absolute;right:-52px;padding:2px 7px;border-radius:99px;background:#16a34a;color:#fff;font-size:.7rem}
+.st-item.active{background:#f97316}.st-item.invalid{background:#dc2626}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}
+.token-row,.array-row{display:flex;gap:8px;overflow:auto;padding:8px 0}.token,.cell{min-width:68px;padding:9px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900;position:relative}.token.current,.cell.current{background:#ffedd5;border-color:#fb923c;color:#9a3412}.token.done,.cell.done{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.pending{background:#eef2ff;border-color:#8b5cf6;color:#5b21b6}.cell.resolved{background:#cffafe;border-color:#06b6d4;color:#155e75}.cell small{display:block;color:#64748b;font-size:.72rem}
+.log{min-height:120px;max-height:350px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.stack-page pre{margin:0;padding:20px;max-height:680px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.stack-page p code,.stack-page li code,.stack-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+details{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:12px 0}summary{font-weight:900;color:#4338ca;cursor:pointer}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.stack-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.stack-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
 </style>
 
-<!-- ====== BẮT ĐẦU NỘI DUNG ====== -->
-<h1>🎯 Bài giảng: Cấu trúc dữ liệu Stack (Ngăn xếp)</h1>
-<p>Stack là một trong những cấu trúc dữ liệu cơ bản nhất, được dùng rộng rãi trong thuật toán và rất gần gũi với đời sống (chồng sách, đĩa, khay cốc...).</p>
-
-<h2>I. Giới thiệu & Ví dụ thực tế</h2>
-<p>Hình dung bạn xếp chồng sách. Muốn lấy sách ở trên cùng bạn phải nhấc quyển vừa đặt gần nhất. Đó là nguyên lý <b>LIFO – Last In, First Out</b> (vào sau, ra trước).</p>
-
-<div class="stack-demo">
-  <div class="block">Sách 3</div>
-  <div class="block">Sách 2</div>
-  <div class="block">Sách 1</div>
-  <div class="stack-label">TOP ↑</div>
+<div class="stack-page">
+<div class="hero">
+  <span class="badge">STL + Expression + Monotonic Stack</span>
+  <h1>📚 Stack – Ngăn xếp LIFO</h1>
+  <p>Stack xử lý phần tử theo nguyên tắc vào sau, ra trước. Từ thao tác push/pop cơ bản, Stack được dùng để kiểm tra dấu ngoặc, tính biểu thức, DFS không đệ quy và giải nhiều bài mảng bằng Monotonic Stack.</p>
+  <div class="stats">
+    <div class="stat"><b>LIFO</b><span>Last In, First Out</span></div>
+    <div class="stat"><b>push/pop/top</b><span>O(1)</span></div>
+    <div class="stat"><b>Brackets</b><span>Kiểm tra cặp mở–đóng</span></div>
+    <div class="stat"><b>Monotonic</b><span>Next Greater O(n)</span></div>
+  </div>
 </div>
-<p style="text-align:center;"><i>Nguyên tắc LIFO – “vào sau ra trước”.</i></p>
 
-<h2>II. Lý thuyết cơ bản</h2>
-<ul>
-  <li><b>Push(x):</b> thêm phần tử x vào <b>đỉnh</b>.</li>
-  <li><b>Pop():</b> lấy phần tử ở đỉnh ra khỏi stack.</li>
-  <li><b>Top():</b> xem (không xoá) phần tử ở đỉnh.</li>
-  <li><b>Empty():</b> kiểm tra rỗng.</li>
-  <li><b>Size():</b> số lượng phần tử hiện có.</li>
-</ul>
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#basic">Stack cơ bản</a><a href="#simulate">Mô phỏng</a><a href="#brackets">Dấu ngoặc</a><a href="#postfix">Postfix</a><a href="#mono">Monotonic Stack</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
 
-<pre><code>#include &lt;iostream&gt;
-#include &lt;stack&gt;
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Nguyên tắc LIFO.</li><li>Các thao tác <code>push</code>, <code>top</code>, <code>pop</code>, <code>empty</code>, <code>size</code>.</li><li>Vì sao phải kiểm tra rỗng trước top/pop.</li><li>Cách Stack xử lý ngoặc và biểu thức hậu tố.</li><li>Cách Monotonic Stack giảm O(n²) xuống O(n).</li></ul></div>
+    <div class="box"><h3>Dấu hiệu nhận biết</h3><ul><li>Cần đảo ngược thứ tự.</li><li>Cấu trúc mở–đóng lồng nhau.</li><li>Cần quay lại trạng thái gần nhất.</li><li>Tìm phần tử lớn/nhỏ gần nhất.</li><li>Mỗi phần tử được push/pop tối đa một lần.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu 1 – cặp ngoặc.</b><br>
+    Cho chuỗi gồm các ký tự <code>()[]{}</code>. Hãy kiểm tra chuỗi có đúng cặp và đúng thứ tự lồng nhau hay không.
+  </div>
+
+  <p>Ví dụ:</p>
+  <ul>
+    <li><code>({[]})</code>: hợp lệ.</li>
+    <li><code>([)]</code>: không hợp lệ vì ngoặc đóng không khớp ngoặc mở gần nhất.</li>
+  </ul>
+
+  <h3>1.1. Cần nhớ ngoặc mở nào?</h3>
+  <p>Khi gặp ngoặc đóng, ta phải so với <b>ngoặc mở chưa được đóng gần nhất</b>. Đây chính là phần tử được đưa vào sau cùng.</p>
+
+  <div class="formula">Ngoặc mở gần nhất phải được xử lý trước → LIFO → Stack</div>
+
+  <div class="call">
+    <b>Bài toán mở đầu 2 – phần tử lớn hơn đầu tiên bên phải.</b><br>
+    Với mỗi vị trí i, tìm phần tử đầu tiên bên phải lớn hơn <code>a[i]</code>.
+  </div>
+
+  <p>Duyệt trực tiếp từ i+1 cho từng i mất O(n²). Nếu lưu các chỉ số chưa tìm được đáp án trong Stack, mỗi chỉ số chỉ push và pop một lần, tổng O(n).</p>
+
+  <div class="call ok"><b>Bản chất:</b> Stack hữu ích khi cần xử lý đối tượng gần nhất chưa hoàn tất hoặc cần quay lại trạng thái mới nhất.</div>
+</section>
+
+<section class="card" id="basic">
+  <h2>2. Stack cơ bản trong C++</h2>
+
+  <div class="g2">
+    <div class="box"><h3>Thao tác</h3><ul><li><code>st.push(x)</code>: thêm vào đỉnh.</li><li><code>st.top()</code>: xem đỉnh.</li><li><code>st.pop()</code>: xóa đỉnh.</li><li><code>st.empty()</code>: kiểm tra rỗng.</li><li><code>st.size()</code>: số phần tử.</li></ul></div>
+    <div class="box"><h3>Độ phức tạp</h3><ul><li><code>push</code>: O(1).</li><li><code>top</code>: O(1).</li><li><code>pop</code>: O(1).</li><li>Không truy cập ngẫu nhiên bằng chỉ số.</li><li>Muốn duyệt thường phải pop hoặc sao chép Stack.</li></ul></div>
+  </div>
+
+  <div class="call warn"><b>Quan trọng:</b> <code>pop()</code> không trả về phần tử. Mẫu chuẩn là <code>x = st.top(); st.pop();</code>.</div>
+</section>
+
+<section class="card" id="simulate">
+  <h2>3. Mô phỏng Stack và highlight code</h2>
+
+  <div class="g3">
+    <div class="visual">
+      <label><b>Giá trị x</b></label><input class="input" id="stInput" value="40">
+      <div class="controls">
+        <button class="btn" id="pushBtn">Push</button>
+        <button class="btn green" id="topBtn">Top</button>
+        <button class="btn red" id="popBtn">Pop</button>
+        <button class="btn orange" id="sizeBtn">Size</button>
+        <button class="btn alt" id="resetBtn">Làm lại</button>
+      </div>
+      <div class="log" id="stackLog"></div>
+    </div>
+
+    <div class="code-lines" id="basicCode">
+      <div class="code-line" data-k="init">stack&lt;int&gt; st;</div>
+      <div class="code-line" data-k="push">st.push(x);</div>
+      <div class="code-line" data-k="top">if (!st.empty()) cout &lt;&lt; st.top();</div>
+      <div class="code-line" data-k="pop">if (!st.empty()) st.pop();</div>
+      <div class="code-line" data-k="size">cout &lt;&lt; st.size();</div>
+    </div>
+
+    <div class="visual">
+      <div class="stack-view" id="stackView"></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="brackets">
+  <h2>4. Kiểm tra dấu ngoặc hợp lệ</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Chuỗi ngoặc</b></label><input class="input" id="bracketInput" value="({[]})">
+      <div class="controls"><button class="btn" id="bracketNext">Bước tiếp</button><button class="btn orange" id="bracketAuto">Tự chạy</button><button class="btn alt" id="bracketReset">Làm lại</button></div>
+      <h3>Chuỗi</h3><div class="token-row" id="bracketTokens"></div>
+      <h3>Stack ngoặc mở</h3><div class="stack-view" id="bracketStack"></div>
+    </div>
+
+    <div class="log" id="bracketLog"></div>
+  </div>
+
+  <div class="call bad"><b>Sai ngay</b> nếu gặp ngoặc đóng khi Stack rỗng hoặc ngoặc đóng không khớp <code>top()</code>. Cuối chuỗi, Stack phải rỗng.</div>
+</section>
+
+<section class="card" id="postfix">
+  <h2>5. Tính biểu thức hậu tố</h2>
+
+  <p>Trong hậu tố, toán tử đứng sau hai toán hạng. Ví dụ <code>5 1 2 + 4 * + 3 -</code>.</p>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Biểu thức hậu tố</b></label><input class="input" id="postfixInput" value="5 1 2 + 4 * + 3 -">
+      <div class="controls"><button class="btn" id="postfixNext">Bước tiếp</button><button class="btn alt" id="postfixReset">Làm lại</button></div>
+      <div class="token-row" id="postfixTokens"></div>
+      <h3>Stack giá trị</h3><div class="stack-view" id="postfixStack"></div>
+    </div>
+
+    <div class="log" id="postfixLog"></div>
+  </div>
+
+  <div class="call warn"><b>Thứ tự toán hạng:</b> pop lần đầu là b, pop lần hai là a, sau đó tính <code>a op b</code>. Điều này đặc biệt quan trọng với phép trừ và chia.</div>
+</section>
+
+<section class="card" id="mono">
+  <h2>6. Monotonic Stack – Next Greater Element</h2>
+
+  <p>Stack lưu chỉ số các phần tử chưa tìm được phần tử lớn hơn đầu tiên bên phải. Khi gặp <code>a[i]</code> lớn hơn <code>a[st.top()]</code>, ta đã tìm được đáp án cho đỉnh Stack.</p>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng</b></label><input class="input" id="ngeInput" value="4 5 2 10 8">
+      <div class="controls"><button class="btn" id="ngeNext">Bước tiếp</button><button class="btn orange" id="ngeAuto">Tự chạy</button><button class="btn alt" id="ngeReset">Làm lại</button></div>
+      <div class="array-row" id="ngeRow"></div>
+      <h3>Stack chỉ số</h3><div class="stack-view" id="ngeStack"></div>
+    </div>
+
+    <div class="log" id="ngeLog"></div>
+  </div>
+
+  <div class="call ok"><b>Độ phức tạp O(n):</b> mỗi chỉ số được push đúng một lần và pop tối đa một lần.</div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>7. Phân tích thuật toán</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Bài toán</th><th>Thời gian</th><th>Bộ nhớ</th><th>Giải thích</th></tr>
+    <tr><td>q thao tác Stack</td><td>O(q)</td><td>O(q)</td><td>Mỗi thao tác O(1).</td></tr>
+    <tr><td>Kiểm tra ngoặc</td><td>O(n)</td><td>O(n)</td><td>Mỗi ký tự xử lý một lần.</td></tr>
+    <tr><td>Tính postfix</td><td>O(t)</td><td>O(t)</td><td>Mỗi token push/pop hữu hạn lần.</td></tr>
+    <tr><td>Next Greater Element</td><td>O(n)</td><td>O(n)</td><td>Mỗi chỉ số push/pop tối đa một lần.</td></tr>
+    <tr><td>DFS lặp</td><td>O(V+E)</td><td>O(V)</td><td>Stack thay cho call stack.</td></tr>
+  </table></div>
+</section>
+
+<section class="card" id="code">
+  <h2>8. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="basicCpp">Stack cơ bản</button>
+      <button class="tab-btn" data-tab="bracketCpp">Dấu ngoặc</button>
+      <button class="tab-btn" data-tab="postfixCpp">Postfix</button>
+      <button class="tab-btn" data-tab="ngeCpp">Next Greater</button>
+      <button class="tab-btn" data-tab="pythonCode">Python</button>
+    </div>
+
+    <div class="panel active" id="basicCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
     stack&lt;int&gt; st;
+
     st.push(10);
     st.push(20);
-    cout &lt;&lt; st.top() &lt;&lt; "\n"; // 20
-    st.pop();                     // xoá 20
-    cout &lt;&lt; st.size() &lt;&lt; "\n";   // 1
-}</code></pre>
+    st.push(30);
 
+    cout &lt;&lt; st.top() &lt;&lt; '\n';
 
-<!-- ========== MÔ PHỎNG ========== -->
-<h2>III. Trình mô phỏng Stack: hình ảnh + mô tả từng dòng lệnh</h2>
-<p>
-Trong mô phỏng dưới đây, giao diện được chia làm <b>3 cột</b>:
-</p>
-<ul>
-  <li>🖱 <b>Cột 1 – Thao tác:</b> Các nút mô phỏng hành động của người lập trình (Push, Pop, Top, Size, Reset).</li>
-  <li>💻 <b>Cột 2 – Dòng lệnh tương ứng:</b> Mỗi thao tác sẽ tô sáng các dòng lệnh C++ mà máy tính thực hiện.</li>
-  <li>📊 <b>Cột 3 – Kết quả minh hoạ:</b> Stack hiển thị theo thời gian thực sau khi lệnh được chạy.</li>
-</ul>
+    if (!st.empty()) {
+        int value = st.top();
+        st.pop();
 
-<div class="sim-3col">
-  <div class="col op-panel">
-    <h4>🖱 Thao tác</h4>
-    <input type="text" id="valInput" placeholder="Giá trị cần push (vd: 42)" />
-    <div class="btn-group">
-      <button class="btn" id="btnPush">Push</button>
-      <button class="btn secondary" id="btnTop">Top</button>
-      <button class="btn" id="btnPop">Pop</button>
-      <button class="btn ghost" id="btnSize">Size</button>
-      <button class="btn ghost" id="btnReset">Reset</button>
-    </div>
-    <div class="callout" id="explain">💡 Hướng dẫn sẽ hiển thị tại đây…</div>
-    <div id="trace"></div>
-  </div>
+        cout &lt;&lt; "Removed: " &lt;&lt; value &lt;&lt; '\n';
+    }
 
-  <div class="col codebox" id="codeBox">
-    <h4>💻 Code đang thực thi</h4>
-    <div class="line" data-k="init">stack&lt;int&gt; st;                  // tạo stack rỗng</div>
-    <div class="line" data-k="push1">int x; cin &gt;&gt; x;                 // đọc giá trị</div>
-    <div class="line" data-k="push2">st.push(x);                       // thêm vào đỉnh</div>
-    <div class="line" data-k="pop1">if(!st.empty())                    // kiểm tra rỗng</div>
-    <div class="line" data-k="pop2">    st.pop();                      // xoá phần tử đỉnh</div>
-    <div class="line" data-k="top1">if(!st.empty())                    // kiểm tra rỗng</div>
-    <div class="line" data-k="top2">    cout &lt;&lt; st.top();            // xem phần tử đỉnh</div>
-    <div class="line" data-k="size">cout &lt;&lt; st.size();              // kích thước stack</div>
-  </div>
+    cout &lt;&lt; st.size();
+}</code></pre></div>
 
-  <div class="col vis-box">
-    <h4>📊 Kết quả Stack</h4>
-    <div class="stack-visual" id="stackVisual"></div>
-    <span class="badge" id="sizeBadge">size=0</span>
-  </div>
-</div>
-
-<style>
-.sim-3col {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-top: 20px;
-}
-@media (max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
-
-.col { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; }
-.col h4 { margin-top: 0; color: var(--blue-main); }
-
-.btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
-.stack-visual {
-  height: 330px; width: 240px; margin: 10px auto;
-  display: flex; flex-direction: column-reverse; align-items: center;
-  background: #fff; border: 2px dashed var(--blue-main);
-  border-radius: 12px; padding: 10px; overflow-y: auto;
-}
-.stack-visual .item {
-  width: 180px; height: 42px; background: var(--blue-main);
-  color: #fff; font-weight: bold; text-align: center;
-  line-height: 42px; border-radius: 6px; margin: 4px 0;
-}
-.stack-visual .item.top { outline: 3px solid #22c55e; }
-.badge {
-  background: #111827; color: #fff; padding: 3px 8px;
-  border-radius: 999px; font-size: 12px; display: block; text-align: center;
-  margin-top: 8px;
-}
-.codebox { font-family: Consolas, monospace; font-size: 14px; background: #f8fafc; }
-.line { padding: 3px 6px; border-radius: 6px; }
-.line.hl { background: #dbeafe; }
-</style>
-
-<script>
-(function(){
-  const st=[]; 
-  const vis=document.getElementById('stackVisual');
-  const badge=document.getElementById('sizeBadge');
-  const explain=document.getElementById('explain');
-  const codeBox=document.getElementById('codeBox');
-  const trace=document.getElementById('trace');
-  const valInput=document.getElementById('valInput');
-
-  function render(){
-    vis.innerHTML='';
-    st.forEach((v,i)=>{
-      const el=document.createElement('div');
-      el.className='item'+(i===st.length-1?' top':'');
-      el.textContent=v;
-      vis.appendChild(el);
-    });
-    badge.textContent='size='+st.length;
-  }
-  function log(msg){
-    const p=document.createElement('div');
-    p.textContent='• '+msg;
-    trace.prepend(p);
-  }
-  function hl(keys){
-    codeBox.querySelectorAll('.line').forEach(l=>l.classList.remove('hl'));
-    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
-      const el=codeBox.querySelector(`.line[data-k="${k}"]`);
-      if(el) el.classList.add('hl');
-    });
-  }
-
-  // 🔹 Push
-  document.getElementById('btnPush').onclick=()=>{
-    const val=valInput.value.trim();
-    if(!val){ explain.textContent='⚠️ Hãy nhập giá trị trước khi push.'; return; }
-    hl(['push1','push2']);
-    st.push(val); render();
-    explain.innerHTML=`Đã <b>push(${val})</b> vào đỉnh stack.`;
-    log(`push(${val}) → size=${st.length}`);
-    valInput.value='';
-  };
-
-  // 🔹 Top
-  document.getElementById('btnTop').onclick=()=>{
-    if(st.length===0){ explain.textContent='⚠️ Stack rỗng, không thể xem top.'; hl(); log('top() thất bại'); return; }
-    hl(['top1','top2']);
-    const t=st[st.length-1];
-    explain.innerHTML=`<b>top()</b>: phần tử ở đỉnh hiện tại là <b>${t}</b>.`;
-    log(`top() = ${t}`);
-    render();
-  };
-
-  // 🔹 Pop
-  document.getElementById('btnPop').onclick=()=>{
-    if(st.length===0){ explain.textContent='⚠️ Stack rỗng, không thể pop.'; hl(); log('pop() thất bại'); return; }
-    hl(['pop1','pop2']);
-    const t=st.pop(); render();
-    explain.innerHTML=`<b>pop()</b>: kiểm tra <code>empty()</code> → xoá phần tử đỉnh <b>${t}</b>.`;
-    log(`pop() = ${t} → size=${st.length}`);
-  };
-
-  // 🔹 Size
-  document.getElementById('btnSize').onclick=()=>{
-    hl(['size']);
-    explain.innerHTML=`<b>size()</b>: Stack hiện có <b>${st.length}</b> phần tử.`;
-    log(`size() = ${st.length}`);
-  };
-
-  // 🔹 Reset
-  document.getElementById('btnReset').onclick=()=>{
-    st.length=0; render(); hl(['init']); explain.textContent='Stack đã được làm trống (reset).'; log('reset()');
-  };
-
-  render(); hl(['init']);
-})();
-</script>
-
-<!-- ===================== Cách dung ======================= -->
-
-<h2 id="stack-usage">VI. Khi nào dùng Stack & Cách nhận biết bài toán cần Stack</h2>
-
-<p>
-Stack được gắn tag cho những bài toán mà <b>thứ tự xử lý dữ liệu phụ thuộc vào nguyên tắc “vào sau ra trước”</b> hoặc khi ta cần
-<b>ghi nhớ tạm thời các trạng thái</b> để quay lại sau.  
-Dưới đây là các nhóm bài toán phổ biến sử dụng Stack, kèm lý do và ví dụ.
-</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Nhóm bài toán</th>
-      <th>Đặc điểm nhận biết</th>
-      <th>Ví dụ & Ứng dụng</th>
-      <th>Tại sao dùng Stack?</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><b>1. Đảo ngược dữ liệu</b></td>
-      <td>Dữ liệu được đưa vào rồi cần xử lý theo thứ tự ngược lại.</td>
-      <td>Đảo chuỗi, đảo mảng, in ngược số, đảo thứ tự từ trong câu.</td>
-      <td>Stack lưu tạm các phần tử, pop ra ngược thứ tự ban đầu (LIFO).</td>
-    </tr>
-    <tr>
-      <td><b>2. Kiểm tra cấu trúc cặp (ngoặc, thẻ XML,...)</b></td>
-      <td>Có cặp mở – đóng cần khớp và đúng thứ tự.</td>
-      <td>Kiểm tra dấu ngoặc, kiểm tra HTML/XML hợp lệ.</td>
-      <td>Khi gặp mở → push, gặp đóng → pop; nếu lệch cặp hoặc còn sót → sai.</td>
-    </tr>
-    <tr>
-      <td><b>3. Biểu thức toán học</b></td>
-      <td>Gồm toán tử, toán hạng cần tính theo thứ tự ưu tiên.</td>
-      <td>Chuyển biểu thức trung tố ↔ hậu tố, tính hậu tố/postfix, tiền tố/prefix.</td>
-      <td>Stack dùng để lưu toán tử và tạm toán hạng trong khi tính.</td>
-    </tr>
-    <tr>
-      <td><b>4. Duyệt cây & đồ thị (DFS, Backtracking)</b></td>
-      <td>Cần ghi nhớ trạng thái trước khi quay lui hoặc đi nhánh khác.</td>
-      <td>DFS không đệ quy, thuật toán quay lui, giải mê cung.</td>
-      <td>Stack thay thế ngăn gọi đệ quy để nhớ “nút đang đi”.</td>
-    </tr>
-    <tr>
-      <td><b>5. Stack đơn điệu – tìm phần tử kế tiếp lớn hơn / nhỏ hơn</b></td>
-      <td>So sánh phần tử với các phần tử đứng trước để tìm vị trí đặc biệt.</td>
-      <td>Next Greater Element, Daily Temperatures, dãy đơn điệu tăng/giảm.</td>
-      <td>Duyệt mảng, dùng stack lưu chỉ số; khi gặp phần tử lớn hơn thì pop để gán kết quả.</td>
-    </tr>
-    <tr>
-      <td><b>6. Tính diện tích hoặc vùng liên tiếp (Histogram, Rain Water)</b></td>
-      <td>Bài có biểu đồ cột, cần tìm vùng lớn nhất/liên tục.</td>
-      <td>Diện tích hình chữ nhật lớn nhất trong histogram, hứng nước mưa.</td>
-      <td>Dùng stack lưu chỉ số cột tăng dần. Khi gặp cột thấp hơn → pop để tính vùng vừa khép lại.</td>
-    </tr>
-    <tr>
-      <td><b>7. Quản lý lịch sử hành động (Undo/Redo, Browser)</b></td>
-      <td>Hệ thống cho phép quay lại bước trước hoặc tiến lên bước sau.</td>
-      <td>Undo/Redo trong Word, lịch sử duyệt web.</td>
-      <td>Hai stack: một cho “Undo”, một cho “Redo” – pop qua lại giữa hai ngăn.</td>
-    </tr>
-    <tr>
-      <td><b>8. Mô phỏng hệ thống gọi lồng nhau</b></td>
-      <td>Hàm hoặc quy trình được gọi lồng nhau (call stack).</td>
-      <td>Hàm đệ quy, chương trình thông dịch biểu thức lồng.</td>
-      <td>Hệ thống máy tính thực tế dùng call stack để lưu địa chỉ trả về.</td>
-    </tr>
-    <tr>
-      <td><b>9. Đánh giá thời gian / khoảng hoạt động</b></td>
-      <td>Bài liên quan đến thời gian bắt đầu – kết thúc xen kẽ nhau.</td>
-      <td>Tính thời gian CPU chạy hàm, log hệ thống dạng <code>start/end</code>.</td>
-      <td>Mỗi khi gặp “start” → push, “end” → pop để tính khoảng thời gian.</td>
-    </tr>
-  </tbody>
-</table>
-
-<p class="callout">
-💡 <b>Tóm lại:</b> Hễ bài toán cần “ghi nhớ tạm thời để quay lại”, “đảo ngược thứ tự”, hoặc “đóng–mở cặp” theo quy luật → gần như chắc chắn có thể giải bằng Stack.
-</p>
-
-
-<!-- ========== BÀI TẬP ========== -->
-<h2>V. Hệ thống bài tập theo cấp độ (có giải thích chi tiết)</h2>
-
-<h3>📘 Egg</h3>
-
-<details>
-  <summary>1️⃣ Bài 1: Đảo ngược chuỗi ký tự (cơ bản)</summary>
-  <p><b>Đề:</b> Nhập chuỗi S (không chứa khoảng trắng). In chuỗi đảo ngược bằng Stack.</p>
-  <p><b>Ý tưởng:</b> Duyệt từng ký tự, <code>push</code> vào stack → <code>pop</code> ra dần để in ngược.</p>
-  <p><b>Bước làm:</b> (1) Tạo <code>stack&lt;char&gt;</code>. (2) Duyệt S và push. (3) Trong khi chưa rỗng, pop và in. (4) Kết thúc.</p>
-  <p><b>Độ phức tạp:</b> O(n) thời gian, O(n) bộ nhớ (n là độ dài chuỗi).</p>
-  <p><b>Lưu ý:</b> Nếu có khoảng trắng, dùng <code>getline</code> thay vì <code>cin&gt;&gt;</code>.</p>
-  <pre><code>#include &lt;iostream&gt;
-#include &lt;stack&gt;
+    <div class="panel" id="bracketCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int main(){
-    string s; cin &gt;&gt; s;
+
+bool isMatching(char open, char close) {
+    return (open == '(' &amp;&amp; close == ')')
+        || (open == '[' &amp;&amp; close == ']')
+        || (open == '{' &amp;&amp; close == '}');
+}
+
+int main() {
+    string s;
+    cin &gt;&gt; s;
+
     stack&lt;char&gt; st;
-    for(char c : s) st.push(c);
-    while(!st.empty()){ cout &lt;&lt; st.top(); st.pop(); }
-}</code></pre>
-  <p><b>Test mẫu:</b> <code>hello</code> → <code>olleh</code></p>
-</details>
 
-<details>
-  <summary>1️⃣ Bài 2: Tổng các phần tử (luyện thao tác)</summary>
-  <p><b>Đề:</b> Nhập n, sau đó n số nguyên. Tính tổng bằng cách lấy ra từng phần tử qua stack.</p>
-  <p><b>Ý tưởng:</b> Dùng stack để “lưu rồi lấy ngược”, đồng thời cộng dồn.</p>
-  <p><b>Bước làm:</b> Push toàn bộ → while !empty: cộng top rồi pop.</p>
-  <p><b>Độ phức tạp:</b> O(n). <b>Lưu ý:</b> Dùng <code>long long</code> nếu tổng lớn.</p>
-  <pre><code>#include &lt;iostream&gt;
-#include &lt;stack&gt;
-using namespace std;
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    int n; long long x,sum=0; cin&gt;&gt;n;
-    stack&lt;long long&gt; st;
-    for(int i=0;i&lt;n;i++){cin&gt;&gt;x; st.push(x);}
-    while(!st.empty()){ sum+=st.top(); st.pop(); }
-    cout&lt;&lt;sum;
-}</code></pre>
-</details>
+    for (char c : s) {
+        if (c == '(' || c == '[' || c == '{') {
+            st.push(c);
+        } else {
+            if (st.empty() || !isMatching(st.top(), c)) {
+                cout &lt;&lt; "NO";
+                return 0;
+            }
 
-<h3>📗 Chicken</h3>
-
-<details>
-  <summary>2️⃣ Bài 3: Kiểm tra dấu ngoặc hợp lệ</summary>
-  <p><b>Đề:</b> Chuỗi gồm <code>()[]{}&lt;&gt;</code>. Hãy kiểm tra có hợp lệ không (mở – đóng đúng cặp, đúng thứ tự).</p>
-  <p><b>Ý tưởng:</b> Gặp ngoặc mở → push. Gặp ngoặc đóng → pop để so cặp. Nếu sai hoặc rỗng → không hợp lệ.</p>
-  <p><b>Bước làm:</b> Duyệt chuỗi: 
-    <br>• Nếu là mở: push. 
-    <br>• Nếu là đóng: nếu rỗng → sai; else kiểm tra xem có khớp cặp không. 
-    <br>• Cuối cùng stack phải rỗng.
-  </p>
-  <p><b>Độ phức tạp:</b> O(n). <b>Lưu ý:</b> Thêm cặp &lt;&gt; nếu muốn.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-bool match(char o, char c){
-    return (o=='('&&c==')')||(o=='['&&c==']')||(o=='{'&&c=='}')||(o=='&lt;'&&c=='&gt;');
-}
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    string s; cin&gt;&gt;s;
-    stack&lt;char&gt; st;
-    for(char c : s){
-        if(c=='('||c=='['||c=='{'||c=='&lt;') st.push(c);
-        else {
-            if(st.empty() || !match(st.top(), c)) return cout&lt;&lt;"NO",0;
             st.pop();
         }
     }
-    cout&lt;&lt;(st.empty()?"YES":"NO");
-}</code></pre>
-  <p><b>Test:</b> <code>({[]})</code> → YES; <code>([)]</code> → NO; <code>&lt;[]&gt;()</code> → YES.</p>
-</details>
 
-<details>
-  <summary>2️⃣ Bài 4: Đảo thứ tự từ trong câu</summary>
-  <p><b>Đề:</b> Nhập một câu gồm nhiều từ cách nhau bằng khoảng trắng. In lại các từ theo thứ tự ngược.</p>
-  <p><b>Ý tưởng:</b> Tách từ, push từng từ vào stack rồi pop dần để in ngược.</p>
-  <p><b>Bước làm:</b> <code>stringstream</code> để tách từ → stack&lt;string&gt; → pop để in.</p>
-  <p><b>Độ phức tạp:</b> O(n) theo số từ/ký tự.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
+    cout &lt;&lt; (st.empty() ? "YES" : "NO");
+}</code></pre></div>
+
+    <div class="panel" id="postfixCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    string s, w; getline(cin, s);
-    stack&lt;string&gt; st;
-    stringstream ss(s);
-    while(ss&gt;&gt;w) st.push(w);
-    bool first=true;
-    while(!st.empty()){
-        if(!first) cout&lt;&lt;' ';
-        cout&lt;&lt;st.top(); st.pop(); first=false;
+
+bool isNumber(const string&amp; token) {
+    if (token.empty()) return false;
+
+    int position = 0;
+
+    if (token[0] == '-' &amp;&amp; token.size() &gt; 1) {
+        position = 1;
     }
-}</code></pre>
-  <p><b>Ví dụ:</b> <code>I love coding</code> → <code>coding love I</code></p>
-</details>
 
-<h3>📙 Chicken farmer</h3>
+    for (; position &lt; (int)token.size(); position++) {
+        if (!isdigit(token[position])) return false;
+    }
 
-<details>
-  <summary>3️⃣ Bài 5: Tính biểu thức hậu tố (Postfix Evaluation)</summary>
-  <p><b>Đề:</b> Cho biểu thức hậu tố gồm số nguyên và toán tử <code>+ - * /</code> cách nhau bởi khoảng trắng. Hãy tính giá trị.</p>
-  <p><b>Ý tưởng:</b> Gặp số → push. Gặp toán tử → pop 2 số theo thứ tự (a trước, b sau), tính <code>a op b</code>, rồi push kết quả.</p>
-  <p><b>Bước làm:</b> Duyệt token bằng <code>stringstream</code>. Dùng <code>stack&lt;long long&gt;</code>. Cẩn thận thứ tự khi trừ/chia.</p>
-  <p><b>Độ phức tạp:</b> O(n) theo số token.</p>
-  <p><b>Lưu ý:</b> Kiểm tra lỗi chia cho 0 nếu cần; nếu có âm/đa chữ số, vẫn nhận diện bằng isdigit(token[0]) hoặc kiểm tra toàn chuỗi.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-bool isNumber(const string &t){
-    if(t.empty()) return false;
-    int i=0; if(t[0]=='-'||t[0]=='+') i=1;
-    for(;i&lt;(int)t.size();++i) if(!isdigit(t[i])) return false;
     return true;
 }
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    string s; getline(cin, s);
-    stringstream ss(s); string tok;
-    stack&lt;long long&gt; st;
-    while(ss&gt;&gt;tok){
-        if(isNumber(tok)) st.push(stoll(tok));
-        else{
-            long long b=st.top(); st.pop();
-            long long a=st.top(); st.pop();
-            if(tok=="+") st.push(a+b);
-            else if(tok=="-") st.push(a-b);
-            else if(tok=="*") st.push(a*b);
-            else if(tok=="/") st.push(a/b); // giả sử b != 0, chia số nguyên
-        }
-    }
-    cout&lt;&lt;st.top();
-}</code></pre>
-  <p><b>Ví dụ:</b> <code>5 1 2 + 4 * + 3 -</code> → <b>14</b></p>
-</details>
 
-<details>
-  <summary>3️⃣ Bài 6: Next Greater Element (NGE) – Dãy đơn điệu</summary>
-  <p><b>Đề:</b> Với mỗi phần tử A[i], tìm phần tử bên phải đầu tiên lớn hơn nó; nếu không có in -1.</p>
-  <p><b>Ý tưởng (stack chỉ số tăng dần):</b> Duyệt i từ trái sang phải. Trong khi A[i] &gt; A[st.top()], cập nhật kết quả cho vị trí đó và pop. Sau đó push i.</p>
-  <p><b>Bước làm:</b> Dùng <code>stack&lt;int&gt;</code> lưu chỉ số. Mảng kết quả khởi tạo -1.</p>
-  <p><b>Độ phức tạp:</b> O(n) vì mỗi chỉ số push/pop tối đa 1 lần.</p>
-  <p><b>Lưu ý:</b> Đây là “stack đơn điệu” – mẫu rất quan trọng cho nhiều bài như nhiệt độ hàng ngày, diện tích hình chữ nhật lớn nhất…</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
+int main() {
+    string expression;
+    getline(cin, expression);
+
+    stringstream stream(expression);
+    string token;
+    stack&lt;long long&gt; st;
+
+    while (stream &gt;&gt; token) {
+        if (isNumber(token)) {
+            st.push(stoll(token));
+            continue;
+        }
+
+        long long right = st.top();
+        st.pop();
+
+        long long left = st.top();
+        st.pop();
+
+        if (token == "+") st.push(left + right);
+        if (token == "-") st.push(left - right);
+        if (token == "*") st.push(left * right);
+        if (token == "/") st.push(left / right);
+    }
+
+    cout &lt;&lt; st.top();
+}</code></pre></div>
+
+    <div class="panel" id="ngeCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
-int main(){
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    int n; cin&gt;&gt;n; vector&lt;int&gt; a(n), ans(n, -1);
-    for(int i=0;i&lt;n;i++) cin&gt;&gt;a[i];
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+
+    vector&lt;long long&gt; a(n);
+    vector&lt;long long&gt; answer(n, -1);
+
+    for (long long &amp;x : a) cin &gt;&gt; x;
+
     stack&lt;int&gt; st;
-    for(int i=0;i&lt;n;i++){
-        while(!st.empty() &amp;&amp; a[i] &gt; a[st.top()]){
-            ans[st.top()] = a[i];
+
+    for (int i = 0; i &lt; n; i++) {
+        while (!st.empty() &amp;&amp; a[st.top()] &lt; a[i]) {
+            answer[st.top()] = a[i];
             st.pop();
         }
+
         st.push(i);
     }
-    for(int i=0;i&lt;n;i++) cout&lt;&lt;ans[i]&lt;&lt;(i+1==n?'\n':' ');
-}</code></pre>
-  <p><b>Ví dụ:</b> <code>4 | 4 5 2 10</code> → <code>5 10 10 -1</code></p>
-</details>
 
-<h2>VII. Tổng kết & Gợi ý mở rộng</h2>
-<ul>
-  <li>Nắm chắc thao tác cơ bản → áp dụng vào đệ quy, backtracking, DFS.</li>
-  <li>Học thêm <b>stack đơn điệu</b> để giải các bài dãy số/nhiệt độ/biểu đồ.</li>
-  <li>Thử tự cài đặt stack bằng <code>vector</code> (tự viết <code>push/pop/back</code>).</li>
-</ul>
+    for (long long x : answer) {
+        cout &lt;&lt; x &lt;&lt; ' ';
+    }
+}</code></pre></div>
 
-<p style="text-align:center;color:#555;font-style:italic;">
-📘 Stack – nền tảng luyện tư duy thuật toán. Hãy luyện từ dễ → khó, và quan sát “vào sau – ra trước” trong mọi tình huống.
-</p>
+    <div class="panel" id="pythonCode"><button class="copy">Sao chép</button><pre><code>def valid_brackets(text):
+    stack = []
+    matching = {
+        ')': '(',
+        ']': '[',
+        '}': '{'
+    }
 
-<!-- ========= (có thể dùng nếu bạn muốn khoá lời giải thêm) =========
-<details>
-  <summary>💡 Lời giải mẫu – Python (ẩn/hiện)</summary>
-  <div id="locked" class="locked">
-    <a id="login-link" href="#">🔒 Vui lòng đăng nhập để xem lời giải.</a>
+    for character in text:
+        if character in '([{':
+            stack.append(character)
+        else:
+            if not stack or stack[-1] != matching[character]:
+                return False
+
+            stack.pop()
+
+    return not stack</code></pre></div>
   </div>
-  <pre id="sol" style="display:none;"><code>
-# ví dụ đảo chuỗi
-s = input().rstrip()
-st = []
-for ch in s:
-    st.append(ch)
-while st:
-    print(st.pop(), end="")
-  </code></pre>
-</details>
--->
+</section>
+
+<section class="card" id="explain">
+  <h2>9. Giải thích code</h2>
+
+  <h3>9.1. Vì sao phải kiểm tra empty trước top/pop?</h3>
+  <p>Gọi <code>top()</code> hoặc <code>pop()</code> khi Stack rỗng gây hành vi không xác định.</p>
+
+  <h3>9.2. Vì sao pop không trả về giá trị?</h3>
+  <p>Trong STL, <code>pop()</code> chỉ xóa. Muốn dùng phần tử, lấy <code>top()</code> trước rồi mới pop.</p>
+
+  <h3>9.3. Vì sao ngoặc đóng phải so với top?</h3>
+  <p>Do cấu trúc lồng nhau, ngoặc mở được thêm sau cùng phải được đóng trước tiên.</p>
+
+  <h3>9.4. Vì sao postfix cần pop b trước a?</h3>
+  <p>Hai toán hạng được push theo thứ tự a rồi b, nên b nằm ở đỉnh. Với phép trừ, phải tính <code>a-b</code>, không phải <code>b-a</code>.</p>
+
+  <h3>9.5. Vì sao NGE lưu chỉ số thay vì giá trị?</h3>
+  <p>Cần gán đáp án cho đúng vị trí. Lưu chỉ số cũng giúp truy cập cả giá trị và vị trí.</p>
+
+  <h3>9.6. Vì sao vòng while trong NGE vẫn O(n)?</h3>
+  <div class="call ok">Mỗi chỉ số được push một lần và sau khi bị pop sẽ không quay lại Stack. Tổng số lần pop không vượt quá n.</div>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>10. Lỗi thường gặp</h2>
+
+  <ul>
+    <li>Gọi <code>top()</code> hoặc <code>pop()</code> khi Stack rỗng.</li>
+    <li>Tưởng <code>pop()</code> trả về phần tử.</li>
+    <li>Kiểm tra ngoặc nhưng quên điều kiện Stack phải rỗng ở cuối.</li>
+    <li>Postfix lấy sai thứ tự toán hạng khi trừ hoặc chia.</li>
+    <li>Monotonic Stack lưu giá trị nhưng cần trả lời theo chỉ số.</li>
+    <li>Dùng dấu <code>&lt;</code> hay <code>&lt;=</code> không đúng khi xử lý phần tử bằng nhau.</li>
+    <li>Cho rằng vòng while bên trong for luôn tạo O(n²).</li>
+    <li>Dùng DFS đệ quy quá sâu mà không cân nhắc Stack lặp.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>11. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Stack tuân theo nguyên tắc nào?<div class="answers"><button class="answer" data-choice="a">FIFO</button><button class="answer" data-choice="b">LIFO</button><button class="answer" data-choice="c">Ngẫu nhiên</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Trong postfix, pop đầu tiên nhận toán hạng nào?<div class="answers"><button class="answer" data-choice="a">Toán hạng trái a</button><button class="answer" data-choice="b">Toán tử</button><button class="answer" data-choice="c">Toán hạng phải b</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> Next Greater Element bằng Monotonic Stack có độ phức tạp nào?<div class="answers"><button class="answer" data-choice="a">O(n)</button><button class="answer" data-choice="b">O(n²)</button><button class="answer" data-choice="c">O(log n)</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Đảo chuỗi bằng Stack.</li><li>Mô phỏng q thao tác.</li><li>Kiểm tra palindrome bằng Stack.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Kiểm tra dấu ngoặc.</li><li>Tính postfix.</li><li>DFS không đệ quy.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Next Greater/Smaller Element.</li><li>Daily Temperatures.</li><li>Stock Span.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>Largest Rectangle in Histogram.</li><li>Trapping Rain Water.</li><li>Cartesian Tree định hướng.</li></ol></div>
+  </div>
+
+  <details><summary>Bài thực hành 1 – Kiểm tra ngoặc</summary><p>Hỗ trợ bốn loại ngoặc <code>()[]{}</code> và <code>&lt;&gt;</code>.</p></details>
+  <details><summary>Bài thực hành 2 – Next Greater</summary><p>Trả về cả giá trị và khoảng cách đến phần tử lớn hơn đầu tiên.</p></details>
+  <details><summary>Bài thực hành 3 – Postfix</summary><p>Hỗ trợ số âm, số nhiều chữ số và kiểm tra biểu thức không hợp lệ.</p></details>
+</section>
+</div>
 
 <script>
 (function(){
-  // Gắn link login ?next=URL hiện tại (nếu dùng khoá lời giải)
-  const link = document.getElementById("login-link");
-  if (link) {
-    const nextUrl = encodeURIComponent(location.pathname + location.search + location.hash);
-    link.href = `/accounts/login/?next=${nextUrl}`;
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+
+/* Basic stack */
+let stData=[10,20,30];
+function highlight(keys){$$('.code-line').forEach(x=>x.classList.remove('hl'));keys.forEach(k=>{let e=$('.code-line[data-k="'+k+'"]');if(e)e.classList.add('hl')})}
+function renderStack(msg,active=-1){
+  $('#stackView').innerHTML=stData.length?stData.map((v,i)=>'<div class="st-item '+(i===stData.length-1?'top ':'')+(i===active?'active':'')+'">'+v+'</div>').join(''):'<span>Stack rỗng</span>';
+  $('#stackLog').innerHTML=msg+'<br><b>size = '+stData.length+'</b>';
+}
+function pushBasic(){let x=$('#stInput').value.trim();if(!x){renderStack('Hãy nhập giá trị.');return}stData.push(x);highlight(['push']);renderStack('Đã push('+x+') vào đỉnh.',stData.length-1)}
+function topBasic(){if(!stData.length){renderStack('Stack rỗng, không có top.');return}highlight(['top']);renderStack('top = '+stData[stData.length-1]+'.',stData.length-1)}
+function popBasic(){if(!stData.length){renderStack('Stack rỗng, không thể pop.');return}let x=stData.pop();highlight(['pop']);renderStack('Đã pop phần tử '+x+'.')}
+function sizeBasic(){highlight(['size']);renderStack('Stack hiện có '+stData.length+' phần tử.')}
+function resetBasic(){stData=[10,20,30];highlight(['init']);renderStack('Stack mẫu ban đầu.')}
+
+/* Brackets */
+let brTokens=[],brIndex=0,brStack=[],brValid=true,brDone=false,brTimer=null;
+const openSet='([{',closeMap={')':'(',']':'[','}':'{'};
+function resetBrackets(){
+  if(brTimer){clearInterval(brTimer);brTimer=null}
+  brTokens=$('#bracketInput').value.trim().split('');brIndex=0;brStack=[];brValid=true;brDone=false;$('#bracketAuto').textContent='Tự chạy';renderBrackets('Bắt đầu từ ký tự đầu tiên.');
+}
+function renderBrackets(msg){
+  $('#bracketTokens').innerHTML=brTokens.map((c,i)=>'<div class="token '+(i<brIndex?'done':i===brIndex?'current':'')+'">'+c+'</div>').join('');
+  $('#bracketStack').innerHTML=brStack.length?brStack.map((c,i)=>'<div class="st-item '+(i===brStack.length-1?'top':'')+'">'+c+'</div>').join(''):'<span>Stack rỗng</span>';
+  $('#bracketLog').innerHTML=msg;
+}
+function stepBrackets(){
+  if(brDone)return;
+  if(brIndex>=brTokens.length){
+    brDone=true;brValid=brValid&&brStack.length===0;
+    renderBrackets(brValid?'Hoàn tất: chuỗi hợp lệ.':'Hoàn tất: còn ngoặc mở chưa được đóng.');
+    return;
   }
+  let c=brTokens[brIndex++];
+  if(openSet.includes(c)){brStack.push(c);renderBrackets('Gặp ngoặc mở '+c+' → push.');return}
+  if(!(c in closeMap)){brValid=false;brDone=true;renderBrackets('Ký tự '+c+' không phải ngoặc hợp lệ.');return}
+  if(!brStack.length){brValid=false;brDone=true;renderBrackets('Gặp '+c+' khi Stack rỗng → không hợp lệ.');return}
+  let t=brStack[brStack.length-1];
+  if(t!==closeMap[c]){brValid=false;brDone=true;renderBrackets('top='+t+' không khớp '+c+' → không hợp lệ.');return}
+  brStack.pop();renderBrackets('Ngoặc '+c+' khớp với '+t+' → pop.');
+}
+function autoBrackets(){
+  if(brTimer){clearInterval(brTimer);brTimer=null;$('#bracketAuto').textContent='Tự chạy';return}
+  $('#bracketAuto').textContent='Tạm dừng';
+  brTimer=setInterval(()=>{if(brDone){clearInterval(brTimer);brTimer=null;$('#bracketAuto').textContent='Tự chạy'}else stepBrackets()},700)
+}
+
+/* Postfix */
+let pfTokens=[],pfIndex=0,pfStack=[],pfDone=false;
+function resetPostfix(){pfTokens=$('#postfixInput').value.trim().split(/\s+/).filter(Boolean);pfIndex=0;pfStack=[];pfDone=false;renderPostfix('Bắt đầu đọc token đầu tiên.')}
+function renderPostfix(msg){
+  $('#postfixTokens').innerHTML=pfTokens.map((c,i)=>'<div class="token '+(i<pfIndex?'done':i===pfIndex?'current':'')+'">'+c+'</div>').join('');
+  $('#postfixStack').innerHTML=pfStack.length?pfStack.map((v,i)=>'<div class="st-item '+(i===pfStack.length-1?'top':'')+'">'+v+'</div>').join(''):'<span>Stack rỗng</span>';
+  $('#postfixLog').innerHTML=msg;
+}
+function stepPostfix(){
+  if(pfDone)return;
+  if(pfIndex>=pfTokens.length){
+    pfDone=true;
+    renderPostfix(pfStack.length===1?'Kết quả = '+pfStack[0]+'.':'Biểu thức không hợp lệ: Stack không có đúng một kết quả.');
+    return;
+  }
+  let tok=pfTokens[pfIndex++];
+  if(/^[-+]?\d+$/.test(tok)){pfStack.push(Number(tok));renderPostfix('Token '+tok+' là số → push.');return}
+  if(!['+','-','*','/'].includes(tok)||pfStack.length<2){pfDone=true;renderPostfix('Không đủ hai toán hạng hoặc toán tử không hợp lệ.');return}
+  let b=pfStack.pop(),a=pfStack.pop(),v;
+  if(tok==='+')v=a+b;if(tok==='-')v=a-b;if(tok==='*')v=a*b;if(tok==='/')v=Math.trunc(a/b);
+  pfStack.push(v);renderPostfix('Pop b='+b+', a='+a+'; tính '+a+' '+tok+' '+b+' = '+v+'; push kết quả.');
+}
+
+/* NGE */
+let ngeA=[],ngeI=0,ngeStack=[],ngeAns=[],ngeDone=false,ngeTimer=null;
+function parseNums(id){let t=$(id).value.trim();return t?t.split(/\s+/).map(Number).filter(Number.isFinite):[]}
+function resetNge(){
+  if(ngeTimer){clearInterval(ngeTimer);ngeTimer=null}
+  ngeA=parseNums('#ngeInput');ngeI=0;ngeStack=[];ngeAns=Array(ngeA.length).fill(-1);ngeDone=false;$('#ngeAuto').textContent='Tự chạy';renderNge('Bắt đầu từ i=0.');
+}
+function renderNge(msg){
+  $('#ngeRow').innerHTML=ngeA.map((v,i)=>{
+    let cls=i<ngeI?'done':'';
+    if(i===ngeI)cls='current';
+    if(ngeStack.includes(i))cls='pending';
+    if(ngeAns[i]!==-1)cls='resolved';
+    return '<div class="cell '+cls+'"><small>i='+i+'</small>'+v+'<small>ans='+(ngeAns[i]===-1?'?':ngeAns[i])+'</small></div>';
+  }).join('');
+  $('#ngeStack').innerHTML=ngeStack.length?ngeStack.map((idx,i)=>'<div class="st-item '+(i===ngeStack.length-1?'top':'')+'">i='+idx+', a='+ngeA[idx]+'</div>').join(''):'<span>Stack rỗng</span>';
+  $('#ngeLog').innerHTML=msg+'<br><b>Đáp án: ['+ngeAns.join(', ')+']</b>';
+}
+function stepNge(){
+  if(ngeDone)return;
+  if(ngeI>=ngeA.length){ngeDone=true;renderNge('Hoàn tất. Các vị trí còn trong Stack không có phần tử lớn hơn bên phải.');return}
+  let i=ngeI,logs=['<b>Xử lý i='+i+', a[i]='+ngeA[i]+'</b>'];
+  while(ngeStack.length&&ngeA[ngeStack[ngeStack.length-1]]<ngeA[i]){
+    let idx=ngeStack.pop();ngeAns[idx]=ngeA[i];logs.push('Pop '+idx+' và gán ans['+idx+']='+ngeA[i]+'.');
+  }
+  ngeStack.push(i);logs.push('Push chỉ số '+i+'.');ngeI++;renderNge(logs.join('<br>'));
+}
+function autoNge(){
+  if(ngeTimer){clearInterval(ngeTimer);ngeTimer=null;$('#ngeAuto').textContent='Tự chạy';return}
+  $('#ngeAuto').textContent='Tạm dừng';
+  ngeTimer=setInterval(()=>{if(ngeDone){clearInterval(ngeTimer);ngeTimer=null;$('#ngeAuto').textContent='Tự chạy'}else stepNge()},800)
+}
+
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+
+  $('#pushBtn').onclick=pushBasic;$('#topBtn').onclick=topBasic;$('#popBtn').onclick=popBasic;$('#sizeBtn').onclick=sizeBasic;$('#resetBtn').onclick=resetBasic;
+  $('#bracketNext').onclick=stepBrackets;$('#bracketAuto').onclick=autoBrackets;$('#bracketReset').onclick=resetBrackets;
+  $('#postfixNext').onclick=stepPostfix;$('#postfixReset').onclick=resetPostfix;
+  $('#ngeNext').onclick=stepNge;$('#ngeAuto').onclick=autoNge;$('#ngeReset').onclick=resetNge;
+
+  resetBasic();resetBrackets();resetPostfix();resetNge();
+
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
 })();
 </script>
 
-<script>
-(async function() {
-  // Nếu có API check_login, tự mở khoá lời giải
-  try {
-    const res = await fetch("/roadmap/api/check_login/", { credentials: "include" });
-    if(!res.ok) return;
-    const data = await res.json();
-    const isLoggedIn = data.is_authenticated === true;
-    const lock = document.getElementById("locked");
-    const sol = document.getElementById("sol");
-    if (isLoggedIn && lock && sol) {
-      lock.style.display = "none";
-      sol.style.display = "block";
-    }
-  } catch (err) {
-    console.warn("Không kiểm tra được trạng thái đăng nhập:", err);
-  }
-})();
-</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

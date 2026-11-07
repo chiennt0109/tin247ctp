@@ -1,326 +1,466 @@
 <style>
-  * { box-sizing: border-box; }
-  .lesson-page {
-    font-family: Inter, Roboto, Arial, sans-serif;
-    color: #1f2937;
-    background: linear-gradient(180deg, #f8fbff, #eef5ff 70%);
-    border-radius: 16px;
-    padding: 20px;
-    line-height: 1.65;
-  }
-  .header {
-    border-radius: 14px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    color: #fff;
-    padding: 18px;
-    box-shadow: 0 10px 24px rgba(37,99,235,.3);
-    margin-bottom: 16px;
-  }
-  .header h1 { margin: 0 0 6px; font-size: 28px; }
-
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    margin-bottom: 16px;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(14px);
-    transition: .5s ease;
-  }
-  .card.show { opacity: 1; transform: translateY(0); }
-  .card-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; background: #f8fafc; }
-  .card-body { padding: 14px; }
-
-  .code {
-    background: #111827;
-    color: #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
-    overflow: auto;
-    font-size: 14px;
-    font-family: Consolas, Monaco, 'Courier New', monospace;
-  }
-
-  .table { width: 100%; border-collapse: collapse; }
-  .table th, .table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
-  .table th { background: #eff6ff; }
-
-  .flow {
-    border: 1px dashed #93c5fd;
-    border-radius: 10px;
-    background: #eff6ff;
-    padding: 10px;
-    white-space: pre;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .demo-box {
-    border: 1px solid #dbeafe;
-    border-radius: 10px;
-    background: #f8fbff;
-    padding: 12px;
-  }
-  .input, .btn {
-    width: 100%;
-    border-radius: 8px;
-    font-size: 14px;
-    padding: 10px;
-  }
-  .input { border: 1px solid #cbd5e1; }
-  .btn { border: 0; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
-  .btn:hover { background: #1d4ed8; }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .col { flex: 1 1 220px; min-width: 220px; }
-
-  .alert {
-    margin-top: 10px;
-    border-radius: 8px;
-    border: 1px solid #bfdbfe;
-    background: #eff6ff;
-    padding: 10px;
-  }
-  .highlight { animation: pulse .55s ease; }
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-    100% { transform: scale(1); }
-  }
-
-  .quiz-option {
-    width: 100%;
-    text-align: left;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 10px;
-    background: #fff;
-    margin-bottom: 8px;
-    cursor: pointer;
-  }
-  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
-  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
-
-  @media (max-width: 768px) {
-    .lesson-page { padding: 12px; }
-    .header h1 { font-size: 22px; }
-  }
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.if-page{font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.if-page *{box-sizing:border-box}.if-page h1,.if-page h2,.if-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:970px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.tree{display:grid;grid-template-columns:1fr;gap:12px;justify-items:center;padding:14px}.node{min-width:190px;padding:12px 16px;border:2px solid #c7d2fe;border-radius:14px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900;transition:.2s}.node.diamond{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);padding:34px 42px;min-width:270px}.node.active{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:scale(1.04)}.node.true{background:#dcfce7;border-color:#22c55e;color:#166534}.node.false{background:#fee2e2;border-color:#ef4444;color:#991b1b}.branches{display:grid;grid-template-columns:1fr 1fr;gap:50px;position:relative}.branch-label{text-align:center;font-weight:900}.yes{color:#15803d}.no{color:#b91c1c}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}
+.bool-grid{
+display:grid;
+grid-template-columns:minmax(180px,1.4fr) minmax(130px,1fr);
+gap:8px;
+width:min(100%,720px);
+margin:12px auto 0
+}
+.bool-cell{
+min-height:56px;
+padding:10px 14px;
+border:1px solid #cbd5e1;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#f8fafc;
+font-weight:800;
+text-align:center
+}
+.bool-cell.expression{justify-content:flex-start;padding-left:22px;font-family:Consolas,monospace}
+.bool-cell.head{background:#eef2ff;color:#312e81;font-size:1.02rem}
+.bool-cell.on{background:#dcfce7;border-color:#22c55e;color:#166534}
+.bool-cell.off{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.log{min-height:120px;max-height:350px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.if-page pre{margin:0;padding:20px;max-height:680px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.if-page p code,.if-page li code,.if-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.if-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.if-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.bool-grid{grid-template-columns:minmax(135px,1.25fr) minmax(100px,.85fr)}.bool-cell{min-height:50px;padding:8px 10px}.bool-cell.expression{padding-left:14px}}
 </style>
 
-<div class="lesson-page">
-  <div class="header">
-    <h1>🔀 Bài học: Cấu trúc rẽ nhánh (if / else)</h1>
-    <p>Học cách ra quyết định trong C++ bằng điều kiện, ví dụ thực tế và demo tương tác.</p>
+<div class="if-page">
+<div class="hero">
+  <span class="badge">C++ Control Flow</span>
+  <h1>🔀 Cấu trúc rẽ nhánh if / else</h1>
+  <p>Rẽ nhánh giúp chương trình lựa chọn hành động dựa trên điều kiện. Bài học đi từ biểu thức Boolean, if–else, else-if đến toán tử logic, điều kiện lồng nhau và các lỗi biên thường gặp.</p>
+  <div class="stats">
+    <div class="stat"><b>if</b><span>Chạy khi điều kiện đúng</span></div>
+    <div class="stat"><b>else</b><span>Nhánh còn lại</span></div>
+    <div class="stat"><b>else if</b><span>Phân loại nhiều trường hợp</span></div>
+    <div class="stat"><b>bool</b><span>true hoặc false</span></div>
+  </div>
+</div>
+
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#boolean">Điều kiện</a><a href="#structures">Cấu trúc</a><a href="#decision">Mô phỏng</a><a href="#logic">Logic</a><a href="#classification">Phân loại</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
+
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Điều kiện là biểu thức cho kết quả true/false.</li><li>Khác nhau giữa <code>if</code>, <code>if-else</code> và chuỗi <code>else if</code>.</li><li>Các toán tử so sánh và logic.</li><li>Thứ tự kiểm tra điều kiện.</li><li>Điều kiện biên và các trường hợp phủ hết.</li></ul></div>
+    <div class="box"><h3>Cần làm được</h3><ul><li>Kiểm tra chẵn/lẻ, âm/dương.</li><li>So sánh hai hoặc ba số.</li><li>Phân loại điểm.</li><li>Kết hợp nhiều điều kiện.</li><li>Tránh lỗi <code>=</code> và <code>==</code>.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Một học sinh được công nhận đạt nếu điểm thi từ 5 trở lên. Nếu điểm dưới 5, học sinh chưa đạt. Nhập điểm và in kết quả.
   </div>
 
-  <section class="card"><div class="card-head">🎯 1. Mục tiêu bài học</div><div class="card-body">
-    <ul>
-      <li>Hiểu điều kiện trong lập trình.</li>
-      <li>Biết dùng <code>if / else</code>.</li>
-      <li>Hiểu toán tử so sánh.</li>
-      <li>Biết viết chương trình ra quyết định.</li>
-      <li>Giải bài toán kiểm tra dữ liệu.</li>
-    </ul>
-  </div></section>
+  <p>Chương trình không thể luôn in cùng một nội dung. Nó phải kiểm tra:</p>
+  <div class="formula">score ≥ 5 ?</div>
 
-  <section class="card"><div class="card-head">🌦️ 2. Vì sao cần cấu trúc điều kiện?</div><div class="card-body">
-    <p>Trong cuộc sống, ta luôn đưa ra quyết định dựa trên điều kiện:</p>
-    <div class="flow">Nếu trời mưa → mang ô
-Nếu điểm ≥ 5 → đậu
-Nếu tuổi < 18 → chưa đủ tuổi</div>
-    <p>Trong lập trình cũng vậy: kiểm tra điều kiện để quyết định chương trình làm gì.</p>
-  </div></section>
+  <div class="g2">
+    <div class="box"><h3>Nếu đúng</h3><p>Chạy nhánh in <b>Đạt</b>.</p></div>
+    <div class="box"><h3>Nếu sai</h3><p>Chạy nhánh in <b>Chưa đạt</b>.</p></div>
+  </div>
 
-  <section class="card"><div class="card-head">🧱 3. Cấu trúc if trong C++</div><div class="card-body">
-    <pre class="code"><code>if (điều kiện) {
-    // lệnh khi điều kiện đúng
-}</code></pre>
-    <pre class="code"><code>int age;
-cin >> age;
+  <h3>1.1. Mở rộng bài toán</h3>
+  <p>Nếu cần phân loại:</p>
+  <ul>
+    <li>Điểm từ 8 đến 10: Giỏi.</li>
+    <li>Điểm từ 6.5 đến dưới 8: Khá.</li>
+    <li>Điểm từ 5 đến dưới 6.5: Đạt.</li>
+    <li>Dưới 5: Chưa đạt.</li>
+  </ul>
 
-if (age >= 18) {
-    cout << "Du tuoi";
-}</code></pre>
-  </div></section>
+  <div class="call warn">Lúc này một <code>if-else</code> chưa đủ; cần chuỗi <code>if - else if - else</code> và phải sắp xếp điều kiện đúng thứ tự.</div>
+</section>
 
-  <section class="card"><div class="card-head">↔️ 4. Cấu trúc if - else</div><div class="card-body">
-    <pre class="code"><code>if (điều kiện) {
-    // khi đúng
-}
-else {
-    // khi sai
-}</code></pre>
-    <pre class="code"><code>int score;
-cin >> score;
+<section class="card" id="boolean">
+  <h2>2. Điều kiện và biểu thức Boolean</h2>
 
-if (score >= 5)
-    cout << "Dau";
-else
-    cout << "Rot";</code></pre>
-  </div></section>
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Toán tử</th><th>Ý nghĩa</th><th>Ví dụ</th><th>Kết quả</th></tr>
+    <tr><td><code>==</code></td><td>Bằng nhau</td><td><code>5 == 5</code></td><td>true</td></tr>
+    <tr><td><code>!=</code></td><td>Khác nhau</td><td><code>5 != 3</code></td><td>true</td></tr>
+    <tr><td><code>&gt;</code></td><td>Lớn hơn</td><td><code>7 &gt; 4</code></td><td>true</td></tr>
+    <tr><td><code>&lt;</code></td><td>Nhỏ hơn</td><td><code>2 &lt; 1</code></td><td>false</td></tr>
+    <tr><td><code>&gt;=</code></td><td>Lớn hơn hoặc bằng</td><td><code>5 &gt;= 5</code></td><td>true</td></tr>
+    <tr><td><code>&lt;=</code></td><td>Nhỏ hơn hoặc bằng</td><td><code>9 &lt;= 8</code></td><td>false</td></tr>
+  </table></div>
 
-  <section class="card"><div class="card-head">🧮 5. Toán tử so sánh</div><div class="card-body">
-    <table class="table">
-      <thead><tr><th>Toán tử</th><th>Ý nghĩa</th></tr></thead>
-      <tbody>
-        <tr><td>==</td><td>bằng</td></tr>
-        <tr><td>!=</td><td>khác</td></tr>
-        <tr><td>&gt;</td><td>lớn hơn</td></tr>
-        <tr><td>&lt;</td><td>nhỏ hơn</td></tr>
-        <tr><td>&gt;=</td><td>lớn hơn hoặc bằng</td></tr>
-        <tr><td>&lt;=</td><td>nhỏ hơn hoặc bằng</td></tr>
-      </tbody>
-    </table>
-    <pre class="code"><code>if (a > b)</code></pre>
-  </div></section>
+  <div class="call bad"><b>Phân biệt:</b> <code>=</code> là phép gán; <code>==</code> là phép so sánh bằng nhau.</div>
+</section>
 
-  <section class="card"><div class="card-head">🧩 6. Ví dụ: kiểm tra số chẵn</div><div class="card-body">
-    <pre class="code"><code>int n;
-cin >> n;
+<section class="card" id="structures">
+  <h2>3. Các cấu trúc rẽ nhánh</h2>
 
-if (n % 2 == 0)
-    cout << "So chan";
-else
-    cout << "So le";</code></pre>
-  </div></section>
+  <div class="g3">
+    <div class="box"><h3>if đơn</h3><pre><code>if (temperature &lt; 10) {
+    cout &lt;&lt; "Mac ao am";
+}</code></pre><p>Không có hành động riêng khi điều kiện sai.</p></div>
+    <div class="box"><h3>if – else</h3><pre><code>if (score &gt;= 5) {
+    cout &lt;&lt; "Dat";
+} else {
+    cout &lt;&lt; "Chua dat";
+}</code></pre><p>Chính xác một trong hai nhánh chạy.</p></div>
+    <div class="box"><h3>else-if chain</h3><pre><code>if (score &gt;= 8) {
+    cout &lt;&lt; "Gioi";
+} else if (score &gt;= 6.5) {
+    cout &lt;&lt; "Kha";
+} else {
+    cout &lt;&lt; "Khac";
+}</code></pre><p>Nhánh đúng đầu tiên được chọn.</p></div>
+  </div>
+</section>
 
-  <section class="card"><div class="card-head">🪜 7. Demo step-by-step điều kiện</div><div class="card-body">
-    <div class="flow">Input: 8
+<section class="card" id="decision">
+  <h2>4. Mô phỏng cây quyết định</h2>
 
-Step 1: n = 8
-Step 2: n % 2 = 0
-Step 3: 0 == 0 → TRUE
-Step 4: in "So chan"</div>
-  </div></section>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Điểm</b></label><input class="input" id="scoreInput" value="7.5">
+      <label><b>Chuyên cần (%)</b></label><input class="input" id="attendanceInput" value="85">
+      <div class="controls"><button class="btn" id="decisionNext">Bước tiếp</button><button class="btn green" id="decisionRun">Chạy hết</button><button class="btn alt" id="decisionReset">Làm lại</button></div>
 
-  <section class="card"><div class="card-head">🏫 8. Ví dụ thực tế</div><div class="card-body">
-    <p><b>Kiểm tra tuổi</b></p>
-    <pre class="code"><code>int age;
-cin >> age;
-
-if (age >= 18)
-    cout << "Du tuoi";
-else
-    cout << "Chua du tuoi";</code></pre>
-
-    <p><b>So sánh hai số</b></p>
-    <pre class="code"><code>int a,b;
-cin >> a >> b;
-
-if (a > b)
-    cout << a;
-else
-    cout << b;</code></pre>
-  </div></section>
-
-  <section class="card"><div class="card-head">🔁 9. else-if chain</div><div class="card-body">
-    <pre class="code"><code>int x;
-cin >> x;
-
-if (x > 0)
-    cout << "Duong";
-else if (x < 0)
-    cout << "Am";
-else
-    cout << "Bang 0";</code></pre>
-  </div></section>
-
-  <section class="card"><div class="card-head">🌳 10. Minh họa logic điều kiện (Decision tree)</div><div class="card-body">
-    <div class="flow">         Điều kiện
-            ↓
-        n % 2 == 0 ?
-          /      \
-       TRUE     FALSE
-        ↓         ↓
-    So chan     So le</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">🎮 Demo 1 — Decision Tree</div><div class="card-body">
-    <div class="demo-box">
-      <div class="row">
-        <div class="col"><label for="scoreInput">score =</label><input id="scoreInput" class="input" type="number" value="7"></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" onclick="checkScoreDecision()">Check condition</button></div>
+      <div class="tree">
+        <div class="node" id="nodeInput">Đọc score, attendance</div>
+        <div>↓</div>
+        <div class="node diamond" id="nodeCond1">attendance ≥ 80?</div>
+        <div class="branches">
+          <div><div class="branch-label yes">TRUE</div><div class="node" id="nodeCond2">score ≥ 5?</div></div>
+          <div><div class="branch-label no">FALSE</div><div class="node" id="nodeFailAttendance">Không đạt chuyên cần</div></div>
+        </div>
+        <div class="branches">
+          <div><div class="node" id="nodePass">Đạt</div></div>
+          <div><div class="node" id="nodeFailScore">Chưa đạt điểm</div></div>
+        </div>
       </div>
-      <div id="scoreDecisionResult" class="alert">Bấm nút để kiểm tra: score &gt;= 5 ?</div>
     </div>
-  </div></section>
 
-  <section class="card"><div class="card-head">🎮 Demo 2 — Even/Odd Visualizer</div><div class="card-body">
-    <div class="demo-box">
-      <div class="row">
-        <div class="col"><label for="evenOddInput">Nhập n</label><input id="evenOddInput" class="input" type="number" value="8"></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" onclick="runEvenOddDemo()">Kiểm tra chẵn/lẻ</button></div>
+    <div class="g2">
+      <div class="code-lines" id="decisionCode">
+        <div class="code-line" data-k="read">cin &gt;&gt; score &gt;&gt; attendance;</div>
+        <div class="code-line" data-k="att">if (attendance &gt;= 80) {</div>
+        <div class="code-line" data-k="score">    if (score &gt;= 5) cout &lt;&lt; "Dat";</div>
+        <div class="code-line" data-k="fail-score">    else cout &lt;&lt; "Chua dat diem";</div>
+        <div class="code-line" data-k="fail-att">} else cout &lt;&lt; "Khong dat chuyen can";</div>
       </div>
-      <div id="evenOddResult" class="alert">Nhấn nút để xem từng bước: n % 2, so sánh, kết quả.</div>
+      <div class="log" id="decisionLog"></div>
     </div>
-  </div></section>
+  </div>
+</section>
 
-  <section class="card"><div class="card-head">11. Ứng dụng của if</div><div class="card-body">
-    <ul>
-      <li>kiểm tra dữ liệu nhập</li>
-      <li>quyết định logic game</li>
-      <li>phân loại học sinh</li>
-      <li>kiểm tra điều kiện thuật toán</li>
-    </ul>
-  </div></section>
+<section class="card" id="logic">
+  <h2>5. Toán tử logic: &&, ||, !</h2>
 
-  <section class="card"><div class="card-head">🧪 Bài tập luyện tập</div><div class="card-body">
-    <ol>
-      <li>Nhập số nguyên n, in: So duong / So am / So 0.</li>
-      <li>Nhập điểm, in: ≥5 → Dau, &lt;5 → Rot.</li>
-      <li>Nhập 3 số, in ra số lớn nhất.</li>
-    </ol>
-  </div></section>
+  <div class="g2">
+    <div class="box"><h3>AND – &&</h3><p>Đúng khi <b>cả hai</b> điều kiện đúng.</p><code>age &gt;= 18 &amp;&amp; hasId</code></div>
+    <div class="box"><h3>OR – ||</h3><p>Đúng khi <b>ít nhất một</b> điều kiện đúng.</p><code>isTeacher || isAdmin</code></div>
+    <div class="box"><h3>NOT – !</h3><p>Đảo giá trị Boolean.</p><code>!isEmpty</code></div>
+    <div class="box"><h3>Short-circuit</h3><p>Với <code>&amp;&amp;</code>, nếu vế trái false thì vế phải không cần chạy. Với <code>||</code>, nếu vế trái true thì vế phải không cần chạy.</p></div>
+  </div>
 
-  <section class="card"><div class="card-head">❓ Quiz nhanh</div><div class="card-body">
-    <p><b>"==" trong C++ nghĩa là gì?</b></p>
-    <button class="quiz-option" data-correct="true">A. So sánh bằng nhau</button>
-    <button class="quiz-option" data-correct="false">B. Gán giá trị</button>
-    <button class="quiz-option" data-correct="false">C. Cộng hai số</button>
-    <div id="quizFeedback" style="color:#64748b;">Chọn 1 đáp án.</div>
-  </div></section>
+  <h3>5.1. Bảng chân trị tương tác</h3>
+  <div class="g2">
+    <div class="visual">
+      <label><input type="checkbox" id="boolA"> A</label><br>
+      <label><input type="checkbox" id="boolB"> B</label>
+      <div class="controls"><button class="btn" id="boolEval">Tính</button></div>
+    </div>
+    <div class="bool-grid" id="boolGrid"></div>
+  </div>
+
+  <div class="call ok"><b>Ứng dụng short-circuit:</b> <code>i &lt; n &amp;&amp; a[i] == x</code> sẽ không truy cập <code>a[i]</code> nếu <code>i &gt;= n</code>.</div>
+</section>
+
+<section class="card" id="classification">
+  <h2>6. Mô phỏng else-if và thứ tự điều kiện</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Điểm từ 0 đến 10</b></label><input class="input" id="classScore" value="8.2">
+      <div class="controls"><button class="btn" id="classifyBtn">Phân loại</button></div>
+      <div class="var-boxes" id="classResult"></div>
+    </div>
+    <div class="log" id="classLog"></div>
+  </div>
+
+  <div class="call bad">
+    <b>Thứ tự sai:</b>
+    <pre><code>if (score &gt;= 5) cout &lt;&lt; "Dat";
+else if (score &gt;= 8) cout &lt;&lt; "Gioi";</code></pre>
+    Điểm 9 đã thỏa <code>score &gt;= 5</code>, nên nhánh Giỏi không bao giờ được chạy.
+  </div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>7. Phân tích trước khi viết code</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Bước</th><th>Câu hỏi</th><th>Ví dụ phân loại điểm</th></tr>
+    <tr><td>1. Xác định miền input</td><td>Giá trị hợp lệ là gì?</td><td>0 ≤ score ≤ 10.</td></tr>
+    <tr><td>2. Liệt kê trường hợp</td><td>Có bao nhiêu nhánh?</td><td>Không hợp lệ, Giỏi, Khá, Đạt, Chưa đạt.</td></tr>
+    <tr><td>3. Xử lý biên</td><td>Điểm 5, 6.5, 8 thuộc nhóm nào?</td><td>Dùng ≥ đúng mốc.</td></tr>
+    <tr><td>4. Sắp thứ tự</td><td>Điều kiện nào phải kiểm tra trước?</td><td>Từ mốc cao xuống thấp.</td></tr>
+    <tr><td>5. Kiểm tra phủ hết</td><td>Còn trường hợp nào chưa xử lý?</td><td>Dùng else cho phần còn lại.</td></tr>
+  </table></div>
+</section>
+
+<section class="card" id="code">
+  <h2>8. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="ifCode">if đơn</button>
+      <button class="tab-btn" data-tab="evenCode">Chẵn lẻ</button>
+      <button class="tab-btn" data-tab="gradeCode">Phân loại điểm</button>
+      <button class="tab-btn" data-tab="maxCode">Max ba số</button>
+      <button class="tab-btn" data-tab="logicCode">Điều kiện kết hợp</button>
+    </div>
+
+    <div class="panel active" id="ifCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int temperature;
+    cin &gt;&gt; temperature;
+
+    if (temperature &lt; 10) {
+        cout &lt;&lt; "Mac ao am";
+    }
+
+    return 0;
+}</code></pre></div>
+
+    <div class="panel" id="evenCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    long long n;
+    cin &gt;&gt; n;
+
+    if (n % 2 == 0) {
+        cout &lt;&lt; "So chan";
+    } else {
+        cout &lt;&lt; "So le";
+    }
+}</code></pre></div>
+
+    <div class="panel" id="gradeCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    double score;
+    cin &gt;&gt; score;
+
+    if (score &lt; 0 || score &gt; 10) {
+        cout &lt;&lt; "Khong hop le";
+    } else if (score &gt;= 8) {
+        cout &lt;&lt; "Gioi";
+    } else if (score &gt;= 6.5) {
+        cout &lt;&lt; "Kha";
+    } else if (score &gt;= 5) {
+        cout &lt;&lt; "Dat";
+    } else {
+        cout &lt;&lt; "Chua dat";
+    }
+}</code></pre></div>
+
+    <div class="panel" id="maxCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    long long a, b, c;
+    cin &gt;&gt; a &gt;&gt; b &gt;&gt; c;
+
+    long long answer = a;
+
+    if (b &gt; answer) {
+        answer = b;
+    }
+
+    if (c &gt; answer) {
+        answer = c;
+    }
+
+    cout &lt;&lt; answer;
+}</code></pre></div>
+
+    <div class="panel" id="logicCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    double score;
+    int attendance;
+
+    cin &gt;&gt; score &gt;&gt; attendance;
+
+    bool validScore = (0 &lt;= score &amp;&amp; score &lt;= 10);
+    bool enoughAttendance = (attendance &gt;= 80);
+    bool passedExam = (score &gt;= 5);
+
+    if (!validScore) {
+        cout &lt;&lt; "Du lieu khong hop le";
+    } else if (enoughAttendance &amp;&amp; passedExam) {
+        cout &lt;&lt; "Dat";
+    } else {
+        cout &lt;&lt; "Chua dat";
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>9. Giải thích code</h2>
+
+  <h3>9.1. Vì sao chuỗi else-if chỉ chạy một nhánh?</h3>
+  <p>Chương trình kiểm tra từ trên xuống. Khi gặp điều kiện đúng đầu tiên, nó chạy nhánh đó rồi bỏ qua các nhánh còn lại.</p>
+
+  <h3>9.2. Vì sao phải kiểm tra dữ liệu không hợp lệ trước?</h3>
+  <p>Điểm −1 cũng thỏa điều kiện “dưới 5”, nhưng đây không phải điểm hợp lệ. Cần tách lỗi input khỏi kết quả phân loại.</p>
+
+  <h3>9.3. Vì sao điều kiện điểm phải sắp từ cao xuống thấp?</h3>
+  <p>Điểm 9 đồng thời thỏa ≥5, ≥6.5 và ≥8. Kiểm tra mốc cao trước để chọn đúng nhóm cụ thể nhất.</p>
+
+  <h3>9.4. Vì sao max ba số dùng hai if độc lập?</h3>
+  <p>Sau khi so sánh với b, giá trị answer có thể thay đổi; ta vẫn phải tiếp tục so sánh với c. Hai kiểm tra không loại trừ nhau.</p>
+
+  <h3>9.5. Có viết 0 ≤ x ≤ 10 trong C++ được không?</h3>
+  <div class="call bad">Không. Biểu thức <code>0 &lt;= x &lt;= 10</code> được tính từ trái sang phải và cho kết quả sai về ý nghĩa. Phải viết <code>0 &lt;= x &amp;&amp; x &lt;= 10</code>.</div>
+
+  <h3>9.6. Có nên luôn dùng dấu ngoặc nhọn?</h3>
+  <p>Nên dùng, kể cả khi nhánh chỉ có một lệnh. Điều này tránh lỗi khi bổ sung câu lệnh và làm rõ <code>else</code> thuộc về <code>if</code> nào.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>10. Lỗi thường gặp</h2>
+
+  <ul>
+    <li>Dùng <code>=</code> thay cho <code>==</code>.</li>
+    <li>Viết <code>0 &lt;= x &lt;= 10</code>.</li>
+    <li>Sắp điều kiện else-if từ rộng đến hẹp.</li>
+    <li>Quên xử lý giá trị biên như 5, 6.5, 8.</li>
+    <li>Đặt dấu chấm phẩy sau <code>if (condition);</code>.</li>
+    <li>Không dùng ngoặc nhọn và khiến <code>else</code> gắn với if gần nhất.</li>
+    <li>So sánh số thực bằng <code>==</code> trong bài cần sai số.</li>
+    <li>Dùng nhiều <code>if</code> độc lập khi các nhánh phải loại trừ nhau.</li>
+    <li>Quên kiểm tra input ngoài miền hợp lệ.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>11. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Toán tử so sánh bằng nhau trong C++?<div class="answers"><button class="answer" data-choice="a">=</button><button class="answer" data-choice="b">==</button><button class="answer" data-choice="c">:=</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Cách kiểm tra x nằm trong [0,10]?<div class="answers"><button class="answer" data-choice="a">0 &lt;= x &lt;= 10</button><button class="answer" data-choice="b">x &gt;= 0 || x &lt;= 10</button><button class="answer" data-choice="c">x &gt;= 0 &amp;&amp; x &lt;= 10</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> Trong chuỗi else-if, điều gì xảy ra sau điều kiện đúng đầu tiên?<div class="answers"><button class="answer" data-choice="a">Các nhánh sau bị bỏ qua</button><button class="answer" data-choice="b">Mọi nhánh sau vẫn chạy</button><button class="answer" data-choice="c">Chương trình lặp lại từ đầu</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Kiểm tra âm, dương hoặc bằng 0.</li><li>Kiểm tra chẵn/lẻ.</li><li>Tìm max hai số.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Tìm max ba số.</li><li>Kiểm tra năm nhuận.</li><li>Kiểm tra ba cạnh tạo tam giác.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao hơn</h3><ol><li>Phân loại tam giác.</li><li>Tính tiền điện theo bậc.</li><li>Kiểm tra ngày tháng hợp lệ.</li></ol></div>
+    <div class="box"><h3>🐣 Học tiếp</h3><ol><li>switch-case.</li><li>Vòng lặp for/while.</li><li>Điều kiện trong thuật toán.</li></ol></div>
+  </div>
+</section>
 </div>
 
 <script>
-  function checkScoreDecision() {
-    var score = Number(document.getElementById('scoreInput').value || 0);
-    var box = document.getElementById('scoreDecisionResult');
-    if (score >= 5) {
-      box.innerHTML = 'score = ' + score + '<br>' + score + ' >= 5 → <b>TRUE</b> → Kết quả: <b>Dau</b>';
-    } else {
-      box.innerHTML = 'score = ' + score + '<br>' + score + ' >= 5 → <b>FALSE</b> → Kết quả: <b>Rot</b>';
-    }
-    box.classList.remove('highlight');
-    void box.offsetWidth;
-    box.classList.add('highlight');
-  }
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
 
-  function runEvenOddDemo() {
-    var n = Number(document.getElementById('evenOddInput').value || 0);
-    var mod = n % 2;
-    var isEven = mod === 0;
-    var box = document.getElementById('evenOddResult');
-    box.innerHTML = 'n = ' + n + '<br>' + n + ' % 2 = ' + mod + '<br>' + mod + ' == 0 → ' + (isEven ? '<b>TRUE</b>' : '<b>FALSE</b>') + '<br>Kết quả: <b>' + (isEven ? 'So chan' : 'So le') + '</b>';
-    box.classList.remove('highlight');
-    void box.offsetWidth;
-    box.classList.add('highlight');
-  }
+/* Decision tree */
+let dStep=0;
+function clearDecision(){
+  $$('.node').forEach(x=>x.classList.remove('active','true','false'));
+  $$('.code-line').forEach(x=>x.classList.remove('hl'));
+}
+function hlCode(key){$$('.code-line').forEach(x=>x.classList.remove('hl'));let e=$('.code-line[data-k="'+key+'"]');if(e)e.classList.add('hl')}
+function resetDecision(){dStep=0;clearDecision();$('#decisionLog').innerHTML='Bắt đầu: chưa đọc dữ liệu.'}
+function stepDecision(){
+  const score=Number($('#scoreInput').value),att=Number($('#attendanceInput').value);
+  dStep++;
+  if(dStep===1){clearDecision();$('#nodeInput').classList.add('active');hlCode('read');$('#decisionLog').innerHTML='<b>Đọc dữ liệu:</b> score='+score+', attendance='+att+'.';return}
+  if(dStep===2){clearDecision();let ok=att>=80;$('#nodeCond1').classList.add(ok?'true':'false');hlCode('att');$('#decisionLog').innerHTML=att+' ≥ 80 → <b>'+(ok?'TRUE':'FALSE')+'</b>.';if(!ok)dStep=4;return}
+  if(dStep===3){clearDecision();let ok=score>=5;$('#nodeCond2').classList.add(ok?'true':'false');hlCode('score');$('#decisionLog').innerHTML=score+' ≥ 5 → <b>'+(ok?'TRUE':'FALSE')+'</b>.';dStep=ok?5:6;return}
+  if(dStep===5){clearDecision();$('#nodePass').classList.add('true');hlCode('score');$('#decisionLog').innerHTML='<b>Kết quả: Đạt.</b>';dStep=99;return}
+  if(dStep===6){clearDecision();$('#nodeFailScore').classList.add('false');hlCode('fail-score');$('#decisionLog').innerHTML='<b>Kết quả: Chưa đạt điểm.</b>';dStep=99;return}
+  if(dStep===4){clearDecision();$('#nodeFailAttendance').classList.add('false');hlCode('fail-att');$('#decisionLog').innerHTML='<b>Kết quả: Không đạt chuyên cần.</b>';dStep=99;return}
+  resetDecision();
+}
+function runDecision(){resetDecision();let count=0,t=setInterval(()=>{stepDecision();count++;if(dStep===99||count>8)clearInterval(t)},450)}
 
-  document.querySelectorAll('.quiz-option').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var ok = btn.getAttribute('data-correct') === 'true';
-      document.querySelectorAll('.quiz-option').forEach(function (x) { x.classList.remove('correct', 'wrong'); });
-      btn.classList.add(ok ? 'correct' : 'wrong');
-      document.getElementById('quizFeedback').innerHTML = ok
-        ? '<span style="color:#15803d;font-weight:700;">✅ Đúng! == là toán tử so sánh bằng nhau.</span>'
-        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Hãy nhớ: == dùng để so sánh.</span>';
-    });
-  });
+/* Boolean */
+function evalBool(){
+  let A=$('#boolA').checked,B=$('#boolB').checked;
+  const rows=[
+    ['A',A],['B',B],['A && B',A&&B],['A || B',A||B],['!A',!A],['!B',!B]
+  ];
+  $('#boolGrid').innerHTML=
+    '<div class="bool-cell head">Biểu thức</div>'+
+    '<div class="bool-cell head">Kết quả</div>'+
+    rows.map(r=>
+      '<div class="bool-cell expression">'+r[0]+'</div>'+
+      '<div class="bool-cell '+(r[1]?'on':'off')+'">'+(r[1]?'true':'false')+'</div>'
+    ).join('');
+}
 
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) entry.target.classList.add('show');
-    });
-  }, { threshold: 0.15 });
-  cards.forEach(function (card) { observer.observe(card); });
+/* Classification */
+function classify(){
+  let s=Number($('#classScore').value),label,checks=[];
+  if(!Number.isFinite(s)||s<0||s>10){label='Không hợp lệ';checks.push('score ngoài [0,10]');}
+  else if(s>=8){label='Giỏi';checks.push(s+' ≥ 8 → TRUE');}
+  else if(s>=6.5){label='Khá';checks.push(s+' ≥ 8 → FALSE',s+' ≥ 6.5 → TRUE');}
+  else if(s>=5){label='Đạt';checks.push(s+' ≥ 8 → FALSE',s+' ≥ 6.5 → FALSE',s+' ≥ 5 → TRUE');}
+  else{label='Chưa đạt';checks.push('Các mốc 8, 6.5, 5 đều FALSE');}
+  $('#classResult').innerHTML='<div class="node active">'+label+'</div>';
+  $('#classLog').innerHTML=checks.join('<br>')+'<br><b>Chọn nhánh: '+label+'</b>';
+}
+
+/* Tabs/copy/quiz */
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+  $('#decisionNext').onclick=stepDecision;$('#decisionRun').onclick=runDecision;$('#decisionReset').onclick=resetDecision;
+  $('#boolEval').onclick=evalBool;$('#classifyBtn').onclick=classify;
+  resetDecision();evalBool();classify();
+
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
+})();
 </script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

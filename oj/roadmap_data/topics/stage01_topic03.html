@@ -1,380 +1,81 @@
 <style>
-  * { box-sizing: border-box; }
-  .lesson-page {
-    font-family: Inter, Roboto, Arial, sans-serif;
-    color: #1f2937;
-    background: linear-gradient(180deg, #f8fbff, #eef5ff 70%);
-    border-radius: 16px;
-    padding: 20px;
-    line-height: 1.65;
-  }
-  .header {
-    border-radius: 14px;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    color: #fff;
-    padding: 18px;
-    box-shadow: 0 10px 24px rgba(37,99,235,.3);
-    margin-bottom: 16px;
-  }
-  .header h1 { margin: 0 0 6px; font-size: 28px; }
-
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    margin-bottom: 16px;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(14px);
-    transition: .5s ease;
-  }
-  .card.show { opacity: 1; transform: translateY(0); }
-  .card-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; background: #f8fafc; }
-  .card-body { padding: 14px; }
-
-  .code {
-    background: #111827;
-    color: #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
-    overflow: auto;
-    font-size: 14px;
-    font-family: Consolas, Monaco, 'Courier New', monospace;
-  }
-
-  .table { width: 100%; border-collapse: collapse; }
-  .table th, .table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
-  .table th { background: #eff6ff; }
-
-  .flow {
-    border: 1px dashed #93c5fd;
-    border-radius: 10px;
-    background: #eff6ff;
-    padding: 10px;
-    white-space: pre;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .demo-box {
-    border: 1px solid #dbeafe;
-    border-radius: 10px;
-    background: #f8fbff;
-    padding: 12px;
-  }
-
-  .row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .col { flex: 1 1 220px; min-width: 220px; }
-
-  .input, .btn {
-    width: 100%;
-    border-radius: 8px;
-    font-size: 14px;
-    padding: 10px;
-  }
-  .input { border: 1px solid #cbd5e1; }
-  .btn { border: 0; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
-  .btn:hover { background: #1d4ed8; }
-
-  .alert {
-    margin-top: 10px;
-    border-radius: 8px;
-    border: 1px solid #bfdbfe;
-    background: #eff6ff;
-    padding: 10px;
-  }
-
-  .iteration-box {
-    margin-top: 8px;
-    border: 2px solid #60a5fa;
-    border-radius: 10px;
-    background: #eff6ff;
-    display: inline-block;
-    padding: 8px 14px;
-    min-width: 120px;
-    text-align: center;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .iteration-box .label { font-size: 13px; color: #1e3a8a; }
-  .iteration-box .value { font-size: 30px; font-weight: 700; color: #1d4ed8; }
-
-  .highlight { animation: pulse .55s ease; }
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-
-  .quiz-option {
-    width: 100%;
-    text-align: left;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 10px;
-    background: #fff;
-    margin-bottom: 8px;
-    cursor: pointer;
-  }
-  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
-  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
-
-  @media (max-width: 768px) {
-    .lesson-page { padding: 12px; }
-    .header h1 { font-size: 22px; }
-  }
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.loop-page{font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.loop-page *{box-sizing:border-box}.loop-page h1,.loop-page h2,.loop-page h3{line-height:1.25}.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:980px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}.state-grid{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:10px}.state{padding:10px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff;text-align:center}.state b{display:block;color:#312e81}.state strong{font-size:1.4rem}.state.active{background:#ffedd5;border-color:#fb923c;color:#9a3412}.state.good{background:#dcfce7;border-color:#22c55e;color:#166534}.state.bad{background:#fee2e2;border-color:#ef4444;color:#991b1b}.output-box{min-height:58px;padding:12px;border:1px dashed #94a3b8;border-radius:13px;background:#f8fafc;font-family:Consolas,monospace;font-weight:900}.iter-row{display:flex;gap:8px;overflow:auto;padding:8px 0}.iter-cell{min-width:70px;padding:9px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900}.iter-cell.current{background:#ffedd5;border-color:#fb923c;color:#9a3412}.iter-cell.done{background:#dcfce7;border-color:#22c55e;color:#166534}.grid-demo{display:grid;gap:6px;justify-content:start}.grid-cell{width:52px;height:52px;border:1px solid #cbd5e1;border-radius:9px;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-weight:900}.grid-cell.current{background:#ffedd5;border-color:#fb923c}.grid-cell.done{background:#dcfce7;border-color:#22c55e}.log{min-height:120px;max-height:350px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}.loop-page pre{margin:0;padding:20px;max-height:680px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.loop-page p code,.loop-page li code,.loop-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.loop-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.loop-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.state-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
-
-<div class="lesson-page">
-  <div class="header">
-    <h1>🔁 Bài học: Vòng lặp (Loops)</h1>
-    <p>Bài học tương tác giúp hiểu cách máy tính lặp từng bước bằng <code>for</code> và <code>while</code>.</p>
-  </div>
-
-  <section class="card"><div class="card-head">🎯 1. Mục tiêu bài học</div><div class="card-body">
-    <ul>
-      <li>Hiểu vòng lặp là gì.</li>
-      <li>Biết dùng <code>for</code> và <code>while</code>.</li>
-      <li>Hiểu cách chương trình lặp lại từng bước.</li>
-      <li>Viết chương trình tính tổng, đếm, in dãy.</li>
-      <li>Hiểu cách vòng lặp chạy bên trong máy tính.</li>
-    </ul>
-  </div></section>
-
-  <section class="card"><div class="card-head">2. Vì sao cần vòng lặp?</div><div class="card-body">
-    <p>Giả sử cần in <code>1 2 3 4 5</code>:</p>
-    <pre class="code"><code>cout << 1;
-cout << 2;
-cout << 3;
-cout << 4;
-cout << 5;</code></pre>
-    <p>Nếu cần in từ 1 → 1000 thì không thể viết 1000 dòng như vậy. ➜ Ta cần vòng lặp.</p>
-  </div></section>
-
-  <section class="card"><div class="card-head">3. Ý tưởng của vòng lặp</div><div class="card-body">
-    <div class="flow">Lặp lại công việc nhiều lần
-
-Bước 1 → in 1
-Bước 2 → in 2
-Bước 3 → in 3
-...</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">4. Vòng lặp for</div><div class="card-body">
-    <pre class="code"><code>for (khởi tạo; điều kiện; cập nhật) {
-    // code
-}</code></pre>
-    <pre class="code"><code>for (int i = 1; i <= 5; i++) {
-    cout << i << " ";
-}</code></pre>
-    <div class="alert">Kết quả: <b>1 2 3 4 5</b></div>
-  </div></section>
-
-  <section class="card"><div class="card-head">5. Giải thích từng phần của for</div><div class="card-body">
-    <pre class="code"><code>for (int i = 1; i <= 5; i++)</code></pre>
-    <table class="table">
-      <thead><tr><th>Phần</th><th>Ý nghĩa</th></tr></thead>
-      <tbody>
-        <tr><td>i = 1</td><td>bắt đầu</td></tr>
-        <tr><td>i <= 5</td><td>điều kiện lặp</td></tr>
-        <tr><td>i++</td><td>tăng i</td></tr>
-      </tbody>
-    </table>
-  </div></section>
-
-  <section class="card"><div class="card-head">6. Step execution ví dụ in 1 → 4</div><div class="card-body">
-    <div class="flow">n = 4
-
-Step 1: i = 1 → output: 1
-Step 2: i = 2 → output: 1 2
-Step 3: i = 3 → output: 1 2 3
-Step 4: i = 4 → output: 1 2 3 4</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">7. Ví dụ: tính tổng 1 → n</div><div class="card-body">
-    <pre class="code"><code>int n, sum = 0;
-cin >> n;
-
-for (int i = 1; i <= n; i++)
-    sum += i;
-
-cout << sum;</code></pre>
-  </div></section>
-
-  <section class="card"><div class="card-head">8. Demo trực quan tính tổng</div><div class="card-body">
-    <div class="flow">n = 4
-sum = 0
-
-i=1 → sum=1
-i=2 → sum=3
-i=3 → sum=6
-i=4 → sum=10</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">9. Vòng lặp while</div><div class="card-body">
-    <pre class="code"><code>while (điều kiện) {
-    // code
-}</code></pre>
-    <pre class="code"><code>int i = 1;
-
-while (i <= 5) {
-    cout << i;
-    i++;
-}</code></pre>
-  </div></section>
-
-  <section class="card"><div class="card-head">10. So sánh for và while</div><div class="card-body">
-    <table class="table">
-      <thead><tr><th>for</th><th>while</th></tr></thead>
-      <tbody>
-        <tr><td>biết số lần lặp</td><td>chưa biết số lần</td></tr>
-        <tr><td>dùng nhiều nhất</td><td>dùng khi điều kiện dừng rõ</td></tr>
-      </tbody>
-    </table>
-  </div></section>
-
-  <section class="card"><div class="card-head">11. Demo while</div><div class="card-body">
-    <div class="flow">i = 1
-Check: i <= 5 ?
-TRUE → chạy</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">12. Interactive loop simulator (Step-by-step)</div><div class="card-body">
-    <div class="demo-box">
-      <div class="row">
-        <div class="col"><label for="loopN">Nhập n</label><input id="loopN" class="input" type="number" value="5" min="1"></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" onclick="startLoopDemo()">Start</button></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" style="background:#475569;" onclick="nextLoopStep()">Next Step</button></div>
-      </div>
-      <div class="iteration-box" id="iterBox">
-        <div class="label">i =</div>
-        <div class="value" id="iterValue">?</div>
-      </div>
-      <div id="loopStepText" class="alert">Nhấn Start rồi dùng Next Step để xem từng vòng lặp.</div>
-      <div id="loopOutput" class="alert">Output: </div>
-    </div>
-  </div></section>
-
-  <section class="card"><div class="card-head">13. Interactive summation demo (1 → n)</div><div class="card-body">
-    <div class="demo-box">
-      <div class="row">
-        <div class="col"><label for="sumN">Nhập n</label><input id="sumN" class="input" type="number" value="4" min="1"></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" onclick="startSumDemo()">Start Sum Demo</button></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" style="background:#475569;" onclick="nextSumStep()">Next Step</button></div>
-      </div>
-      <div id="sumStepText" class="alert">Nhấn Start Sum Demo để bắt đầu.</div>
-      <div id="sumResultText" class="alert">sum = 0</div>
-    </div>
-  </div></section>
-
-  <section class="card"><div class="card-head">14. Quiz</div><div class="card-body">
-    <p><b>Câu 1: Loop nào dùng khi biết số lần lặp?</b></p>
-    <button class="quiz-option" data-q="q1" data-correct="false">A. while</button>
-    <button class="quiz-option" data-q="q1" data-correct="true">B. for</button>
-    <div id="q1Result" class="alert">Chọn một đáp án.</div>
-
-    <p><b>Câu 2: Trong <code>for(int i=1;i<=5;i++)</code>, i++ nghĩa là gì?</b></p>
-    <button class="quiz-option" data-q="q2" data-correct="false">A. i giảm</button>
-    <button class="quiz-option" data-q="q2" data-correct="true">B. i tăng 1</button>
-    <button class="quiz-option" data-q="q2" data-correct="false">C. i reset</button>
-    <div id="q2Result" class="alert">Chọn một đáp án.</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">15. Bài tập luyện tập</div><div class="card-body">
-    <ol>
-      <li>Nhập n, in ra dãy 1 2 3 ... n.</li>
-      <li>Tính tổng 1 + 2 + ... + n.</li>
-      <li>Tính giai thừa n!.</li>
-    </ol>
-  </div></section>
-
-  <section class="card"><div class="card-head">🚀 Thử thách</div><div class="card-body">
-    <p>Dùng <code>while</code> thay cho <code>for</code> để làm lại các bài trên.</p>
-  </div></section>
+<div class="loop-page">
+<div class="hero"><span class="badge">C++ Control Flow</span><h1>🔁 Vòng lặp for, while và do-while</h1><p>Vòng lặp giúp chương trình thực hiện một công việc nhiều lần mà không lặp lại code. Bài học trình bày cơ chế từng bước, biến đếm, điều kiện dừng, biến tích lũy, break/continue, vòng lặp lồng nhau và lỗi vòng lặp vô hạn.</p><div class="stats"><div class="stat"><b>for</b><span>Thường dùng khi biết số lần</span></div><div class="stat"><b>while</b><span>Lặp khi điều kiện còn đúng</span></div><div class="stat"><b>do-while</b><span>Chạy ít nhất một lần</span></div><div class="stat"><b>O(n)</b><span>Một lượt qua n phần tử</span></div></div></div>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav"><a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#for">For</a><a href="#while">While</a><a href="#dowhile">Do-while</a><a href="#sum">Tích lũy</a><a href="#control">Break/Continue</a><a href="#nested">Lồng nhau</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a></div></div>
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2"><div class="box"><h3>Cần hiểu</h3><ul><li>Bốn bước: khởi tạo, kiểm tra, thực hiện, cập nhật.</li><li>Khác nhau giữa <code>for</code>, <code>while</code>, <code>do-while</code>.</li><li>Biến đếm, biến tích lũy.</li><li><code>break</code>, <code>continue</code>.</li><li>Độ phức tạp vòng lặp.</li></ul></div><div class="box"><h3>Cần làm được</h3><ul><li>In dãy theo quy luật.</li><li>Tính tổng, tích, đếm.</li><li>Xử lý đến điều kiện dừng.</li><li>Viết vòng lặp lồng nhau.</li><li>Phát hiện vòng lặp vô hạn.</li></ul></div></div></section>
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2><div class="call"><b>Bài toán mở đầu.</b><br>Nhập số nguyên dương n. Hãy in các số từ 1 đến n và tính tổng của chúng.</div><h3>1.1. Nếu không dùng vòng lặp</h3><pre><code>cout &lt;&lt; 1 &lt;&lt; ' ';
+cout &lt;&lt; 2 &lt;&lt; ' ';
+cout &lt;&lt; 3 &lt;&lt; ' ';
+// Phải viết tiếp đến n</code></pre><p>Khi n thay đổi hoặc rất lớn, không thể viết sẵn từng câu lệnh.</p><h3>1.2. Tìm phần giống nhau</h3><ul><li>Công việc lặp lại: in i và cộng i vào tổng.</li><li>Giá trị thay đổi: i tăng từ 1 đến n.</li><li>Điều kiện dừng: i vượt quá n.</li></ul><div class="formula">Khởi tạo i → kiểm tra → chạy thân → cập nhật i → quay lại kiểm tra</div><div class="call ok"><b>Kết luận:</b> Vòng lặp mô tả một quy trình lặp, không chỉ là cách viết code ngắn hơn.</div></section>
+<section class="card" id="for"><h2>2. Vòng lặp for</h2><div class="formula">for (khởi_tạo; điều_kiện; cập_nhật) { thân_vòng_lặp }</div><div class="g3"><div class="box"><h3>Khởi tạo</h3><code>int i = 1</code></div><div class="box"><h3>Điều kiện</h3><code>i &lt;= n</code></div><div class="box"><h3>Cập nhật</h3><code>i++</code></div></div><h3>2.1. Mô phỏng từng bước</h3><div class="g2"><div class="visual"><label><b>n</b></label><input class="input" id="forN" value="5"><div class="controls"><button class="btn" id="forNext">Bước tiếp</button><button class="btn orange" id="forAuto">Tự chạy</button><button class="btn alt" id="forReset">Làm lại</button></div><div class="state-grid"><div class="state" id="forI"><b>i</b><strong>?</strong></div><div class="state" id="forCond"><b>i ≤ n</b><strong>?</strong></div><div class="state" id="forAction"><b>Hành động</b><strong>?</strong></div><div class="state" id="forUpdate"><b>Cập nhật</b><strong>?</strong></div></div><h3>Output</h3><div class="output-box" id="forOutput"></div></div><div class="g2"><div class="code-lines"><div class="code-line" data-for="init">for (int i = 1;</div><div class="code-line" data-for="cond">     i &lt;= n;</div><div class="code-line" data-for="update">     i++) {</div><div class="code-line" data-for="body">    cout &lt;&lt; i &lt;&lt; ' ';</div><div class="code-line">}</div></div><div class="log" id="forLog"></div></div></div></section>
+<section class="card" id="while"><h2>3. Vòng lặp while</h2><div class="formula">while (điều_kiện) { thân_vòng_lặp; cập_nhật; }</div><div class="g2"><div class="box"><h3>Khi nào dùng?</h3><ul><li>Chưa biết trước số lần lặp.</li><li>Lặp đến dữ liệu dừng.</li><li>Biến đổi một số cho đến 0.</li></ul></div><div class="box"><h3>Ví dụ</h3><pre><code>while (n &gt; 0) {
+    digitSum += n % 10;
+    n /= 10;
+}</code></pre></div></div><h3>3.1. Mô phỏng tổng chữ số</h3><div class="g2"><div class="visual"><label><b>n</b></label><input class="input" id="digitInput" value="50724"><div class="controls"><button class="btn" id="digitNext">Bước tiếp</button><button class="btn alt" id="digitReset">Làm lại</button></div><div class="state-grid"><div class="state" id="digitN"><b>n</b><strong>?</strong></div><div class="state" id="digitLast"><b>n % 10</b><strong>?</strong></div><div class="state" id="digitSum"><b>sum</b><strong>0</strong></div><div class="state" id="digitCond"><b>n &gt; 0</b><strong>?</strong></div></div></div><div class="log" id="digitLog"></div></div></section>
+<section class="card" id="dowhile"><h2>4. Vòng lặp do-while</h2><div class="g2"><div class="box"><pre><code>do {
+    // công việc
+} while (condition);</code></pre></div><div class="box"><p>Điều kiện được kiểm tra sau thân vòng lặp, nên thân chạy ít nhất một lần.</p></div></div><div class="call warn"><b>Ví dụ phù hợp:</b> hiển thị menu ít nhất một lần rồi hỏi có tiếp tục hay không.</div></section>
+<section class="card" id="sum"><h2>5. Biến đếm và biến tích lũy</h2><div class="g3"><div class="box"><h3>Đếm</h3><code>count++;</code></div><div class="box"><h3>Tổng</h3><code>sum += x;</code></div><div class="box"><h3>Tích</h3><code>product *= x;</code></div></div><h3>5.1. Mô phỏng tổng 1 đến n</h3><div class="g2"><div class="visual"><label><b>n</b></label><input class="input" id="sumN" value="6"><div class="controls"><button class="btn" id="sumNext">Bước tiếp</button><button class="btn alt" id="sumReset">Làm lại</button></div><div class="iter-row" id="sumRow"></div></div><div class="log" id="sumLog"></div></div><div class="call ok"><b>Bất biến:</b> Sau khi xử lý xong i, <code>sum</code> bằng tổng từ 1 đến i.</div></section>
+<section class="card" id="control"><h2>6. break và continue</h2><div class="g2"><div class="box"><h3>break</h3><p>Dừng ngay vòng lặp gần nhất.</p><pre><code>if (x == target) break;</code></pre></div><div class="box"><h3>continue</h3><p>Bỏ phần còn lại của lượt hiện tại.</p><pre><code>if (x &lt; 0) continue;</code></pre></div></div><div class="call warn"><b>Trong while:</b> nếu <code>continue</code> xảy ra trước câu lệnh cập nhật, biến điều khiển có thể không đổi và gây vòng lặp vô hạn.</div></section>
+<section class="card" id="nested"><h2>7. Vòng lặp lồng nhau</h2><p>Vòng trong chạy đầy đủ cho mỗi lượt của vòng ngoài.</p><div class="g2"><div class="visual"><label><b>Số hàng</b></label><input class="input" id="rowsInput" value="3"><label><b>Số cột</b></label><input class="input" id="colsInput" value="4"><div class="controls"><button class="btn" id="gridNext">Bước tiếp</button><button class="btn alt" id="gridReset">Làm lại</button></div><div class="grid-demo" id="gridDemo"></div></div><div class="log" id="gridLog"></div></div><div class="formula">Vòng ngoài n lần, vòng trong m lần mỗi lượt → O(nm)</div></section>
+<section class="card" id="analysis"><h2>8. Phân tích thuật toán</h2><div class="table-wrap"><table class="tbl"><tr><th>Mẫu</th><th>Số lượt</th><th>Độ phức tạp</th><th>Ví dụ</th></tr><tr><td><code>for(i=0;i&lt;n;i++)</code></td><td>n</td><td>O(n)</td><td>Duyệt mảng.</td></tr><tr><td><code>for(i=1;i&lt;=n;i*=2)</code></td><td>≈ log₂n</td><td>O(log n)</td><td>Nhân đôi biến.</td></tr><tr><td>Hai vòng liên tiếp</td><td>n+n</td><td>O(n)</td><td>Hai lượt duyệt.</td></tr><tr><td>Hai vòng lồng n×n</td><td>n²</td><td>O(n²)</td><td>Duyệt mọi cặp.</td></tr><tr><td>while chia n cho 10</td><td>Số chữ số</td><td>O(log₁₀n)</td><td>Xử lý chữ số.</td></tr></table></div></section>
+<section class="card" id="code"><h2>9. Code mẫu</h2><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="forCode">For cơ bản</button><button class="tab-btn" data-tab="sumCode">Tổng 1..n</button><button class="tab-btn" data-tab="whileCode">Tổng chữ số</button><button class="tab-btn" data-tab="breakCode">Break/Continue</button><button class="tab-btn" data-tab="nestedCode">Lồng nhau</button></div><div class="panel active" id="forCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+int main(){
+    int n; cin &gt;&gt; n;
+    for(int i=1;i&lt;=n;i++) cout &lt;&lt; i &lt;&lt; ' ';
+}</code></pre></div><div class="panel" id="sumCode"><button class="copy">Sao chép</button><pre><code>long long n, sum = 0;
+cin &gt;&gt; n;
+for(long long i=1;i&lt;=n;i++) sum += i;
+cout &lt;&lt; sum;</code></pre></div><div class="panel" id="whileCode"><button class="copy">Sao chép</button><pre><code>long long n;
+cin &gt;&gt; n;
+n = llabs(n);
+int digitSum = 0;
+do {
+    digitSum += n % 10;
+    n /= 10;
+} while(n &gt; 0);
+cout &lt;&lt; digitSum;</code></pre></div><div class="panel" id="breakCode"><button class="copy">Sao chép</button><pre><code>for(int i=0;i&lt;n;i++) {
+    int x; cin &gt;&gt; x;
+    if(x &lt; 0) continue;
+    if(x == target) { found = true; break; }
+}</code></pre></div><div class="panel" id="nestedCode"><button class="copy">Sao chép</button><pre><code>for(int i=1;i&lt;=rows;i++) {
+    for(int j=1;j&lt;=columns;j++) {
+        cout &lt;&lt; '(' &lt;&lt; i &lt;&lt; ',' &lt;&lt; j &lt;&lt; ") ";
+    }
+    cout &lt;&lt; '\n';
+}</code></pre></div></div></section>
+<section class="card" id="explain"><h2>10. Giải thích code</h2><h3>10.1. Vì sao for có thể không chạy lần nào?</h3><p>Điều kiện được kiểm tra trước thân vòng lặp. Nếu sai ngay từ đầu, thân không chạy.</p><h3>10.2. Vì sao tổng khởi tạo bằng 0?</h3><p>0 là phần tử trung hòa của phép cộng.</p><h3>10.3. Vì sao tích khởi tạo bằng 1?</h3><p>Nếu bằng 0 thì mọi lần nhân sau vẫn bằng 0.</p><h3>10.4. Vì sao tổng chữ số dùng do-while?</h3><p>Với n=0, vẫn cần xử lý một chữ số 0.</p><h3>10.5. For có nhanh hơn while không?</h3><div class="call ok">Không. Hiệu năng phụ thuộc số lượt và công việc bên trong, không phụ thuộc tên vòng lặp.</div></section>
+<section class="card" id="mistakes"><h2>11. Lỗi thường gặp</h2><ul><li>Nhầm <code>i&lt;n</code> với <code>i&lt;=n</code>.</li><li>Quên cập nhật biến trong while.</li><li>Đặt dấu <code>;</code> sau for/while.</li><li>Khởi tạo tổng hoặc tích sai.</li><li>Dùng int cho tổng lớn.</li><li>Continue làm bỏ qua cập nhật.</li><li>Cho rằng hai vòng liên tiếp là O(n²).</li><li>Vòng lặp lồng quá lớn gây TLE.</li></ul></section>
+<section class="card" id="quiz"><h2>12. Quiz và bài tập</h2><div class="quiz" data-answer="b"><b>Câu 1.</b> Vòng nào chạy thân ít nhất một lần?<div class="answers"><button class="answer" data-choice="a">for</button><button class="answer" data-choice="b">do-while</button><button class="answer" data-choice="c">while</button></div><div class="feedback"></div></div><div class="quiz" data-answer="c"><b>Câu 2.</b> <code>for(int i=0;i&lt;n;i++)</code> chạy bao nhiêu lượt?<div class="answers"><button class="answer" data-choice="a">n+1</button><button class="answer" data-choice="b">n−1</button><button class="answer" data-choice="c">n</button></div><div class="feedback"></div></div><div class="quiz" data-answer="a"><b>Câu 3.</b> Hai vòng O(n) liên tiếp có tổng độ phức tạp?<div class="answers"><button class="answer" data-choice="a">O(n)</button><button class="answer" data-choice="b">O(n²)</button><button class="answer" data-choice="c">O(log n)</button></div><div class="feedback"></div></div><div class="g2"><div class="box"><h3>📘 Cơ bản</h3><ol><li>In 1..n và n..1.</li><li>Tổng số chẵn ≤n.</li><li>Đếm chữ số.</li></ol></div><div class="box"><h3>📗 Trung bình</h3><ol><li>Tính n!.</li><li>Kiểm tra số nguyên tố.</li><li>UCLN bằng Euclid.</li></ol></div><div class="box"><h3>📙 Nâng cao</h3><ol><li>Bảng cửu chương.</li><li>Vẽ hình.</li><li>Đếm ước O(√n).</li></ol></div><div class="box"><h3>🐣 Học tiếp</h3><ol><li>Mảng.</li><li>Chuỗi.</li><li>Độ phức tạp.</li></ol></div></div></section>
 </div>
-
 <script>
-  var loopState = { n: 0, i: 0, output: [] };
-  function startLoopDemo() {
-    loopState.n = Math.max(1, Number(document.getElementById('loopN').value || 1));
-    loopState.i = 1;
-    loopState.output = [];
-    document.getElementById('iterValue').innerText = '?';
-    document.getElementById('loopOutput').innerText = 'Output: ';
-    document.getElementById('loopStepText').innerText = 'Đã khởi động: for (i = 1; i <= ' + loopState.n + '; i++)';
-  }
-
-  function nextLoopStep() {
-    var iterBox = document.getElementById('iterBox');
-    if (loopState.n < 1 || loopState.i < 1) {
-      document.getElementById('loopStepText').innerText = 'Hãy nhấn Start trước.';
-      return;
-    }
-
-    if (loopState.i <= loopState.n) {
-      document.getElementById('iterValue').innerText = String(loopState.i);
-      loopState.output.push(loopState.i);
-      document.getElementById('loopStepText').innerText = 'Step ' + loopState.i + ' → i = ' + loopState.i + ' → in ' + loopState.i;
-      document.getElementById('loopOutput').innerText = 'Output: ' + loopState.output.join(' ');
-      iterBox.classList.remove('highlight');
-      void iterBox.offsetWidth;
-      iterBox.classList.add('highlight');
-      loopState.i += 1;
-    } else {
-      document.getElementById('loopStepText').innerText = 'Hoàn thành vòng lặp. Điều kiện i <= n đã sai.';
-    }
-  }
-
-  var sumState = { n: 0, i: 1, sum: 0 };
-  function startSumDemo() {
-    sumState.n = Math.max(1, Number(document.getElementById('sumN').value || 1));
-    sumState.i = 1;
-    sumState.sum = 0;
-    document.getElementById('sumStepText').innerText = 'Bắt đầu: sum = 0, i = 1, n = ' + sumState.n;
-    document.getElementById('sumResultText').innerText = 'sum = 0';
-  }
-
-  function nextSumStep() {
-    var box = document.getElementById('sumResultText');
-    if (sumState.n < 1) {
-      document.getElementById('sumStepText').innerText = 'Hãy nhấn Start Sum Demo trước.';
-      return;
-    }
-
-    if (sumState.i <= sumState.n) {
-      sumState.sum += sumState.i;
-      document.getElementById('sumStepText').innerText = 'Step ' + sumState.i + ': cộng ' + sumState.i + ' → sum = ' + sumState.sum;
-      document.getElementById('sumResultText').innerText = 'sum = ' + sumState.sum;
-      box.classList.remove('highlight');
-      void box.offsetWidth;
-      box.classList.add('highlight');
-      sumState.i += 1;
-    } else {
-      document.getElementById('sumStepText').innerText = 'Kết thúc: tổng từ 1 đến n = ' + sumState.sum;
-    }
-  }
-
-  document.querySelectorAll('.quiz-option').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var q = btn.getAttribute('data-q');
-      var ok = btn.getAttribute('data-correct') === 'true';
-
-      document.querySelectorAll('.quiz-option[data-q="' + q + '"]').forEach(function (x) {
-        x.classList.remove('correct', 'wrong');
-      });
-
-      btn.classList.add(ok ? 'correct' : 'wrong');
-      var resultEl = document.getElementById(q + 'Result');
-      resultEl.innerHTML = ok
-        ? '<span style="color:#15803d;font-weight:700;">✅ Chính xác.</span>'
-        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng, thử lại nhé.</span>';
-    });
-  });
-
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) entry.target.classList.add('show');
-    });
-  }, { threshold: 0.15 });
-  cards.forEach(function (card) { observer.observe(card); });
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+let f={n:5,i:1,phase:0,out:[],done:false,timer:null};
+function clearFor(){$$('[data-for]').forEach(x=>x.classList.remove('hl'));$$('#forI,#forCond,#forAction,#forUpdate').forEach(x=>x.className='state')}
+function markFor(k){$$('[data-for]').forEach(x=>x.classList.remove('hl'));let e=$('[data-for="'+k+'"]');if(e)e.classList.add('hl')}
+function setState(id,l,v,c='active'){let e=$(id);e.className='state '+c;e.innerHTML='<b>'+l+'</b><strong>'+v+'</strong>'}
+function resetFor(){if(f.timer){clearInterval(f.timer);f.timer=null}f.n=Math.max(0,Math.floor(Number($('#forN').value)||0));f.i=1;f.phase=0;f.out=[];f.done=false;$('#forAuto').textContent='Tự chạy';clearFor();$('#forI').innerHTML='<b>i</b><strong>?</strong>';$('#forCond').innerHTML='<b>i ≤ n</b><strong>?</strong>';$('#forAction').innerHTML='<b>Hành động</b><strong>?</strong>';$('#forUpdate').innerHTML='<b>Cập nhật</b><strong>?</strong>';$('#forOutput').textContent='';$('#forLog').innerHTML='Chưa khởi tạo.'}
+function stepFor(){if(f.done){$('#forLog').innerHTML='Đã kết thúc.';return}clearFor();if(f.phase===0){setState('#forI','i',1);markFor('init');$('#forLog').innerHTML='Khởi tạo i=1.';f.phase=1;return}if(f.phase===1){let ok=f.i<=f.n;setState('#forCond','i ≤ n',ok?'true':'false',ok?'good':'bad');markFor('cond');$('#forLog').innerHTML=f.i+' ≤ '+f.n+' → '+ok;if(ok)f.phase=2;else f.done=true;return}if(f.phase===2){f.out.push(f.i);setState('#forAction','In',f.i);markFor('body');$('#forOutput').textContent=f.out.join(' ');$('#forLog').innerHTML='In '+f.i;f.phase=3;return}let old=f.i;f.i++;setState('#forUpdate','i++',old+'→'+f.i);setState('#forI','i',f.i);markFor('update');$('#forLog').innerHTML='Cập nhật i.';f.phase=1}
+function autoFor(){if(f.timer){clearInterval(f.timer);f.timer=null;$('#forAuto').textContent='Tự chạy';return}$('#forAuto').textContent='Tạm dừng';f.timer=setInterval(()=>{stepFor();if(f.done){clearInterval(f.timer);f.timer=null;$('#forAuto').textContent='Tự chạy'}},650)}
+let d={n:0,sum:0,done:false};function resetDigit(){d.n=Math.abs(Math.trunc(Number($('#digitInput').value)||0));d.sum=0;d.done=false;setState('#digitN','n',d.n);setState('#digitLast','n % 10','?','');setState('#digitSum','sum',0,'');setState('#digitCond','n > 0',d.n>0?'true':'false',d.n>0?'good':'bad');$('#digitLog').innerHTML='Khởi tạo sum=0.'}function stepDigit(){if(d.done){$('#digitLog').innerHTML='Hoàn tất. sum='+d.sum;return}if(d.n===0){d.done=true;setState('#digitCond','n > 0','false','bad');$('#digitLog').innerHTML='Điều kiện sai, kết thúc.';return}let last=d.n%10,old=d.n;d.sum+=last;d.n=Math.floor(d.n/10);setState('#digitN','n',d.n);setState('#digitLast','chữ số cuối',last);setState('#digitSum','sum',d.sum,'good');setState('#digitCond','n > 0',d.n>0?'true':'false',d.n>0?'good':'bad');$('#digitLog').innerHTML=old+' % 10 = '+last+'<br>sum = '+d.sum+'<br>n = '+d.n}
+let s={n:0,i:1,sum:0,done:false};function resetSum(){s.n=Math.max(0,Math.floor(Number($('#sumN').value)||0));s.i=1;s.sum=0;s.done=false;renderSum('Khởi tạo sum=0, i=1.')}function renderSum(m){$('#sumRow').innerHTML=Array.from({length:s.n},(_,k)=>{let i=k+1,c=i<s.i?'done':i===s.i?'current':'';return '<div class="iter-cell '+c+'"><small>i='+i+'</small>'+i+'</div>'}).join('');$('#sumLog').innerHTML=m+'<br><b>sum='+s.sum+'</b>'}function stepSum(){if(s.done)return;if(s.i>s.n){s.done=true;renderSum('Kết thúc.');return}let old=s.sum;s.sum+=s.i;renderSum('sum='+old+'+'+s.i+'='+s.sum);s.i++}
+let g={r:0,c:0,i:0,j:0,done:false};function resetGrid(){g.r=Math.max(1,Math.min(8,Math.floor(Number($('#rowsInput').value)||1)));g.c=Math.max(1,Math.min(10,Math.floor(Number($('#colsInput').value)||1)));g.i=0;g.j=0;g.done=false;renderGrid('Bắt đầu tại (1,1).')}function renderGrid(m){$('#gridDemo').style.gridTemplateColumns='repeat('+g.c+',52px)';let h='';for(let i=0;i<g.r;i++)for(let j=0;j<g.c;j++){let p=i*g.c+j,cur=g.i*g.c+g.j,c=p<cur?'done':p===cur&&!g.done?'current':'';h+='<div class="grid-cell '+c+'">'+(i+1)+','+(j+1)+'</div>'}$('#gridDemo').innerHTML=h;$('#gridLog').innerHTML=m+'<br><b>Đã xử lý '+Math.min(g.i*g.c+g.j,g.r*g.c)+' / '+(g.r*g.c)+' ô.</b>'}function stepGrid(){if(g.done){renderGrid('Đã hoàn tất.');return}let ci=g.i,cj=g.j;g.j++;if(g.j>=g.c){g.j=0;g.i++}if(g.i>=g.r)g.done=true;renderGrid('i='+(ci+1)+', j='+(cj+1))}
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();$('#forNext').onclick=stepFor;$('#forAuto').onclick=autoFor;$('#forReset').onclick=resetFor;$('#digitNext').onclick=stepDigit;$('#digitReset').onclick=resetDigit;$('#sumNext').onclick=stepSum;$('#sumReset').onclick=resetSum;$('#gridNext').onclick=stepGrid;$('#gridReset').onclick=resetGrid;resetFor();resetDigit();resetSum();resetGrid();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}})
+})();
 </script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

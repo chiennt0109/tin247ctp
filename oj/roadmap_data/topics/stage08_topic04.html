@@ -1,279 +1,717 @@
 <style>
-:root {
-  --blue-main: #2563eb;
-  --blue-dark: #1e3a8a;
-  --text-color: #1e293b;
-}
-
-h1 { color: var(--blue-dark); font-size: 28px; }
-h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
-h3 { color: #334155; margin-top: 25px; }
-
-p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
-
-.codebox { font-family: Consolas, monospace; background:#f8fafc; padding:10px; border-radius:8px; font-size:14px; }
-.line { padding:3px 6px; border-radius:6px; }
-.line.hl { background:#dbeafe; }
-
-.sim-3col {
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:16px;
-  margin-top:20px;
-}
-@media(max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
-
-.col { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; }
-.col h4 { margin-top:0; color:var(--blue-main); }
-
-.btn { border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
-.btn.main { background:var(--blue-main); color:#fff; }
-.btn.secondary { background:#0ea5e9; color:#fff; }
-.btn.red { background:#ef4444; color:#fff; }
-
-#ll-vis {
-  display:flex; align-items:center; overflow-x:auto; padding:10px;
-  border:2px dashed var(--blue-main); border-radius:10px;
-}
-
-.node {
-  display:flex; flex-direction:column; align-items:center; margin-right:20px;
-}
-
-.node-box {
-  background:var(--blue-main); color:white; min-width:60px; height:60px;
-  border-radius:8px; display:flex; justify-content:center; align-items:center;
-  font-weight:bold;
-}
-
-.arrow {
-  font-size:20px; color:var(--blue-main); margin-right:20px;
-}
-
-.callout {
-  border-left:6px solid #10b981; background:#ecfeff; padding:10px 12px;
-  border-radius:8px; margin:12px 0;
-}
+:root{--p:#2563eb;--pd:#1e3a8a;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.ll-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;
+margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.ll-page *{box-sizing:border-box}.ll-page h1,.ll-page h2,.ll-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#1d4ed8,#0e7490);box-shadow:0 22px 55px rgba(37,99,235,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1150px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1040px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#1d4ed8;color:#fff}
+.list-view{display:flex;align-items:center;gap:8px;min-height:150px;padding:42px 15px 18px;border:2px dashed #60a5fa;border-radius:18px;background:#f8fafc;overflow-x:auto}
+.node-wrap{display:flex;align-items:center;gap:8px;position:relative}.ll-node{display:grid;grid-template-columns:minmax(62px,auto) 54px;min-width:122px;height:68px;border:3px solid #2563eb;border-radius:12px;overflow:hidden;background:#fff;position:relative;box-shadow:0 7px 16px rgba(37,99,235,.15)}
+.ll-value,.ll-next{display:flex;align-items:center;justify-content:center;font-weight:900}.ll-value{background:#2563eb;color:#fff}.ll-next{background:#e0f2fe;color:#0e7490;border-left:2px solid #2563eb}.ll-node.active{border-color:#f97316;transform:translateY(-3px)}.ll-node.active .ll-value{background:#f97316}.ll-node.found{border-color:#22c55e}.ll-node.found .ll-value{background:#16a34a}.ll-node.deleted{opacity:.4;border-color:#ef4444}.ll-node.slow{outline:4px solid #22c55e}.ll-node.fast{box-shadow:0 0 0 5px rgba(249,115,22,.55)}.ll-node.prev{outline:4px solid #8b5cf6}
+.ptr-label{position:absolute;top:-31px;left:50%;transform:translateX(-50%);padding:3px 8px;border-radius:99px;color:#fff;font-size:.72rem;font-weight:900;white-space:nowrap}.head-label{background:#2563eb}.tail-label{background:#0891b2}.slow-label{background:#16a34a}.fast-label{background:#f97316}.prev-label{background:#7c3aed}.cur-label{background:#dc2626}
+.arrow{font-size:1.75rem;color:#2563eb;font-weight:900;flex:0 0 auto}.null-box{padding:13px;border:2px dashed #94a3b8;border-radius:11px;color:#64748b;font-weight:900;background:#fff}
+.node-anatomy{display:flex;align-items:center;justify-content:center;padding:20px;gap:0}.anatomy-part{min-width:150px;padding:22px;border:3px solid #2563eb;text-align:center;font-weight:900}.anatomy-part:first-child{border-radius:15px 0 0 15px;background:#2563eb;color:#fff}.anatomy-part:last-child{border-radius:0 15px 15px 0;background:#e0f2fe;color:#0e7490}
+.log{min-height:130px;max-height:380px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.step-list{counter-reset:step}.step-list li{counter-increment:step;list-style:none;margin:10px 0;padding:10px 12px 10px 48px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;position:relative}.step-list li::before{content:counter(step);position:absolute;left:12px;top:9px;width:25px;height:25px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.ll-page pre{margin:0;padding:20px;max-height:720px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.ll-page p code,.ll-page li code,.ll-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.ll-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.ll-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
 </style>
 
-
-<h1>🔗 Bài giảng: Linked List (có mô phỏng trực quan)</h1>
-<p>
-Linked List gồm các node được nối liên tiếp bằng con trỏ <code>next</code>.  
-Ta có thể chèn/xoá node ở đầu hoặc giữa rất nhanh — không cần dời toàn bộ phần tử như mảng.
-</p>
-
-
-<h2>I. Mô phỏng Linked List</h2>
-
-<div class="sim-3col">
-
-  <!-- Cột thao tác -->
-  <div class="col">
-    <h4>🛠 Thao tác</h4>
-
-    <input id="val" placeholder="Giá trị..." />
-
-    <div>
-      <button class="btn main" id="btn-pf">Insert đầu</button>
-      <button class="btn main" id="btn-pb">Insert cuối</button>
-      <button class="btn red" id="btn-del">Delete giá trị</button>
-      <button class="btn secondary" id="btn-print">Print</button>
-    </div>
-
-    <div class="callout" id="msg">💡 Nhập giá trị và thao tác để thấy Linked List thay đổi.</div>
+<div class="ll-page">
+<div class="hero">
+  <span class="badge">Dynamic Data Structure + Pointers</span>
+  <h1>🔗 Linked List – Danh sách liên kết</h1>
+  <p>Linked List gồm các node được nối bằng con trỏ. Bài học tập trung vào cách tổ chức node, thay đổi liên kết khi chèn/xóa, duyệt danh sách, đảo danh sách và kỹ thuật slow/fast pointer.</p>
+  <div class="stats">
+    <div class="stat"><b>Node</b><span>data + next</span></div>
+    <div class="stat"><b>Insert đầu</b><span>O(1)</span></div>
+    <div class="stat"><b>Duyệt/tìm</b><span>O(n)</span></div>
+    <div class="stat"><b>Slow/Fast</b><span>Giữa và chu kỳ</span></div>
   </div>
-
-  <!-- Cột code -->
-  <div class="col">
-    <h4>💻 Code đang chạy</h4>
-
-    <div id="ll-code" class="codebox">
-      <div class="line" data-k="init">Node* head = NULL;</div>
-
-      <div class="line" data-k="pf1">Node* p = new Node(x);</div>
-      <div class="line" data-k="pf2">p->next = head;</div>
-      <div class="line" data-k="pf3">head = p;</div>
-
-      <div class="line" data-k="pb1">Node* p = new Node(x);</div>
-      <div class="line" data-k="pb2">if(head == NULL) head = p;</div>
-      <div class="line" data-k="pb3">else tail->next = p;</div>
-
-      <div class="line" data-k="del1">if(head->val == x) head = head->next;</div>
-      <div class="line" data-k="del2">cur->next = cur->next->next;</div>
-
-      <div class="line" data-k="print">cout << head->val;</div>
-    </div>
-  </div>
-
-  <!-- Cột visual -->
-  <div class="col">
-    <h4>📊 Linked List</h4>
-    <div id="ll-vis"></div>
-  </div>
-
 </div>
 
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#anatomy">Cấu tạo node</a><a href="#simulate">Mô phỏng</a><a href="#operations">Các thao tác</a><a href="#reverse">Đảo danh sách</a><a href="#slowfast">Slow/Fast</a><a href="#compare">So sánh</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
+
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Node, con trỏ <code>next</code>, <code>head</code> và <code>tail</code>.</li><li>Vì sao Linked List không hỗ trợ truy cập ngẫu nhiên O(1).</li><li>Cách đổi liên kết khi chèn, xóa và đảo danh sách.</li><li>Vai trò của node trước khi xóa.</li><li>Kỹ thuật slow/fast pointer.</li></ul></div>
+    <div class="box"><h3>Cần làm được</h3><ul><li>Chèn đầu, chèn cuối, chèn theo vị trí.</li><li>Xóa đầu, xóa giá trị đầu tiên, xóa theo vị trí.</li><li>Tìm kiếm và duyệt danh sách.</li><li>Đảo danh sách liên kết đơn.</li><li>Tìm node giữa và phát hiện chu kỳ.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Ta quản lý một dãy dữ liệu thường xuyên chèn và xóa ở đầu hoặc giữa. Nếu dùng mảng/vector, các phần tử phía sau có thể phải dịch chuyển.
+  </div>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Thao tác</th><th>Vector/mảng</th><th>Linked List</th><th>Điều kiện</th></tr>
+    <tr><td>Truy cập phần tử thứ i</td><td>O(1)</td><td>O(i)</td><td>Linked List phải đi từ head.</td></tr>
+    <tr><td>Chèn đầu</td><td>O(n)</td><td>O(1)</td><td>Chỉ đổi một vài con trỏ.</td></tr>
+    <tr><td>Xóa đầu</td><td>O(n)</td><td>O(1)</td><td>Cập nhật head.</td></tr>
+    <tr><td>Chèn/xóa sau node đã biết</td><td>O(n)</td><td>O(1)</td><td>Đã có con trỏ tới node cần thao tác.</td></tr>
+    <tr><td>Tìm một giá trị</td><td>O(n)</td><td>O(n)</td><td>Đều phải duyệt trong trường hợp tổng quát.</td></tr>
+  </table></div>
+
+  <h3>1.1. Ý tưởng thay vì dịch chuyển phần tử</h3>
+  <p>Mỗi phần tử được đặt trong một node. Node lưu dữ liệu và địa chỉ node tiếp theo. Chèn/xóa được thực hiện bằng cách thay đổi liên kết.</p>
+
+  <div class="formula">Node hiện tại ──next──▶ Node tiếp theo</div>
+
+  <div class="call warn"><b>Không phải Linked List luôn nhanh hơn vector.</b> Linked List mạnh khi đã biết vị trí node cần chèn/xóa; việc tìm vị trí vẫn có thể mất O(n).</div>
+</section>
+
+<section class="card" id="anatomy">
+  <h2>2. Cấu tạo node và danh sách</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <div class="node-anatomy">
+        <div class="anatomy-part">data<br><small>giá trị</small></div>
+        <div class="anatomy-part">next<br><small>địa chỉ node sau</small></div>
+      </div>
+    </div>
+    <div class="box">
+      <pre><code>struct Node {
+    int data;
+    Node* next;
+
+    Node(int value)
+        : data(value), next(nullptr) {}
+};</code></pre>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="box"><h3>head</h3><p>Trỏ tới node đầu tiên. Nếu danh sách rỗng, <code>head == nullptr</code>.</p></div>
+    <div class="box"><h3>tail</h3><p>Trỏ tới node cuối. Giúp chèn cuối O(1), nhưng phải cập nhật đúng khi danh sách thay đổi.</p></div>
+    <div class="box"><h3>next</h3><p>Node cuối có <code>next == nullptr</code>. Đây là điều kiện dừng khi duyệt.</p></div>
+  </div>
+</section>
+
+<section class="card" id="simulate">
+  <h2>3. Mô phỏng Linked List tương tác</h2>
+
+  <div class="g3">
+    <div class="visual">
+      <label><b>Giá trị x</b></label><input class="input" id="valueInput" value="25">
+      <label><b>Vị trí pos (0-based)</b></label><input class="input" id="positionInput" value="2">
+      <div class="controls">
+        <button class="btn" id="pushFrontBtn">Chèn đầu</button>
+        <button class="btn" id="pushBackBtn">Chèn cuối</button>
+        <button class="btn green" id="insertPosBtn">Chèn tại pos</button>
+        <button class="btn orange" id="searchBtn">Tìm x</button>
+        <button class="btn red" id="deleteValueBtn">Xóa x đầu tiên</button>
+        <button class="btn red" id="deletePosBtn">Xóa tại pos</button>
+        <button class="btn orange" id="popFrontBtn">Xóa đầu</button>
+        <button class="btn alt" id="printBtn">In danh sách</button>
+        <button class="btn alt" id="resetListBtn">Làm lại</button>
+      </div>
+      <div class="log" id="listLog"></div>
+    </div>
+
+    <div class="code-lines">
+      <div class="code-line" data-op="create">Node* node = new Node(x);</div>
+      <div class="code-line" data-op="pf1">node-&gt;next = head;</div>
+      <div class="code-line" data-op="pf2">head = node;</div>
+      <div class="code-line" data-op="pb1">tail-&gt;next = node;</div>
+      <div class="code-line" data-op="pb2">tail = node;</div>
+      <div class="code-line" data-op="find">while (cur &amp;&amp; cur-&gt;data != x) cur=cur-&gt;next;</div>
+      <div class="code-line" data-op="insert">node-&gt;next = prev-&gt;next; prev-&gt;next = node;</div>
+      <div class="code-line" data-op="delete">prev-&gt;next = cur-&gt;next; delete cur;</div>
+      <div class="code-line" data-op="pop">Node* old=head; head=head-&gt;next; delete old;</div>
+    </div>
+
+    <div class="visual">
+      <h3>Danh sách hiện tại</h3>
+      <div class="list-view" id="listView"></div>
+    </div>
+  </div>
+
+  <div class="call ok"><b>Mô phỏng dùng mảng để thể hiện giá trị, nhưng phần giải thích và code mẫu dùng đúng logic con trỏ của Linked List.</b></div>
+</section>
+
+<section class="card" id="operations">
+  <h2>4. Các thao tác quan trọng</h2>
+
+  <div class="g2">
+    <div class="box">
+      <h3>4.1. Chèn đầu</h3>
+      <ol class="step-list">
+        <li>Tạo node mới.</li>
+        <li>Cho node mới trỏ tới head cũ.</li>
+        <li>Cập nhật head thành node mới.</li>
+        <li>Nếu danh sách ban đầu rỗng, cập nhật cả tail.</li>
+      </ol>
+    </div>
+    <div class="box">
+      <h3>4.2. Chèn cuối</h3>
+      <ol class="step-list">
+        <li>Tạo node mới có next = nullptr.</li>
+        <li>Nếu rỗng, head = tail = node mới.</li>
+        <li>Nếu không rỗng, nối tail cũ tới node mới.</li>
+        <li>Cập nhật tail.</li>
+      </ol>
+    </div>
+    <div class="box">
+      <h3>4.3. Xóa một node</h3>
+      <ol class="step-list">
+        <li>Tìm node cần xóa và node đứng trước.</li>
+        <li>Nối node trước tới node sau node bị xóa.</li>
+        <li>Cập nhật head/tail nếu cần.</li>
+        <li>Giải phóng bộ nhớ bằng delete.</li>
+      </ol>
+    </div>
+    <div class="box">
+      <h3>4.4. Tìm kiếm</h3>
+      <ol class="step-list">
+        <li>Bắt đầu từ head.</li>
+        <li>So sánh dữ liệu node hiện tại.</li>
+        <li>Nếu chưa thấy, đi theo next.</li>
+        <li>Dừng khi tìm thấy hoặc cur == nullptr.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="call bad"><b>Không được viết <code>head-&gt;data</code> khi head có thể là nullptr.</b> Luôn kiểm tra danh sách rỗng trước khi truy cập node đầu.</div>
+</section>
+
+<section class="card" id="reverse">
+  <h2>5. Đảo Linked List bằng ba con trỏ</h2>
+
+  <p>Ta cần giữ node tiếp theo trước khi đổi liên kết, nếu không sẽ mất phần còn lại của danh sách.</p>
+
+  <div class="formula">nextNode = current→next; current→next = previous; previous = current; current = nextNode</div>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Dữ liệu</b></label><input class="input" id="reverseInput" value="1 2 3 4 5">
+      <div class="controls">
+        <button class="btn" id="reverseNextBtn">Bước tiếp</button>
+        <button class="btn orange" id="reverseAutoBtn">Tự chạy</button>
+        <button class="btn alt" id="reverseResetBtn">Làm lại</button>
+      </div>
+      <div class="list-view" id="reverseView"></div>
+    </div>
+    <div class="log" id="reverseLog"></div>
+  </div>
+
+  <div class="call warn"><b>Lỗi thường gặp:</b> đổi <code>current-&gt;next = previous</code> trước khi lưu <code>nextNode</code>, làm mất đường đi tới phần còn lại.</div>
+</section>
+
+<section class="card" id="slowfast">
+  <h2>6. Slow/Fast Pointer</h2>
+
+  <h3>6.1. Tìm node giữa</h3>
+  <p><code>slow</code> đi một bước, <code>fast</code> đi hai bước. Khi fast tới cuối, slow ở giữa.</p>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Dữ liệu</b></label><input class="input" id="middleInput" value="10 20 30 40 50 60">
+      <div class="controls">
+        <button class="btn" id="middleNextBtn">Bước tiếp</button>
+        <button class="btn alt" id="middleResetBtn">Làm lại</button>
+      </div>
+      <div class="list-view" id="middleView"></div>
+    </div>
+    <div class="log" id="middleLog"></div>
+  </div>
+
+  <h3>6.2. Phát hiện chu kỳ</h3>
+  <div class="g2">
+    <div class="box">
+      <p>Nếu danh sách có chu kỳ, slow và fast cuối cùng sẽ gặp nhau. Nếu fast đạt nullptr, danh sách không có chu kỳ.</p>
+      <pre><code>while (fast &amp;&amp; fast-&gt;next) {
+    slow = slow-&gt;next;
+    fast = fast-&gt;next-&gt;next;
+
+    if (slow == fast) return true;
+}</code></pre>
+    </div>
+    <div class="call ok"><b>Độ phức tạp:</b> O(n) thời gian và O(1) bộ nhớ phụ.</div>
+  </div>
+</section>
+
+<section class="card" id="compare">
+  <h2>7. So sánh Linked List và vector</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Tiêu chí</th><th>vector</th><th>Linked List</th></tr>
+    <tr><td>Bộ nhớ</td><td>Liên tiếp, tốt cho cache.</td><td>Rời rạc, mỗi node tốn thêm con trỏ.</td></tr>
+    <tr><td>Truy cập chỉ số</td><td>O(1).</td><td>O(n).</td></tr>
+    <tr><td>Chèn/xóa đầu</td><td>O(n).</td><td>O(1).</td></tr>
+    <tr><td>Chèn/xóa giữa</td><td>O(n) do dịch chuyển.</td><td>O(1) nếu đã có node trước; O(n) nếu phải tìm.</td></tr>
+    <tr><td>Duyệt</td><td>Nhanh do cache locality.</td><td>Thường chậm hơn do truy cập bộ nhớ rời rạc.</td></tr>
+    <tr><td>STL tương ứng</td><td><code>vector</code>.</td><td><code>forward_list</code>, <code>list</code>.</td></tr>
+  </table></div>
+
+  <div class="call warn"><b>Trong lập trình thi đấu, vector thường là lựa chọn mặc định.</b> Chỉ chọn Linked List khi cấu trúc con trỏ hoặc thao tác chèn/xóa theo node thực sự cần thiết.</div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>8. Phân tích thuật toán</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Thao tác</th><th>Không có tail</th><th>Có tail / có node trước</th><th>Ghi chú</th></tr>
+    <tr><td>Chèn đầu</td><td>O(1)</td><td>O(1)</td><td>Cập nhật head.</td></tr>
+    <tr><td>Chèn cuối</td><td>O(n)</td><td>O(1) với tail</td><td>Phải cập nhật tail.</td></tr>
+    <tr><td>Tìm giá trị</td><td>O(n)</td><td>O(n)</td><td>Không có truy cập ngẫu nhiên.</td></tr>
+    <tr><td>Xóa theo giá trị</td><td>O(n)</td><td>O(n)</td><td>Phải tìm node trước.</td></tr>
+    <tr><td>Xóa sau node đã biết</td><td>O(1)</td><td>O(1)</td><td>Không áp dụng nếu node cần xóa là head.</td></tr>
+    <tr><td>Đảo danh sách</td><td>O(n)</td><td>O(n)</td><td>O(1) bộ nhớ phụ.</td></tr>
+    <tr><td>Tìm giữa / chu kỳ</td><td>O(n)</td><td>O(n)</td><td>Slow/Fast, O(1) bộ nhớ.</td></tr>
+  </table></div>
+</section>
+
+<section class="card" id="code">
+  <h2>9. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="nodeCode">Node và List</button>
+      <button class="tab-btn" data-tab="insertCode">Chèn</button>
+      <button class="tab-btn" data-tab="deleteCode">Xóa</button>
+      <button class="tab-btn" data-tab="reverseCode">Reverse</button>
+      <button class="tab-btn" data-tab="slowFastCode">Slow/Fast</button>
+      <button class="tab-btn" data-tab="stlCode">STL list</button>
+    </div>
+
+    <div class="panel active" id="nodeCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+
+    Node(int value)
+        : data(value), next(nullptr) {}
+};
+
+struct LinkedList {
+    Node* head = nullptr;
+    Node* tail = nullptr;
+
+    bool empty() const {
+        return head == nullptr;
+    }
+
+    void print() const {
+        for (Node* current = head;
+             current != nullptr;
+             current = current-&gt;next) {
+            cout &lt;&lt; current-&gt;data &lt;&lt; ' ';
+        }
+    }
+
+    ~LinkedList() {
+        while (head != nullptr) {
+            Node* old = head;
+            head = head-&gt;next;
+            delete old;
+        }
+    }
+};</code></pre></div>
+
+    <div class="panel" id="insertCode"><button class="copy">Sao chép</button><pre><code>void pushFront(int value) {
+    Node* node = new Node(value);
+
+    node-&gt;next = head;
+    head = node;
+
+    if (tail == nullptr) {
+        tail = node;
+    }
+}
+
+void pushBack(int value) {
+    Node* node = new Node(value);
+
+    if (tail == nullptr) {
+        head = tail = node;
+        return;
+    }
+
+    tail-&gt;next = node;
+    tail = node;
+}
+
+bool insertAt(int position, int value) {
+    if (position &lt; 0) return false;
+
+    if (position == 0) {
+        pushFront(value);
+        return true;
+    }
+
+    Node* previous = head;
+
+    for (int index = 1;
+         index &lt; position &amp;&amp; previous != nullptr;
+         index++) {
+        previous = previous-&gt;next;
+    }
+
+    if (previous == nullptr) return false;
+
+    if (previous == tail) {
+        pushBack(value);
+        return true;
+    }
+
+    Node* node = new Node(value);
+    node-&gt;next = previous-&gt;next;
+    previous-&gt;next = node;
+
+    return true;
+}</code></pre></div>
+
+    <div class="panel" id="deleteCode"><button class="copy">Sao chép</button><pre><code>bool popFront() {
+    if (head == nullptr) return false;
+
+    Node* old = head;
+    head = head-&gt;next;
+
+    if (head == nullptr) {
+        tail = nullptr;
+    }
+
+    delete old;
+    return true;
+}
+
+bool eraseFirst(int value) {
+    if (head == nullptr) return false;
+
+    if (head-&gt;data == value) {
+        return popFront();
+    }
+
+    Node* previous = head;
+    Node* current = head-&gt;next;
+
+    while (current != nullptr
+           &amp;&amp; current-&gt;data != value) {
+        previous = current;
+        current = current-&gt;next;
+    }
+
+    if (current == nullptr) return false;
+
+    previous-&gt;next = current-&gt;next;
+
+    if (current == tail) {
+        tail = previous;
+    }
+
+    delete current;
+    return true;
+}</code></pre></div>
+
+    <div class="panel" id="reverseCode"><button class="copy">Sao chép</button><pre><code>void reverseList() {
+    Node* previous = nullptr;
+    Node* current = head;
+
+    tail = head;
+
+    while (current != nullptr) {
+        Node* nextNode = current-&gt;next;
+
+        current-&gt;next = previous;
+        previous = current;
+        current = nextNode;
+    }
+
+    head = previous;
+}</code></pre></div>
+
+    <div class="panel" id="slowFastCode"><button class="copy">Sao chép</button><pre><code>Node* middleNode(Node* head) {
+    Node* slow = head;
+    Node* fast = head;
+
+    while (fast != nullptr
+           &amp;&amp; fast-&gt;next != nullptr) {
+        slow = slow-&gt;next;
+        fast = fast-&gt;next-&gt;next;
+    }
+
+    return slow;
+}
+
+bool hasCycle(Node* head) {
+    Node* slow = head;
+    Node* fast = head;
+
+    while (fast != nullptr
+           &amp;&amp; fast-&gt;next != nullptr) {
+        slow = slow-&gt;next;
+        fast = fast-&gt;next-&gt;next;
+
+        if (slow == fast) {
+            return true;
+        }
+    }
+
+    return false;
+}</code></pre></div>
+
+    <div class="panel" id="stlCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    list&lt;int&gt; values = {10, 20, 30};
+
+    values.push_front(5);
+    values.push_back(40);
+
+    auto iterator = values.begin();
+    advance(iterator, 2);
+
+    values.insert(iterator, 15);
+
+    for (int value : values) {
+        cout &lt;&lt; value &lt;&lt; ' ';
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>10. Giải thích code</h2>
+
+  <h3>10.1. Vì sao constructor gán next = nullptr?</h3>
+  <p>Node mới chưa nối tới node nào. Khởi tạo rõ ràng tránh con trỏ rác và giúp node có thể trở thành node cuối.</p>
+
+  <h3>10.2. Vì sao pushFront phải cập nhật tail khi danh sách rỗng?</h3>
+  <p>Node mới đồng thời là node đầu và node cuối. Nếu chỉ cập nhật head, tail sẽ sai.</p>
+
+  <h3>10.3. Vì sao xóa phải giữ node previous?</h3>
+  <p>Danh sách liên kết đơn không có con trỏ lùi. Muốn bỏ current khỏi chuỗi, phải thay đổi <code>previous-&gt;next</code>.</p>
+
+  <h3>10.4. Vì sao phải delete node bị xóa?</h3>
+  <p>Node được tạo bằng <code>new</code>. Nếu bỏ liên kết mà không <code>delete</code>, vùng nhớ vẫn tồn tại nhưng không còn truy cập được, gây memory leak.</p>
+
+  <h3>10.5. Vì sao reverse cần nextNode?</h3>
+  <p>Sau khi đổi <code>current-&gt;next</code>, liên kết cũ bị mất. <code>nextNode</code> giữ đường tới phần còn lại.</p>
+
+  <h3>10.6. Danh sách chẵn có node giữa nào?</h3>
+  <p>Với cách slow đi 1 và fast đi 2 từ head, danh sách chẵn trả về node giữa thứ hai. Có thể thay khởi tạo hoặc điều kiện nếu đề yêu cầu node giữa thứ nhất.</p>
+
+  <h3>10.7. Vì sao destructor cần duyệt và delete toàn bộ?</h3>
+  <p>Mỗi node được cấp phát động. Destructor giải phóng từng node để tránh rò rỉ bộ nhớ khi đối tượng LinkedList bị hủy.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>11. Lỗi thường gặp</h2>
+
+  <ul>
+    <li>Truy cập <code>head-&gt;data</code> khi head là nullptr.</li>
+    <li>Chèn vào danh sách rỗng nhưng quên cập nhật tail.</li>
+    <li>Xóa node cuối nhưng không cập nhật tail.</li>
+    <li>Thay đổi liên kết trước khi lưu node tiếp theo.</li>
+    <li>Xóa liên kết nhưng quên <code>delete</code>, gây memory leak.</li>
+    <li><code>delete</code> node rồi tiếp tục dùng con trỏ tới node đó.</li>
+    <li>Cho rằng chèn/xóa theo chỉ số là O(1); thực tế phải tìm vị trí O(n).</li>
+    <li>Không xử lý riêng vị trí 0 khi chèn/xóa.</li>
+    <li>Slow/Fast nhưng không kiểm tra <code>fast</code> và <code>fast-&gt;next</code>.</li>
+    <li>Sao chép LinkedList chứa con trỏ thô mà không cài Rule of Three/Five, dẫn tới double delete.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>12. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Node cuối của danh sách liên kết đơn có next bằng gì?<div class="answers"><button class="answer" data-choice="a">head</button><button class="answer" data-choice="b">nullptr</button><button class="answer" data-choice="c">tail</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Chèn tại vị trí i của Linked List có chắc chắn O(1) không?<div class="answers"><button class="answer" data-choice="a">Luôn O(1)</button><button class="answer" data-choice="b">Luôn O(log n)</button><button class="answer" data-choice="c">Chỉ O(1) nếu đã có node cần thiết; tìm vị trí có thể O(n)</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> Khi đảo danh sách, cần lưu gì trước khi đổi current-&gt;next?<div class="answers"><button class="answer" data-choice="a">Node tiếp theo</button><button class="answer" data-choice="b">Giá trị head</button><button class="answer" data-choice="c">Kích thước vector</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="b"><b>Câu 4.</b> Slow/Fast tìm giữa có độ phức tạp nào?<div class="answers"><button class="answer" data-choice="a">O(n²)</button><button class="answer" data-choice="b">O(n)</button><button class="answer" data-choice="c">O(log n)</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Chèn đầu/cuối.</li><li>In danh sách.</li><li>Đếm số node.</li><li>Tìm giá trị x.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Chèn/xóa theo vị trí.</li><li>Xóa mọi node bằng x.</li><li>Tìm node thứ k từ cuối.</li><li>Tìm node giữa.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Đảo toàn bộ danh sách.</li><li>Đảo đoạn [L,R].</li><li>Gộp hai danh sách tăng.</li><li>Kiểm tra palindrome.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>Floyd Cycle Detection.</li><li>Tìm điểm bắt đầu chu kỳ.</li><li>LRU Cache định hướng.</li><li>Danh sách liên kết hai chiều.</li></ol></div>
+  </div>
+</section>
+</div>
 
 <script>
 (function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+function parseNums(id){let text=$(id).value.trim();return text?text.split(/\s+/).map(Number).filter(Number.isFinite):[]}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 
-  let head = [];
-  const vis = document.getElementById("ll-vis");
-  const code = document.getElementById("ll-code");
-  const msg = document.getElementById("msg");
-  const val = document.getElementById("val");
+/* Main linked-list simulator */
+let list=[10,20,30,40],listMark={type:'',indexes:[]};
+function clearCode(){$$('[data-op]').forEach(x=>x.classList.remove('hl'))}
+function markCode(keys){clearCode();keys.forEach(k=>{let e=$('[data-op="'+k+'"]');if(e)e.classList.add('hl')})}
+function readValue(){let text=$('#valueInput').value.trim();return text===''?null:text}
+function readPosition(){let value=Number($('#positionInput').value);return Number.isFinite(value)?Math.trunc(value):NaN}
+function listHtml(values,mark={},labels={}){
+  if(!values.length)return '<span>Danh sách rỗng: head = tail = nullptr</span>';
+  return values.map((value,index)=>{
+    let classes=[];
+    if(mark.type==='active'&&mark.indexes.includes(index))classes.push('active');
+    if(mark.type==='found'&&mark.indexes.includes(index))classes.push('found');
+    if(mark.type==='deleted'&&mark.indexes.includes(index))classes.push('deleted');
+    if(labels.slow===index)classes.push('slow');
+    if(labels.fast===index)classes.push('fast');
+    if(labels.prev===index)classes.push('prev');
+    let ptrs='';
+    if(index===0)ptrs+='<span class="ptr-label head-label">head</span>';
+    if(index===values.length-1)ptrs+='<span class="ptr-label tail-label" style="top:auto;bottom:-31px">tail</span>';
+    if(labels.slow===index)ptrs+='<span class="ptr-label slow-label" style="left:22%">slow</span>';
+    if(labels.fast===index)ptrs+='<span class="ptr-label fast-label" style="left:78%">fast</span>';
+    if(labels.prev===index)ptrs+='<span class="ptr-label prev-label" style="left:24%">prev</span>';
+    if(labels.current===index)ptrs+='<span class="ptr-label cur-label" style="left:76%">current</span>';
+    return '<div class="node-wrap">'+
+      '<div class="ll-node '+classes.join(' ')+'">'+ptrs+
+      '<div class="ll-value">'+escapeHtml(value)+'</div>'+
+      '<div class="ll-next">'+(index===values.length-1?'null':'next')+'</div></div>'+
+      '<div class="arrow">'+(index===values.length-1?'':'→')+'</div></div>';
+  }).join('')+(values.length?'<div class="null-box">nullptr</div>':'');
+}
+function renderList(message){
+  $('#listView').innerHTML=listHtml(list,listMark);
+  $('#listLog').innerHTML=message+'<br><b>size = '+list.length+', dãy = ['+list.map(escapeHtml).join(', ')+']</b>';
+}
+function pushFront(){
+  let x=readValue();if(x===null)return renderList('Hãy nhập giá trị x.');
+  list.unshift(x);listMark={type:'active',indexes:[0]};markCode(['create','pf1','pf2']);
+  renderList('Tạo node '+escapeHtml(x)+', cho node-&gt;next = head cũ, rồi cập nhật head.');
+}
+function pushBack(){
+  let x=readValue();if(x===null)return renderList('Hãy nhập giá trị x.');
+  let wasEmpty=list.length===0;list.push(x);listMark={type:'active',indexes:[list.length-1]};markCode(['create','pb1','pb2']);
+  renderList(wasEmpty?'Danh sách rỗng nên head = tail = node mới.':'Nối tail cũ tới node mới và cập nhật tail.');
+}
+function insertAt(){
+  let x=readValue(),pos=readPosition();
+  if(x===null)return renderList('Hãy nhập giá trị x.');
+  if(!Number.isInteger(pos)||pos<0||pos>list.length)return renderList('Vị trí không hợp lệ. Cần 0 ≤ pos ≤ size.');
+  list.splice(pos,0,x);listMark={type:'active',indexes:[pos]};markCode(pos===0?['create','pf1','pf2']:['create','insert']);
+  renderList('Đã chèn '+escapeHtml(x)+' tại vị trí '+pos+'. Phần liên kết sau vị trí này được nối lại.');
+}
+function searchValue(){
+  let x=readValue();if(x===null)return renderList('Hãy nhập giá trị x.');
+  let pos=list.findIndex(v=>String(v)===String(x));listMark={type:'found',indexes:pos===-1?[]:[pos]};markCode(['find']);
+  renderList(pos===-1?'Duyệt tới nullptr nhưng không tìm thấy '+escapeHtml(x)+'.':'Tìm thấy '+escapeHtml(x)+' tại vị trí '+pos+'.');
+}
+function deleteFirstValue(){
+  let x=readValue();if(x===null)return renderList('Hãy nhập giá trị x.');
+  let pos=list.findIndex(v=>String(v)===String(x));markCode(pos===0?['pop']:['find','delete']);
+  if(pos===-1){listMark={type:'',indexes:[]};return renderList('Không tìm thấy '+escapeHtml(x)+', danh sách không đổi.')}
+  list.splice(pos,1);listMark={type:'active',indexes:pos<list.length?[pos]:[]};
+  renderList('Đã xóa lần xuất hiện đầu tiên của '+escapeHtml(x)+' tại vị trí '+pos+'.');
+}
+function deleteAt(){
+  let pos=readPosition();
+  if(!Number.isInteger(pos)||pos<0||pos>=list.length)return renderList('Vị trí xóa không hợp lệ. Cần 0 ≤ pos < size.');
+  let removed=list[pos];list.splice(pos,1);listMark={type:'active',indexes:pos<list.length?[pos]:[]};markCode(pos===0?['pop']:['delete']);
+  renderList('Đã xóa node vị trí '+pos+' có giá trị '+escapeHtml(removed)+'.');
+}
+function popFront(){
+  if(!list.length)return renderList('Danh sách rỗng, không thể xóa đầu.');
+  let removed=list.shift();listMark={type:'active',indexes:list.length?[0]:[]};markCode(['pop']);
+  renderList('Đã chuyển head sang node kế tiếp và giải phóng node '+escapeHtml(removed)+'.');
+}
 
-  function highlight(keys){
-    code.querySelectorAll(".line").forEach(l=>l.classList.remove("hl"));
-    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
-      const line = code.querySelector(`.line[data-k="${k}"]`);
-      if(line) line.classList.add("hl");
-    });
+/* Reverse simulator */
+let rev={a:[],previous:[],current:0,done:false,timer:null};
+function resetReverse(){
+  if(rev.timer){clearInterval(rev.timer);rev.timer=null}
+  rev.a=parseNums('#reverseInput');rev.previous=[];rev.current=0;rev.done=false;$('#reverseAutoBtn').textContent='Tự chạy';renderReverse('Khởi tạo previous=nullptr, current=head.');
+}
+function renderReverse(message){
+  let labels={current:rev.current<rev.a.length?rev.current:null,prev:rev.current>0?rev.current-1:null};
+  $('#reverseView').innerHTML=listHtml(rev.a,{type:'',indexes:[]},labels);
+  $('#reverseLog').innerHTML=message+'<br><b>Phần đã đảo: ['+rev.previous.slice().reverse().join(', ')+']</b>';
+}
+function stepReverse(){
+  if(rev.done)return;
+  if(rev.current>=rev.a.length){
+    rev.a=rev.a.slice().reverse();rev.done=true;renderReverse('current == nullptr. Gán head = previous. Danh sách đã được đảo.');return;
   }
+  let value=rev.a[rev.current];
+  rev.previous.push(value);rev.current++;
+  renderReverse('Lưu nextNode, đổi liên kết của node '+value+' về previous, rồi tiến current.');
+}
+function autoReverse(){
+  if(rev.timer){clearInterval(rev.timer);rev.timer=null;$('#reverseAutoBtn').textContent='Tự chạy';return}
+  $('#reverseAutoBtn').textContent='Tạm dừng';
+  rev.timer=setInterval(()=>{stepReverse();if(rev.done){clearInterval(rev.timer);rev.timer=null;$('#reverseAutoBtn').textContent='Tự chạy'}},750);
+}
 
-  function render(){
-    vis.innerHTML = "";
-    head.forEach((v,i)=>{
-      // node
-      const node = document.createElement("div");
-      node.className = "node";
-      node.innerHTML = `<div class="node-box">${v}</div>`;
-
-      vis.appendChild(node);
-
-      // arrow
-      if(i < head.length - 1){
-        const ar = document.createElement("div");
-        ar.className = "arrow";
-        ar.innerHTML = "→";
-        vis.appendChild(ar);
-      }
-    });
+/* Middle simulator */
+let mid={a:[],slow:0,fast:0,done:false};
+function resetMiddle(){mid.a=parseNums('#middleInput');mid.slow=0;mid.fast=0;mid.done=mid.a.length===0;renderMiddle(mid.done?'Danh sách rỗng.':'Khởi tạo slow = fast = head.')}
+function renderMiddle(message){
+  $('#middleView').innerHTML=listHtml(mid.a,{type:'',indexes:[]},{slow:mid.a.length?mid.slow:null,fast:mid.a.length&&mid.fast<mid.a.length?mid.fast:null});
+  $('#middleLog').innerHTML=message+'<br><b>slow='+(mid.a.length?mid.slow:'null')+', fast='+(mid.fast<mid.a.length?mid.fast:'null')+'</b>';
+}
+function stepMiddle(){
+  if(mid.done)return renderMiddle(mid.a.length?'Đã tìm node giữa: '+mid.a[mid.slow]+'.':'Danh sách rỗng.');
+  if(mid.fast>=mid.a.length||mid.fast+1>=mid.a.length){
+    mid.done=true;return renderMiddle('fast không thể đi thêm hai bước. slow đang ở node giữa '+mid.a[mid.slow]+'.');
   }
+  mid.slow+=1;mid.fast+=2;
+  renderMiddle('slow đi 1 bước; fast đi 2 bước.');
+}
 
-  // insert front
-  document.getElementById("btn-pf").onclick = () => {
-    if(!val.value.trim()) return msg.innerHTML = "⚠️ Nhập giá trị!";
-    head.unshift(val.value.trim());
-    highlight(["pf1","pf2","pf3"]);
-    msg.innerHTML = `Insert đầu: <b>${val.value.trim()}</b>`;
-    val.value="";
-    render();
-  };
+/* Tabs/copy/quiz */
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(button=>button.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));button.classList.add('active');$('#'+button.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(button=>button.onclick=()=>{let text=button.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(text):Promise.resolve()).then(()=>{let old=button.textContent;button.textContent='Đã chép';setTimeout(()=>button.textContent=old,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(button=>button.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(button.dataset.choice===q.dataset.answer){button.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{button.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
 
-  // insert back
-  document.getElementById("btn-pb").onclick = () => {
-    if(!val.value.trim()) return msg.innerHTML = "⚠️ Nhập giá trị!";
-    head.push(val.value.trim());
-    highlight(["pb1","pb2","pb3"]);
-    msg.innerHTML = `Insert cuối: <b>${val.value.trim()}</b>`;
-    val.value="";
-    render();
-  };
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
 
-  // delete value
-  document.getElementById("btn-del").onclick = () => {
-    if(!val.value.trim()) return msg.innerHTML = "⚠️ Nhập giá trị để xoá!";
-    let x = val.value.trim();
-    highlight(["del1","del2"]);
+  $('#pushFrontBtn').onclick=pushFront;$('#pushBackBtn').onclick=pushBack;$('#insertPosBtn').onclick=insertAt;
+  $('#searchBtn').onclick=searchValue;$('#deleteValueBtn').onclick=deleteFirstValue;$('#deletePosBtn').onclick=deleteAt;
+  $('#popFrontBtn').onclick=popFront;$('#printBtn').onclick=()=>renderList('Duyệt từ head đến nullptr để in danh sách.');
+  $('#resetListBtn').onclick=()=>{list=[10,20,30,40];listMark={type:'',indexes:[]};clearCode();renderList('Đã khôi phục danh sách mẫu.')};
 
-    head = head.filter(v => v != x);
+  $('#reverseNextBtn').onclick=stepReverse;$('#reverseAutoBtn').onclick=autoReverse;$('#reverseResetBtn').onclick=resetReverse;
+  $('#middleNextBtn').onclick=stepMiddle;$('#middleResetBtn').onclick=resetMiddle;
 
-    msg.innerHTML = `Đã xoá mọi node có giá trị <b>${x}</b>`;
-    val.value="";
-    render();
-  };
+  renderList('Danh sách mẫu ban đầu.');resetReverse();resetMiddle();
 
-  // print
-  document.getElementById("btn-print").onclick = () => {
-    highlight("print");
-    msg.innerHTML = `Dãy hiện tại: <b>${head.join(" → ") || "rỗng"}</b>`;
-  };
-
-  render();
-  highlight("init");
-
+  addEventListener('scroll',()=>{let height=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/height*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(error){}
+});
 })();
 </script>
 
-
-<h2>II. Lý thuyết cơ bản</h2>
-<p>
-Linked List là cấu trúc dữ liệu **linh hoạt**, đặc biệt mạnh trong thao tác chèn/xoá.
-</p>
-
-<ul>
-  <li><b>Insert đầu:</b> O(1)</li>
-  <li><b>Insert cuối:</b> O(1) nếu có tail</li>
-  <li><b>Delete node:</b> O(1) nếu biết node trước đó</li>
-  <li><b>Duyệt:</b> O(n)</li>
-</ul>
-
-<h2>III. Khi nào dùng Linked List</h2>
-
-<div class="callout">
-<b>1) Khi có rất nhiều thao tác chèn/xoá</b>  
-👉 Insert/Delete O(1) → mạnh hơn mảng.
-</div>
-
-<div class="callout">
-<b>2) Khi bài yêu cầu mô phỏng con trỏ</b>  
-👉 Con trỏ trái/phải, xoá tại vị trí → đặc trưng Linked List.
-</div>
-
-<div class="callout">
-<b>3) Khi xử lý bằng slow/fast pointer</b>  
-👉 Tìm giữa, tìm chu kỳ, tìm node thứ k từ cuối.
-</div>
-
-<div class="callout">
-<b>4) Khi bài yêu cầu đảo ngược dãy hoặc đảo một đoạn</b>  
-👉 Đổi con trỏ, không phải đổi chỗ phần tử như array.
-</div>
-
-<div class="callout">
-<b>5) Khi bộ nhớ phân mảnh</b>  
-👉 Linked List không cần vùng nhớ liên tục.
-</div>
-
-
-<h2>IV. Bài tập luyện tập</h2>
-
-<h3>📘 Cơ bản</h3>
-<details>
-  <summary>1️⃣ Chèn đầu/cuối danh sách</summary>
-  <pre><code>Node* push_front(Node* head, int x){
-  Node* p = new Node(x);
-  p->next = head;
-  return p;
-}</code></pre>
-</details>
-
-<h3>📗 Trung bình – Two pointers</h3>
-
-<details>
-  <summary>2️⃣ Tìm phần tử giữa</summary>
-  <pre><code>Node* mid(Node* head){
-  Node *slow=head, *fast=head;
-  while(fast && fast->next){
-    slow=slow->next;
-    fast=fast->next->next;
-  }
-  return slow;
-}</code></pre>
-</details>
-
-<h3>📙 Nâng cao</h3>
-<details>
-  <summary>3️⃣ Reverse toàn bộ Linked List</summary>
-</details>
-
-<h3>🐉 HSG – khó</h3>
-<details>
-  <summary>4️⃣ Floyd Cycle Detection</summary>
-</details>
-
-<p style="text-align:center; font-style:italic; color:#555;">
-🔚 Mô phỏng giúp bạn hiểu rõ Linked List hoạt động thế nào trong thực tế.
-</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="if(window.hljs)hljs.highlightAll()"></script>

@@ -1,19 +1,665 @@
-<article class="roadmap-extra-topic">
-  <h1>STL algorithm: sort, lower_bound, upper_bound</h1>
-  <section>
-    <h2>Mục tiêu</h2>
-    <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
-    </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.alg-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;
+margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.alg-page *{box-sizing:border-box}.alg-page h1,.alg-page h2,.alg-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1160px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1040px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.array-row{display:flex;gap:8px;overflow:auto;padding:32px 4px 12px}.cell{min-width:78px;padding:10px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900;position:relative;transition:.2s}.cell small{display:block;color:#64748b;font-size:.72rem}.cell.active{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:translateY(-3px)}.cell.range{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}.cell.left{outline:4px solid #22c55e}.cell.right{box-shadow:0 0 0 4px rgba(220,38,38,.45)}.cell.answer{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.outside{opacity:.42}.ptr-label{position:absolute;top:-27px;left:50%;transform:translateX(-50%);padding:2px 8px;border-radius:99px;color:#fff;font-size:.72rem;white-space:nowrap}.l-label{background:#16a34a}.r-label{background:#dc2626}.m-label{background:#f97316}.ans-label{background:#7c3aed}
+.end-cell{min-width:92px;padding:10px;border:2px dashed #94a3b8;border-radius:12px;background:#fff;text-align:center;font-weight:900;color:#64748b;position:relative}.end-cell.answer{background:#dcfce7;border-color:#22c55e;color:#166534}
+.pair-row{display:flex;gap:8px;flex-wrap:wrap}.pair-card{min-width:126px;padding:10px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff;text-align:center;font-weight:900}.pair-card.active{background:#ffedd5;border-color:#fb923c}.pair-card.done{background:#dcfce7;border-color:#22c55e}.pair-card small{display:block;color:#64748b}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}
+.log{min-height:130px;max-height:390px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.alg-page pre{margin:0;padding:20px;max-height:720px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.alg-page p code,.alg-page li code,.alg-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer-btn{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer-btn.right{background:#dcfce7;border-color:#22c55e}.answer-btn.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.alg-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.alg-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
+</style>
+
+<div class="alg-page">
+<div class="hero">
+  <span class="badge">C++ STL Algorithms</span>
+  <h1>⚙️ sort, lower_bound và upper_bound</h1>
+  <p>Ba công cụ này thường đi cùng nhau: sắp xếp dữ liệu bằng <code>sort</code>, sau đó tìm biên bằng tìm kiếm nhị phân. Bài học giúp phân biệt chính xác “đầu tiên ≥ x”, “đầu tiên &gt; x” và cách đếm số lần xuất hiện trong O(log n).</p>
+  <div class="stats">
+    <div class="stat"><b>sort</b><span>O(n log n)</span></div>
+    <div class="stat"><b>lower_bound</b><span>Vị trí đầu tiên ≥ x</span></div>
+    <div class="stat"><b>upper_bound</b><span>Vị trí đầu tiên &gt; x</span></div>
+    <div class="stat"><b>Count x</b><span>upper − lower</span></div>
+  </div>
+</div>
+
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#sort">sort</a><a href="#sort-sim">Mô phỏng sort</a><a href="#bounds">lower/upper</a><a href="#bound-sim">Mô phỏng biên</a><a href="#pairs">Comparator</a><a href="#applications">Ứng dụng</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
+
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Cách dùng <code>sort(first,last)</code> trên phạm vi nửa mở.</li><li>Sắp xếp tăng, giảm và theo tiêu chí tùy chỉnh.</li><li>Ý nghĩa chính xác của <code>lower_bound</code> và <code>upper_bound</code>.</li><li>Điều kiện dữ liệu phải được sắp xếp.</li><li>Cách chuyển iterator thành chỉ số.</li></ul></div>
+    <div class="box"><h3>Cần làm được</h3><ul><li>Sắp xếp vector số và vector pair.</li><li>Tìm vị trí đầu tiên ≥ x và &gt; x.</li><li>Kiểm tra x có tồn tại.</li><li>Đếm số lần xuất hiện của x.</li><li>Đếm số phần tử trong đoạn giá trị [L,R].</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Cho mảng n số nguyên và q truy vấn. Mỗi truy vấn cho số x, cần:
     <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
+      <li>Kiểm tra x có xuất hiện không.</li>
+      <li>Đếm số lần x xuất hiện.</li>
+      <li>Đếm số phần tử nhỏ hơn x.</li>
     </ol>
-  </section>
-</article>
+  </div>
+
+  <h3>1.1. Cách duyệt trực tiếp</h3>
+  <p>Mỗi truy vấn duyệt toàn bộ mảng mất O(n). Với q truy vấn, tổng thời gian là O(nq).</p>
+
+  <h3>1.2. Sắp xếp một lần, tìm kiếm nhiều lần</h3>
+  <p>Nếu sắp xếp mảng trước:</p>
+  <ul>
+    <li>Các phần tử bằng x nằm liên tiếp.</li>
+    <li>Có thể dùng tìm kiếm nhị phân để tìm biên trái và biên phải.</li>
+    <li>Mỗi truy vấn chỉ còn O(log n).</li>
+  </ul>
+
+  <div class="formula">Sắp xếp O(n log n) + q truy vấn O(q log n)</div>
+
+  <div class="call ok"><b>Ý tưởng trung tâm:</b> <code>sort</code> tạo tính đơn điệu; <code>lower_bound</code> và <code>upper_bound</code> khai thác tính đơn điệu đó.</div>
+</section>
+
+<section class="card" id="sort">
+  <h2>2. Hàm sort</h2>
+
+  <div class="g3">
+    <div class="box"><h3>Tăng dần</h3><pre><code>sort(a.begin(), a.end());</code></pre></div>
+    <div class="box"><h3>Giảm dần</h3><pre><code>sort(a.begin(), a.end(), greater&lt;int&gt;());</code></pre></div>
+    <div class="box"><h3>Một đoạn</h3><pre><code>sort(a.begin()+L, a.begin()+R);</code></pre><p>Sắp xếp chỉ số <code>[L,R)</code>.</p></div>
+  </div>
+
+  <div class="call warn"><b>Phạm vi STL là nửa mở:</b> iterator đầu được tính, iterator cuối không được tính.</div>
+
+  <h3>2.1. Comparator tùy chỉnh</h3>
+  <pre><code>bool compare(const Student&amp; a, const Student&amp; b) {
+    if (a.score != b.score) {
+        return a.score &gt; b.score;
+    }
+
+    return a.name &lt; b.name;
+}</code></pre>
+
+  <div class="call bad"><b>Comparator phải nghiêm ngặt.</b> Không viết <code>return a.score &gt;= b.score;</code>. Khi hai phần tử bằng nhau, comparator phải trả về false ở cả hai chiều.</div>
+</section>
+
+<section class="card" id="sort-sim">
+  <h2>3. Mô phỏng sort</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng</b></label><input class="input" id="sortInput" value="7 2 9 2 5 1">
+      <label><b>Kiểu sắp xếp</b></label>
+      <select class="select" id="sortMode">
+        <option value="asc">Tăng dần</option>
+        <option value="desc">Giảm dần</option>
+      </select>
+      <div class="controls">
+        <button class="btn" id="sortPrepareBtn">Nạp mảng</button>
+        <button class="btn green" id="sortRunBtn">Thực hiện sort</button>
+        <button class="btn orange" id="sortRangeBtn">Sort đoạn [L,R)</button>
+        <button class="btn alt" id="sortResetBtn">Làm lại</button>
+      </div>
+      <label><b>L</b></label><input class="input" id="sortL" value="1">
+      <label><b>R</b></label><input class="input" id="sortR" value="5">
+      <div class="array-row" id="sortRow"></div>
+    </div>
+    <div class="g2">
+      <div class="code-lines">
+        <div class="code-line" data-sort="asc">sort(a.begin(), a.end());</div>
+        <div class="code-line" data-sort="desc">sort(a.begin(), a.end(), greater&lt;int&gt;());</div>
+        <div class="code-line" data-sort="range">sort(a.begin()+L, a.begin()+R);</div>
+      </div>
+      <div class="log" id="sortLog"></div>
+    </div>
+  </div>
+
+  <div class="call warn"><b>Lưu ý:</b> Mô phỏng chỉ minh họa kết quả trước/sau. Chuẩn C++ không bắt buộc <code>std::sort</code> phải dùng đúng một thuật toán nội bộ cụ thể.</div>
+</section>
+
+<section class="card" id="bounds">
+  <h2>4. lower_bound và upper_bound</h2>
+
+  <div class="g2">
+    <div class="box">
+      <h3>lower_bound</h3>
+      <div class="formula">vị trí đầu tiên có giá trị ≥ x</div>
+      <pre><code>auto it = lower_bound(
+    a.begin(),
+    a.end(),
+    x
+);</code></pre>
+    </div>
+    <div class="box">
+      <h3>upper_bound</h3>
+      <div class="formula">vị trí đầu tiên có giá trị &gt; x</div>
+      <pre><code>auto it = upper_bound(
+    a.begin(),
+    a.end(),
+    x
+);</code></pre>
+    </div>
+  </div>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Mảng tăng</th><th>x</th><th>lower_bound</th><th>upper_bound</th><th>Số lần x xuất hiện</th></tr>
+    <tr><td>[1,2,2,2,5,7]</td><td>2</td><td>index 1</td><td>index 4</td><td>4−1=3</td></tr>
+    <tr><td>[1,2,2,2,5,7]</td><td>4</td><td>index 4</td><td>index 4</td><td>0</td></tr>
+    <tr><td>[1,2,2,2,5,7]</td><td>8</td><td>end()</td><td>end()</td><td>0</td></tr>
+  </table></div>
+
+  <div class="formula">count(x) = upper_bound(x) − lower_bound(x)</div>
+
+  <div class="call bad"><b>Điều kiện bắt buộc:</b> Phạm vi phải được sắp xếp theo cùng thứ tự so sánh mà hàm binary search đang dùng.</div>
+</section>
+
+<section class="card" id="bound-sim">
+  <h2>5. Mô phỏng lower_bound và upper_bound</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng đã sắp xếp</b></label><input class="input" id="boundInput" value="1 2 2 2 5 7 9">
+      <label><b>x</b></label><input class="input" id="boundX" value="2">
+      <label><b>Chế độ</b></label>
+      <select class="select" id="boundMode">
+        <option value="lower">lower_bound: đầu tiên ≥ x</option>
+        <option value="upper">upper_bound: đầu tiên &gt; x</option>
+      </select>
+      <div class="controls">
+        <button class="btn" id="boundNextBtn">Bước tiếp</button>
+        <button class="btn orange" id="boundAutoBtn">Tự chạy</button>
+        <button class="btn green" id="countBtn">Tính cả hai biên</button>
+        <button class="btn alt" id="boundResetBtn">Làm lại</button>
+      </div>
+      <div class="array-row" id="boundRow"></div>
+    </div>
+
+    <div class="g2">
+      <div class="code-lines">
+        <div class="code-line" data-bound="init">int left=0, right=n;</div>
+        <div class="code-line" data-bound="loop">while (left &lt; right) {</div>
+        <div class="code-line" data-bound="mid">    int mid=(left+right)/2;</div>
+        <div class="code-line" data-bound="lower">    if (a[mid] &gt;= x) right=mid;</div>
+        <div class="code-line" data-bound="upper">    if (a[mid] &gt; x) right=mid;</div>
+        <div class="code-line" data-bound="move">    else left=mid+1;</div>
+        <div class="code-line">}</div>
+      </div>
+      <div class="log" id="boundLog"></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="pairs">
+  <h2>6. sort với pair và comparator</h2>
+
+  <div class="g2">
+    <div class="box">
+      <h3>Mặc định</h3>
+      <p><code>pair</code> được so sánh từ <code>first</code>, nếu bằng nhau mới so sánh <code>second</code>.</p>
+      <pre><code>sort(items.begin(), items.end());</code></pre>
+    </div>
+    <div class="box">
+      <h3>Tùy chỉnh</h3>
+      <p>Sắp xếp điểm giảm dần; nếu hòa, mã tăng dần.</p>
+      <pre><code>sort(items.begin(), items.end(),
+    [](const auto&amp; a, const auto&amp; b) {
+        if (a.second != b.second)
+            return a.second &gt; b.second;
+        return a.first &lt; b.first;
+    }
+);</code></pre>
+    </div>
+  </div>
+
+  <h3>6.1. Mô phỏng sắp xếp pair</h3>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Các pair dạng mã:điểm</b></label>
+      <input class="input" id="pairInput" value="3:8 1:9 2:8 5:10 4:9">
+      <div class="controls">
+        <button class="btn" id="pairDefaultBtn">Sort mặc định</button>
+        <button class="btn green" id="pairCustomBtn">Điểm giảm, mã tăng</button>
+        <button class="btn alt" id="pairResetBtn">Làm lại</button>
+      </div>
+      <div class="pair-row" id="pairRow"></div>
+    </div>
+    <div class="log" id="pairLog"></div>
+  </div>
+</section>
+
+<section class="card" id="applications">
+  <h2>7. Ứng dụng thường gặp</h2>
+
+  <div class="g3">
+    <div class="box"><h3>Kiểm tra tồn tại</h3><pre><code>auto it=lower_bound(a.begin(),a.end(),x);
+bool exists=(it!=a.end() &amp;&amp; *it==x);</code></pre></div>
+    <div class="box"><h3>Đếm nhỏ hơn x</h3><pre><code>int countLess=
+    lower_bound(a.begin(),a.end(),x)
+    - a.begin();</code></pre></div>
+    <div class="box"><h3>Đếm ≤ x</h3><pre><code>int countLE=
+    upper_bound(a.begin(),a.end(),x)
+    - a.begin();</code></pre></div>
+    <div class="box"><h3>Đếm trong [L,R]</h3><pre><code>int answer=
+    upper_bound(a.begin(),a.end(),R)
+    - lower_bound(a.begin(),a.end(),L);</code></pre></div>
+    <div class="box"><h3>Vị trí chèn giữ tăng</h3><pre><code>int pos=
+    lower_bound(a.begin(),a.end(),x)
+    - a.begin();</code></pre></div>
+    <div class="box"><h3>Số phần tử bằng x</h3><pre><code>auto [first,last]=equal_range(
+    a.begin(),a.end(),x
+);
+int count=last-first;</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>8. Phân tích thuật toán</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Thao tác</th><th>Độ phức tạp</th><th>Điều kiện / ghi chú</th></tr>
+    <tr><td><code>sort</code> n phần tử</td><td>O(n log n)</td><td>Random-access iterator như vector, array, deque.</td></tr>
+    <tr><td><code>lower_bound</code> trên vector tăng</td><td>O(log n)</td><td>Phạm vi đã sắp xếp.</td></tr>
+    <tr><td><code>upper_bound</code> trên vector tăng</td><td>O(log n)</td><td>Phạm vi đã sắp xếp.</td></tr>
+    <tr><td>q truy vấn sau khi sort</td><td>O(n log n + q log n)</td><td>Hữu ích khi q lớn.</td></tr>
+    <tr><td>Chèn vào vector tại vị trí tìm được</td><td>O(n)</td><td>Tìm vị trí O(log n), nhưng dịch chuyển phần tử O(n).</td></tr>
+  </table></div>
+
+  <div class="call warn"><b>Chi tiết quan trọng:</b> Tìm vị trí bằng binary search là O(log n), nhưng chèn vào giữa vector vẫn O(n).</div>
+</section>
+
+<section class="card" id="code">
+  <h2>9. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="sortCode">sort cơ bản</button>
+      <button class="tab-btn" data-tab="boundCode">lower/upper</button>
+      <button class="tab-btn" data-tab="rangeCountCode">Đếm đoạn giá trị</button>
+      <button class="tab-btn" data-tab="pairCode">Pair comparator</button>
+      <button class="tab-btn" data-tab="pythonCode">Python tương đương</button>
+    </div>
+
+    <div class="panel active" id="sortCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; a = {7, 2, 9, 2, 5, 1};
+
+    sort(a.begin(), a.end());
+
+    for (int value : a) {
+        cout &lt;&lt; value &lt;&lt; ' ';
+    }
+
+    cout &lt;&lt; '\n';
+
+    sort(
+        a.begin(),
+        a.end(),
+        greater&lt;int&gt;()
+    );
+
+    for (int value : a) {
+        cout &lt;&lt; value &lt;&lt; ' ';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="boundCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, q;
+    cin &gt;&gt; n &gt;&gt; q;
+
+    vector&lt;long long&gt; a(n);
+
+    for (long long &amp;value : a) {
+        cin &gt;&gt; value;
+    }
+
+    sort(a.begin(), a.end());
+
+    while (q--) {
+        long long x;
+        cin &gt;&gt; x;
+
+        auto lower = lower_bound(
+            a.begin(),
+            a.end(),
+            x
+        );
+
+        auto upper = upper_bound(
+            a.begin(),
+            a.end(),
+            x
+        );
+
+        int firstPosition = lower - a.begin();
+        int count = upper - lower;
+
+        bool exists
+            = lower != a.end()
+            &amp;&amp; *lower == x;
+
+        cout &lt;&lt; firstPosition
+             &lt;&lt; ' '
+             &lt;&lt; count
+             &lt;&lt; ' '
+             &lt;&lt; exists
+             &lt;&lt; '\n';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="rangeCountCode"><button class="copy">Sao chép</button><pre><code>long long countInClosedRange(
+    const vector&lt;long long&gt;&amp; a,
+    long long leftValue,
+    long long rightValue
+) {
+    auto first = lower_bound(
+        a.begin(),
+        a.end(),
+        leftValue
+    );
+
+    auto afterLast = upper_bound(
+        a.begin(),
+        a.end(),
+        rightValue
+    );
+
+    return afterLast - first;
+}</code></pre></div>
+
+    <div class="panel" id="pairCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    vector&lt;pair&lt;int,int&gt;&gt; students = {
+        {3, 8},
+        {1, 9},
+        {2, 8},
+        {5, 10},
+        {4, 9}
+    };
+
+    sort(
+        students.begin(),
+        students.end(),
+        [](const pair&lt;int,int&gt;&amp; a,
+           const pair&lt;int,int&gt;&amp; b) {
+            if (a.second != b.second) {
+                return a.second &gt; b.second;
+            }
+
+            return a.first &lt; b.first;
+        }
+    );
+
+    for (auto [id, score] : students) {
+        cout &lt;&lt; id &lt;&lt; ' '
+             &lt;&lt; score &lt;&lt; '\n';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="pythonCode"><button class="copy">Sao chép</button><pre><code>from bisect import bisect_left, bisect_right
+
+a = [7, 2, 9, 2, 5, 1]
+a.sort()
+
+x = 2
+
+lower = bisect_left(a, x)
+upper = bisect_right(a, x)
+
+count_x = upper - lower
+exists = lower &lt; len(a) and a[lower] == x
+
+print(lower, upper, count_x, exists)</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>10. Giải thích code</h2>
+
+  <h3>10.1. Vì sao sort dùng begin() và end()?</h3>
+  <p>STL biểu diễn phạm vi bằng cặp iterator nửa mở <code>[first,last)</code>. <code>end()</code> là vị trí ngay sau phần tử cuối.</p>
+
+  <h3>10.2. Vì sao lower_bound có thể trả về end()?</h3>
+  <p>Nếu mọi phần tử đều nhỏ hơn x, không có phần tử nào ≥ x. Vị trí chèn hợp lệ là cuối mảng, tức <code>end()</code>.</p>
+
+  <h3>10.3. Vì sao phải kiểm tra lower != end() trước khi *lower?</h3>
+  <p>Không được dereference <code>end()</code>. Điều kiện ngắn mạch bảo đảm chỉ đọc <code>*lower</code> khi iterator hợp lệ.</p>
+
+  <h3>10.4. Vì sao upper−lower bằng số lần x xuất hiện?</h3>
+  <p><code>lower</code> đứng trước phần tử x đầu tiên; <code>upper</code> đứng sau phần tử x cuối cùng. Khoảng nửa mở giữa hai iterator chứa đúng các phần tử bằng x.</p>
+
+  <h3>10.5. Vì sao comparator không được dùng ≥?</h3>
+  <p><code>sort</code> yêu cầu strict weak ordering. Với hai phần tử bằng nhau, cả <code>comp(a,b)</code> và <code>comp(b,a)</code> phải false.</p>
+
+  <h3>10.6. lower_bound trên mảng giảm dần dùng thế nào?</h3>
+  <p>Phải truyền cùng comparator đã dùng để sắp xếp:</p>
+  <pre><code>sort(a.begin(), a.end(), greater&lt;int&gt;());
+
+auto it = lower_bound(
+    a.begin(),
+    a.end(),
+    x,
+    greater&lt;int&gt;()
+);</code></pre>
+
+  <h3>10.7. Vì sao std::sort không dùng được trực tiếp với std::list?</h3>
+  <p><code>std::sort</code> cần random-access iterator. <code>list</code> chỉ có bidirectional iterator và cung cấp hàm thành viên <code>list.sort()</code>.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>11. Lỗi thường gặp</h2>
+
+  <ul>
+    <li>Dùng <code>lower_bound</code> hoặc <code>upper_bound</code> trên mảng chưa sắp xếp.</li>
+    <li>Nhầm lower_bound là phần tử đầu tiên &gt; x.</li>
+    <li>Nhầm upper_bound là phần tử cuối cùng bằng x.</li>
+    <li>Dereference iterator bằng <code>*it</code> khi <code>it == end()</code>.</li>
+    <li>Quên trừ <code>a.begin()</code> khi cần chỉ số.</li>
+    <li>Viết comparator bằng <code>&gt;=</code> hoặc <code>&lt;=</code>.</li>
+    <li>Sắp xếp giảm dần nhưng gọi lower_bound với comparator mặc định.</li>
+    <li>Nhầm đoạn STL <code>[L,R)</code> với đoạn đóng <code>[L,R]</code>.</li>
+    <li>Cho rằng tìm vị trí O(log n) khiến thao tác insert vector cũng O(log n).</li>
+    <li>Dùng <code>std::sort</code> trực tiếp cho <code>std::list</code>.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>12. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> lower_bound(a.begin(),a.end(),x) trả về gì?<div class="answers"><button class="answer-btn" data-choice="a">Phần tử cuối cùng ≤ x</button><button class="answer-btn" data-choice="b">Phần tử đầu tiên ≥ x</button><button class="answer-btn" data-choice="c">Phần tử đầu tiên &gt; x</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> upper_bound trả về gì?<div class="answers"><button class="answer-btn" data-choice="a">Phần tử đầu tiên ≥ x</button><button class="answer-btn" data-choice="b">Phần tử cuối cùng bằng x</button><button class="answer-btn" data-choice="c">Phần tử đầu tiên &gt; x</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> Số phần tử bằng x được tính bằng?<div class="answers"><button class="answer-btn" data-choice="a">upper_bound − lower_bound</button><button class="answer-btn" data-choice="b">lower_bound − upper_bound</button><button class="answer-btn" data-choice="c">sort − find</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="b"><b>Câu 4.</b> Comparator nào đúng để sắp xếp giảm dần?<div class="answers"><button class="answer-btn" data-choice="a">return a &gt;= b;</button><button class="answer-btn" data-choice="b">return a &gt; b;</button><button class="answer-btn" data-choice="c">return a == b;</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Sắp xếp tăng/giảm.</li><li>Tìm x có tồn tại.</li><li>Đếm số lần x xuất hiện.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Đếm số phần tử nhỏ hơn x.</li><li>Đếm số phần tử trong [L,R].</li><li>Vị trí chèn giữ thứ tự tăng.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Sắp xếp struct nhiều tiêu chí.</li><li>Binary search trên vector pair.</li><li>Offline query sau khi sort.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>Coordinate compression.</li><li>Meet-in-the-middle + bounds.</li><li>Đếm cặp bằng sort + binary search.</li></ol></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(selector,root){return(root||document).querySelector(selector)}
+function $$(selector,root){return Array.from((root||document).querySelectorAll(selector))}
+function parseNumbers(id){let text=$(id).value.trim();return text?text.split(/\s+/).map(Number).filter(Number.isFinite):[]}
+
+/* Sort simulator */
+let sortArray=[];
+function clearSortCode(){$$('[data-sort]').forEach(line=>line.classList.remove('hl'))}
+function markSortCode(key){clearSortCode();let line=$('[data-sort="'+key+'"]');if(line)line.classList.add('hl')}
+function renderSort(message,range=null){
+  $('#sortRow').innerHTML=sortArray.map((value,index)=>{
+    let cls=range&&index>=range[0]&&index<range[1]?'range':'';
+    return '<div class="cell '+cls+'"><small>index '+index+'</small>'+value+'</div>';
+  }).join('');
+  $('#sortLog').innerHTML=message+'<br><b>Mảng hiện tại: ['+sortArray.join(', ')+']</b>';
+}
+function prepareSort(){
+  sortArray=parseNumbers('#sortInput');clearSortCode();renderSort('Đã nạp mảng. Chưa sắp xếp.');
+}
+function runSort(){
+  let mode=$('#sortMode').value;
+  sortArray.sort((a,b)=>mode==='asc'?a-b:b-a);
+  markSortCode(mode);
+  renderSort('Đã gọi sort toàn bộ theo thứ tự '+(mode==='asc'?'tăng dần.':'giảm dần.'));
+}
+function sortRange(){
+  let L=Math.trunc(Number($('#sortL').value)),R=Math.trunc(Number($('#sortR').value));
+  if(!Number.isFinite(L)||!Number.isFinite(R)||L<0||R<L||R>sortArray.length)return renderSort('Đoạn không hợp lệ. Cần 0 ≤ L ≤ R ≤ n.');
+  let mode=$('#sortMode').value;
+  let part=sortArray.slice(L,R).sort((a,b)=>mode==='asc'?a-b:b-a);
+  sortArray.splice(L,R-L,...part);markSortCode('range');
+  renderSort('Đã sắp xếp đoạn chỉ số ['+L+','+R+').',[L,R]);
+}
+
+/* Bound simulator */
+let bound={a:[],x:0,left:0,right:0,mid:null,mode:'lower',done:false,timer:null,started:false};
+function clearBoundCode(){$$('[data-bound]').forEach(line=>line.classList.remove('hl'))}
+function markBoundCode(key){clearBoundCode();let line=$('[data-bound="'+key+'"]');if(line)line.classList.add('hl')}
+function resetBound(){
+  if(bound.timer){clearInterval(bound.timer);bound.timer=null}
+  bound.a=parseNumbers('#boundInput');bound.x=Number($('#boundX').value);bound.mode=$('#boundMode').value;
+  bound.left=0;bound.right=bound.a.length;bound.mid=null;bound.done=false;bound.started=false;$('#boundAutoBtn').textContent='Tự chạy';clearBoundCode();
+  renderBound('Khởi tạo phạm vi tìm kiếm [0,n).');
+}
+function conditionAt(value){return bound.mode==='lower'?value>=bound.x:value>bound.x}
+function renderBound(message,answerIndex=null){
+  let cells=bound.a.map((value,index)=>{
+    let classes=[];
+    if(index<bound.left||index>=bound.right)classes.push('outside');
+    else classes.push('range');
+    if(index===bound.left)classes.push('left');
+    if(index===bound.right&&bound.right<bound.a.length)classes.push('right');
+    if(index===bound.mid)classes.push('active');
+    if(answerIndex===index)classes.push('answer');
+    let labels='';
+    if(index===bound.left)labels+='<span class="ptr-label l-label" style="left:22%">L</span>';
+    if(index===bound.right&&bound.right<bound.a.length)labels+='<span class="ptr-label r-label" style="left:78%">R</span>';
+    if(index===bound.mid)labels+='<span class="ptr-label m-label">mid</span>';
+    if(answerIndex===index)labels+='<span class="ptr-label ans-label" style="top:auto;bottom:-27px">answer</span>';
+    return '<div class="cell '+classes.join(' ')+'">'+labels+'<small>index '+index+'</small>'+value+'</div>';
+  }).join('');
+  let endAnswer=answerIndex===bound.a.length;
+  $('#boundRow').innerHTML=cells+'<div class="end-cell '+(endAnswer?'answer':'')+'">'+(endAnswer?'<span class="ptr-label ans-label">answer</span>':'')+'end()</div>';
+  $('#boundLog').innerHTML=message+'<br><b>mode='+(bound.mode==='lower'?'đầu tiên ≥ x':'đầu tiên > x')+', L='+bound.left+', R='+bound.right+'</b>';
+}
+function stepBound(){
+  if(bound.done)return;
+  if(!bound.started){bound.started=true;markBoundCode('init');renderBound('Đặt left=0, right=n. Đáp án luôn nằm trong [left,right].');return}
+  if(bound.left>=bound.right){
+    bound.done=true;bound.mid=null;renderBound('Kết thúc vì left == right. Vị trí biên là '+bound.left+'.',bound.left);return;
+  }
+  bound.mid=Math.floor((bound.left+bound.right)/2);markBoundCode('mid');
+  let value=bound.a[bound.mid],condition=conditionAt(value);
+  if(condition){
+    let description=bound.mode==='lower'?value+' ≥ '+bound.x:value+' > '+bound.x;
+    bound.right=bound.mid;markBoundCode(bound.mode);renderBound(description+' đúng → giữ mid làm ứng viên, gán right=mid.');
+  }else{
+    let description=bound.mode==='lower'?value+' < '+bound.x:value+' ≤ '+bound.x;
+    bound.left=bound.mid+1;markBoundCode('move');renderBound(description+' → đáp án phải ở bên phải, gán left=mid+1.');
+  }
+}
+function autoBound(){
+  if(bound.timer){clearInterval(bound.timer);bound.timer=null;$('#boundAutoBtn').textContent='Tự chạy';return}
+  $('#boundAutoBtn').textContent='Tạm dừng';
+  bound.timer=setInterval(()=>{stepBound();if(bound.done){clearInterval(bound.timer);bound.timer=null;$('#boundAutoBtn').textContent='Tự chạy'}},750);
+}
+function binaryBoundary(array,x,mode){
+  let left=0,right=array.length;
+  while(left<right){
+    let mid=Math.floor((left+right)/2);
+    let condition=mode==='lower'?array[mid]>=x:array[mid]>x;
+    if(condition)right=mid;else left=mid+1;
+  }
+  return left;
+}
+function countBoth(){
+  let a=parseNumbers('#boundInput'),x=Number($('#boundX').value);
+  let lower=binaryBoundary(a,x,'lower'),upper=binaryBoundary(a,x,'upper');
+  bound.a=a;bound.x=x;bound.left=lower;bound.right=lower;bound.mid=null;bound.done=true;bound.started=true;
+  renderBound('lower_bound = '+lower+', upper_bound = '+upper+', số lần x xuất hiện = '+(upper-lower)+'.',lower);
+}
+
+/* Pair simulator */
+let pairArray=[];
+function parsePairs(){
+  let tokens=$('#pairInput').value.trim().split(/\s+/).filter(Boolean);
+  return tokens.map(token=>{
+    let parts=token.split(':').map(Number);
+    return {id:parts[0],score:parts[1]};
+  }).filter(item=>Number.isFinite(item.id)&&Number.isFinite(item.score));
+}
+function renderPairs(message){
+  $('#pairRow').innerHTML=pairArray.map((item,index)=>'<div class="pair-card"><small>vị trí '+index+'</small>('+item.id+', '+item.score+')</div>').join('');
+  $('#pairLog').innerHTML=message+'<br><b>Thứ tự: '+pairArray.map(item=>'('+item.id+','+item.score+')').join(' ')+'</b>';
+}
+function resetPairs(){pairArray=parsePairs();renderPairs('Đã nạp các pair theo thứ tự ban đầu.')}
+function sortPairsDefault(){pairArray.sort((a,b)=>a.id-b.id||a.score-b.score);renderPairs('Sort mặc định: so first trước, nếu bằng mới so second.')}
+function sortPairsCustom(){pairArray.sort((a,b)=>b.score-a.score||a.id-b.id);renderPairs('Comparator tùy chỉnh: điểm giảm dần, nếu hòa thì mã tăng dần.')}
+
+/* Tabs, copy, quiz */
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(button=>button.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));button.classList.add('active');$('#'+button.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(button=>button.onclick=()=>{let text=button.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(text):Promise.resolve()).then(()=>{let old=button.textContent;button.textContent='Đã chép';setTimeout(()=>button.textContent=old,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer-btn',q).forEach(button=>button.onclick=()=>{$$('.answer-btn',q).forEach(x=>x.classList.remove('right','wrong'));if(button.dataset.choice===q.dataset.answer){button.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{button.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+
+  $('#sortPrepareBtn').onclick=prepareSort;$('#sortRunBtn').onclick=runSort;$('#sortRangeBtn').onclick=sortRange;$('#sortResetBtn').onclick=prepareSort;
+
+  $('#boundNextBtn').onclick=stepBound;$('#boundAutoBtn').onclick=autoBound;$('#countBtn').onclick=countBoth;$('#boundResetBtn').onclick=resetBound;
+  $('#boundMode').onchange=resetBound;
+
+  $('#pairDefaultBtn').onclick=sortPairsDefault;$('#pairCustomBtn').onclick=sortPairsCustom;$('#pairResetBtn').onclick=resetPairs;
+
+  prepareSort();resetBound();resetPairs();
+
+  addEventListener('scroll',()=>{let height=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/height*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(error){}
+});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="if(window.hljs)hljs.highlightAll()"></script>

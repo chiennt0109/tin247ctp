@@ -1,494 +1,459 @@
 <style>
-:root {
-  --blue-main: #2563eb;
-  --blue-dark: #1e3a8a;
-  --text-color: #1e293b;
-  --slate-100:#f1f5f9;
-  --slate-200:#e2e8f0;
-  --slate-600:#475569;
-}
-
-h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
-h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
-h3 { color: #334155; margin-top: 25px; }
-p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
-ul { margin-left: 1.5rem; }
-code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
-pre {
-  background: #f1f5f9;
-  border-left: 4px solid var(--blue-main);
-  padding: 14px 18px;
-  font-size: 15px;
-  border-radius: 8px;
-  overflow-x: auto;
-}
-
-/* NEW: highlight code line */
-.line { padding: 4px 6px; border-radius: 6px; }
-.line.hl { background: #dbeafe; }
-
-table {
-  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
-}
-th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
-th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
-
-.callout {
-  border-left: 6px solid #10b981; background: #ecfeff; padding: 10px 12px; border-radius:8px; margin: 12px 0;
-}
-
-/* Deque visual */
-.deque-visual {
-  display:flex;
-  gap:12px;
-  padding:12px;
-  border:2px dashed var(--blue-main);
-  border-radius:10px;
-  margin:20px 0;
-  overflow-x:auto;
-}
-.deque-visual .item {
-  min-width:70px; height:70px;
-  background:var(--blue-main); color:#fff;
-  border-radius:8px; line-height:70px;
-  text-align:center; font-weight:bold;
-  position:relative;
-}
-.deque-visual .item.front::after {
-  content:"front";
-  position:absolute; top:-20px; left:50%; transform:translateX(-50%);
-  background:#22c55e; padding:2px 6px; border-radius:6px; font-size:12px;
-}
-.deque-visual .item.back::after {
-  content:"back";
-  position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
-  background:#f97316; padding:2px 6px; border-radius:6px; font-size:12px;
-}
-
-.btn { border:none; background:var(--blue-main); color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
-.btn.secondary { background:#0ea5e9; }
-.btn.danger { background:#ef4444; }
-
-.sim-3col {
-  display:grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap:16px;
-}
-@media(max-width:900px){
-  .sim-3col { grid-template-columns: 1fr; }
-}
-.col { background:#fff; padding:12px; border-radius:10px; border:1px solid #e2e8f0; }
+:root{--p:#2563eb;--pd:#1e3a8a;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.deque-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+border-radius:0;box-sizing:border-box;position:relative;width:calc(100vw - 24px);
+max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.deque-page *{box-sizing:border-box}.deque-page h1,.deque-page h2,.deque-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#1d4ed8,#0e7490);box-shadow:0 22px 55px rgba(37,99,235,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1120px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:950px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.deque-view{display:flex;gap:10px;align-items:center;min-height:108px;padding:17px 12px;border:2px dashed #60a5fa;border-radius:18px;background:#f8fafc;overflow-x:auto}
+.dq-item{min-width:74px;height:68px;border-radius:13px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;position:relative;box-shadow:0 7px 16px rgba(37,99,235,.18)}
+.dq-item.front::before{content:"front";position:absolute;top:-25px;left:50%;transform:translateX(-50%);padding:2px 7px;border-radius:99px;background:#16a34a;color:#fff;font-size:.72rem}
+.dq-item.back::after{content:"back";position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);padding:2px 7px;border-radius:99px;background:#f97316;color:#fff;font-size:.72rem}
+.dq-item.active{background:#f97316;transform:translateY(-3px)}.dq-item.discard{background:#dc2626}.dq-index{font-size:.7rem;opacity:.85;position:absolute;top:3px;right:6px}
+.log{min-height:120px;max-height:340px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#1d4ed8;color:#fff}
+.window-array{display:flex;gap:8px;overflow:auto;padding:8px 0}.arr-cell{min-width:67px;padding:9px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900}.arr-cell small{display:block;color:#64748b;font-size:.72rem}.arr-cell.window{background:#dbeafe;border-color:#3b82f6}.arr-cell.best{background:#dcfce7;border-color:#22c55e;color:#166534}.arr-cell.current{background:#ffedd5;border-color:#fb923c;color:#9a3412}
+.graph-board{position:relative;min-height:340px;border:1px dashed #bfdbfe;border-radius:17px;background:#f8fafc}.graph-board svg{position:absolute;inset:0;width:100%;height:100%}.edge0{stroke:#16a34a;stroke-width:4}.edge1{stroke:#f97316;stroke-width:4}.edge-label{font-size:12px;font-weight:900;fill:#334155}.g-node{position:absolute;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eef2ff;border:3px solid #c7d2fe;color:#312e81;font-weight:900}.g-node.active{background:#ffedd5;border-color:#f97316}.g-node.done{background:#dcfce7;border-color:#22c55e}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.deque-page pre{margin:0;padding:20px;max-height:660px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.deque-page p code,.deque-page li code,.deque-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.deque-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.deque-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
 </style>
 
-
-
-<h1>🧮 Bài giảng: Cấu trúc dữ liệu DEQUE (Double-Ended Queue)</h1>
-<p>
-Deque là Queue mở rộng: thay vì chỉ thao tác ở cuối (enqueue) và đầu (dequeue), deque cho phép thao tác ở <b>cả hai đầu</b>.
-</p>
-
-<div class="callout">
-  💡 Deque = kết hợp sức mạnh của cả Stack (LIFO) và Queue (FIFO).
+<div class="deque-page">
+<div class="hero">
+  <span class="badge">STL + Sliding Window + Graph</span>
+  <h1>↔️ Deque – Hàng đợi hai đầu</h1>
+  <p>Deque cho phép thêm và xóa ở cả hai đầu. Ngoài mô phỏng hai đầu, deque còn là nền tảng của Sliding Window Maximum/Minimum, Monotonic Deque, tối ưu DP và 0–1 BFS.</p>
+  <div class="stats">
+    <div class="stat"><b>Hai đầu</b><span>push/pop front và back</span></div>
+    <div class="stat"><b>O(1)</b><span>Thao tác ở hai đầu</span></div>
+    <div class="stat"><b>Sliding Window</b><span>Max/min mỗi cửa sổ O(n)</span></div>
+    <div class="stat"><b>0–1 BFS</b><span>Đường đi ngắn nhất O(V+E)</span></div>
+  </div>
 </div>
 
-
-
-<h2>I. Deque là gì?</h2>
-
-<ul>
-  <li><b>push_front(x)</b> — thêm vào đầu</li>
-  <li><b>push_back(x)</b> — thêm vào cuối</li>
-  <li><b>pop_front()</b> — xoá đầu</li>
-  <li><b>pop_back()</b> — xoá cuối</li>
-  <li><b>front()</b> — xem đầu</li>
-  <li><b>back()</b> — xem cuối</li>
-</ul>
-
-
-
-<h2>II. Minh hoạ trực quan</h2>
-
-<div class="deque-visual">
-  <div class="item front">A</div>
-  <div class="item">B</div>
-  <div class="item back">C</div>
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#basic">Deque cơ bản</a><a href="#simulate">Mô phỏng</a><a href="#window">Sliding Window</a><a href="#zeroone">0–1 BFS</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
 </div>
 
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Khác nhau giữa stack, queue và deque.</li><li>Các thao tác hai đầu và điều kiện kiểm tra rỗng.</li><li>Vì sao Sliding Window Maximum cần lưu chỉ số.</li><li>Cách duy trì deque đơn điệu.</li><li>Vì sao 0–1 BFS dùng push_front/push_back.</li></ul></div>
+    <div class="box"><h3>Dấu hiệu nhận biết</h3><ul><li>Chọn hoặc xóa ở đầu trái/phải.</li><li>Mỗi đoạn liên tiếp độ dài k.</li><li>Cần max/min cửa sổ trong O(n).</li><li>Loại bỏ phần tử không còn hữu ích.</li><li>Đồ thị chỉ có trọng số 0 hoặc 1.</li></ul></div>
+  </div>
+</section>
 
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+  <div class="call">
+    <b>Bài toán mở đầu 1 – mô phỏng hai đầu.</b><br>
+    Một dãy số cho phép thêm hoặc xóa ở cả đầu trái và đầu phải. Hãy xử lý q thao tác:
+    <code>push_front x</code>, <code>push_back x</code>, <code>pop_front</code>, <code>pop_back</code>.
+  </div>
 
-<h2>III. Cú pháp deque trong C++</h2>
+  <h3>1.1. Vì sao stack hoặc queue chưa đủ?</h3>
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Cấu trúc</th><th>Thêm</th><th>Xóa</th><th>Hạn chế</th></tr>
+    <tr><td>Stack</td><td>Một đầu</td><td>Cùng đầu đó</td><td>Chỉ LIFO.</td></tr>
+    <tr><td>Queue</td><td>Cuối</td><td>Đầu</td><td>Chỉ FIFO.</td></tr>
+    <tr><td>Deque</td><td>Cả hai đầu</td><td>Cả hai đầu</td><td>Linh hoạt nhất cho bài hai đầu.</td></tr>
+  </table></div>
 
-<pre><code>#include &lt;deque&gt;
+  <div class="call">
+    <b>Bài toán mở đầu 2 – cửa sổ trượt.</b><br>
+    Cho mảng n phần tử và số k. Với mỗi đoạn liên tiếp có đúng k phần tử, hãy in giá trị lớn nhất.
+  </div>
+
+  <p>Nếu mỗi cửa sổ đều duyệt lại k phần tử, tổng thời gian là O(nk). Với n lớn, cách này dễ TLE.</p>
+  <div class="formula">Mục tiêu: duy trì phần tử lớn nhất của cửa sổ trong tổng thời gian O(n)</div>
+
+  <h3>1.2. Quan sát dẫn tới Monotonic Deque</h3>
+  <ul>
+    <li>Phần tử đã ra khỏi cửa sổ phải bị loại khỏi đầu deque.</li>
+    <li>Nếu một phần tử mới lớn hơn phần tử ở cuối deque, phần tử cuối đó không thể trở thành max trong tương lai.</li>
+    <li>Deque chỉ giữ các chỉ số còn hữu ích theo thứ tự giá trị giảm dần.</li>
+  </ul>
+
+  <div class="call ok"><b>Kết luận:</b> deque vừa giải bài thao tác hai đầu, vừa là công cụ tối ưu giúp loại bỏ phần tử cũ và phần tử kém tối ưu.</div>
+</section>
+
+<section class="card" id="basic">
+  <h2>2. Deque cơ bản trong C++</h2>
+  <div class="g2">
+    <div class="box"><h3>Thao tác</h3><ul><li><code>push_front(x)</code></li><li><code>push_back(x)</code></li><li><code>pop_front()</code></li><li><code>pop_back()</code></li><li><code>front()</code>, <code>back()</code></li><li><code>empty()</code>, <code>size()</code>, <code>clear()</code></li></ul></div>
+    <div class="box"><h3>Độ phức tạp</h3><ul><li>Thêm/xóa ở hai đầu: O(1).</li><li>Truy cập <code>dq[i]</code>: O(1).</li><li>Chèn/xóa giữa: O(n).</li><li>Không đảm bảo vùng nhớ liên tiếp như vector.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="simulate">
+  <h2>3. Mô phỏng Deque và highlight code</h2>
+  <div class="g3">
+    <div class="visual">
+      <label><b>Giá trị x</b></label><input class="input" id="dqInput" value="7">
+      <div class="controls">
+        <button class="btn" id="pf">push_front</button>
+        <button class="btn" id="pb">push_back</button>
+        <button class="btn red" id="popf">pop_front</button>
+        <button class="btn red" id="popb">pop_back</button>
+        <button class="btn green" id="viewEnds">front/back</button>
+        <button class="btn alt" id="resetDq">Làm lại</button>
+      </div>
+      <div class="log" id="dqLog"></div>
+    </div>
+
+    <div class="code-lines" id="basicCode">
+      <div class="code-line" data-k="init">deque&lt;int&gt; dq;</div>
+      <div class="code-line" data-k="pf">dq.push_front(x);</div>
+      <div class="code-line" data-k="pb">dq.push_back(x);</div>
+      <div class="code-line" data-k="popf">if (!dq.empty()) dq.pop_front();</div>
+      <div class="code-line" data-k="popb">if (!dq.empty()) dq.pop_back();</div>
+      <div class="code-line" data-k="view">cout &lt;&lt; dq.front() &lt;&lt; dq.back();</div>
+    </div>
+
+    <div class="visual">
+      <div class="deque-view" id="dqView"></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="window">
+  <h2>4. Sliding Window Maximum bằng Monotonic Deque</h2>
+  <div class="call warn"><b>Deque lưu chỉ số, không chỉ lưu giá trị.</b> Ta cần biết phần tử nào đã ra khỏi cửa sổ bằng điều kiện chỉ số.</div>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng</b></label><input class="input" id="arrInput" value="1 3 -1 -3 5 3 6 7">
+      <label><b>Kích thước cửa sổ k</b></label><input class="input" id="kInput" value="3">
+      <div class="controls"><button class="btn" id="windowNext">Bước tiếp</button><button class="btn alt" id="windowReset">Làm lại</button><button class="btn orange" id="windowAuto">Tự chạy</button></div>
+      <h3>Mảng và cửa sổ hiện tại</h3><div class="window-array" id="windowArray"></div>
+      <h3>Deque chỉ số</h3><div class="deque-view" id="monoView"></div>
+    </div>
+    <div class="log" id="windowLog"></div>
+  </div>
+
+  <h3>4.1. Ba bước tại vị trí i</h3>
+  <ol>
+    <li>Xóa đầu deque nếu chỉ số đã ra khỏi cửa sổ: <code>dq.front() &lt;= i-k</code>.</li>
+    <li>Xóa cuối khi <code>a[dq.back()] &lt;= a[i]</code>.</li>
+    <li>Đưa i vào cuối. Khi cửa sổ đủ k phần tử, max là <code>a[dq.front()]</code>.</li>
+  </ol>
+</section>
+
+<section class="card" id="zeroone">
+  <h2>5. 0–1 BFS</h2>
+  <p>Với đồ thị có trọng số cạnh chỉ 0 hoặc 1, khi relax:</p>
+  <div class="formula">w = 0 → push_front(v), &nbsp;&nbsp; w = 1 → push_back(v)</div>
+  <div class="g2">
+    <div class="visual">
+      <div class="graph-board" id="graphBoard"></div>
+      <div class="controls"><button class="btn" id="bfsNext">Bước tiếp</button><button class="btn alt" id="bfsReset">Làm lại</button></div>
+      <h3>Deque</h3><div class="deque-view" id="bfsDeque"></div>
+    </div>
+    <div class="log" id="bfsLog"></div>
+  </div>
+  <div class="call ok"><b>Trực giác:</b> cạnh 0 tạo trạng thái ưu tiên ngang với đỉnh hiện tại nên đưa lên đầu; cạnh 1 có chi phí lớn hơn nên đưa xuống cuối.</div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>6. Phân tích thuật toán</h2>
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Bài toán</th><th>Cách đơn giản</th><th>Dùng deque</th><th>Giải thích</th></tr>
+    <tr><td>Mô phỏng hai đầu</td><td>Vector có thể O(n) khi xóa đầu</td><td>O(1)/thao tác</td><td>Deque hỗ trợ trực tiếp hai đầu.</td></tr>
+    <tr><td>Max/min mỗi cửa sổ k</td><td>O(nk)</td><td>O(n)</td><td>Mỗi chỉ số vào và ra deque tối đa một lần.</td></tr>
+    <tr><td>0–1 BFS</td><td>Dijkstra O((V+E)log V)</td><td>O(V+E)</td><td>Trọng số chỉ 0 hoặc 1.</td></tr>
+    <tr><td>DP có cửa sổ chuyển trạng thái</td><td>O(nk)</td><td>O(n)</td><td>Duy trì min/max của miền trạng thái hợp lệ.</td></tr>
+  </table></div>
+</section>
+
+<section class="card" id="code">
+  <h2>7. Code mẫu</h2>
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="basicCpp">Deque cơ bản</button>
+      <button class="tab-btn" data-tab="windowCpp">Sliding Window Max</button>
+      <button class="tab-btn" data-tab="bfsCpp">0–1 BFS</button>
+      <button class="tab-btn" data-tab="pythonCode">Python deque</button>
+    </div>
+
+    <div class="panel active" id="basicCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
 int main() {
     deque&lt;int&gt; dq;
 
-    dq.push_front(3);  // [3]
-    dq.push_back(5);   // [3, 5]
-    dq.push_front(2);  // [2, 3, 5]
+    dq.push_front(3);
+    dq.push_back(5);
+    dq.push_front(2);
 
-    cout &lt;&lt; dq.front(); // 2
-    cout &lt;&lt; dq.back();  // 5
-}
-</code></pre>
+    cout &lt;&lt; dq.front() &lt;&lt; ' ';
+    cout &lt;&lt; dq.back() &lt;&lt; '\n';
 
+    if (!dq.empty()) dq.pop_front();
+    if (!dq.empty()) dq.pop_back();
 
+    for (int x : dq) cout &lt;&lt; x &lt;&lt; ' ';
+}</code></pre></div>
 
-<h2>IV. Mô phỏng Deque (có highlight code)</h2>
+    <div class="panel" id="windowCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
 
-<div class="sim-3col">
+int main() {
+    int n, k;
+    cin &gt;&gt; n &gt;&gt; k;
 
-<!-- Column 1 -->
-<div class="col">
-  <h4>🔧 Thao tác</h4>
-  <input id="inp" placeholder="Giá trị..." />
+    vector&lt;long long&gt; a(n);
+    for (long long &amp;x : a) cin &gt;&gt; x;
 
-  <button class="btn" id="pf">push_front</button>
-  <button class="btn" id="pb">push_back</button>
-  <button class="btn danger" id="popf">pop_front</button>
-  <button class="btn danger" id="popb">pop_back</button>
-  <button class="btn secondary" id="view">front/back</button>
+    deque&lt;int&gt; dq;
 
-  <div id="dq-msg" class="callout">💡 Bấm nút để xem mô phỏng + highlight code.</div>
-</div>
+    for (int i = 0; i &lt; n; i++) {
+        while (!dq.empty() &amp;&amp; dq.front() &lt;= i - k) {
+            dq.pop_front();
+        }
 
-<!-- Column 2 -->
-<div class="col">
-  <h4>💻 Code</h4>
-  <div id="dq-code">
-    <div class="line" data-k="init">deque&lt;int&gt; dq;                 // tạo deque</div>
-    <div class="line" data-k="pf1">int x = input;                   // đọc</div>
-    <div class="line" data-k="pf2">dq.push_front(x);               // thêm đầu</div>
+        while (!dq.empty() &amp;&amp; a[dq.back()] &lt;= a[i]) {
+            dq.pop_back();
+        }
 
-    <div class="line" data-k="pb1">int x = input;                   // đọc</div>
-    <div class="line" data-k="pb2">dq.push_back(x);                // thêm cuối</div>
+        dq.push_back(i);
 
-    <div class="line" data-k="popf1">if(!dq.empty())                // kiểm tra</div>
-    <div class="line" data-k="popf2">dq.pop_front();               // xoá đầu</div>
+        if (i &gt;= k - 1) {
+            cout &lt;&lt; a[dq.front()] &lt;&lt; ' ';
+        }
+    }
+}</code></pre></div>
 
-    <div class="line" data-k="popb1">if(!dq.empty())                // kiểm tra</div>
-    <div class="line" data-k="popb2">dq.pop_back();                // xoá cuối</div>
+    <div class="panel" id="bfsCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
 
-    <div class="line" data-k="view1">dq.front(); dq.back();        // xem 2 đầu</div>
+const int INF = 1e9;
+
+int main() {
+    int n, m, source;
+    cin &gt;&gt; n &gt;&gt; m &gt;&gt; source;
+
+    vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj(n + 1);
+
+    for (int i = 0; i &lt; m; i++) {
+        int u, v, w;
+        cin &gt;&gt; u &gt;&gt; v &gt;&gt; w;
+        adj[u].push_back({v, w});
+        adj[v].push_back({u, w});
+    }
+
+    vector&lt;int&gt; dist(n + 1, INF);
+    deque&lt;int&gt; dq;
+
+    dist[source] = 0;
+    dq.push_front(source);
+
+    while (!dq.empty()) {
+        int u = dq.front();
+        dq.pop_front();
+
+        for (auto [v, w] : adj[u]) {
+            if (dist[v] &gt; dist[u] + w) {
+                dist[v] = dist[u] + w;
+
+                if (w == 0) dq.push_front(v);
+                else dq.push_back(v);
+            }
+        }
+    }
+}</code></pre></div>
+
+    <div class="panel" id="pythonCode"><button class="copy">Sao chép</button><pre><code>from collections import deque
+
+dq = deque()
+
+dq.appendleft(3)
+dq.append(5)
+
+left = dq[0]
+right = dq[-1]
+
+dq.popleft()
+dq.pop()</code></pre></div>
   </div>
-</div>
+</section>
 
-<!-- Column 3 -->
-<div class="col">
-  <h4>📊 Deque</h4>
-  <div id="dq-vis" class="deque-visual"></div>
-</div>
+<section class="card" id="explain">
+  <h2>8. Giải thích code</h2>
 
+  <h3>8.1. Vì sao phải kiểm tra empty?</h3>
+  <p>Gọi <code>front()</code>, <code>back()</code>, <code>pop_front()</code> hoặc <code>pop_back()</code> khi deque rỗng gây hành vi không xác định.</p>
+
+  <h3>8.2. Vì sao Sliding Window lưu chỉ số?</h3>
+  <p>Giá trị không cho biết phần tử thuộc vị trí nào. Chỉ số giúp kiểm tra phần tử đã rời cửa sổ bằng <code>dq.front() &lt;= i-k</code>.</p>
+
+  <h3>8.3. Vì sao xóa các phần tử nhỏ hơn ở cuối?</h3>
+  <p>Nếu <code>a[j] &lt;= a[i]</code> và j đứng trước i, thì i vừa mới hơn vừa không nhỏ hơn j. Trong mọi cửa sổ tương lai chứa cả hai, j không bao giờ là max.</p>
+
+  <h3>8.4. Vì sao Sliding Window là O(n)?</h3>
+  <div class="call ok">Mỗi chỉ số được push đúng một lần và bị pop nhiều nhất một lần ở mỗi đầu. Tổng số thao tác tuyến tính theo n.</div>
+
+  <h3>8.5. Vì sao 0–1 BFS đúng?</h3>
+  <p>Deque giữ các đỉnh theo khoảng cách không giảm. Relax cạnh 0 giữ nguyên khoảng cách nên đẩy lên đầu; cạnh 1 tăng khoảng cách nên đẩy xuống cuối.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>9. Lỗi thường gặp</h2>
+  <ul>
+    <li>Không kiểm tra deque rỗng trước khi truy cập hoặc pop.</li>
+    <li>Sliding Window lưu giá trị thay vì chỉ số.</li>
+    <li>Xóa phần tử hết hạn bằng điều kiện sai: đúng là <code>dq.front() &lt;= i-k</code>.</li>
+    <li>Đặt bước loại phần tử hết hạn sau khi lấy kết quả.</li>
+    <li>Dùng dấu so sánh sai khiến xử lý phần tử bằng nhau không nhất quán.</li>
+    <li>Cho rằng deque luôn tốt hơn vector; deque không có vùng nhớ liên tiếp.</li>
+    <li>Dùng 0–1 BFS khi trọng số có giá trị khác 0 và 1.</li>
+    <li>Trong bài game hai đầu, áp dụng greedy lấy đầu lớn hơn mà chưa chứng minh.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>10. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Trong Sliding Window Maximum, deque nên lưu gì?<div class="answers"><button class="answer" data-choice="a">Chỉ giá trị</button><button class="answer" data-choice="b">Chỉ số phần tử</button><button class="answer" data-choice="c">Tổng prefix</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Điều kiện loại chỉ số hết hạn là gì?<div class="answers"><button class="answer" data-choice="a">dq.front() &lt; i</button><button class="answer" data-choice="b">dq.front() == k</button><button class="answer" data-choice="c">dq.front() &lt;= i-k</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> Trong 0–1 BFS, cạnh trọng số 0 được xử lý thế nào?<div class="answers"><button class="answer" data-choice="a">push_front</button><button class="answer" data-choice="b">push_back</button><button class="answer" data-choice="c">Không đưa vào deque</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Mô phỏng q thao tác deque.</li><li>Kiểm tra palindrome.</li><li>Đảo dãy bằng push_front.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Sliding Window Max.</li><li>Sliding Window Min.</li><li>Max−min mỗi cửa sổ.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>DP tối ưu bằng monotonic deque.</li><li>Shortest subarray có tổng ≥ K.</li><li>Constrained subsequence sum.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>0–1 BFS trên lưới.</li><li>Dial's algorithm định hướng.</li><li>Deque optimization trong DP.</li></ol></div>
+  </div>
+</section>
 </div>
 
 <script>
 (function(){
-  let dq = [];
-  const vis = document.getElementById("dq-vis");
-  const msg = document.getElementById("dq-msg");
-  const code = document.getElementById("dq-code");
-  const inp = document.getElementById("inp");
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
 
-  function render(){
-    vis.innerHTML="";
-    dq.forEach((v,i)=>{
-      let e=document.createElement("div");
-      e.className="item";
-      if(i===0) e.classList.add("front");
-      if(i===dq.length-1) e.classList.add("back");
-      e.textContent=v;
-      vis.appendChild(e);
-    });
-  }
+let dq=['A','B','C'];
+function highlight(keys){$$('.code-line').forEach(x=>x.classList.remove('hl'));keys.forEach(k=>{let e=$('.code-line[data-k="'+k+'"]');if(e)e.classList.add('hl')})}
+function renderDq(msg,active=-1){
+  $('#dqView').innerHTML=dq.length?dq.map((v,i)=>'<div class="dq-item '+(i===0?'front ':'')+(i===dq.length-1?'back ':'')+(i===active?'active':'')+'"><span class="dq-index">'+i+'</span>'+v+'</div>').join(''):'<span>Deque rỗng</span>';
+  $('#dqLog').innerHTML=msg+'<br><b>size = '+dq.length+'</b>';
+}
+function inputValue(){return $('#dqInput').value.trim()}
+function pushFront(){let x=inputValue();if(!x){renderDq('Hãy nhập giá trị.');return}dq.unshift(x);highlight(['pf']);renderDq('push_front('+x+')',0)}
+function pushBack(){let x=inputValue();if(!x){renderDq('Hãy nhập giá trị.');return}dq.push(x);highlight(['pb']);renderDq('push_back('+x+')',dq.length-1)}
+function popFront(){if(!dq.length){renderDq('Không thể pop_front vì deque rỗng.');return}let x=dq.shift();highlight(['popf']);renderDq('Đã xóa đầu: '+x)}
+function popBack(){if(!dq.length){renderDq('Không thể pop_back vì deque rỗng.');return}let x=dq.pop();highlight(['popb']);renderDq('Đã xóa cuối: '+x)}
+function viewEnds(){if(!dq.length){renderDq('Deque rỗng.');return}highlight(['view']);renderDq('front = '+dq[0]+', back = '+dq[dq.length-1])}
+function resetBasic(){dq=['A','B','C'];highlight(['init']);renderDq('Deque mẫu ban đầu.')}
 
-  function hl(list){
-    code.querySelectorAll(".line").forEach(l=>l.classList.remove("hl"));
-    list.forEach(k=>{
-      const el = code.querySelector(`.line[data-k="${k}"]`);
-      if(el) el.classList.add("hl");
-    });
-  }
+let arr=[],k=3,wi=0,mono=[],results=[],windowTimer=null;
+function parseArray(){let t=$('#arrInput').value.trim();return t?t.split(/\s+/).map(Number).filter(Number.isFinite):[]}
+function resetWindow(){
+  if(windowTimer){clearInterval(windowTimer);windowTimer=null}
+  arr=parseArray();k=Math.max(1,Math.floor(Number($('#kInput').value)||1));k=Math.min(k,Math.max(1,arr.length));$('#kInput').value=k;
+  wi=0;mono=[];results=[];$('#windowAuto').textContent='Tự chạy';
+  renderWindow('Bắt đầu xử lý từ i = 0.');
+}
+function renderWindow(msg,current=-1){
+  let L=Math.max(0,current-k+1),R=current;
+  $('#windowArray').innerHTML=arr.map((v,i)=>{
+    let cls=i===current?'current':(current>=0&&i>=L&&i<=R?'window':'');
+    if(mono.length&&i===mono[0])cls+=' best';
+    return '<div class="arr-cell '+cls+'"><small>i='+i+'</small>'+v+'</div>';
+  }).join('');
+  $('#monoView').innerHTML=mono.length?mono.map((idx,j)=>'<div class="dq-item '+(j===0?'front ':'')+(j===mono.length-1?'back ':'')+'"><span class="dq-index">'+idx+'</span>'+arr[idx]+'</div>').join(''):'<span>Deque rỗng</span>';
+  $('#windowLog').innerHTML=msg+'<br><b>Kết quả đã có: ['+results.join(', ')+']</b>';
+}
+function stepWindow(){
+  if(wi>=arr.length){renderWindow('Hoàn tất Sliding Window Maximum.',arr.length-1);return}
+  let i=wi++,logs=['<b>Xử lý i='+i+', a[i]='+arr[i]+'</b>'];
+  while(mono.length&&mono[0]<=i-k){logs.push('pop_front chỉ số '+mono[0]+' vì đã ra khỏi cửa sổ.');mono.shift()}
+  while(mono.length&&arr[mono[mono.length-1]]<=arr[i]){logs.push('pop_back chỉ số '+mono[mono.length-1]+' vì giá trị '+arr[mono[mono.length-1]]+' <= '+arr[i]+'.');mono.pop()}
+  mono.push(i);logs.push('push_back('+i+').');
+  if(i>=k-1){results.push(arr[mono[0]]);logs.push('Max cửa sổ = a['+mono[0]+'] = '+arr[mono[0]]+'.')}
+  renderWindow(logs.join('<br>'),i);
+}
+function autoWindow(){
+  if(windowTimer){clearInterval(windowTimer);windowTimer=null;$('#windowAuto').textContent='Tự chạy';return}
+  $('#windowAuto').textContent='Tạm dừng';
+  windowTimer=setInterval(()=>{if(wi>=arr.length){clearInterval(windowTimer);windowTimer=null;$('#windowAuto').textContent='Tự chạy'}else stepWindow()},850)
+}
 
-  document.getElementById("pf").onclick=()=>{
-    if(!inp.value.trim()) return msg.innerHTML="⚠️ Nhập giá trị!";
-    let x = inp.value.trim();
-    dq.unshift(x);
-    msg.innerHTML = `push_front(<b>${x}</b>)`;
-    hl(["pf1","pf2"]);
-    inp.value="";
-    render();
-  };
+const graphPos={1:[12,45],2:[38,18],3:[38,72],4:[68,20],5:[68,70],6:[88,45]};
+const graphEdges=[[1,2,0],[1,3,1],[2,4,1],[2,5,0],[3,5,0],[4,6,1],[5,6,0]];
+let dist={},bq=[],bDone={},bStep=0;
+function drawGraph(active=null){
+  let svg='<svg viewBox="0 0 100 100" preserveAspectRatio="none">';
+  graphEdges.forEach(e=>{let a=graphPos[e[0]],b=graphPos[e[1]],cls=e[2]===0?'edge0':'edge1';svg+='<line class="'+cls+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/><text class="edge-label" x="'+((a[0]+b[0])/2)+'" y="'+((a[1]+b[1])/2)+'">'+e[2]+'</text>'});svg+='</svg>';
+  let nodes='';for(let u=1;u<=6;u++){let c='g-node '+(active===u?'active ':'')+(bDone[u]?'done':'');nodes+='<div class="'+c+'" style="left:calc('+graphPos[u][0]+'% - 25px);top:calc('+graphPos[u][1]+'% - 25px)">'+u+'<small style="position:absolute;bottom:-20px">d='+(dist[u]===999?'∞':dist[u])+'</small></div>'}
+  $('#graphBoard').innerHTML=svg+nodes;
+}
+function renderBq(msg,active=null){
+  drawGraph(active);
+  $('#bfsDeque').innerHTML=bq.length?bq.map((u,i)=>'<div class="dq-item '+(i===0?'front ':'')+(i===bq.length-1?'back ':'')+'">'+u+'</div>').join(''):'<span>Deque rỗng</span>';
+  $('#bfsLog').innerHTML=msg;
+}
+function resetBfs(){
+  dist={1:0,2:999,3:999,4:999,5:999,6:999};bq=[1];bDone={};bStep=0;
+  renderBq('Khởi tạo dist[1]=0, đưa 1 vào đầu deque.');
+}
+function stepBfs(){
+  if(!bq.length){renderBq('Hoàn tất 0–1 BFS.');return}
+  let u=bq.shift();bDone[u]=true;let logs=['<b>Lấy đỉnh '+u+' khỏi đầu deque.</b>'];
+  graphEdges.forEach(e=>{
+    if(e[0]!==u)return;
+    let v=e[1],w=e[2];
+    if(dist[v]>dist[u]+w){
+      dist[v]=dist[u]+w;
+      if(w===0){bq.unshift(v);logs.push('Relax '+u+'→'+v+' (w=0), push_front('+v+').')}
+      else{bq.push(v);logs.push('Relax '+u+'→'+v+' (w=1), push_back('+v+').')}
+    }
+  });
+  renderBq(logs.join('<br>'),u);
+}
 
-  document.getElementById("pb").onclick=()=>{
-    if(!inp.value.trim()) return msg.innerHTML="⚠️ Nhập giá trị!";
-    let x = inp.value.trim();
-    dq.push(x);
-    msg.innerHTML = `push_back(<b>${x}</b>)`;
-    hl(["pb1","pb2"]);
-    inp.value="";
-    render();
-  };
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
 
-  document.getElementById("popf").onclick=()=>{
-    if(!dq.length) return msg.innerHTML="Deque rỗng!";
-    let x=dq.shift();
-    msg.innerHTML=`pop_front → xoá <b>${x}</b>`;
-    hl(["popf1","popf2"]);
-    render();
-  };
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+  $('#pf').onclick=pushFront;$('#pb').onclick=pushBack;$('#popf').onclick=popFront;$('#popb').onclick=popBack;$('#viewEnds').onclick=viewEnds;$('#resetDq').onclick=resetBasic;
+  $('#windowNext').onclick=stepWindow;$('#windowReset').onclick=resetWindow;$('#windowAuto').onclick=autoWindow;
+  $('#bfsNext').onclick=stepBfs;$('#bfsReset').onclick=resetBfs;
 
-  document.getElementById("popb").onclick=()=>{
-    if(!dq.length) return msg.innerHTML="Deque rỗng!";
-    let x=dq.pop();
-    msg.innerHTML=`pop_back → xoá <b>${x}</b>`;
-    hl(["popb1","popb2"]);
-    render();
-  };
+  resetBasic();resetWindow();resetBfs();
 
-  document.getElementById("view").onclick=()=>{
-    if(!dq.length) return msg.innerHTML="Deque rỗng!";
-    msg.innerHTML = `front=<b>${dq[0]}</b>, back=<b>${dq[dq.length-1]}</b>`;
-    hl(["view1"]);
-  };
-
-  hl(["init"]);
-  render();
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
 })();
 </script>
 
-
-
-<h2>V. Khi nào dùng Deque?</h2>
-
-<p>
-Deque không phải để “học cho biết”, mà là công cụ giải quyết <b>nhóm bài toán rất đặc thù</b>.  
-Một học sinh giỏi phải nhận ra deque ngay khi đọc đề: <b>bài này có cửa sổ trượt?</b>  
-<b>có hai đầu?</b> <b>có loại bỏ những phần tử không optimal?</b>  
-Nếu có → chắc chắn cần dùng Deque.
-</p>
-
-<h3>🔍 Các tín hiệu mạnh nhận biết bài toán dùng Deque</h3>
-
-<div class="callout">
-  <b>1) Bài toán cửa sổ trượt (Sliding Window)</b><br>
-  ➡ Xuất hiện từ khóa: “trong mỗi đoạn dài k…”, “cửa sổ trượt kích thước k”, “đoạn con cố định k”.<br>
-  👉 Deque giúp duy trì phần tử tối ưu và loại bỏ phần tử quá cũ trong O(1).
-</div>
-
-<div class="callout">
-  <b>2) Bài toán hai đầu (trái/phải)</b><br>
-  ➡ Đề có cụm: “chọn phần tử trái hoặc phải”, “hai người chơi chọn đầu nào có lợi hơn”.<br>
-  👉 Deque mô phỏng đúng bản chất thao tác hai đầu.
-</div>
-
-<div class="callout">
-  <b>3) Loại bỏ phần tử không còn hữu dụng (Monotonic Deque)</b><br>
-  ➡ Đề yêu cầu: “giữ lại phần tử tốt nhất”, “loại bỏ phần tử kém tối ưu”.<br>
-  👉 Dùng pop_back để duy trì tính đơn điệu.
-</div>
-
-<div class="callout">
-  <b>4) Mô phỏng thực tế có hai phía vào/ra</b><br>
-  ➡ Ví dụ: xe vào/ra từ hai cổng, xử lý khách từ cả hai đầu.<br>
-  👉 Deque mô phỏng chính xác hành vi này.
-</div>
-
-<div class="callout">
-  <b>5) Thuật toán 0-1 BFS</b><br>
-  ➡ Đồ thị có cạnh trọng số chỉ 0 hoặc 1.<br>
-  👉 Cạnh trọng số 0: push_front, trọng số 1: push_back.  
-  Giải nhanh hơn Dijkstra.
-</div>
-
-
-<h2>VI. Bài tập luyện tập – đầy đủ theo phân dạng</h2>
-<p>
-Dưới đây là hệ thống bài tập cho học sinh từ mức độ cơ bản → nâng cao,  
-mỗi bài đều có <b>nhận dạng đề</b> & <b>giải thích tại sao phải dùng deque</b>.
-</p>
-
-<h3>📘 Nhóm 1 — Bài cơ bản về Deque</h3>
-
-<details>
-  <summary>1️⃣ Bài 1: Mô phỏng deque với các thao tác cơ bản</summary>
-
-  <p><b>Nhận dạng:</b> Đề xã xuất hiện các thao tác <code>push_front, push_back, pop_front, pop_back</code> → bắt buộc dùng deque.</p>
-
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-
-int main() {
-    int n; cin >> n;
-    deque&lt;int&gt; dq;
-    while(n--) {
-        string s; cin >> s;
-        if(s=="push_front"){int x; cin >> x; dq.push_front(x);}
-        else if(s=="push_back"){int x; cin >> x; dq.push_back(x);}
-        else if(s=="pop_front" && !dq.empty()) dq.pop_front();
-        else if(s=="pop_back" && !dq.empty()) dq.pop_back();
-    }
-    for(int x : dq) cout << x << " ";
-}
-</code></pre>
-
-</details>
-
-<details>
-  <summary>2️⃣ Bài 2: Đảo ngược dãy bằng deque</summary>
-
-  <p><b>Nhận dạng:</b> Đảo dãy = đẩy phần tử vào đầu → dùng <code>push_front</code>.</p>
-
-  <p><b>Ý tưởng:</b> Đọc từng số a → <code>push_front(a)</code>.</p>
-
-</details>
-
-
-<h3>📗 Nhóm 2 — Hai đầu (Game / Greedy)</h3>
-
-<details>
-  <summary>3️⃣ Bài 3: Hai người lấy số — chọn trái hoặc phải</summary>
-
-  <p><b>Nhận dạng:</b> Từ khóa: “chọn trái hoặc phải”, “chọn đầu có giá trị lớn”. Đây là dạng bài kinh điển → hàng đợi 2 đầu.</p>
-
-  <pre><code>// Người A luôn lấy số lớn hơn ở hai đầu
-#include &lt;bits/stdc++.h&gt;
-using namespace std;
-
-int main() {
-    int n; cin >> n;
-    deque&lt;int&gt; dq(n);
-    for(int i=0;i&lt;n;i++) cin >> dq[i];
-
-    long long A = 0;
-    while(!dq.empty()) {
-        if(dq.front() > dq.back())
-            A += dq.front(), dq.pop_front();
-        else
-            A += dq.back(), dq.pop_back();
-    }
-    cout << A;
-}
-</code></pre>
-
-</details>
-
-<details>
-  <summary>4️⃣ Bài 4: Kiểm tra chuỗi palindrome</summary>
-
-  <p><b>Nhận dạng:</b> So sánh đầu – cuối ⇒ pop_front/pop_back.</p>
-
-</details>
-
-
-<h3>📙 Nhóm 3 — Sliding Window (dạng quan trọng nhất)</h3>
-
-<details>
-  <summary>5️⃣ Bài 5: Tìm max trong mỗi đoạn dài k – O(n)</summary>
-
-  <p><b>Nhận dạng:</b> Có cụm từ “mỗi đoạn dài k” → dạng cửa sổ trượt.</p>
-
-  <p><b>Lý do:</b> Deque loại bỏ phần tử quá cũ bằng <code>pop_front</code>  
-  và loại bỏ phần tử kém optimal bằng <code>pop_back</code>.</p>
-
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-
-int main(){
-    int n,k; cin >> n >> k;
-    vector&lt;int&gt; a(n);
-    for(int &x:a) cin >> x;
-
-    deque&lt;int&gt; dq;
-    for(int i=0;i&lt;n;i++){
-        while(!dq.empty() && a[dq.back()] <= a[i])
-            dq.pop_back();
-
-        dq.push_back(i);
-
-        if(dq.front() <= i-k)
-            dq.pop_front();
-
-        if(i >= k-1)
-            cout << a[dq.front()] << " ";
-    }
-}
-</code></pre>
-
-</details>
-
-
-<details>
-  <summary>6️⃣ Bài 6: Tìm min trong mỗi đoạn dài k</summary>
-
-  <p><b>Nhận dạng:</b> Giống bài tìm max, nhưng thay điều kiện so sánh.</p>
-
-</details>
-
-<details>
-  <summary>7️⃣ Bài 7: Đếm số phần tử ≥ X trong mỗi đoạn k</summary>
-
-  <p><b>Nhận dạng:</b> Cửa sổ trượt + cần loại bỏ phần tử cũ.</p>
-
-  <p><b>Ý tưởng:</b> Duy trì deque chứa chỉ số phần tử ≥ X.</p>
-
-</details>
-
-
-<h3>🐓 Nhóm 4 — Monotonic Deque nâng cao (Greedy / DP)</h3>
-
-<details>
-  <summary>8️⃣ Bài 8: Giữ dãy đơn điệu để tối ưu hoá</summary>
-
-  <p><b>Nhận dạng:</b> Đề yêu cầu loại bỏ phần tử “kém optimal” → pop_back.</p>
-
-  <p><b>Ý tưởng:</b> Tạo deque tăng dần hoặc giảm dần.</p>
-
-</details>
-
-
-<h3>🐔 Nhóm 5 — Mô phỏng thực tế</h3>
-
-<details>
-  <summary>9️⃣ Bài 9: Trạm thu phí hai đầu</summary>
-
-  <p><b>Nhận dạng:</b> Xe vào/ra từ trái hoặc phải → đúng bản chất deque.</p>
-
-</details>
-
-
-<h3>🐉 Nhóm 6 — 0–1 BFS (chuyên đề HSG – quan trọng)</h3>
-
-<details>
-  <summary>🔟 Bài 10: 0–1 BFS tìm đường đi ngắn nhất</summary>
-
-  <p><b>Nhận dạng:</b> Đề có trọng số là 0 hoặc 1 → tuyệt đối phải dùng deque.</p>
-
-  <pre><code>if(w == 0) dq.push_front(v);
-else dq.push_back(v);
-</code></pre>
-
-  <p><b>Ưu điểm:</b> Chạy O(V+E), nhanh hơn Dijkstra rất nhiều.</p>
-
-</details>
-
-<details>
-  <summary>1️⃣1️⃣ Bài 11: Robot di chuyển trong lưới – phí 0 hoặc 1</summary>
-
-  <p><b>Nhận dạng:</b> “Bấm nút không tốn phí, di chuyển tốn 1” → đúng mẫu 0-1 BFS.</p>
-
-</details>
-
-
-<h2>VII. Tổng kết</h2>
-
-<ul>
-  <li><b>Deque</b> mạnh nhất trong bài cửa sổ trượt và mô phỏng hai đầu.</li>
-  <li><b>Monotonic deque</b> giải quyết nhiều bài greedy/DP trong O(n).</li>
-  <li><b>0–1 BFS</b> là dạng nâng cao, rất quan trọng trong HSG.</li>
-</ul>
-
-<p style="text-align:center; color:#555; font-style:italic;">
-🎯 Nắm chắc các dạng bài trên nghĩa là bạn đã khai thác tối đa sức mạnh của deque.
-</p>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

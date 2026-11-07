@@ -1,42 +1,669 @@
-<article class="space-y-6">
-  <nav aria-label="Breadcrumb" class="text-sm text-gray-500">
-    <a class="text-indigo-600 font-semibold hover:underline" href="/#roadmap">Roadmap</a>
-    <span class="mx-2">/</span>
-    <a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/5/">Chương 5</a>
-    <span class="mx-2">/</span>
-    <span>5.3</span>
-  </nav>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.bt-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;
+margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.bt-page *{box-sizing:border-box}.bt-page h1,.bt-page h2,.bt-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1160px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1040px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.step-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.flow-step{padding:13px;border:2px solid #c7d2fe;border-radius:14px;background:#eef2ff;text-align:center;font-weight:900;color:#312e81}.flow-step.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.flow-step.done{background:#dcfce7;border-color:#22c55e;color:#166534}
+.choice-row{display:flex;gap:8px;flex-wrap:wrap}.choice{padding:9px 12px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:900}.choice.active{background:#ffedd5;border-color:#f97316}.choice.good{background:#dcfce7;border-color:#22c55e;color:#166534}.choice.bad{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.tree-area{min-height:320px;padding:14px;border:2px dashed #bfdbfe;border-radius:16px;background:#f8fafc;overflow:auto}.tree-level{display:flex;justify-content:center;gap:10px;margin:12px 0}.tree-node{min-width:105px;padding:9px 12px;border:2px solid #c7d2fe;border-radius:12px;background:#eef2ff;text-align:center;font-weight:900;color:#312e81}.tree-node.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.tree-node.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.tree-node.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}.tree-node small{display:block;color:#64748b;font-size:.72rem}
+.board{display:grid;gap:2px;justify-content:start;padding:10px}.square{width:52px;height:52px;border:1px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:1.65rem;font-weight:900}.square.light{background:#eef2ff}.square.dark{background:#c7d2fe}.square.queen{background:#dcfce7;border-color:#22c55e}.square.attack{background:#fee2e2;border-color:#ef4444}.square.try{outline:4px solid #f97316}
+.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.domain-card{padding:11px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff}.domain-card.active{background:#ffedd5;border-color:#f97316}.domain-card.assigned{background:#dcfce7;border-color:#22c55e}.domain-card.fail{background:#fee2e2;border-color:#ef4444}.domain-values{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.domain-value{padding:5px 8px;border-radius:9px;background:#fff;border:1px solid #cbd5e1;font-weight:900}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}
+.log{min-height:130px;max-height:400px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.bt-page pre{margin:0;padding:20px;max-height:740px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.bt-page p code,.bt-page li code,.bt-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.bt-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3,.step-flow{grid-template-columns:1fr}.bt-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.tree-level{justify-content:flex-start}.square{width:42px;height:42px}}
+</style>
 
-  <header>
-    <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Mục 5.3</p>
-    <h1 class="text-3xl font-bold text-gray-900 mt-2">Quay lui, cắt nhánh và CSP</h1>
-    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 mt-4">Đang biên soạn</span>
-  </header>
+<div class="bt-page">
+<div class="hero">
+  <span class="badge">Chương 5.3 • Backtracking & CSP</span>
+  <h1>🧠 Quay lui, cắt nhánh và CSP</h1>
+  <p>Quay lui thử từng lựa chọn, kiểm tra ràng buộc, đi sâu và hoàn tác. Cắt nhánh giúp bỏ sớm những trạng thái chắc chắn vô ích. CSP mở rộng tư duy này bằng biến, miền giá trị và ràng buộc, cùng các chiến lược như MRV, forward checking và symmetry breaking.</p>
+  <div class="stats">
+    <div class="stat"><b>Choose</b><span>Chọn một giá trị</span></div>
+    <div class="stat"><b>Check</b><span>Kiểm tra ràng buộc</span></div>
+    <div class="stat"><b>Prune</b><span>Cắt nhánh vô ích</span></div>
+    <div class="stat"><b>Undo</b><span>Hoàn tác trạng thái</span></div>
+  </div>
+</div>
 
-  <section class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-gray-700">
-    <p>Nội dung bài học đang được biên soạn. Trang này được tạo tạm để bảo đảm liên kết trong lộ trình hoạt động.</p>
-  </section>
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#pattern">Mẫu quay lui</a><a href="#tree">Cây tìm kiếm</a><a href="#pruning">Cắt nhánh</a><a href="#ordering">Thứ tự nhánh</a><a href="#csp">CSP</a><a href="#mrv">MRV/Forward</a><a href="#nqueen">N-Queens</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
 
-  <section>
-    <h2 class="text-xl font-semibold text-gray-800 mb-3">Nội dung dự kiến</h2>
-    <ul class="list-disc pl-6 space-y-2 text-gray-700">
-      <li>Choose – check – recurse – undo</li>
-      <li>Pruning</li>
-      <li>Branch ordering</li>
-      <li>Symmetry breaking</li>
-      <li>Forward checking</li>
-      <li>MRV</li>
-      <li>N-Queens</li>
-      <li>Sudoku</li>
-    </ul>
-    <h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Bài toán minh họa đã có</h2>
-    <ul class="list-disc pl-6 space-y-2 text-gray-700">
-      <li><a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/7/topic/2/">N-Queens</a></li>
-      <li><a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/7/topic/3/">Sudoku Solver</a></li>
-    </ul>
-  </section>
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Mẫu <code>choose → check → recurse → undo</code>.</li><li>Khác nhau giữa quay lui thuần và quay lui có cắt nhánh.</li><li>Branch ordering và symmetry breaking.</li><li>CSP gồm biến, miền giá trị và ràng buộc.</li><li>Forward checking và MRV.</li></ul></div>
+    <div class="box"><h3>Cần làm được</h3><ul><li>Viết quay lui sinh cấu hình hợp lệ.</li><li>Cắt nhánh theo ràng buộc và cận.</li><li>Sắp thứ tự thử để tìm nghiệm sớm.</li><li>Mô hình hóa bài toán thành CSP.</li><li>Giải N-Queens bằng mảng đánh dấu.</li></ul></div>
+  </div>
+</section>
 
-  <p>
-    <a class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700" href="/roadmap/stage/5/">⬅️ Quay lại Chương 5</a>
-  </p>
-</article>
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Đặt n quân hậu lên bàn cờ n×n sao cho không có hai quân hậu cùng hàng, cùng cột hoặc cùng đường chéo.
+  </div>
+
+  <p>Nếu thử mọi cách chọn n ô trong n² ô, số trường hợp rất lớn. Ta khai thác ràng buộc:</p>
+  <ul>
+    <li>Mỗi hàng chỉ đặt đúng một quân hậu.</li>
+    <li>Khi đang đặt ở hàng r, chỉ thử các cột chưa bị chiếm.</li>
+    <li>Nếu cột hoặc đường chéo xung đột, bỏ nhánh ngay.</li>
+  </ul>
+
+  <div class="formula">Không sinh mọi bàn cờ → chỉ sinh các trạng thái còn có khả năng thành nghiệm</div>
+
+  <div class="call ok"><b>Ý tưởng:</b> xây lời giải từng bước; phát hiện sai càng sớm thì càng tiết kiệm nhiều nhánh phía dưới.</div>
+</section>
+
+<section class="card" id="pattern">
+  <h2>2. Mẫu quay lui chuẩn</h2>
+
+  <div class="step-flow">
+    <div class="flow-step" id="flowChoose">1. Choose<br><small>chọn giá trị</small></div>
+    <div class="flow-step" id="flowCheck">2. Check<br><small>kiểm tra hợp lệ</small></div>
+    <div class="flow-step" id="flowRecurse">3. Recurse<br><small>đi tới biến tiếp</small></div>
+    <div class="flow-step" id="flowUndo">4. Undo<br><small>hoàn tác</small></div>
+  </div>
+
+  <div class="g2">
+    <div class="box">
+      <pre><code>void backtrack(int position) {
+    if (position == n) {
+        recordAnswer();
+        return;
+    }
+
+    for (Value value : candidates(position)) {
+        choose(value);
+
+        if (valid()) {
+            backtrack(position + 1);
+        }
+
+        undo(value);
+    }
+}</code></pre>
+    </div>
+    <div class="box">
+      <h3>Ý nghĩa</h3>
+      <ul>
+        <li><b>Choose:</b> thay đổi trạng thái hiện tại.</li>
+        <li><b>Check:</b> loại trạng thái vi phạm.</li>
+        <li><b>Recurse:</b> giải phần còn lại.</li>
+        <li><b>Undo:</b> trả trạng thái về trước lựa chọn.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="call bad"><b>Quên undo</b> làm trạng thái của nhánh trước “rò rỉ” sang nhánh sau và cho kết quả sai.</div>
+</section>
+
+<section class="card" id="tree">
+  <h2>3. Mô phỏng cây tìm kiếm</h2>
+
+  <div class="call">
+    Bài toán minh họa: chọn các số trong {1,2,3,4} sao cho tổng không vượt quá S.
+  </div>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Giới hạn S</b></label><input class="input" id="treeLimit" value="5">
+      <div class="controls">
+        <button class="btn" id="treeNextBtn">Bước tiếp</button>
+        <button class="btn orange" id="treeAutoBtn">Tự chạy</button>
+        <button class="btn alt" id="treeResetBtn">Làm lại</button>
+      </div>
+      <div class="choice-row" id="treeChoices"></div>
+      <div class="log" id="treeLog"></div>
+    </div>
+    <div class="tree-area" id="searchTree"></div>
+  </div>
+</section>
+
+<section class="card" id="pruning">
+  <h2>4. Cắt nhánh – Pruning</h2>
+
+  <div class="g3">
+    <div class="box"><h3>Vi phạm ràng buộc</h3><p>Nếu tổng hiện tại đã vượt S, không cần đi sâu.</p></div>
+    <div class="box"><h3>Cận tối ưu</h3><p>Nếu ngay cả trường hợp tốt nhất còn lại cũng không thắng đáp án hiện tại, bỏ nhánh.</p></div>
+    <div class="box"><h3>Miền rỗng</h3><p>Nếu một biến chưa gán không còn giá trị hợp lệ, quay lui ngay.</p></div>
+  </div>
+
+  <div class="formula">Pruning đúng phải loại nhánh chắc chắn không chứa nghiệm cần tìm</div>
+
+  <div class="call warn"><b>Cắt nhánh càng mạnh không phải lúc nào càng tốt.</b> Điều kiện cắt phải đúng và chi phí kiểm tra cắt nhánh không nên quá lớn.</div>
+</section>
+
+<section class="card" id="ordering">
+  <h2>5. Branch ordering và symmetry breaking</h2>
+
+  <div class="g2">
+    <div class="box">
+      <h3>Branch ordering</h3>
+      <p>Thử lựa chọn hứa hẹn trước để tìm nghiệm tốt sớm. Trong bài tối ưu, nghiệm tốt sớm tạo cận mạnh hơn.</p>
+      <ul><li>Thử giá trị lớn trước trong bài tối đa hóa.</li><li>Thử ô có ít lựa chọn trước.</li><li>Ưu tiên nước đi gây nhiều ràng buộc.</li></ul>
+    </div>
+    <div class="box">
+      <h3>Symmetry breaking</h3>
+      <p>Loại các nghiệm tương đương do đối xứng để tránh duyệt lặp.</p>
+      <ul><li>N-Queens: có thể cố định hậu hàng đầu ở nửa bàn cờ.</li><li>Phân nhóm giống nhau: ép thứ tự nhóm.</li><li>Hoán vị có phần tử trùng: bỏ lựa chọn trùng ở cùng mức.</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="csp">
+  <h2>6. CSP – Constraint Satisfaction Problem</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Thành phần</th><th>Ý nghĩa</th><th>Ví dụ Sudoku</th><th>Ví dụ N-Queens</th></tr>
+    <tr><td>Variables</td><td>Các biến cần gán</td><td>Các ô trống</td><td>Hàng 0..n−1</td></tr>
+    <tr><td>Domains</td><td>Giá trị có thể gán</td><td>1..9 còn hợp lệ</td><td>Các cột chưa xung đột</td></tr>
+    <tr><td>Constraints</td><td>Điều kiện phải thỏa</td><td>Không trùng hàng/cột/khối</td><td>Không cùng cột/chéo</td></tr>
+    <tr><td>Assignment</td><td>Trạng thái gán hiện tại</td><td>Một số ô đã điền</td><td>Một số hàng đã đặt hậu</td></tr>
+  </table></div>
+
+  <div class="call ok"><b>Tư duy CSP:</b> chọn biến nào trước, thử giá trị nào trước, và cập nhật miền các biến còn lại.</div>
+</section>
+
+<section class="card" id="mrv">
+  <h2>7. MRV và Forward Checking</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Chế độ chọn biến</b></label>
+      <select class="select" id="cspMode">
+        <option value="normal">Theo thứ tự A → B → C → D</option>
+        <option value="mrv">MRV: miền nhỏ nhất trước</option>
+      </select>
+      <div class="controls">
+        <button class="btn" id="cspNextBtn">Gán bước tiếp</button>
+        <button class="btn orange" id="cspForwardBtn">Forward checking</button>
+        <button class="btn alt" id="cspResetBtn">Làm lại</button>
+      </div>
+      <div class="domain-grid" id="domainGrid"></div>
+    </div>
+    <div class="log" id="cspLog"></div>
+  </div>
+
+  <div class="g2">
+    <div class="call"><b>MRV:</b> chọn biến có số giá trị hợp lệ ít nhất để phát hiện bế tắc sớm.</div>
+    <div class="call"><b>Forward checking:</b> sau khi gán, loại giá trị xung đột khỏi miền các biến chưa gán.</div>
+  </div>
+</section>
+
+<section class="card" id="nqueen">
+  <h2>8. Mô phỏng N-Queens</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Kích thước n</b></label><input class="input" id="queenN" value="5">
+      <div class="controls">
+        <button class="btn" id="queenNextBtn">Bước tiếp</button>
+        <button class="btn orange" id="queenAutoBtn">Tự chạy</button>
+        <button class="btn green" id="queenSolveBtn">Tìm nghiệm ngay</button>
+        <button class="btn alt" id="queenResetBtn">Làm lại</button>
+      </div>
+      <div class="board" id="queenBoard"></div>
+    </div>
+
+    <div class="g2">
+      <div class="code-lines">
+        <div class="code-line" data-q="try">for (int col=0; col&lt;n; col++) {</div>
+        <div class="code-line" data-q="check">if (usedCol[col] || usedDiag1[...] || usedDiag2[...]) continue;</div>
+        <div class="code-line" data-q="choose">place queen; mark constraints;</div>
+        <div class="code-line" data-q="recurse">backtrack(row+1);</div>
+        <div class="code-line" data-q="undo">remove queen; unmark constraints;</div>
+      </div>
+      <div class="log" id="queenLog"></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>9. Phân tích thuật toán</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Kỹ thuật</th><th>Không gian tìm kiếm</th><th>Tác dụng</th></tr>
+    <tr><td>Quay lui thuần</td><td>Có thể gần b^d</td><td>Duyệt mọi lựa chọn hợp lệ theo từng mức.</td></tr>
+    <tr><td>Pruning theo ràng buộc</td><td>Giảm mạnh tùy bài</td><td>Không mở rộng trạng thái đã sai.</td></tr>
+    <tr><td>Branch ordering</td><td>Không đổi worst-case</td><td>Tìm nghiệm tốt sớm hơn.</td></tr>
+    <tr><td>Symmetry breaking</td><td>Giảm trạng thái tương đương</td><td>Tránh nghiệm đối xứng/trùng lặp.</td></tr>
+    <tr><td>MRV</td><td>Không đổi tập nghiệm</td><td>Phát hiện thất bại sớm.</td></tr>
+    <tr><td>Forward checking</td><td>Tốn thêm cập nhật miền</td><td>Cắt nhánh khi miền biến trở thành rỗng.</td></tr>
+  </table></div>
+
+  <div class="call warn"><b>Worst-case vẫn có thể là hàm mũ.</b> Các heuristic thường cải thiện rất lớn trên dữ liệu thực tế nhưng không luôn thay đổi giới hạn xấu nhất.</div>
+</section>
+
+<section class="card" id="code">
+  <h2>10. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="basicCode">Mẫu quay lui</button>
+      <button class="tab-btn" data-tab="sumCode">Cắt nhánh tổng</button>
+      <button class="tab-btn" data-tab="queenCode">N-Queens</button>
+      <button class="tab-btn" data-tab="permCode">Bỏ trùng</button>
+      <button class="tab-btn" data-tab="sudokuCode">Sudoku + MRV</button>
+    </div>
+
+    <div class="panel active" id="basicCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; current;
+
+void backtrack(int position, int n) {
+    if (position == n) {
+        for (int value : current) {
+            cout &lt;&lt; value;
+        }
+        cout &lt;&lt; '\n';
+        return;
+    }
+
+    for (int value : {0, 1}) {
+        current.push_back(value);
+
+        backtrack(position + 1, n);
+
+        current.pop_back();
+    }
+}</code></pre></div>
+
+    <div class="panel" id="sumCode"><button class="copy">Sao chép</button><pre><code>vector&lt;int&gt; a;
+int limitValue;
+vector&lt;int&gt; chosen;
+
+void generate(int index, int currentSum) {
+    if (currentSum &gt; limitValue) {
+        return; // Pruning.
+    }
+
+    if (index == (int)a.size()) {
+        // Ghi nhận cấu hình hợp lệ.
+        return;
+    }
+
+    // Không chọn a[index].
+    generate(index + 1, currentSum);
+
+    // Chọn a[index].
+    chosen.push_back(a[index]);
+
+    generate(
+        index + 1,
+        currentSum + a[index]
+    );
+
+    chosen.pop_back();
+}</code></pre></div>
+
+    <div class="panel" id="queenCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int n;
+vector&lt;int&gt; queenColumn;
+vector&lt;bool&gt; usedColumn;
+vector&lt;bool&gt; usedDiagonal1;
+vector&lt;bool&gt; usedDiagonal2;
+
+bool solve(int row) {
+    if (row == n) {
+        return true;
+    }
+
+    for (int column = 0;
+         column &lt; n;
+         column++) {
+        int diagonal1 = row - column + n - 1;
+        int diagonal2 = row + column;
+
+        if (usedColumn[column]
+            || usedDiagonal1[diagonal1]
+            || usedDiagonal2[diagonal2]) {
+            continue;
+        }
+
+        queenColumn[row] = column;
+        usedColumn[column] = true;
+        usedDiagonal1[diagonal1] = true;
+        usedDiagonal2[diagonal2] = true;
+
+        if (solve(row + 1)) {
+            return true;
+        }
+
+        usedColumn[column] = false;
+        usedDiagonal1[diagonal1] = false;
+        usedDiagonal2[diagonal2] = false;
+    }
+
+    return false;
+}</code></pre></div>
+
+    <div class="panel" id="permCode"><button class="copy">Sao chép</button><pre><code>sort(a.begin(), a.end());
+
+for (int i = 0; i &lt; (int)a.size(); i++) {
+    if (used[i]) continue;
+
+    if (i &gt; 0
+        &amp;&amp; a[i] == a[i - 1]
+        &amp;&amp; !used[i - 1]) {
+        continue;
+    }
+
+    used[i] = true;
+    current.push_back(a[i]);
+
+    backtrack();
+
+    current.pop_back();
+    used[i] = false;
+}</code></pre></div>
+
+    <div class="panel" id="sudokuCode"><button class="copy">Sao chép</button><pre><code>bool solveSudoku() {
+    int bestRow = -1;
+    int bestColumn = -1;
+    vector&lt;int&gt; bestCandidates;
+
+    for (int row = 0; row &lt; 9; row++) {
+        for (int column = 0; column &lt; 9; column++) {
+            if (board[row][column] != 0) continue;
+
+            vector&lt;int&gt; candidates
+                = getCandidates(row, column);
+
+            if (candidates.empty()) {
+                return false;
+            }
+
+            if (bestRow == -1
+                || candidates.size()
+                   &lt; bestCandidates.size()) {
+                bestRow = row;
+                bestColumn = column;
+                bestCandidates = candidates;
+            }
+        }
+    }
+
+    if (bestRow == -1) {
+        return true;
+    }
+
+    for (int value : bestCandidates) {
+        board[bestRow][bestColumn] = value;
+
+        if (solveSudoku()) {
+            return true;
+        }
+
+        board[bestRow][bestColumn] = 0;
+    }
+
+    return false;
+}</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>11. Giải thích code</h2>
+
+  <h3>11.1. Vì sao kiểm tra ràng buộc trước khi gọi sâu?</h3>
+  <p>Một trạng thái đã sai thì mọi trạng thái mở rộng từ nó cũng sai. Dừng sớm tránh sinh cả cây con vô ích.</p>
+
+  <h3>11.2. Vì sao N-Queens dùng ba mảng đánh dấu?</h3>
+  <p><code>usedColumn</code> kiểm tra cột; <code>row-column+n-1</code> xác định đường chéo chính; <code>row+column</code> xác định đường chéo phụ. Mỗi kiểm tra chỉ O(1).</p>
+
+  <h3>11.3. Vì sao solve trả về bool?</h3>
+  <p>Khi chỉ cần một nghiệm, trả về true giúp dừng toàn bộ quá trình ngay khi tìm thấy.</p>
+
+  <h3>11.4. MRV giúp gì cho Sudoku?</h3>
+  <p>Ô có ít ứng viên nhất được thử trước. Nếu ô đó không có ứng viên, nhánh bị loại ngay; nếu chỉ có một ứng viên, lựa chọn gần như bắt buộc.</p>
+
+  <h3>11.5. Forward checking khác kiểm tra hợp lệ thông thường thế nào?</h3>
+  <p>Kiểm tra thông thường chỉ xác nhận gán hiện tại không vi phạm. Forward checking còn cập nhật miền của các biến chưa gán và phát hiện miền rỗng sớm.</p>
+
+  <h3>11.6. Branch ordering có làm đổi đáp án không?</h3>
+  <p>Không, nếu vẫn thử đủ các nhánh cần thiết. Nó chỉ thay đổi thứ tự tìm kiếm và thời điểm tìm thấy nghiệm.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>12. Lỗi thường gặp</h2>
+
+  <ul>
+    <li>Quên hoàn tác trạng thái sau lời gọi đệ quy.</li>
+    <li>Đánh dấu ràng buộc sai chỉ số đường chéo.</li>
+    <li>Cắt nhánh bằng điều kiện chưa chắc chắn, làm mất nghiệm.</li>
+    <li>Không kiểm tra miền rỗng sau forward checking.</li>
+    <li>Dùng MRV nhưng tính miền ứng viên sai.</li>
+    <li>Không xử lý phần tử trùng khi sinh hoán vị.</li>
+    <li>Nhầm branch ordering với pruning.</li>
+    <li>Không dừng sớm khi chỉ cần một nghiệm.</li>
+    <li>Sao chép toàn bộ trạng thái ở mỗi bước gây chậm và tốn bộ nhớ.</li>
+    <li>Không ước lượng kích thước cây tìm kiếm.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>13. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="a"><b>Câu 1.</b> Trình tự cốt lõi của quay lui?<div class="answers"><button class="answer" data-choice="a">Choose → Check → Recurse → Undo</button><button class="answer" data-choice="b">Sort → Print → Exit</button><button class="answer" data-choice="c">Push → Pop → Sort</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> MRV chọn biến nào?<div class="answers"><button class="answer" data-choice="a">Biến đầu tiên</button><button class="answer" data-choice="b">Biến có miền lớn nhất</button><button class="answer" data-choice="c">Biến có miền nhỏ nhất</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="b"><b>Câu 3.</b> Forward checking làm gì?<div class="answers"><button class="answer" data-choice="a">Sắp xếp nghiệm</button><button class="answer" data-choice="b">Loại giá trị xung đột khỏi miền biến chưa gán</button><button class="answer" data-choice="c">Tăng độ sâu đệ quy</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 4.</b> Branch ordering có nhất thiết giảm worst-case không?<div class="answers"><button class="answer" data-choice="a">Không</button><button class="answer" data-choice="b">Có, luôn giảm thành O(n)</button><button class="answer" data-choice="c">Luôn làm tăng số nghiệm</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Sinh xâu nhị phân không có hai số 1 liên tiếp.</li><li>Chọn tập con có tổng không vượt S.</li><li>Liệt kê hoán vị không trùng.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>N-Queens.</li><li>Chia nhóm với ràng buộc.</li><li>Tô màu đồ thị nhỏ.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Sudoku với MRV.</li><li>Branch and Bound cho balô.</li><li>Hamilton path trên đồ thị nhỏ.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>Exact Cover định hướng.</li><li>Constraint propagation.</li><li>Backtracking + memoization.</li></ol></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+
+/* Search tree simulation */
+let tree={states:[],index:0,timer:null,limit:5};
+function buildTreeStates(limit){
+  const values=[1,2,3,4],states=[];
+  function dfs(i,sum,path){
+    states.push({i,sum,path:path.slice(),cut:sum>limit,leaf:i===values.length});
+    if(sum>limit||i===values.length)return;
+    dfs(i+1,sum,path);
+    path.push(values[i]);
+    dfs(i+1,sum+values[i],path);
+    path.pop();
+  }
+  dfs(0,0,[]);
+  return states;
+}
+function resetTree(){
+  if(tree.timer){clearInterval(tree.timer);tree.timer=null}
+  tree.limit=Math.max(0,Number($('#treeLimit').value)||0);
+  tree.states=buildTreeStates(tree.limit);tree.index=0;$('#treeAutoBtn').textContent='Tự chạy';renderTree('Bắt đầu tại gốc.');
+}
+function renderTree(msg){
+  let st=tree.states[tree.index];
+  $('#treeChoices').innerHTML=[1,2,3,4].map((v,i)=>{
+    let cls=i<st.i?(st.path.includes(v)?'good':''):(i===st.i?'active':'');
+    return '<div class="choice '+cls+'">'+v+'</div>';
+  }).join('');
+  $('#treeLog').innerHTML=msg+'<br><b>i='+st.i+', sum='+st.sum+', current={'+st.path.join(',')+'}</b>';
+  let levels=[];
+  tree.states.forEach((s,idx)=>{
+    if(idx>tree.index)return;
+    if(!levels[s.i])levels[s.i]=[];
+    levels[s.i].push({s,idx});
+  });
+  $('#searchTree').innerHTML=levels.map(level=>'<div class="tree-level">'+level.map(({s,idx})=>{
+    let cls=idx===tree.index?'active':s.cut?'cut':s.leaf?'ok':'';
+    return '<div class="tree-node '+cls+'"><small>#'+idx+' i='+s.i+'</small>Σ='+s.sum+'<br>{'+s.path.join(',')+'}</div>';
+  }).join('')+'</div>').join('');
+}
+function stepTree(){
+  if(tree.index>=tree.states.length-1)return renderTree('Đã duyệt hết cây tìm kiếm.');
+  tree.index++;
+  let s=tree.states[tree.index];
+  renderTree(s.cut?'Tổng vượt giới hạn → cắt nhánh.':s.leaf?'Tới lá hợp lệ.':'Mở rộng trạng thái tiếp theo.');
+}
+function autoTree(){
+  if(tree.timer){clearInterval(tree.timer);tree.timer=null;$('#treeAutoBtn').textContent='Tự chạy';return}
+  $('#treeAutoBtn').textContent='Tạm dừng';
+  tree.timer=setInterval(()=>{if(tree.index>=tree.states.length-1){clearInterval(tree.timer);tree.timer=null;$('#treeAutoBtn').textContent='Tự chạy'}else stepTree()},600);
+}
+
+/* CSP simulator */
+let csp={domains:{A:[1,2,3],B:[1,2],C:[2,3],D:[1,2,3]},assigned:{},step:0};
+function resetCsp(){
+  csp={domains:{A:[1,2,3],B:[1,2],C:[2,3],D:[1,2,3]},assigned:{},step:0};
+  renderCsp('Miền ban đầu. Ràng buộc: các biến kề nhau không bằng nhau.');
+}
+function variableOrder(){
+  let unassigned=Object.keys(csp.domains).filter(v=>!(v in csp.assigned));
+  if($('#cspMode').value==='mrv')unassigned.sort((a,b)=>csp.domains[a].length-csp.domains[b].length||a.localeCompare(b));
+  return unassigned;
+}
+function renderCsp(msg,active=null){
+  $('#domainGrid').innerHTML=Object.keys(csp.domains).map(v=>{
+    let cls=v===active?'active':v in csp.assigned?'assigned':csp.domains[v].length===0?'fail':'';
+    return '<div class="domain-card '+cls+'"><b>'+v+(v in csp.assigned?' = '+csp.assigned[v]:'')+'</b><div class="domain-values">'+csp.domains[v].map(x=>'<span class="domain-value">'+x+'</span>').join('')+'</div></div>';
+  }).join('');
+  $('#cspLog').innerHTML=msg+'<br><b>Assigned: '+JSON.stringify(csp.assigned)+'</b>';
+}
+function cspNext(){
+  let order=variableOrder();
+  if(!order.length)return renderCsp('Đã gán hết biến.');
+  let v=order[0];
+  if(!csp.domains[v].length)return renderCsp('Miền của '+v+' rỗng → thất bại, cần quay lui.',v);
+  let value=csp.domains[v][0];
+  csp.assigned[v]=value;csp.domains[v]=[value];
+  renderCsp('Chọn biến '+v+' và gán giá trị '+value+'.',v);
+}
+function forwardCheck(){
+  const edges=[['A','B'],['A','C'],['B','D'],['C','D']];
+  for(const [u,v] of edges){
+    if(u in csp.assigned && !(v in csp.assigned))csp.domains[v]=csp.domains[v].filter(x=>x!==csp.assigned[u]);
+    if(v in csp.assigned && !(u in csp.assigned))csp.domains[u]=csp.domains[u].filter(x=>x!==csp.assigned[v]);
+  }
+  let empty=Object.keys(csp.domains).find(v=>!(v in csp.assigned)&&csp.domains[v].length===0);
+  renderCsp(empty?'Forward checking làm miền '+empty+' rỗng → quay lui.':'Đã loại các giá trị xung đột khỏi miền biến chưa gán.',empty||null);
+}
+
+/* N-Queens simulator */
+let queen={n:5,steps:[],index:0,timer:null};
+function buildQueenSteps(n){
+  const col=Array(n).fill(-1),usedCol=Array(n).fill(false),d1=Array(2*n).fill(false),d2=Array(2*n).fill(false),steps=[];
+  function dfs(row){
+    if(row===n){steps.push({type:'solution',row,col:col.slice()});return true}
+    for(let c=0;c<n;c++){
+      steps.push({type:'try',row,c,col:col.slice()});
+      let a=row-c+n-1,b=row+c;
+      if(usedCol[c]||d1[a]||d2[b]){steps.push({type:'reject',row,c,col:col.slice()});continue}
+      col[row]=c;usedCol[c]=d1[a]=d2[b]=true;
+      steps.push({type:'choose',row,c,col:col.slice()});
+      if(dfs(row+1))return true;
+      usedCol[c]=d1[a]=d2[b]=false;col[row]=-1;
+      steps.push({type:'undo',row,c,col:col.slice()});
+    }
+    return false;
+  }
+  dfs(0);
+  return steps;
+}
+function clearQueenCode(){$$('[data-q]').forEach(x=>x.classList.remove('hl'))}
+function markQueenCode(k){clearQueenCode();let e=$('[data-q="'+k+'"]');if(e)e.classList.add('hl')}
+function resetQueen(){
+  if(queen.timer){clearInterval(queen.timer);queen.timer=null}
+  queen.n=Math.max(4,Math.min(8,Math.trunc(Number($('#queenN').value)||4)));
+  queen.steps=buildQueenSteps(queen.n);queen.index=0;$('#queenAutoBtn').textContent='Tự chạy';renderQueen('Sẵn sàng thử hàng 0.');
+}
+function renderQueen(msg){
+  let st=queen.steps[queen.index]||{type:'try',row:0,c:0,col:Array(queen.n).fill(-1)};
+  $('#queenBoard').style.gridTemplateColumns='repeat('+queen.n+',52px)';
+  let html='';
+  for(let r=0;r<queen.n;r++)for(let c=0;c<queen.n;c++){
+    let cls=(r+c)%2?'dark':'light';
+    if(st.col[r]===c)cls+=' queen';
+    if(st.row===r&&st.c===c)cls+=st.type==='reject'?' attack':' try';
+    html+='<div class="square '+cls+'">'+(st.col[r]===c?'♛':'')+'</div>';
+  }
+  $('#queenBoard').innerHTML=html;
+  $('#queenLog').innerHTML=msg+'<br><b>row='+st.row+', columns=['+st.col.join(',')+']</b>';
+  let map={try:'try',reject:'check',choose:'choose',solution:'recurse',undo:'undo'};
+  markQueenCode(map[st.type]||'try');
+}
+function stepQueen(){
+  if(queen.index>=queen.steps.length-1)return renderQueen('Đã hoàn tất mô phỏng.');
+  queen.index++;
+  let st=queen.steps[queen.index];
+  let msg=st.type==='try'?'Thử đặt hậu tại hàng '+st.row+', cột '+st.c+'.':
+          st.type==='reject'?'Vị trí xung đột → bỏ qua.':
+          st.type==='choose'?'Vị trí hợp lệ → đặt hậu và đi hàng tiếp.':
+          st.type==='undo'?'Nhánh thất bại → gỡ hậu và thử cột khác.':
+          'Đã tìm được một nghiệm.';
+  renderQueen(msg);
+}
+function autoQueen(){
+  if(queen.timer){clearInterval(queen.timer);queen.timer=null;$('#queenAutoBtn').textContent='Tự chạy';return}
+  $('#queenAutoBtn').textContent='Tạm dừng';
+  queen.timer=setInterval(()=>{if(queen.index>=queen.steps.length-1){clearInterval(queen.timer);queen.timer=null;$('#queenAutoBtn').textContent='Tự chạy'}else stepQueen()},500);
+}
+function solveQueenNow(){queen.index=queen.steps.length-1;renderQueen('Đã nhảy tới nghiệm đầu tiên.')}
+
+/* tabs/copy/quiz */
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+
+  $('#treeNextBtn').onclick=stepTree;$('#treeAutoBtn').onclick=autoTree;$('#treeResetBtn').onclick=resetTree;
+  $('#cspNextBtn').onclick=cspNext;$('#cspForwardBtn').onclick=forwardCheck;$('#cspResetBtn').onclick=resetCsp;$('#cspMode').onchange=resetCsp;
+  $('#queenNextBtn').onclick=stepQueen;$('#queenAutoBtn').onclick=autoQueen;$('#queenSolveBtn').onclick=solveQueenNow;$('#queenResetBtn').onclick=resetQueen;
+
+  resetTree();resetCsp();resetQueen();
+
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="if(window.hljs)hljs.highlightAll()"></script>

@@ -1,48 +1,314 @@
-<article class="roadmap-extra-topic">
-  <h1>Euler Tour on Tree</h1>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.euler-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;
+color:var(--ink);
+line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);
+padding:clamp(16px,2.2vw,34px);
+border-radius:0;
+box-sizing:border-box;
+position:relative;
+width:calc(100vw - 24px);
+max-width:none!important;
+margin-left:calc(50% - 50vw + 12px);
+margin-right:calc(50% - 50vw + 12px);
+overflow-x:clip;
+}.euler-page *{box-sizing:border-box}.hero{width:100%;max-width:none;padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1050px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:850px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.tree{position:relative;min-height:410px;border:1px dashed #bfdbfe;border-radius:17px;background:#f8fafc}.tree svg{position:absolute;inset:0;width:100%;height:100%}.edge{stroke:#94a3b8;stroke-width:3}.edge.hot{stroke:var(--o);stroke-width:5}.node{position:absolute;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;background:#eef2ff;border:3px solid #c7d2fe;color:#312e81;font-weight:900;transition:.2s}.node.enter{background:#dcfce7;border-color:#22c55e;color:#166534;transform:scale(1.08)}.node.exit{background:#fee2e2;border-color:#ef4444;color:#991b1b}.node.done{background:#cffafe;border-color:#06b6d4;color:#155e75}.node.sub{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}.node.lca{background:#ffedd5;border-color:#f97316;color:#9a3412;transform:scale(1.1)}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:12px;background:#fff}.log{min-height:115px;max-height:300px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}.row{display:flex;gap:7px;overflow:auto;padding:5px 0}.cell{min-width:61px;padding:7px;border:1px solid #cbd5e1;border-radius:11px;background:#f8fafc;text-align:center;font-weight:900}.cell small{display:block;color:#64748b;font-size:.7rem}.cell.hot{background:#ffedd5;border-color:#fb923c;color:#9a3412}.cell.sub{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}.cell.first{background:#dbeafe;border-color:#3b82f6}.cell.second{background:#dcfce7;border-color:#22c55e}.stack{display:flex;flex-wrap:wrap;gap:7px}.chip{padding:6px 10px;border:1px solid #c7d2fe;border-radius:99px;background:#eef2ff;color:#312e81;font-weight:900}.chip.top{background:#ffedd5;border-color:#fb923c}.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}.euler-page pre{margin:0;padding:20px;max-height:610px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.euler-page p code,.euler-page li code,.euler-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
 
-  <section>
-    <h2>Mục tiêu</h2>
+@media(min-width:1800px){
+  .euler-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}
+}
+@media(max-width:900px){
+  .euler-page{
+    width:100%;
+    margin-left:0;
+    margin-right:0;
+    border-radius:0;
+    padding:12px;
+  }
+}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.tree{min-height:360px}}
+</style>
+
+<div class="euler-page">
+<div class="hero"><span class="badge">Tree Traversal & Flattening</span><h1>🌳 Euler Tour trên cây</h1><p>Biến cây thành dãy để giải truy vấn cây con, kiểm tra tổ tiên, tính tổng bằng Fenwick/Segment Tree và tìm LCA bằng RMQ.</p><div class="stats"><div class="stat"><b>tin / tout</b><span>Thời điểm vào và kết thúc subtree</span></div><div class="stat"><b>Flatten</b><span>Cây con thành một đoạn</span></div><div class="stat"><b>Full Euler</b><span>Dãy dài 2n−1</span></div><div class="stat"><b>LCA + RMQ</b><span>O(1) sau tiền xử lý</span></div></div></div>
+
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav"><a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#types">Các dạng</a><a href="#sim">Mô phỏng</a><a href="#subtree">Subtree</a><a href="#lca">LCA</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#apps">Ứng dụng</a><a href="#quiz">Quiz</a></div></div>
+
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2"><div class="box"><h3>Cần hiểu</h3><ul><li>Ý nghĩa <code>tin[u]</code>, <code>tout[u]</code>, <code>flat[]</code>.</li><li>Vì sao subtree là một đoạn liên tiếp.</li><li>Khác nhau giữa flatten Euler Tour và Full Euler Tour.</li><li>Cách liên kết Euler Tour với Fenwick, Segment Tree, Sparse Table.</li></ul></div><div class="box"><h3>Khi nào dùng?</h3><ul><li>Truy vấn/cập nhật toàn bộ cây con.</li><li>Kiểm tra quan hệ tổ tiên.</li><li>LCA bằng RMQ.</li><li>Chuyển bài toán cây về bài toán mảng.</li></ul></div></div></section>
+
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề: từ truy vấn trên cây đến truy vấn trên mảng</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Cho một cây có <code>n</code> đỉnh, gốc tại đỉnh <code>1</code>. Mỗi đỉnh <code>u</code> có một giá trị
+    <code>value[u]</code>. Có nhiều truy vấn thuộc một trong các dạng:
     <ul>
-      <li>Biến cấu trúc cây thành một thứ tự tuyến tính bằng thời điểm vào/ra DFS.</li>
-      <li>Áp dụng mảng Euler để xử lý truy vấn trên cây con.</li>
-      <li>Kết hợp với Fenwick Tree hoặc Segment Tree cho các bài toán cập nhật/truy vấn nhanh.</li>
+      <li>Tính tổng giá trị của tất cả đỉnh trong cây con của <code>u</code>.</li>
+      <li>Cập nhật giá trị tại một đỉnh.</li>
+      <li>Tăng giá trị của mọi đỉnh trong cây con của <code>u</code>.</li>
+      <li>Kiểm tra <code>u</code> có phải tổ tiên của <code>v</code> hay không.</li>
     </ul>
-  </section>
+  </div>
 
-  <section>
-    <h2>Ý tưởng chính</h2>
-    <p>
-      Khi DFS trên cây, mỗi đỉnh <code>u</code> được gán thời điểm vào <code>tin[u]</code>.
-      Toàn bộ các đỉnh thuộc cây con của <code>u</code> sẽ nằm liên tiếp trong đoạn
-      <code>[tin[u], tout[u]]</code> nếu ta ghi nhận mỗi đỉnh một lần khi đi vào.
-    </p>
-  </section>
+  <h3>1.1. Cách làm trực tiếp</h3>
+  <p>
+    Với mỗi truy vấn cây con của <code>u</code>, ta có thể DFS từ <code>u</code> để duyệt toàn bộ hậu duệ.
+    Cách này đúng nhưng trong trường hợp xấu có thể phải đi qua gần như toàn bộ cây.
+  </p>
 
-  <section>
-    <h2>Mẫu cài đặt C++</h2>
-    <pre><code>int timer = 0;
-vector&lt;vector&lt;int&gt;&gt; g;
-vector&lt;int&gt; tin, tout, order;
+  <div class="table-wrap">
+    <table class="tbl">
+      <tr>
+        <th>Cách làm</th>
+        <th>Mỗi truy vấn</th>
+        <th>Tổng với q truy vấn</th>
+        <th>Đánh giá</th>
+      </tr>
+      <tr>
+        <td>DFS lại từ đỉnh u</td>
+        <td>O(size of subtree)</td>
+        <td>Có thể tới O(nq)</td>
+        <td>Dễ TLE khi n, q lớn</td>
+      </tr>
+      <tr>
+        <td>Euler Tour + Fenwick/Segment Tree</td>
+        <td>O(log n)</td>
+        <td>O((n+q)log n)</td>
+        <td>Phù hợp dữ liệu lớn</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>1.2. Khó khăn cốt lõi</h3>
+  <p>
+    Fenwick Tree, Segment Tree và Prefix Sum đều hoạt động trên <b>mảng</b>, trong khi dữ liệu ban đầu lại là một
+    <b>cây</b>. Vì vậy cần tìm cách đánh số các đỉnh sao cho toàn bộ cây con của một đỉnh trở thành một đoạn liên tiếp.
+  </p>
+
+  <div class="formula">
+    Cần biến subtree(u) thành một đoạn [L, R] trên mảng
+  </div>
+
+  <h3>1.3. Ý tưởng Euler Tour</h3>
+  <p>
+    Ta chạy DFS từ gốc. Ngay khi đi vào một đỉnh <code>u</code>, gán cho nó vị trí tiếp theo trong một mảng.
+    Do DFS luôn duyệt xong toàn bộ cây con của <code>u</code> trước khi quay ra ngoài, các đỉnh trong cây con của
+    <code>u</code> sẽ nằm liên tiếp.
+  </p>
+
+  <div class="g3">
+    <div class="box">
+      <h3>Bước 1</h3>
+      <p>DFS từ gốc và ghi thứ tự các đỉnh khi đi vào.</p>
+    </div>
+    <div class="box">
+      <h3>Bước 2</h3>
+      <p>Lưu <code>tin[u]</code> là vị trí đầu và <code>tout[u]</code> là vị trí cuối của subtree.</p>
+    </div>
+    <div class="box">
+      <h3>Bước 3</h3>
+      <p>Chuyển truy vấn subtree thành truy vấn đoạn <code>[tin[u], tout[u]]</code>.</p>
+    </div>
+  </div>
+
+  <h3>1.4. Ví dụ nhanh</h3>
+  <p>
+    Với cây mẫu, thứ tự vào DFS là:
+  </p>
+  <div class="formula">flat = [1, 2, 4, 5, 3, 6, 7]</div>
+  <ul>
+    <li>Cây con của đỉnh <code>2</code> gồm <code>{2,4,5}</code>, tương ứng đoạn <code>[1,3]</code>.</li>
+    <li>Cây con của đỉnh <code>3</code> gồm <code>{3,6,7}</code>, tương ứng đoạn <code>[4,6]</code>.</li>
+    <li>Cây con của đỉnh <code>1</code> là toàn bộ cây, tương ứng đoạn <code>[0,6]</code>.</li>
+  </ul>
+
+  <div class="call ok">
+    <b>Kết luận đặt vấn đề:</b> Euler Tour không trực tiếp trả lời truy vấn.
+    Nó là bước chuyển đổi cây thành mảng để các cấu trúc dữ liệu trên đoạn có thể được áp dụng.
+  </div>
+</section>
+
+
+<section class="card" id="types"><h2>2. Ba cách ghi Euler Tour thường gặp</h2><div class="table-wrap"><table class="tbl"><tr><th>Dạng</th><th>Cách ghi</th><th>Độ dài</th><th>Dùng cho</th></tr><tr><td>Entry order / Flatten</td><td>Mỗi đỉnh được ghi một lần khi DFS đi vào.</td><td>n</td><td>Subtree query/update.</td></tr><tr><td>Full Euler Tour</td><td>Ghi đỉnh khi đi vào và khi quay lại từ con.</td><td>2n−1</td><td>LCA bằng RMQ.</td></tr><tr><td>Entry/Exit events</td><td>Mỗi đỉnh có sự kiện vào và ra.</td><td>2n sự kiện</td><td>Offline query, ancestor check.</td></tr></table></div><div class="call warn"><b>Chú ý:</b> đây không phải cùng một dãy. Chúng đều sinh từ DFS nhưng phục vụ mục đích khác nhau.</div></section>
+
+<section class="card" id="sim"><h2>3. Mô phỏng DFS Euler Tour</h2><p>Cây mẫu có các cạnh: <code>1-2, 1-3, 2-4, 2-5, 3-6, 3-7</code>.</p><div class="g2"><div class="visual"><div class="tree" id="tree"></div><div class="controls"><button class="btn" id="next">Bước tiếp</button><button class="btn alt" id="reset">Làm lại</button><button class="btn" id="auto">Tự chạy</button></div></div><div><div class="log" id="tourLog"></div><h3>Stack DFS</h3><div class="stack" id="stack"></div><h3>Flatten</h3><div class="row" id="flat"></div><h3>tin / tout</h3><div class="row" id="times"></div></div></div></section>
+
+<section class="card" id="subtree"><h2>4. Cây con trở thành một đoạn</h2><p>DFS phải duyệt xong toàn bộ hậu duệ của <code>u</code> trước khi quay ra ngoài, nên các đỉnh trong subtree của <code>u</code> nằm liên tiếp.</p><div class="formula">subtree(u) ↔ flat[tin[u] ... tout[u]]</div><div class="g2"><div class="visual"><label>Chọn đỉnh u</label><select class="select" id="subSel"></select><div class="controls"><button class="btn green" id="showSub">Tô cây con</button></div><div class="row" id="subRow"></div></div><div class="log" id="subLog"></div></div><div class="call ok"><b>Hệ quả:</b> đặt <code>base[tin[u]] = value[u]</code>. Tổng cây con của u chính là tổng đoạn <code>[tin[u], tout[u]]</code>.</div></section>
+
+<section class="card" id="lca"><h2>5. Full Euler Tour và LCA bằng RMQ</h2><div class="formula">1, 2, 4, 2, 5, 2, 1, 3, 6, 3, 7, 3, 1</div><p>Giữa lần xuất hiện đầu tiên của u và v, đỉnh có độ sâu nhỏ nhất chính là LCA.</p><div class="g2"><div class="visual"><label>u</label><select class="select" id="uSel"></select><label>v</label><select class="select" id="vSel"></select><div class="controls"><button class="btn" id="findLca">Tìm LCA</button></div><div class="row" id="eulerRow"></div></div><div class="log" id="lcaLog"></div></div></section>
+
+<section class="card" id="analysis"><h2>6. Phân tích thuật toán</h2><div class="table-wrap"><table class="tbl"><tr><th>Thành phần</th><th>Thời gian</th><th>Bộ nhớ</th><th>Ghi chú</th></tr><tr><td>DFS tạo tin/tout</td><td>O(n)</td><td>O(n)</td><td>Mỗi cạnh được duyệt hai lần.</td></tr><tr><td>Flatten subtree</td><td>O(n)</td><td>O(n)</td><td>Mỗi đỉnh ghi một lần.</td></tr><tr><td>Full Euler Tour</td><td>O(n)</td><td>O(n)</td><td>Dãy dài 2n−1.</td></tr><tr><td>LCA + Sparse Table</td><td>Build O(n log n), query O(1)</td><td>O(n log n)</td><td>RMQ trên độ sâu.</td></tr><tr><td>Subtree sum + Fenwick</td><td>O(log n)/query-update</td><td>O(n)</td><td>Truy vấn đoạn tin..tout.</td></tr></table></div></section>
+
+<section class="card" id="code"><h2>7. Code mẫu</h2><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="flatCpp">C++ Flatten</button><button class="tab-btn" data-tab="iterCpp">C++ Iterative</button><button class="tab-btn" data-tab="fullCpp">C++ Full Euler</button><button class="tab-btn" data-tab="pyFlat">Python</button></div>
+<div class="panel active" id="flatCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int n, timerDFS = 0;
+vector&lt;vector&lt;int&gt;&gt; adj;
+vector&lt;int&gt; tin, tout, flat;
 
 void dfs(int u, int parent) {
-    tin[u] = ++timer;
-    order[timer] = u;
-    for (int v : g[u]) {
+    tin[u] = timerDFS;
+    flat[timerDFS] = u;
+    timerDFS++;
+
+    for (int v : adj[u]) {
         if (v == parent) continue;
         dfs(v, u);
     }
-    tout[u] = timer;
-}</code></pre>
-  </section>
 
-  <section>
-    <h2>Bài toán thường gặp</h2>
-    <ul>
-      <li>Tính tổng giá trị trong cây con của một đỉnh.</li>
-      <li>Cập nhật giá trị một đỉnh và truy vấn cây con.</li>
-      <li>Đếm số đỉnh thỏa điều kiện trong subtree.</li>
-      <li>Làm nền tảng cho LCA, HLD hoặc DSU on Tree.</li>
-    </ul>
-  </section>
-</article>
+    tout[u] = timerDFS - 1;
+}
+
+int main() {
+    cin &gt;&gt; n;
+    adj.assign(n + 1, {});
+    tin.assign(n + 1, 0);
+    tout.assign(n + 1, 0);
+    flat.assign(n, 0);
+
+    for (int i = 1; i &lt; n; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    dfs(1, 0);
+}</code></pre></div>
+<div class="panel" id="iterCpp"><button class="copy">Sao chép</button><pre><code>struct Event {
+    int u, parent;
+    bool isExit;
+};
+
+void eulerIterative(int root) {
+    int timerDFS = 0;
+    vector&lt;Event&gt; st;
+    st.push_back({root, 0, false});
+
+    while (!st.empty()) {
+        Event cur = st.back();
+        st.pop_back();
+
+        if (cur.isExit) {
+            tout[cur.u] = timerDFS - 1;
+            continue;
+        }
+
+        tin[cur.u] = timerDFS;
+        flat[timerDFS++] = cur.u;
+
+        st.push_back({cur.u, cur.parent, true});
+
+        for (int i = (int)adj[cur.u].size() - 1; i &gt;= 0; i--) {
+            int v = adj[cur.u][i];
+            if (v == cur.parent) continue;
+            st.push_back({v, cur.u, false});
+        }
+    }
+}</code></pre></div>
+<div class="panel" id="fullCpp"><button class="copy">Sao chép</button><pre><code>vector&lt;int&gt; firstPos, depth;
+vector&lt;int&gt; euler, eulerDepth;
+
+void dfsEuler(int u, int parent, int dep) {
+    depth[u] = dep;
+
+    if (firstPos[u] == -1)
+        firstPos[u] = (int)euler.size();
+
+    euler.push_back(u);
+    eulerDepth.push_back(dep);
+
+    for (int v : adj[u]) {
+        if (v == parent) continue;
+
+        dfsEuler(v, u, dep + 1);
+
+        euler.push_back(u);
+        eulerDepth.push_back(dep);
+    }
+}</code></pre></div>
+<div class="panel" id="pyFlat"><button class="copy">Sao chép</button><pre><code>def euler_flatten(adj, root=1):
+    n = len(adj) - 1
+    tin = [0] * (n + 1)
+    tout = [0] * (n + 1)
+    flat = [0] * n
+    timer = 0
+
+    def dfs(u, parent):
+        nonlocal timer
+
+        tin[u] = timer
+        flat[timer] = u
+        timer += 1
+
+        for v in adj[u]:
+            if v != parent:
+                dfs(v, u)
+
+        tout[u] = timer - 1
+
+    dfs(root, 0)
+    return tin, tout, flat</code></pre></div></div>
+
+<h3>7.1. Fenwick Tree + Euler Tour</h3><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="fenCode">C++</button></div><div class="panel active" id="fenCode"><button class="copy">Sao chép</button><pre><code>// Lưu value[u] tại vị trí tin[u].
+for (int u = 1; u &lt;= n; u++)
+    bit.add(tin[u], value[u]);
+
+// Cập nhật giá trị một đỉnh:
+bit.add(tin[u], delta);
+
+// Tổng cây con u:
+long long subtreeSum = bit.rangeSum(tin[u], tout[u]);</code></pre></div></div></section>
+
+<section class="card" id="explain"><h2>8. Giải thích code</h2><h3>Vì sao gán tin trước khi duyệt con?</h3><p><code>tin[u]</code> phải là vị trí đầu tiên của subtree u, nên được gán ngay khi DFS bước vào u.</p><h3>Vì sao tout = timer − 1?</h3><p>Sau khi duyệt xong subtree, timer đang chỉ vị trí trống tiếp theo. Vị trí cuối subtree là vị trí trước đó.</p><h3>Vì sao bỏ qua parent?</h3><div class="call warn">Cây lưu cạnh hai chiều. Nếu không bỏ qua cha, DFS sẽ quay ngược và lặp vô hạn.</div><h3>Kiểm tra tổ tiên</h3><div class="formula">u là tổ tiên của v ⇔ tin[u] ≤ tin[v] và tout[v] ≤ tout[u]</div><h3>Vì sao LCA trở thành RMQ?</h3><p>Trong Full Euler Tour, đoạn giữa first[u] và first[v] mô tả quá trình DFS đi qua vùng nối hai nhánh. Đỉnh có depth nhỏ nhất trên đoạn là tổ tiên chung thấp nhất.</p></section>
+
+<section class="card" id="apps"><h2>9. Ứng dụng và mở rộng</h2><div class="g3"><div class="box"><h3>Subtree query</h3><p>Fenwick/Segment Tree trên đoạn tin..tout.</p></div><div class="box"><h3>Subtree update</h3><p>Lazy Segment Tree để range add/range assign.</p></div><div class="box"><h3>LCA</h3><p>Euler Tour + Sparse Table hoặc Binary Lifting.</p></div><div class="box"><h3>Path query</h3><p>Euler Tour đơn thuần chưa đủ; thường dùng HLD.</p></div><div class="box"><h3>Mo on Trees</h3><p>Dùng Euler Tour hai lần xuất hiện cho truy vấn offline.</p></div><div class="box"><h3>DSU on Tree</h3><p>Kết hợp size subtree và thứ tự DFS để xử lý màu/tần suất.</p></div></div><div class="call bad"><b>Lỗi phổ biến:</b> cho rằng mọi đường đi u-v đều là một đoạn liên tiếp trong flatten array. Chỉ subtree mới luôn là một đoạn.</div></section>
+
+<section class="card" id="quiz"><h2>10. Quiz và bài tập</h2>
+<div class="quiz" data-answer="b"><b>Câu 1.</b> Subtree u tương ứng đoạn nào?<div class="answers"><button class="answer" data-choice="a">[depth[u], parent[u]]</button><button class="answer" data-choice="b">[tin[u], tout[u]]</button><button class="answer" data-choice="c">[1,u]</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="c"><b>Câu 2.</b> Full Euler Tour của cây n đỉnh có độ dài?<div class="answers"><button class="answer" data-choice="a">n</button><button class="answer" data-choice="b">2n</button><button class="answer" data-choice="c">2n−1</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="a"><b>Câu 3.</b> Tổng subtree có update điểm nên kết hợp với?<div class="answers"><button class="answer" data-choice="a">Fenwick hoặc Segment Tree</button><button class="answer" data-choice="b">Binary Search</button><button class="answer" data-choice="c">DSU cơ bản</button></div><div class="feedback"></div></div>
+<div class="g2"><div class="box"><h3>Cơ bản</h3><ol><li>In tin/tout.</li><li>Kiểm tra tổ tiên.</li><li>Liệt kê subtree.</li></ol></div><div class="box"><h3>Trung bình</h3><ol><li>Subtree sum + Fenwick.</li><li>Update điểm, query subtree.</li><li>LCA + Sparse Table.</li></ol></div><div class="box"><h3>Nâng cao</h3><ol><li>Subtree range add.</li><li>Mo on Trees.</li><li>Đếm màu phân biệt trong subtree.</li></ol></div><div class="box"><h3>HSG</h3><ol><li>Virtual Tree.</li><li>HLD + Euler Tour.</li><li>Dynamic Euler Tour Tree.</li></ol></div></div></section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+const pos={1:[50,8],2:[28,34],3:[72,34],4:[15,68],5:[40,68],6:[60,68],7:[85,68]};
+const edges=[[1,2],[1,3],[2,4],[2,5],[3,6],[3,7]];
+const par={1:0,2:1,3:1,4:2,5:2,6:3,7:3},dep={1:0,2:1,3:1,4:2,5:2,6:2,7:2};
+const flat=[1,2,4,5,3,6,7],tin={1:0,2:1,4:2,5:3,3:4,6:5,7:6},tout={1:6,2:3,4:2,5:3,3:6,6:5,7:6};
+const euler=[1,2,4,2,5,2,1,3,6,3,7,3,1],first={1:0,2:1,4:2,5:4,3:7,6:8,7:10};
+const ev=[['enter',1,[1]],['enter',2,[1,2]],['enter',4,[1,2,4]],['exit',4,[1,2]],['enter',5,[1,2,5]],['exit',5,[1,2]],['exit',2,[1]],['enter',3,[1,3]],['enter',6,[1,3,6]],['exit',6,[1,3]],['enter',7,[1,3,7]],['exit',7,[1,3]],['exit',3,[1]],['exit',1,[]]];
+let idx=0,entered={},exited={},timer=null;
+function draw(active,type,subs,lca){
+ let svg='<svg viewBox="0 0 100 100" preserveAspectRatio="none">';
+ edges.forEach(e=>{let a=pos[e[0]],b=pos[e[1]],hot=active&&par[active]===e[0]&&active===e[1];svg+='<line class="edge '+(hot?'hot':'')+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>'});svg+='</svg>';
+ let nodes='';for(let u=1;u<=7;u++){let c='node';if(subs&&subs.includes(u))c+=' sub';if(exited[u])c+=' done';if(active===u)c+=' '+type;if(lca===u)c+=' lca';nodes+='<div class="'+c+'" style="left:calc('+pos[u][0]+'% - 27px);top:calc('+pos[u][1]+'% - 27px)">'+u+'</div>'}$('#tree').innerHTML=svg+nodes
+}
+function renderFlat(active){$('#flat').innerHTML=flat.map((u,i)=>'<div class="cell '+(u===active?'hot':'')+'"><small>'+i+'</small>'+u+'</div>').join('')}
+function renderTimes(active){let s='';for(let u=1;u<=7;u++)s+='<div class="cell '+(u===active?'hot':'')+'"><small>u='+u+'</small>'+(entered[u]?tin[u]:'—')+' / '+(exited[u]?tout[u]:'—')+'</div>';$('#times').innerHTML=s}
+function reset(){if(timer)clearInterval(timer);timer=null;idx=0;entered={};exited={};draw();renderFlat();renderTimes();$('#stack').innerHTML='';$('#tourLog').innerHTML='Bắt đầu DFS tại gốc 1.';$('#auto').textContent='Tự chạy'}
+function step(){if(idx>=ev.length){$('#tourLog').innerHTML='Hoàn tất: flat = ['+flat.join(', ')+']';return}let [type,u,st]=ev[idx++];if(type==='enter')entered[u]=true;else exited[u]=true;draw(u,type);renderFlat(type==='enter'?u:null);renderTimes(u);$('#stack').innerHTML=st.map((x,i)=>'<span class="chip '+(i===st.length-1?'top':'')+'">'+x+'</span>').join('');$('#tourLog').innerHTML=type==='enter'?'<b>ENTER '+u+'</b><br>tin['+u+']='+tin[u]+', flat['+tin[u]+']='+u:'<b>EXIT '+u+'</b><br>tout['+u+']='+tout[u]}
+function auto(){if(timer){clearInterval(timer);timer=null;$('#auto').textContent='Tự chạy';return}$('#auto').textContent='Tạm dừng';timer=setInterval(()=>{if(idx>=ev.length){clearInterval(timer);timer=null;$('#auto').textContent='Tự chạy'}else step()},750)}
+function fillSelect(id){let s='';for(let i=1;i<=7;i++)s+='<option value="'+i+'">'+i+'</option>';$(id).innerHTML=s}
+function showSub(){let u=Number($('#subSel').value),nodes=flat.slice(tin[u],tout[u]+1);draw(null,null,nodes);$('#subRow').innerHTML=flat.map((x,i)=>'<div class="cell '+(i>=tin[u]&&i<=tout[u]?'sub':'')+'"><small>'+i+'</small>'+x+'</div>').join('');$('#subLog').innerHTML='<b>subtree('+u+')={'+nodes.join(', ')+'}</b><br>Đoạn ['+tin[u]+','+tout[u]+']'}
+function showLca(){let u=Number($('#uSel').value),v=Number($('#vSel').value),l=first[u],r=first[v];if(l>r)[l,r]=[r,l];let best=l;for(let i=l;i<=r;i++)if(dep[euler[i]]<dep[euler[best]])best=i;let ans=euler[best];draw(null,null,null,ans);$('#eulerRow').innerHTML=euler.map((x,i)=>{let c=i===first[u]?'first':i===first[v]?'second':i>=l&&i<=r?'sub':'';if(i===best)c='hot';return'<div class="cell '+c+'"><small>'+i+'/d'+dep[x]+'</small>'+x+'</div>'}).join('');$('#lcaLog').innerHTML='first['+u+']='+first[u]+', first['+v+']='+first[v]+'<br>RMQ depth trên ['+l+','+r+']<br><b>LCA='+ans+'</b>'}
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+document.addEventListener('DOMContentLoaded',()=>{fillSelect('#subSel');fillSelect('#uSel');fillSelect('#vSel');$('#subSel').value='2';$('#uSel').value='4';$('#vSel').value='5';$('#next').onclick=step;$('#reset').onclick=reset;$('#auto').onclick=auto;$('#showSub').onclick=showSub;$('#findLca').onclick=showLca;tabs();copies();quizzes();reset();showSub();showLca();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}})
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

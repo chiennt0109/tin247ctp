@@ -1,37 +1,399 @@
-<article class="space-y-6">
-  <nav aria-label="Breadcrumb" class="text-sm text-gray-500">
-    <a class="text-indigo-600 font-semibold hover:underline" href="/#roadmap">Roadmap</a>
-    <span class="mx-2">/</span>
-    <a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/5/">Chương 5</a>
-    <span class="mx-2">/</span>
-    <span>5.4</span>
-  </nav>
 
-  <header>
-    <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Mục 5.4</p>
-    <h1 class="text-3xl font-bold text-gray-900 mt-2">Branch-and-Bound và tìm kiếm tăng dần</h1>
-    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 mt-4">Đang biên soạn</span>
-  </header>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.lesson-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;
+margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1180px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1040px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.state{padding:10px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff;text-align:center}.state b{display:block;color:#312e81}.state strong{font-size:1.25rem}.state.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.state.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.state.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.array-row{display:flex;gap:8px;overflow:auto;padding:10px 0}.cell{min-width:78px;padding:10px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900}.cell.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.cell.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}.cell small{display:block;color:#64748b;font-size:.72rem}
+.tree-area{min-height:320px;padding:14px;border:2px dashed #bfdbfe;border-radius:16px;background:#f8fafc;overflow:auto}.tree-level{display:flex;justify-content:center;gap:10px;margin:12px 0}.tree-node{min-width:112px;padding:9px 12px;border:2px solid #c7d2fe;border-radius:12px;background:#eef2ff;text-align:center;font-weight:900;color:#312e81}.tree-node.active{background:#ffedd5;border-color:#f97316;color:#9a3412}.tree-node.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.tree-node.cut{background:#fee2e2;border-color:#ef4444;color:#991b1b}.tree-node small{display:block;color:#64748b;font-size:.72rem}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}
+.log{min-height:130px;max-height:420px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.lesson-page pre{margin:0;padding:20px;max-height:760px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.lesson-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.lesson-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.tree-level{justify-content:flex-start}}
+</style>
 
-  <section class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-gray-700">
-    <p>Nội dung bài học đang được biên soạn. Trang này được tạo tạm để bảo đảm liên kết trong lộ trình hoạt động.</p>
-  </section>
+<div class="lesson-page">
+<div class="hero">
+  <span class="badge">Chương 5.4 • Optimization & Incremental Search</span>
+  <h1>🎯 Branch-and-Bound và tìm kiếm tăng dần</h1>
+  <p>Branch-and-Bound dùng nghiệm tốt nhất hiện có và các cận để loại cả cây con không thể cải thiện đáp án. Tìm kiếm tăng dần giới hạn tài nguyên theo từng vòng, như DLS, IDDFS và IDA*, nhằm kết hợp ưu điểm của DFS với khả năng tìm nghiệm nông hoặc chi phí nhỏ.</p>
+  <div class="stats">
+    <div class="stat"><b>Incumbent</b><span>Nghiệm tốt nhất hiện có</span></div>
+    <div class="stat"><b>Bound</b><span>Cận cho cây con</span></div>
+    <div class="stat"><b>IDDFS</b><span>Tăng dần độ sâu</span></div>
+    <div class="stat"><b>IDA*</b><span>Tăng dần ngưỡng f=g+h</span></div>
+  </div>
+</div>
 
-  <section>
-    <h2 class="text-xl font-semibold text-gray-800 mb-3">Nội dung dự kiến</h2>
-    <ul class="list-disc pl-6 space-y-2 text-gray-700">
-      <li>Incumbent</li>
-      <li>Cận trên và cận dưới</li>
-      <li>DFS Branch-and-Bound</li>
-      <li>Best-first Branch-and-Bound</li>
-      <li>Depth-Limited Search</li>
-      <li>IDDFS</li>
-      <li>IDA*</li>
-      <li>TSP làm ví dụ</li>
-    </ul>
-  </section>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav">
+<a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#bnb">Branch-and-Bound</a><a href="#knapsack">Mô phỏng B&amp;B</a><a href="#bestfirst">Best-first</a><a href="#dls">DLS/IDDFS</a><a href="#iddfs-sim">Mô phỏng IDDFS</a><a href="#ida">IDA*</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+</div></div>
 
-  <p>
-    <a class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700" href="/roadmap/stage/5/">⬅️ Quay lại Chương 5</a>
-  </p>
-</article>
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2">
+<div class="box"><h3>Cần hiểu</h3><ul><li>Incumbent, cận trên và cận dưới.</li><li>Điều kiện cắt nhánh trong bài tối đa hóa/tối thiểu hóa.</li><li>DFS Branch-and-Bound và Best-first B&amp;B.</li><li>Depth-Limited Search, IDDFS và IDA*.</li><li>Khác nhau giữa pruning đúng và heuristic.</li></ul></div>
+<div class="box"><h3>Cần làm được</h3><ul><li>Xây cận khả thi cho bài tối ưu.</li><li>Dùng nghiệm hiện có để cắt nhánh.</li><li>Sắp thứ tự nhánh để tìm nghiệm tốt sớm.</li><li>Viết IDDFS trên cây trạng thái.</li><li>Nhận biết khi nào IDA* phù hợp hơn A*.</li></ul></div>
+</div></section>
+
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2>
+<div class="call"><b>Bài toán mở đầu – Ba lô 0/1.</b><br>Có n món đồ, mỗi món có trọng lượng và giá trị. Chọn một số món sao cho tổng trọng lượng không vượt W và tổng giá trị lớn nhất.</div>
+<p>Duyệt toàn bộ có 2ⁿ tập con. Tuy nhiên tại một trạng thái, nếu ngay cả trong trường hợp lạc quan nhất, cây con đó vẫn không thể vượt nghiệm tốt nhất đã có, ta có thể bỏ toàn bộ cây con.</p>
+<div class="formula">Nếu upperBound(state) ≤ incumbent thì cắt nhánh trong bài tối đa hóa</div>
+<div class="call ok"><b>Đặt vấn đề thứ hai.</b> Khi tìm một trạng thái đích trong cây rất sâu nhưng không biết độ sâu nghiệm, DFS có thể đi quá sâu; BFS lại tốn nhiều bộ nhớ. IDDFS tăng giới hạn sâu dần để cân bằng hai phía.</div>
+</section>
+
+<section class="card" id="bnb"><h2>2. Branch-and-Bound</h2>
+<div class="g3">
+<div class="box"><h3>Incumbent</h3><p>Nghiệm khả thi tốt nhất đã tìm thấy. Với tối đa hóa, incumbent là giá trị lớn nhất hiện có.</p></div>
+<div class="box"><h3>Upper bound</h3><p>Giá trị tốt nhất mà một cây con <em>có thể</em> đạt trong trường hợp lạc quan.</p></div>
+<div class="box"><h3>Lower bound</h3><p>Trong bài tối thiểu hóa, lower bound là chi phí nhỏ nhất có thể của cây con.</p></div>
+</div>
+<div class="table-wrap"><table class="tbl">
+<tr><th>Bài toán</th><th>Incumbent</th><th>Cận của node</th><th>Điều kiện cắt</th></tr>
+<tr><td>Tối đa hóa</td><td>Giá trị khả thi lớn nhất</td><td>Upper bound</td><td><code>bound ≤ incumbent</code></td></tr>
+<tr><td>Tối thiểu hóa</td><td>Chi phí khả thi nhỏ nhất</td><td>Lower bound</td><td><code>bound ≥ incumbent</code></td></tr>
+</table></div>
+<div class="call warn"><b>Cận phải an toàn.</b> Cận quá “bi quan” có thể cắt mất nghiệm tối ưu. Cận yếu vẫn đúng nhưng cắt được ít.</div>
+</section>
+
+<section class="card" id="knapsack"><h2>3. Mô phỏng Branch-and-Bound cho ba lô</h2>
+<div class="g2">
+<div class="visual">
+<label><b>Sức chứa W</b></label><input class="input" id="capacityInput" value="10">
+<label><b>Đồ vật dạng weight:value</b></label><input class="input" id="itemsInput" value="2:6 3:8 4:9 5:10">
+<div class="controls"><button class="btn" id="bnbNext">Bước tiếp</button><button class="btn orange" id="bnbAuto">Tự chạy</button><button class="btn green" id="bnbSolve">Chạy đến cuối</button><button class="btn alt" id="bnbReset">Làm lại</button></div>
+<div class="state-grid">
+<div class="state" id="bnbLevel"><b>level</b><strong>0</strong></div>
+<div class="state" id="bnbWeight"><b>weight</b><strong>0</strong></div>
+<div class="state" id="bnbValue"><b>value</b><strong>0</strong></div>
+<div class="state" id="bnbBound"><b>upper bound</b><strong>0</strong></div>
+<div class="state ok" id="bnbBest"><b>incumbent</b><strong>0</strong></div>
+</div>
+<div class="array-row" id="itemRow"></div>
+</div>
+<div class="g2"><div class="code-lines">
+<div class="code-line" data-bnb="bound">if (upperBound(node) &lt;= best) return;</div>
+<div class="code-line" data-bnb="take">try taking item[level];</div>
+<div class="code-line" data-bnb="skip">try skipping item[level];</div>
+<div class="code-line" data-bnb="update">best = max(best, currentValue);</div>
+</div><div class="log" id="bnbLog"></div></div>
+</div>
+<div class="tree-area" id="bnbTree"></div>
+<div class="call ok"><b>Cận dùng trong mô phỏng:</b> cho phép lấy phân số món đồ còn lại theo tỉ lệ value/weight. Đây là upper bound của bài ba lô 0/1.</div>
+</section>
+
+<section class="card" id="bestfirst"><h2>4. DFS B&amp;B và Best-first B&amp;B</h2>
+<div class="table-wrap"><table class="tbl">
+<tr><th>Chiến lược</th><th>Node tiếp theo</th><th>Ưu điểm</th><th>Nhược điểm</th></tr>
+<tr><td>DFS Branch-and-Bound</td><td>Node sâu nhất</td><td>Bộ nhớ nhỏ, dễ cài.</td><td>Có thể tìm incumbent tốt muộn.</td></tr>
+<tr><td>Best-first B&amp;B</td><td>Node có bound hứa hẹn nhất</td><td>Thường tập trung vào nhánh tốt.</td><td>Priority Queue có thể chứa rất nhiều node.</td></tr>
+<tr><td>Branch ordering</td><td>Thử nhánh tốt trước trong DFS</td><td>Cải thiện incumbent sớm.</td><td>Không thay đổi worst-case.</td></tr>
+</table></div>
+</section>
+
+<section class="card" id="dls"><h2>5. Depth-Limited Search và IDDFS</h2>
+<div class="g2">
+<div class="box"><h3>DLS</h3><p>DFS nhưng không đi sâu hơn giới hạn L. Kết quả có thể là FOUND, NOT_FOUND hoặc CUTOFF.</p></div>
+<div class="box"><h3>IDDFS</h3><p>Chạy DLS với L=0,1,2,... cho đến khi tìm thấy đích.</p></div>
+</div>
+<div class="formula">IDDFS có bộ nhớ O(d) như DFS và tìm nghiệm nông như BFS khi chi phí cạnh bằng nhau</div>
+<div class="call warn">IDDFS duyệt lại các node gần gốc, nhưng trong cây phân nhánh lớn, phần lớn node nằm ở mức sâu nhất nên chi phí lặp lại thường chấp nhận được.</div>
+</section>
+
+<section class="card" id="iddfs-sim"><h2>6. Mô phỏng IDDFS</h2>
+<div class="g2">
+<div class="visual">
+<label><b>Node đích</b></label><select class="select" id="targetNode"><option>G</option><option>H</option><option>I</option><option>J</option></select>
+<div class="controls"><button class="btn" id="idNext">Bước tiếp</button><button class="btn orange" id="idAuto">Tự chạy</button><button class="btn alt" id="idReset">Làm lại</button></div>
+<div class="state-grid"><div class="state" id="idLimit"><b>depth limit</b><strong>0</strong></div><div class="state" id="idCurrent"><b>current</b><strong>A</strong></div><div class="state" id="idVisited"><b>visited</b><strong>0</strong></div></div>
+</div>
+<div class="log" id="idLog"></div>
+</div>
+<div class="tree-area" id="idTree"></div>
+</section>
+
+<section class="card" id="ida"><h2>7. IDA*</h2>
+<p>IDA* thay giới hạn độ sâu bằng ngưỡng <code>f(n)=g(n)+h(n)</code>. Mỗi vòng chỉ mở rộng node có f không vượt ngưỡng; ngưỡng sau là f nhỏ nhất đã vượt ngưỡng ở vòng trước.</p>
+<div class="g3">
+<div class="box"><h3>g(n)</h3><p>Chi phí thật từ trạng thái đầu tới n.</p></div>
+<div class="box"><h3>h(n)</h3><p>Ước lượng chi phí còn lại; muốn tối ưu cần heuristic admissible.</p></div>
+<div class="box"><h3>Ngưỡng</h3><p>Bắt đầu từ h(start), tăng dần theo cận f.</p></div>
+</div>
+<div class="call ok"><b>Khi phù hợp:</b> không gian trạng thái lớn, A* tốn quá nhiều bộ nhớ, nhưng có heuristic tốt và đường đi tối ưu không quá sâu.</div>
+</section>
+
+<section class="card" id="analysis"><h2>8. Phân tích thuật toán</h2>
+<div class="table-wrap"><table class="tbl">
+<tr><th>Thuật toán</th><th>Thời gian điển hình</th><th>Bộ nhớ</th><th>Điểm mạnh</th></tr>
+<tr><td>DFS B&amp;B</td><td>Hàm mũ trong worst-case</td><td>O(depth)</td><td>Cận tốt có thể giảm mạnh số node.</td></tr>
+<tr><td>Best-first B&amp;B</td><td>Hàm mũ trong worst-case</td><td>Có thể hàm mũ</td><td>Mở rộng node hứa hẹn trước.</td></tr>
+<tr><td>DLS</td><td>O(b^L)</td><td>O(L)</td><td>Chặn độ sâu.</td></tr>
+<tr><td>IDDFS</td><td>O(b^d)</td><td>O(d)</td><td>Tìm nghiệm nông, ít bộ nhớ.</td></tr>
+<tr><td>IDA*</td><td>Phụ thuộc heuristic</td><td>O(d)</td><td>Tiết kiệm bộ nhớ hơn A*.</td></tr>
+</table></div>
+</section>
+
+<section class="card" id="code"><h2>9. Code mẫu</h2>
+<div class="tabs"><div class="tab-head">
+<button class="tab-btn active" data-tab="dfsBnbCode">DFS B&amp;B</button><button class="tab-btn" data-tab="bestCode">Best-first</button><button class="tab-btn" data-tab="iddfsCode">IDDFS</button><button class="tab-btn" data-tab="idaCode">IDA*</button>
+</div>
+<div class="panel active" id="dfsBnbCode"><button class="copy">Sao chép</button><pre><code>struct Item {
+    int weight;
+    int value;
+    double ratio;
+};
+
+vector&lt;Item&gt; items;
+int capacity;
+int bestValue = 0;
+
+double upperBound(
+    int index,
+    int currentWeight,
+    int currentValue
+) {
+    if (currentWeight &gt; capacity) {
+        return -1;
+    }
+
+    double bound = currentValue;
+    int remaining = capacity - currentWeight;
+
+    for (int i = index;
+         i &lt; (int)items.size() &amp;&amp; remaining &gt; 0;
+         i++) {
+        if (items[i].weight &lt;= remaining) {
+            remaining -= items[i].weight;
+            bound += items[i].value;
+        } else {
+            bound += items[i].ratio * remaining;
+            break;
+        }
+    }
+
+    return bound;
+}
+
+void branchAndBound(
+    int index,
+    int currentWeight,
+    int currentValue
+) {
+    if (currentWeight &gt; capacity) return;
+
+    bestValue = max(bestValue, currentValue);
+
+    if (index == (int)items.size()) return;
+
+    if (upperBound(index, currentWeight, currentValue)
+        &lt;= bestValue) {
+        return;
+    }
+
+    branchAndBound(
+        index + 1,
+        currentWeight + items[index].weight,
+        currentValue + items[index].value
+    );
+
+    branchAndBound(
+        index + 1,
+        currentWeight,
+        currentValue
+    );
+}</code></pre></div>
+<div class="panel" id="bestCode"><button class="copy">Sao chép</button><pre><code>struct Node {
+    int level;
+    int weight;
+    int value;
+    double bound;
+
+    bool operator&lt;(const Node&amp; other) const {
+        return bound &lt; other.bound;
+    }
+};
+
+priority_queue&lt;Node&gt; pq;
+pq.push(root);
+
+while (!pq.empty()) {
+    Node current = pq.top();
+    pq.pop();
+
+    if (current.bound &lt;= bestValue) {
+        continue;
+    }
+
+    // Sinh node chọn và không chọn.
+}</code></pre></div>
+<div class="panel" id="iddfsCode"><button class="copy">Sao chép</button><pre><code>enum Result {
+    FOUND,
+    NOT_FOUND,
+    CUTOFF
+};
+
+Result depthLimitedSearch(
+    int node,
+    int target,
+    int remainingDepth
+) {
+    if (node == target) return FOUND;
+    if (remainingDepth == 0) return CUTOFF;
+
+    bool hadCutoff = false;
+
+    for (int child : children[node]) {
+        Result result = depthLimitedSearch(
+            child,
+            target,
+            remainingDepth - 1
+        );
+
+        if (result == FOUND) return FOUND;
+        if (result == CUTOFF) hadCutoff = true;
+    }
+
+    return hadCutoff ? CUTOFF : NOT_FOUND;
+}
+
+bool iddfs(int start, int target) {
+    for (int limit = 0; ; limit++) {
+        Result result = depthLimitedSearch(
+            start,
+            target,
+            limit
+        );
+
+        if (result == FOUND) return true;
+        if (result == NOT_FOUND) return false;
+    }
+}</code></pre></div>
+<div class="panel" id="idaCode"><button class="copy">Sao chép</button><pre><code>const int FOUND = -1;
+const int INF = 1e9;
+
+int dfs(State state, int g, int threshold) {
+    int f = g + heuristic(state);
+
+    if (f &gt; threshold) return f;
+    if (isGoal(state)) return FOUND;
+
+    int nextThreshold = INF;
+
+    for (State next : neighbors(state)) {
+        if (onCurrentPath(next)) continue;
+
+        mark(next);
+
+        int result = dfs(
+            next,
+            g + moveCost(state, next),
+            threshold
+        );
+
+        unmark(next);
+
+        if (result == FOUND) return FOUND;
+        nextThreshold = min(nextThreshold, result);
+    }
+
+    return nextThreshold;
+}
+
+bool idaStar(State start) {
+    int threshold = heuristic(start);
+
+    while (true) {
+        int result = dfs(start, 0, threshold);
+
+        if (result == FOUND) return true;
+        if (result == INF) return false;
+
+        threshold = result;
+    }
+}</code></pre></div>
+</div></section>
+
+<section class="card" id="explain"><h2>10. Giải thích code</h2>
+<h3>10.1. Vì sao sắp đồ vật theo ratio trước khi tính bound?</h3><p>Fractional knapsack tối ưu khi lấy tỉ lệ value/weight giảm dần. Kết quả phân số là upper bound hợp lệ cho ba lô 0/1.</p>
+<h3>10.2. Vì sao cập nhật incumbent trước khi kiểm tra bound?</h3><p>Trạng thái hiện tại đã là một nghiệm khả thi nếu không vượt sức chứa. Cập nhật sớm giúp cắt nhiều nhánh hơn.</p>
+<h3>10.3. DLS cần phân biệt NOT_FOUND và CUTOFF vì sao?</h3><p>CUTOFF nghĩa là chưa thể kết luận vì giới hạn sâu đã chặn tìm kiếm; IDDFS cần tăng giới hạn. NOT_FOUND nghĩa là cây con đã hết thật sự.</p>
+<h3>10.4. IDA* chọn ngưỡng mới thế nào?</h3><p>Chọn giá trị f nhỏ nhất đã vượt ngưỡng cũ để không bỏ qua mức cận cần thiết.</p>
+</section>
+
+<section class="card" id="mistakes"><h2>11. Lỗi thường gặp</h2><ul>
+<li>Cắt nhánh bằng cận không an toàn.</li><li>Không cập nhật incumbent khi gặp nghiệm tốt hơn.</li><li>Dùng bound yếu và kỳ vọng giảm mạnh thời gian.</li><li>Best-first nhưng comparator Priority Queue bị đảo.</li><li>IDDFS không phân biệt CUTOFF và NOT_FOUND.</li><li>IDA* dùng heuristic đánh giá quá cao khi cần tối ưu.</li><li>Không tránh chu kỳ trên đường đi hiện tại.</li><li>Không ước lượng bộ nhớ của Best-first.</li>
+</ul></section>
+
+<section class="card" id="quiz"><h2>12. Quiz và bài tập</h2>
+<div class="quiz" data-answer="b"><b>Câu 1.</b> Trong tối đa hóa, khi nào cắt node?<div class="answers"><button class="answer" data-choice="a">bound &gt; incumbent</button><button class="answer" data-choice="b">bound ≤ incumbent</button><button class="answer" data-choice="c">depth = 0</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="c"><b>Câu 2.</b> IDDFS tăng dần đại lượng nào?<div class="answers"><button class="answer" data-choice="a">Số cạnh đồ thị</button><button class="answer" data-choice="b">Giá trị incumbent</button><button class="answer" data-choice="c">Giới hạn độ sâu</button></div><div class="feedback"></div></div>
+<div class="quiz" data-answer="a"><b>Câu 3.</b> IDA* dùng ngưỡng gì?<div class="answers"><button class="answer" data-choice="a">f=g+h</button><button class="answer" data-choice="b">Chỉ h</button><button class="answer" data-choice="c">Chỉ số node</button></div><div class="feedback"></div></div>
+<div class="g2"><div class="box"><h3>📘 Cơ bản</h3><ol><li>DLS trên cây.</li><li>IDDFS tìm node đích.</li><li>Ba lô B&amp;B nhỏ.</li></ol></div><div class="box"><h3>📙 Nâng cao</h3><ol><li>TSP Branch-and-Bound.</li><li>Best-first B&amp;B.</li><li>IDA* cho 8-puzzle.</li></ol></div></div>
+</section>
+</div>
+<script>
+(function(){
+'use strict';
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,900)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+/* Knapsack B&B */
+let kb={items:[],W:10,states:[],i:0,best:0,timer:null};
+function parseItems(){return $('#itemsInput').value.trim().split(/\s+/).map(s=>{let [w,v]=s.split(':').map(Number);return{w,v,r:v/w}}).filter(x=>Number.isFinite(x.w)&&x.w>0&&Number.isFinite(x.v)).sort((a,b)=>b.r-a.r)}
+function bound(items,W,level,w,v){if(w>W)return-1;let b=v,rem=W-w;for(let i=level;i<items.length&&rem>0;i++){if(items[i].w<=rem){rem-=items[i].w;b+=items[i].v}else{b+=items[i].r*rem;break}}return b}
+function buildStates(){
+  let states=[],best=0;
+  function dfs(level,w,v,path){
+    let bd=bound(kb.items,kb.W,level,w,v),cut=w>kb.W||bd<=best;
+    if(w<=kb.W&&v>best)best=v;
+    states.push({level,w,v,bd,best,path:path.slice(),cut});
+    if(cut||level===kb.items.length)return;
+    path.push(1);dfs(level+1,w+kb.items[level].w,v+kb.items[level].v,path);path.pop();
+    path.push(0);dfs(level+1,w,v,path);path.pop();
+  }
+  dfs(0,0,0,[]);return states;
+}
+function markBnb(k){$$('[data-bnb]').forEach(x=>x.classList.remove('hl'));let e=$('[data-bnb="'+k+'"]');if(e)e.classList.add('hl')}
+function resetBnb(){if(kb.timer){clearInterval(kb.timer);kb.timer=null}kb.W=Number($('#capacityInput').value)||0;kb.items=parseItems();kb.states=buildStates();kb.i=0;$('#bnbAuto').textContent='Tự chạy';renderBnb('Bắt đầu tại node gốc.')}
+function renderBnb(msg){let s=kb.states[kb.i];$('#bnbLevel strong').textContent=s.level;$('#bnbWeight strong').textContent=s.w;$('#bnbValue strong').textContent=s.v;$('#bnbBound strong').textContent=s.bd.toFixed(2);$('#bnbBest strong').textContent=s.best;
+$('#itemRow').innerHTML=kb.items.map((x,i)=>'<div class="cell '+(i===s.level?'active':i<s.level?(s.path[i]?'ok':'cut'):'')+'"><small>#'+i+'</small>w='+x.w+'<br>v='+x.v+'</div>').join('');
+$('#bnbLog').innerHTML=msg+'<br><b>path='+s.path.join('')+', bound='+s.bd.toFixed(2)+', incumbent='+s.best+'</b>';
+let levels=[];kb.states.forEach((x,idx)=>{if(idx>kb.i)return;if(!levels[x.level])levels[x.level]=[];levels[x.level].push({x,idx})});$('#bnbTree').innerHTML=levels.map(l=>'<div class="tree-level">'+l.map(({x,idx})=>'<div class="tree-node '+(idx===kb.i?'active':x.cut?'cut':x.level===kb.items.length?'ok':'')+'"><small>#'+idx+' L='+x.level+'</small>w='+x.w+', v='+x.v+'<br>b='+x.bd.toFixed(1)+'</div>').join('')+'</div>').join('')}
+function stepBnb(){if(kb.i>=kb.states.length-1)return renderBnb('Đã duyệt hết.');kb.i++;let s=kb.states[kb.i];markBnb(s.cut?'bound':s.path[s.path.length-1]?'take':'skip');renderBnb(s.cut?'Cắt nhánh vì vượt sức chứa hoặc bound không thắng incumbent.':'Mở rộng node tiếp theo.')}
+function autoBnb(){if(kb.timer){clearInterval(kb.timer);kb.timer=null;$('#bnbAuto').textContent='Tự chạy';return}$('#bnbAuto').textContent='Tạm dừng';kb.timer=setInterval(()=>{if(kb.i>=kb.states.length-1){clearInterval(kb.timer);kb.timer=null;$('#bnbAuto').textContent='Tự chạy'}else stepBnb()},500)}
+function solveBnb(){kb.i=kb.states.length-1;renderBnb('Đã chạy đến cuối.')}
+
+/* IDDFS */
+const tree={A:['B','C'],B:['D','E'],C:['F'],D:['G'],E:['H','I'],F:['J'],G:[],H:[],I:[],J:[]};
+let ids={limit:0,order:[],idx:0,timer:null,found:false};
+function dlsOrder(limit,target){let out=[];function dfs(u,d){out.push({u,d});if(u===target)return true;if(d===limit)return false;for(const v of tree[u])if(dfs(v,d+1))return true;return false}dfs('A',0);return out}
+function resetId(){if(ids.timer){clearInterval(ids.timer);ids.timer=null}ids.limit=0;ids.order=dlsOrder(0,$('#targetNode').value);ids.idx=0;ids.found=false;$('#idAuto').textContent='Tự chạy';renderId('Bắt đầu DLS với limit=0.')}
+function renderId(msg){let cur=ids.order[Math.min(ids.idx,ids.order.length-1)]||{u:'A',d:0};$('#idLimit strong').textContent=ids.limit;$('#idCurrent strong').textContent=cur.u;$('#idVisited strong').textContent=ids.idx+1;$('#idLog').innerHTML=msg+'<br><b>order='+ids.order.slice(0,ids.idx+1).map(x=>x.u).join(' → ')+'</b>';
+let levels=[['A'],['B','C'],['D','E','F'],['G','H','I','J']];$('#idTree').innerHTML=levels.map((l,d)=>'<div class="tree-level">'+l.map(u=>'<div class="tree-node '+(u===cur.u?'active':d>ids.limit?'cut':'')+'"><small>depth '+d+'</small>'+u+'</div>').join('')+'</div>').join('')}
+function stepId(){let target=$('#targetNode').value,cur=ids.order[ids.idx];if(cur&&cur.u===target){ids.found=true;return renderId('Đã tìm thấy '+target+' ở limit='+ids.limit+'.')}if(ids.idx<ids.order.length-1){ids.idx++;return renderId('Duyệt node tiếp theo trong DLS.')}ids.limit++;ids.order=dlsOrder(ids.limit,target);ids.idx=0;renderId('Không thấy ở giới hạn trước. Tăng limit lên '+ids.limit+'.')}
+function autoId(){if(ids.timer){clearInterval(ids.timer);ids.timer=null;$('#idAuto').textContent='Tự chạy';return}$('#idAuto').textContent='Tạm dừng';ids.timer=setInterval(()=>{stepId();if(ids.found){clearInterval(ids.timer);ids.timer=null;$('#idAuto').textContent='Tự chạy'}},650)}
+
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();$('#bnbNext').onclick=stepBnb;$('#bnbAuto').onclick=autoBnb;$('#bnbSolve').onclick=solveBnb;$('#bnbReset').onclick=resetBnb;$('#idNext').onclick=stepId;$('#idAuto').onclick=autoId;$('#idReset').onclick=resetId;$('#targetNode').onchange=resetId;resetBnb();resetId();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true})});
+})();
+</script>

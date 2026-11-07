@@ -1,19 +1,341 @@
-<article class="roadmap-extra-topic">
-  <h1>Sparse table</h1>
-  <section>
-    <h2>Mục tiêu</h2>
-    <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
-    </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
-    <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
-    </ol>
-  </section>
-</article>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#06b6d4;--g:#16a34a;--o:#f97316;--r:#ef4444;--text:#1e293b;--b:#dbe4ff;--code:#0f172a}
+.lesson-page{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);background:linear-gradient(180deg,#f8fbff,#eef4ff);border-radius:22px;padding:clamp(18px,2.6vw,34px);line-height:1.72;width:min(1680px,calc(100vw - 32px));max-width:none!important;margin:0!important;position:relative;left:50%;transform:translateX(-50%);z-index:1;overflow:visible}.lesson-page *{box-sizing:border-box}.lesson-page h1,.lesson-page h2,.lesson-page h3{line-height:1.25}.lesson-hero{position:relative;overflow:hidden;color:#fff;padding:clamp(26px,4vw,46px);border-radius:28px;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 25px 60px rgba(79,70,229,.25);margin-bottom:24px}.lesson-hero:after{content:"";position:absolute;width:270px;height:270px;right:-90px;top:-85px;border-radius:50%;background:rgba(255,255,255,.14)}.hero-badge{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);padding:7px 12px;border-radius:999px;font-weight:800;margin-bottom:12px}.lesson-hero h1{margin:0 0 12px;font-size:clamp(1.75rem,4vw,3rem);font-weight:900}.lesson-hero p{color:#e0f2fe;max-width:1050px;font-size:1.05rem;margin:0}.hero-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}.hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:14px}.hero-stat b{display:block;font-size:1.18rem}.hero-stat span{color:#dbeafe;font-size:.9rem}.lesson-progress-wrap{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.84);backdrop-filter:blur(10px);padding:10px 0}.lesson-progress{height:10px;border-radius:999px;background:#dbeafe;overflow:hidden}.lesson-progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.lesson-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.lesson-nav a{text-decoration:none;color:var(--pd);background:#eef2ff;border:1px solid #dbe4ff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.9rem}.lesson-card{background:rgba(255,255,255,.96);border:1px solid var(--b);border-radius:24px;padding:clamp(18px,2.4vw,28px);margin:20px 0;box-shadow:0 16px 42px rgba(30,64,175,.08)}.lesson-card h2{color:var(--pd);margin:0 0 14px;font-weight:900;display:flex;align-items:center;gap:10px}.lesson-card h3{color:#334155;margin-top:20px;font-weight:850}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.info-box{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0}.callout{border-left:6px solid var(--a);background:#ecfeff;border-radius:16px;padding:14px 16px;margin:14px 0}.warn{border-left-color:var(--o);background:#fff7ed}.danger{border-left-color:var(--r);background:#fff1f2}.success{border-left-color:var(--g);background:#f0fdf4}.table-wrap{overflow-x:auto;border:1px solid #e2e8f0;border-radius:18px}.lesson-table{width:100%;border-collapse:collapse;min-width:850px;background:#fff}.lesson-table th,.lesson-table td{padding:12px 14px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.lesson-table th{background:#eef2ff;color:#312e81;font-weight:900}.lesson-table tr:last-child td{border-bottom:0}.code-tabs{border:1px solid var(--b);border-radius:18px;overflow:hidden;background:var(--code);margin:14px 0}.tab-buttons{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:12px 16px;font-weight:900;color:#334155;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.tab-panel{display:none;position:relative}.tab-panel.active{display:block}.copy-btn{position:absolute;right:10px;top:10px;z-index:2;border:0;background:rgba(255,255,255,.14);color:#e2e8f0;border-radius:999px;padding:6px 10px;cursor:pointer}.lesson-page pre{margin:0;max-height:620px;overflow:auto;background:var(--code);color:#f8fafc;padding:22px;font-size:14.5px;line-height:1.7;white-space:pre;tab-size:4}.lesson-page code{font-family:Consolas,Monaco,"Courier New",monospace}.lesson-page p code,.lesson-page li code,.lesson-page td code{background:#fdf2f8;color:#be185d;border-radius:7px;padding:2px 6px;font-weight:800}.visual-box{background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe4ff;border-radius:22px;padding:18px}.input-lesson{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:11px 13px;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.btn-lesson{border:0;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;background:var(--p);color:#fff}.btn-lesson.secondary{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn-lesson.green{background:var(--g)}.st-grid{display:grid;gap:8px;margin-top:14px;overflow-x:auto}.st-row{display:flex;gap:8px;min-width:max-content}.st-label{width:105px;flex:0 0 105px;border-radius:12px;background:#e0e7ff;color:#3730a3;padding:8px;font-weight:900;text-align:center}.st-cell{min-width:64px;border-radius:12px;background:#f8fafc;border:1px solid #cbd5e1;text-align:center;padding:8px;font-weight:900}.st-cell small{display:block;color:#64748b;font-size:.72rem}.st-cell.left{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}.st-cell.right{background:#dcfce7;border-color:#22c55e;color:#166534}.st-cell.both{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}.log-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;min-height:120px;max-height:300px;overflow:auto;font-family:Consolas,monospace;font-size:14px}.formula{font-family:Cambria,Georgia,serif;background:#eef2ff;border:1px solid #c7d2fe;color:#312e81;border-radius:16px;padding:14px;text-align:center;font-weight:800;margin:12px 0}.exercise-card{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:#fff}.exercise-card h3{margin-top:0}.quiz-item{border:1px solid #e2e8f0;border-radius:18px;padding:16px;margin:12px 0;background:#fff}.quiz-options{display:grid;gap:8px;margin-top:10px}.quiz-option{text-align:left;border:1px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:10px 12px;cursor:pointer;font-weight:800}.quiz-option.correct{background:#dcfce7;border-color:#22c55e;color:#166534}.quiz-option.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}.feedback{margin-top:8px;font-weight:800}.sparse-lesson-host-unlocked{max-width:none!important;overflow:visible!important;min-width:0!important}.sparse-lesson-host-unlocked.container,.sparse-lesson-host-unlocked[class*="container"]{width:100%!important}
+@media(max-width:900px){.grid-2,.grid-3,.hero-grid{grid-template-columns:1fr}.lesson-page{padding:14px}}
+
+.explain-lead{font-size:1.04rem;background:linear-gradient(135deg,#eef2ff,#ecfeff);border:1px solid #c7d2fe;border-radius:18px;padding:16px 18px;margin-bottom:18px}
+.concept-row{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:start;margin:12px 0}.concept-key{background:#312e81;color:#fff;border-radius:14px;padding:11px 12px;text-align:center;font-weight:900}.concept-value{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:11px 14px}
+.lg-demo{background:linear-gradient(180deg,#f8fafc,#eef2ff);border:1px solid #c7d2fe;border-radius:20px;padding:18px}.lg-result{margin-top:12px;border-radius:16px;background:#fff;border:1px solid #dbe4ff;padding:14px;min-height:82px}.power-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.power-chip{border-radius:999px;padding:6px 10px;background:#e2e8f0;color:#334155;font-weight:800}.power-chip.active{background:#4f46e5;color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.22)}
+.segment-diagram{overflow-x:auto;border:1px solid #dbe4ff;border-radius:20px;background:#f8fbff;padding:18px;margin:14px 0}.segment-track{display:grid;grid-template-columns:repeat(8,minmax(58px,1fr));gap:5px;min-width:570px}.segment-cell{border:1px solid #cbd5e1;background:#fff;border-radius:11px;padding:10px 5px;text-align:center;font-weight:900}.segment-cell small{display:block;color:#64748b;font-weight:700}.segment-cell.left-half{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}.segment-cell.right-half{background:#dcfce7;border-color:#22c55e;color:#166534}.segment-cell.overlap{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}.diagram-caption{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.92rem}.legend-dot{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}.dot-blue{background:#93c5fd}.dot-green{background:#86efac}.dot-purple{background:#c4b5fd}
+.formula-stack{display:grid;gap:10px;margin:14px 0}.formula-step{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:start}.formula-step-num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#4f46e5;color:#fff;font-weight:900}.formula-step-body{border:1px solid #dbe4ff;background:#fff;border-radius:16px;padding:11px 14px}
+.mistake-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.mistake-card{border:1px solid #fecaca;background:#fff7f7;border-radius:18px;padding:15px}.mistake-card b{color:#991b1b}.fix-line{margin-top:8px;border-left:4px solid #16a34a;background:#f0fdf4;border-radius:10px;padding:8px 10px}.mini-table{min-width:620px}.mini-table th,.mini-table td{text-align:center}.trace-box{border:1px solid #bae6fd;background:#f0f9ff;border-radius:18px;padding:16px}.index-note{font-size:.92rem;color:#475569}.code-explain-list{counter-reset:codeStep;display:grid;gap:10px;margin-top:12px}.code-explain-item{counter-increment:codeStep;position:relative;padding:13px 14px 13px 54px;border:1px solid #e2e8f0;border-radius:16px;background:#fff}.code-explain-item:before{content:counter(codeStep);position:absolute;left:14px;top:13px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#0e7490;color:#fff;font-weight:900}
+@media(max-width:760px){.concept-row{grid-template-columns:1fr}.mistake-grid{grid-template-columns:1fr}.concept-key{text-align:left}}
+
+
+/* Bố cục riêng cho phần mô phỏng xây Sparse Table:
+   ưu tiên chiều rộng cho bảng bên trái, thu gọn khung nhật ký bên phải. */
+#build .build-layout{
+    display:grid;
+    grid-template-columns:minmax(0,3.2fr) minmax(280px,.8fr);
+    gap:18px;
+    align-items:start;
+}
+#build .build-visual{
+    min-width:0;
+    width:100%;
+}
+#build #tableView{
+    width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding-bottom:4px;
+}
+#build #tableView .st-row{
+    display:grid;
+    grid-template-columns:105px repeat(var(--st-columns,9),minmax(48px,1fr));
+    gap:8px;
+    width:100%;
+    min-width:0;
+}
+#build #tableView .st-label{
+    width:auto;
+    min-width:0;
+    flex:none;
+}
+#build #tableView .st-cell{
+    min-width:0;
+    width:auto;
+    padding:8px 4px;
+}
+#build .build-log{
+    width:100%;
+    min-height:150px;
+    max-height:360px;
+    align-self:start;
+}
+@media(max-width:1180px){
+    #build .build-layout{grid-template-columns:minmax(0,2.35fr) minmax(250px,.85fr)}
+    #build #tableView .st-row{grid-template-columns:96px repeat(var(--st-columns,9),minmax(46px,1fr));min-width:0}
+}
+@media(max-width:900px){
+    #build .build-layout{grid-template-columns:1fr}
+    #build .build-log{min-height:120px;max-height:260px}
+}
+
+</style>
+<div class="lesson-page" id="lessonTop">
+<div class="lesson-hero"><div class="hero-badge"><i class="fa-solid fa-table-cells-large"></i> Range Query trên mảng tĩnh</div><h1>📚 Sparse Table: RMQ O(1) và các mở rộng</h1><p>Sparse Table tiền xử lý các đoạn có độ dài là lũy thừa của 2. Sau O(n log n) tiền xử lý, truy vấn min/max/gcd trên đoạn được trả lời trong O(1).</p><div class="hero-grid"><div class="hero-stat"><b>Build</b><span>O(n log n)</span></div><div class="hero-stat"><b>Query</b><span>O(1)</span></div><div class="hero-stat"><b>Memory</b><span>O(n log n)</span></div><div class="hero-stat"><b>Static</b><span>Không phù hợp update</span></div></div></div>
+<div class="lesson-progress-wrap"><div class="lesson-progress"><div class="lesson-progress-bar" id="progressBar"></div></div><div class="lesson-nav"><a href="#goals">Mục tiêu</a><a href="#idea">Ý tưởng</a><a href="#build">Xây bảng</a><a href="#query">Truy vấn</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#advanced">Mở rộng</a><a href="#quiz">Quiz</a></div></div>
+<section class="lesson-card" id="goals"><h2><i class="fa-solid fa-bullseye"></i> Mục tiêu bài học</h2><div class="grid-2"><div class="info-box"><h3>Cần nắm được</h3><ul><li><code>st[k][i]</code> lưu gì.</li><li>Công thức xây bảng.</li><li>Công thức truy vấn RMQ O(1).</li><li>Vì sao min/max/gcd dùng được còn sum/xor không dùng công thức chồng lấn.</li></ul></div><div class="info-box"><h3>Khi nào dùng?</h3><ul><li>Mảng không thay đổi.</li><li>Số truy vấn lớn.</li><li>Phép toán idempotent: min, max, gcd, AND, OR.</li><li>Cần query rất nhanh.</li></ul></div></div></section>
+<section class="lesson-card" id="idea"><h2><i class="fa-solid fa-lightbulb"></i> 1. Ý tưởng cốt lõi</h2><p>Ta tiền xử lý kết quả cho mọi đoạn có độ dài <code>1,2,4,8,...</code>.</p><div class="formula">st[k][i] = kết quả trên đoạn [i, i + 2<sup>k</sup> - 1]</div><div class="grid-3"><div class="info-box"><h3>k = 0</h3><p><code>st[0][i] = a[i]</code></p></div><div class="info-box"><h3>k = 1</h3><p>Độ dài 2.</p></div><div class="info-box"><h3>k = 2</h3><p>Độ dài 4.</p></div></div><div class="callout"><b>Công thức xây:</b> <code>st[k][i] = min(st[k-1][i], st[k-1][i + 2^(k-1)])</code>.</div></section>
+<section class="lesson-card" id="build"><h2><i class="fa-solid fa-gears"></i> 2. Mô phỏng xây Sparse Table</h2><div class="build-layout"><div class="visual-box build-visual"><label><b>Mảng đầu vào</b></label><input id="arrayInput" class="input-lesson" value="7 2 3 0 5 10 3 12 18"><div class="controls"><button class="btn-lesson" id="buildBtn">Xây bảng</button><button class="btn-lesson secondary" id="stepBtn">Hiện từng tầng</button></div><div class="st-grid" id="tableView"></div></div><div class="log-box build-log" id="buildLog">Nhấn “Xây bảng”.</div></div></section>
+<section class="lesson-card" id="query"><h2><i class="fa-solid fa-magnifying-glass"></i> 3. Truy vấn RMQ O(1)</h2><p>Với <code>len=R-L+1</code>, chọn <code>k=floor(log2(len))</code>. Lấy hai đoạn dài <code>2^k</code> phủ từ hai đầu.</p><div class="formula">min(L,R) = min(st[k][L], st[k][R - 2<sup>k</sup> + 1])</div><div class="grid-2"><div class="visual-box"><label><b>L (0-based)</b></label><input id="queryL" class="input-lesson" value="1"><label><b>R (0-based)</b></label><input id="queryR" class="input-lesson" value="6"><div class="controls"><button class="btn-lesson green" id="queryBtn">Truy vấn min</button></div><div class="st-grid" id="queryView"></div></div><div class="log-box" id="queryLog">Xây bảng trước, sau đó nhập L và R.</div></div><div class="callout success"><b>Hai đoạn được phép chồng lấn</b> vì min idempotent: <code>min(x,x)=x</code>.</div></section>
+<section class="lesson-card" id="analysis"><h2><i class="fa-solid fa-chart-line"></i> 4. Phân tích thuật toán</h2><div class="table-wrap"><table class="lesson-table"><thead><tr><th>Phần</th><th>Độ phức tạp</th><th>Giải thích</th></tr></thead><tbody><tr><td>Tiền xử lý log</td><td>O(n)</td><td><code>lg[i]=lg[i/2]+1</code>.</td></tr><tr><td>Xây bảng</td><td>O(n log n)</td><td>Khoảng log n tầng, mỗi tầng tối đa n trạng thái.</td></tr><tr><td>Query min/max/gcd</td><td>O(1)</td><td>Hai đoạn chồng lấn.</td></tr><tr><td>Bộ nhớ</td><td>O(n log n)</td><td>Lưu toàn bộ các tầng.</td></tr><tr><td>Update</td><td>Không phù hợp</td><td>Nếu có cập nhật, dùng Segment Tree.</td></tr></tbody></table></div><div class="callout warn"><b>Điều kiện:</b> Công thức O(1) bằng hai đoạn chồng lấn chỉ đúng trực tiếp cho phép toán idempotent. Sum và xor sẽ đếm lặp phần giao.</div></section>
+<section class="lesson-card" id="code"><h2><i class="fa-solid fa-code"></i> 5. Code mẫu</h2><div class="code-tabs"><div class="tab-buttons"><button class="tab-btn active" data-target="cppMin">C++17 RMQ Min</button><button class="tab-btn" data-target="cppGcd">C++17 GCD</button><button class="tab-btn" data-target="pyMin">Python</button></div><div class="tab-panel active" id="cppMin"><button class="copy-btn">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+struct SparseTableMin {
+    int n, K;
+    vector&lt;int&gt; lg;
+    vector&lt;vector&lt;long long&gt;&gt; st;
+
+    SparseTableMin(const vector&lt;long long&gt;&amp; a) {
+        n = (int)a.size();
+
+        lg.assign(n + 1, 0);
+        for (int i = 2; i &lt;= n; i++)
+            lg[i] = lg[i / 2] + 1;
+
+        K = lg[n] + 1;
+        st.assign(K, vector&lt;long long&gt;(n));
+        st[0] = a;
+
+        for (int k = 1; k &lt; K; k++) {
+            int len = 1 &lt;&lt; k;
+            int half = len &gt;&gt; 1;
+
+            for (int i = 0; i + len &lt;= n; i++) {
+                st[k][i] = min(st[k - 1][i],
+                               st[k - 1][i + half]);
+            }
+        }
+    }
+
+    long long query(int l, int r) const {
+        int len = r - l + 1;
+        int k = lg[len];
+        return min(st[k][l],
+                   st[k][r - (1 &lt;&lt; k) + 1]);
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, q;
+    cin &gt;&gt; n &gt;&gt; q;
+    vector&lt;long long&gt; a(n);
+    for (long long &amp;x : a) cin &gt;&gt; x;
+
+    SparseTableMin rmq(a);
+
+    while (q--) {
+        int l, r;
+        cin &gt;&gt; l &gt;&gt; r;
+        --l; --r;
+        cout &lt;&lt; rmq.query(l, r) &lt;&lt; '\n';
+    }
+}</code></pre></div><div class="tab-panel" id="cppGcd"><button class="copy-btn">Sao chép</button><pre><code>long long queryGcd(int l, int r) {
+    int k = lg[r - l + 1];
+    return std::gcd(
+        st[k][l],
+        st[k][r - (1 &lt;&lt; k) + 1]
+    );
+}</code></pre></div><div class="tab-panel" id="pyMin"><button class="copy-btn">Sao chép</button><pre><code>class SparseTableMin:
+    def __init__(self, a):
+        self.n = len(a)
+        self.lg = [0] * (self.n + 1)
+        for i in range(2, self.n + 1):
+            self.lg[i] = self.lg[i // 2] + 1
+
+        self.K = self.lg[self.n] + 1
+        self.st = [[0] * self.n for _ in range(self.K)]
+        self.st[0] = a[:]
+
+        for k in range(1, self.K):
+            length = 1 &lt;&lt; k
+            half = length &gt;&gt; 1
+            for i in range(self.n - length + 1):
+                self.st[k][i] = min(
+                    self.st[k - 1][i],
+                    self.st[k - 1][i + half]
+                )
+
+    def query(self, left, right):
+        k = self.lg[right - left + 1]
+        return min(
+            self.st[k][left],
+            self.st[k][right - (1 &lt;&lt; k) + 1]
+        )</code></pre></div></div></section>
+<section class="lesson-card" id="explain">
+<h2><i class="fa-solid fa-magnifying-glass-code"></i> 6. Giải thích code từ bản chất đến công thức</h2>
+<div class="explain-lead"><b>Mục tiêu của phần này:</b> không chỉ nhớ công thức, mà phải trả lời được ba câu hỏi: <b>mỗi tầng quản lý đoạn dài bao nhiêu</b>, <b>vì sao nửa phải dịch đúng <code>2^(k-1)</code> vị trí</b>, và <b>mảng <code>lg</code> chọn tầng nào cho đoạn truy vấn</b>.</div>
+
+<h3>6.1. Ý nghĩa chính xác của <code>st[k][i]</code></h3>
+<div class="concept-row"><div class="concept-key"><code>k</code></div><div class="concept-value">Số tầng. Tầng <code>k</code> quản lý các đoạn có độ dài <code>2^k</code>.</div></div>
+<div class="concept-row"><div class="concept-key"><code>i</code></div><div class="concept-value">Vị trí bắt đầu của đoạn.</div></div>
+<div class="concept-row"><div class="concept-key"><code>st[k][i]</code></div><div class="concept-value">Giá trị nhỏ nhất trên đoạn <code>[i, i + 2^k - 1]</code>.</div></div>
+<div class="formula">st[k][i] = min của đoạn [i, i + 2<sup>k</sup> - 1]</div>
+<div class="table-wrap"><table class="lesson-table mini-table"><thead><tr><th>Tầng k</th><th>Độ dài 2<sup>k</sup></th><th><code>st[k][i]</code> quản lý</th></tr></thead><tbody><tr><td>0</td><td>1</td><td>[i, i]</td></tr><tr><td>1</td><td>2</td><td>[i, i+1]</td></tr><tr><td>2</td><td>4</td><td>[i, i+3]</td></tr><tr><td>3</td><td>8</td><td>[i, i+7]</td></tr></tbody></table></div>
+
+<h3>6.2. Mảng <code>lg</code> dùng để chọn tầng, không quản lý trực tiếp đoạn</h3>
+<p><code>lg[len]</code> trả về số nguyên lớn nhất <code>k</code> sao cho <code>2^k ≤ len</code>. Nói cách khác:</p>
+<div class="formula">lg[len] = ⌊log<sub>2</sub>(len)⌋</div>
+<div class="grid-2">
+<div>
+<div class="code-tabs"><div class="tab-panel active"><pre><code>lg.assign(n + 1, 0);
+for (int len = 2; len &lt;= n; len++) {
+    lg[len] = lg[len / 2] + 1;
+}</code></pre></div></div>
+<div class="callout success"><b>Phải bắt đầu từ 2.</b> Ta cần <code>lg[1]=0</code>. Nếu lặp từ <code>i=1</code> thì <code>lg[1]=lg[0]+1=1</code>, sai vì <code>log2(1)=0</code>.</div>
+<p><b>Vì sao dùng <code>len/2</code>?</b> Khi chia độ dài cho 2, số mũ lớn nhất của 2 giảm đúng 1. Do đó <code>lg[len] = lg[len/2] + 1</code>.</p>
+<p><b>Không dùng <code>sqrt(len)</code></b> vì căn bậc hai không cho biết số mũ tầng. Ví dụ <code>len=64</code>: <code>sqrt(64)=8</code>, nhưng tầng đúng là <code>log2(64)=6</code>.</p>
+</div>
+<div class="lg-demo">
+<label for="lgLenInput"><b>Thử chọn tầng theo độ dài</b></label>
+<input id="lgLenInput" class="input-lesson" type="number" min="1" value="13">
+<div class="controls"><button class="btn-lesson" id="lgDemoBtn" type="button">Tính lg[len]</button></div>
+<div class="lg-result" id="lgDemoResult"></div>
+<div class="power-strip" id="lgPowerStrip"></div>
+</div>
+</div>
+<div class="table-wrap"><table class="lesson-table mini-table"><thead><tr><th>len</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>16</th></tr></thead><tbody><tr><th>lg[len]</th><td>0</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>2</td><td>3</td><td>3</td><td>4</td></tr></tbody></table></div>
+
+<h3>6.3. Công thức quan trọng nhất khi xây Sparse Table</h3>
+<p>Đoạn dài <code>2^k</code> được ghép từ hai đoạn liên tiếp, mỗi đoạn dài <code>2^(k-1)</code>.</p>
+<div class="formula">st[k][i] = min(st[k-1][i], st[k-1][i + 2<sup>k-1</sup>])</div>
+<div class="segment-diagram">
+<div class="segment-track">
+<div class="segment-cell left-half"><small>i</small>1</div><div class="segment-cell left-half"><small>i+1</small>2</div><div class="segment-cell left-half"><small>i+2</small>3</div><div class="segment-cell left-half"><small>i+3</small>4</div>
+<div class="segment-cell right-half"><small>i+4</small>5</div><div class="segment-cell right-half"><small>i+5</small>6</div><div class="segment-cell right-half"><small>i+6</small>7</div><div class="segment-cell right-half"><small>i+7</small>8</div>
+</div>
+<div class="diagram-caption"><span><i class="legend-dot dot-blue"></i><code>st[k-1][i]</code>: nửa trái</span><span><i class="legend-dot dot-green"></i><code>st[k-1][i + 2^(k-1)]</code>: nửa phải</span></div>
+<p class="index-note">Hình minh họa với <code>k=3</code>: đoạn cha dài <code>2^3=8</code>; mỗi nửa dài <code>2^2=4</code>; nửa phải bắt đầu tại <code>i+4</code>.</p>
+</div>
+<div class="formula-stack">
+<div class="formula-step"><div class="formula-step-num">1</div><div class="formula-step-body"><b>Độ dài đoạn cha:</b> <code>2^k</code>.</div></div>
+<div class="formula-step"><div class="formula-step-num">2</div><div class="formula-step-body"><b>Độ dài mỗi nửa:</b> <code>2^(k-1)</code>.</div></div>
+<div class="formula-step"><div class="formula-step-num">3</div><div class="formula-step-body"><b>Nửa trái bắt đầu tại:</b> <code>i</code>.</div></div>
+<div class="formula-step"><div class="formula-step-num">4</div><div class="formula-step-body"><b>Nửa phải bắt đầu tại:</b> <code>i + 2^(k-1)</code>, viết trong C++ là <code>i + (1 &lt;&lt; (k-1))</code>.</div></div>
+</div>
+<div class="callout danger"><b>Không dùng <code>i+k</code>.</b> <code>k</code> chỉ là số tầng. Khoảng dịch cần dùng là độ dài nửa đoạn, tức <code>2^(k-1)</code>.</div>
+
+<h3>6.4. Vì sao điều kiện build là <code>i + len &lt;= n</code>?</h3>
+<p>Code mẫu dùng chỉ số <b>0-based</b>. Đoạn bắt đầu tại <code>i</code>, dài <code>len</code>, kết thúc tại <code>i+len-1</code>. Điều kiện không vượt mảng là:</p>
+<div class="formula">i + len - 1 ≤ n - 1 &nbsp;⇔&nbsp; i + len ≤ n</div>
+<div class="callout warn"><b>Nếu dùng 1-based như code ban đầu:</b> điều kiện tương đương là <code>i + (1&lt;&lt;k) - 1 &lt;= n</code>. Hai cách viết đều đúng, nhưng phải thống nhất hệ chỉ số.</div>
+
+<h3>6.5. Công thức truy vấn RMQ O(1)</h3>
+<div class="code-tabs"><div class="tab-panel active"><pre><code>long long query(int l, int r) const {
+    int len = r - l + 1;
+    int k = lg[len];
+
+    return min(
+        st[k][l],
+        st[k][r - (1 &lt;&lt; k) + 1]
+    );
+}</code></pre></div></div>
+<div class="formula-stack">
+<div class="formula-step"><div class="formula-step-num">1</div><div class="formula-step-body"><code>len = r-l+1</code>: tính độ dài đoạn cần hỏi.</div></div>
+<div class="formula-step"><div class="formula-step-num">2</div><div class="formula-step-body"><code>k = lg[len]</code>: chọn tầng lớn nhất có <code>2^k ≤ len</code>.</div></div>
+<div class="formula-step"><div class="formula-step-num">3</div><div class="formula-step-body"><code>st[k][l]</code>: đoạn dài <code>2^k</code> bám từ đầu trái.</div></div>
+<div class="formula-step"><div class="formula-step-num">4</div><div class="formula-step-body"><code>st[k][r-2^k+1]</code>: đoạn dài <code>2^k</code> bám đến đầu phải.</div></div>
+</div>
+<div class="trace-box"><b>Ví dụ 0-based: truy vấn [1,6]</b><br><code>len=6</code>, nên <code>k=lg[6]=2</code> và <code>2^k=4</code>.<br>Đoạn trái: <code>[1,4]</code>.<br>Đoạn phải bắt đầu tại <code>6-4+1=3</code>, nên là <code>[3,6]</code>.<br>Hai đoạn phủ toàn bộ <code>[1,6]</code>; phần <code>[3,4]</code> bị chồng lấn nhưng không làm sai phép min.</div>
+<div class="segment-diagram">
+<div class="segment-track">
+<div class="segment-cell"><small>0</small>A[0]</div><div class="segment-cell left-half"><small>1</small>A[1]</div><div class="segment-cell left-half"><small>2</small>A[2]</div><div class="segment-cell overlap"><small>3</small>A[3]</div><div class="segment-cell overlap"><small>4</small>A[4]</div><div class="segment-cell right-half"><small>5</small>A[5]</div><div class="segment-cell right-half"><small>6</small>A[6]</div><div class="segment-cell"><small>7</small>A[7]</div>
+</div>
+<div class="diagram-caption"><span><i class="legend-dot dot-blue"></i>chỉ đoạn trái</span><span><i class="legend-dot dot-purple"></i>phần chồng lấn</span><span><i class="legend-dot dot-green"></i>chỉ đoạn phải</span></div>
+</div>
+
+<h3>6.6. Vì sao min dùng được hai đoạn chồng lấn, còn sum thì không?</h3>
+<div class="callout success"><b>Min là idempotent:</b> <code>min(x,x)=x</code>. Một phần tử xuất hiện ở cả hai đoạn vẫn chỉ ảnh hưởng như xuất hiện một lần.</div>
+<div class="callout danger"><b>Sum không idempotent:</b> <code>x+x≠x</code>. Phần giao sẽ bị cộng hai lần. Range sum tĩnh nên dùng Prefix Sum; phép toán kết hợp tổng quát có thể dùng Disjoint Sparse Table.</div>
+</section>
+<section class="lesson-card" id="advanced"><h2><i class="fa-solid fa-layer-group"></i> 7. Kiến thức mở rộng</h2><div class="grid-2"><div class="info-box"><h3>Disjoint Sparse Table</h3><p>Build O(n log n), query O(1) cho phép toán associative như sum, xor, product. Hai phần dùng để query không chồng lấn.</p></div><div class="info-box"><h3>Argmin / Argmax</h3><p>Lưu chỉ số thay vì giá trị để biết vị trí phần tử nhỏ nhất/lớn nhất.</p></div><div class="info-box"><h3>2D Sparse Table</h3><p>Truy vấn min/max trên hình chữ nhật tĩnh, nhưng bộ nhớ lớn: O(nm log n log m).</p></div><div class="info-box"><h3>Fischer–Heun RMQ</h3><p>Lý thuyết nâng cao đạt build O(n), query O(1), nhưng Sparse Table đơn giản hơn và phù hợp đa số bài thi.</p></div></div><div class="table-wrap"><table class="lesson-table"><thead><tr><th>Cấu trúc</th><th>Build</th><th>Query</th><th>Update</th><th>Dùng khi</th></tr></thead><tbody><tr><td>Sparse Table</td><td>O(n log n)</td><td>O(1)</td><td>Không tốt</td><td>RMQ tĩnh</td></tr><tr><td>Segment Tree</td><td>O(n)</td><td>O(log n)</td><td>O(log n)</td><td>Có cập nhật</td></tr><tr><td>Fenwick</td><td>O(n)</td><td>O(log n)</td><td>O(log n)</td><td>Tổng prefix/range</td></tr><tr><td>Prefix Sum</td><td>O(n)</td><td>O(1)</td><td>Không tốt</td><td>Range sum tĩnh</td></tr><tr><td>Disjoint Sparse Table</td><td>O(n log n)</td><td>O(1)</td><td>Không tốt</td><td>Phép toán associative</td></tr></tbody></table></div></section>
+<section class="lesson-card"><h2><i class="fa-solid fa-triangle-exclamation"></i> 8. Lỗi hay gặp</h2><ul><li>Nhầm 0-based và 1-based.</li><li>Tính sai vị trí đoạn phải.</li><li>Build vượt giới hạn mảng.</li><li>Dùng Sparse Table khi có update.</li><li>Dùng công thức chồng lấn cho sum/xor.</li><li>Dùng <code>log2()</code> số thực trong query và gặp sai số.</li></ul></section>
+<section class="lesson-card" id="quiz"><h2><i class="fa-solid fa-circle-question"></i> 9. Quiz và bài tập</h2><div class="quiz-item" data-answer="b"><b>Câu 1.</b> <code>st[k][i]</code> lưu đoạn nào?<div class="quiz-options"><button class="quiz-option" data-choice="a">[0,i]</button><button class="quiz-option" data-choice="b">[i,i+2^k-1]</button><button class="quiz-option" data-choice="c">[i-k,i+k]</button></div><div class="feedback"></div></div><div class="quiz-item" data-answer="c"><b>Câu 2.</b> Vì sao query min được dùng hai đoạn chồng lấn?<div class="quiz-options"><button class="quiz-option" data-choice="a">Vì mảng đã sắp xếp</button><button class="quiz-option" data-choice="b">Vì hai đoạn luôn rời nhau</button><button class="quiz-option" data-choice="c">Vì min idempotent</button></div><div class="feedback"></div></div><div class="grid-2"><div class="exercise-card"><h3>📘 Cơ bản</h3><ol><li>RMQ min.</li><li>RMQ max.</li><li>GCD trên đoạn.</li></ol></div><div class="exercise-card"><h3>📗 Trung bình</h3><ol><li>Trả về chỉ số min.</li><li>Binary search kết hợp RMQ.</li><li>Longest subarray thỏa điều kiện min/max.</li></ol></div><div class="exercise-card"><h3>📙 Nâng cao</h3><ol><li>2D Sparse Table.</li><li>Disjoint Sparse Table cho xor/sum.</li><li>LCA bằng Euler Tour + RMQ.</li></ol></div><div class="exercise-card"><h3>🐉 HSG</h3><ol><li>Cartesian Tree + RMQ.</li><li>GCD subarray compression.</li><li>So sánh Sparse Table và Fischer–Heun.</li></ol></div></div></section>
+</div>
+<script>
+(function(){'use strict';function $(s,r){return(r||document).querySelector(s)}function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}function parseA(){var t=$('#arrayInput').value.trim();return t?t.split(/\s+/).map(Number).filter(Number.isFinite):[]}function build(a){var n=a.length,lg=Array(n+1).fill(0);for(var i=2;i<=n;i++)lg[i]=lg[Math.floor(i/2)]+1;var K=n?lg[n]+1:0,st=[];if(n)st.push(a.slice());for(var k=1;k<K;k++){var len=1<<k,half=len>>1,row=Array(n).fill(null);for(var j=0;j+len<=n;j++)row[j]=Math.min(st[k-1][j],st[k-1][j+half]);st.push(row)}return{a:a,lg:lg,st:st,K:K}}var state={d:null,visible:0};function cell(v,i,cls){return'<div class="st-cell '+(cls||'')+'"><small>i='+i+'</small>'+(v==null?'—':v)+'</div>'}function render(limit){var d=state.d,box=$('#tableView');if(!d||!box)return;box.style.setProperty('--st-columns',d.a.length);var s='';for(var k=0;k<Math.min(d.K,limit);k++){s+='<div class="st-row"><div class="st-label">k='+k+'<br>len='+(1<<k)+'</div>';for(var i=0;i<d.a.length;i++)s+=cell(d.st[k][i],i,'');s+='</div>'}box.innerHTML=s}function doBuild(){var a=parseA();if(!a.length)return;state.d=build(a);state.visible=state.d.K;render(state.visible);$('#buildLog').innerHTML='Đã xây '+state.d.K+' tầng cho n='+a.length+'.'}function step(){var a=parseA();if(!state.d||state.d.a.join(',')!==a.join(',')){state.d=build(a);state.visible=0}state.visible=Math.min(state.d.K,state.visible+1);render(state.visible);$('#buildLog').innerHTML='Hiển thị đến tầng k='+(state.visible-1)+'.'}function query(){if(!state.d)doBuild();var d=state.d,n=d.a.length,L=Math.max(0,Math.floor(Number($('#queryL').value)||0)),R=Math.max(0,Math.floor(Number($('#queryR').value)||0));if(L>R){var t=L;L=R;R=t}R=Math.min(R,n-1);L=Math.min(L,R);var len=R-L+1,k=d.lg[len],pow=1<<k,right=R-pow+1,ans=Math.min(d.st[k][L],d.st[k][right]),s='<div class="st-row"><div class="st-label">A</div>';for(var i=0;i<n;i++){var inL=i>=L&&i<L+pow,inR=i>=right&&i<=R,cls=inL&&inR?'both':inL?'left':inR?'right':'';s+=cell(d.a[i],i,cls)}s+='</div>';$('#queryView').innerHTML=s;$('#queryLog').innerHTML='<b>len='+len+', k='+k+'.</b><br>Trái ['+L+','+(L+pow-1)+'] → '+d.st[k][L]+'.<br>Phải ['+right+','+R+'] → '+d.st[k][right]+'.<br><b>Kết quả = '+ans+'.</b>'}function tabs(){$all('.code-tabs').forEach(function(box){$all('.tab-btn',box).forEach(function(btn){btn.addEventListener('click',function(){$all('.tab-btn',box).forEach(function(x){x.classList.remove('active')});$all('.tab-panel',box).forEach(function(x){x.classList.remove('active')});btn.classList.add('active');var p=document.getElementById(btn.dataset.target);if(p)p.classList.add('active')})})})}function copy(){$all('.copy-btn').forEach(function(btn){btn.addEventListener('click',function(){var txt=btn.parentElement.querySelector('code').textContent;if(navigator.clipboard)navigator.clipboard.writeText(txt);var o=btn.textContent;btn.textContent='Đã chép';setTimeout(function(){btn.textContent=o},1000)})})}function quiz(){$all('.quiz-item').forEach(function(item){var ans=item.dataset.answer,fb=item.querySelector('.feedback');$all('.quiz-option',item).forEach(function(btn){btn.addEventListener('click',function(){$all('.quiz-option',item).forEach(function(x){x.classList.remove('correct','wrong')});if(btn.dataset.choice===ans){btn.classList.add('correct');fb.textContent='Đúng rồi!'}else{btn.classList.add('wrong');item.querySelector('[data-choice="'+ans+'"]').classList.add('correct');fb.textContent='Chưa đúng.'}})})})}function progress(){var b=$('#progressBar');function f(){var h=Math.max(1,document.documentElement.scrollHeight-innerHeight);b.style.width=Math.min(100,scrollY/h*100)+'%'}addEventListener('scroll',f,{passive:true});f()}document.addEventListener('DOMContentLoaded',function(){tabs();copy();quiz();progress();$('#buildBtn').addEventListener('click',doBuild);$('#stepBtn').addEventListener('click',step);$('#queryBtn').addEventListener('click',query);doBuild();if(window.hljs&&window.hljs.highlightAll)try{window.hljs.highlightAll()}catch(e){}})})();
+</script>
+
+<script>
+(function(){
+  'use strict';
+  function renderLgDemo(){
+    var input=document.getElementById('lgLenInput');
+    var result=document.getElementById('lgDemoResult');
+    var strip=document.getElementById('lgPowerStrip');
+    if(!input||!result||!strip)return;
+    var len=Math.max(1,Math.floor(Number(input.value)||1));
+    input.value=len;
+    var k=0;
+    while((1<<(k+1))<=len && k<29)k++;
+    var low=Math.pow(2,k),high=Math.pow(2,k+1);
+    result.innerHTML='<b>lg['+len+'] = '+k+'</b><br>Vì <code>2<sup>'+k+'</sup> = '+low+' ≤ '+len+' &lt; '+high+' = 2<sup>'+(k+1)+'</sup></code>.<br>Sparse Table sẽ chọn <b>tầng '+k+'</b>, mỗi block dài <b>'+low+'</b> phần tử.';
+    var html='';
+    for(var i=0;i<=Math.min(k+2,12);i++){
+      html+='<span class="power-chip '+(i===k?'active':'')+'">2<sup>'+i+'</sup>='+Math.pow(2,i)+'</span>';
+    }
+    strip.innerHTML=html;
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('lgDemoBtn');
+    var input=document.getElementById('lgLenInput');
+    if(btn)btn.addEventListener('click',renderLgDemo);
+    if(input)input.addEventListener('keydown',function(e){if(e.key==='Enter')renderLgDemo();});
+    renderLgDemo();
+  });
+})();
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  function unlockSparseLessonWidth(){
+    var lesson=document.querySelector('.lesson-page');
+    if(!lesson)return;
+
+    /* Căn bài giảng theo toàn bộ viewport, không theo cột nội dung hẹp bên ngoài. */
+    lesson.style.setProperty('width','min(1680px, calc(100vw - 32px))','important');
+    lesson.style.setProperty('max-width','none','important');
+    lesson.style.setProperty('margin','0','important');
+    lesson.style.setProperty('left','50%','important');
+    lesson.style.setProperty('transform','translateX(-50%)','important');
+
+    /*
+       Một số template đặt bài học trong .container/.card có max-width và
+       overflow:hidden. Chỉ mở khóa đúng chuỗi phần tử cha của bài giảng,
+       không tác động đến các phần khác của website.
+    */
+    var parent=lesson.parentElement;
+    var depth=0;
+    while(parent&&parent!==document.body&&depth<14){
+      parent.classList.add('sparse-lesson-host-unlocked');
+      parent.style.setProperty('max-width','none','important');
+      parent.style.setProperty('overflow','visible','important');
+      parent.style.setProperty('overflow-x','visible','important');
+      parent.style.setProperty('min-width','0','important');
+
+      var parentStyle=window.getComputedStyle(parent.parentElement||document.body);
+      if(parentStyle.display==='grid'){
+        parent.style.setProperty('grid-column','1 / -1','important');
+      }
+      if(parentStyle.display==='flex'){
+        parent.style.setProperty('flex','1 1 100%','important');
+      }
+
+      parent=parent.parentElement;
+      depth++;
+    }
+
+    document.documentElement.style.setProperty('overflow-x','visible','important');
+    if(document.body){
+      document.body.style.setProperty('overflow-x','visible','important');
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',unlockSparseLessonWidth);
+  }else{
+    unlockSparseLessonWidth();
+  }
+  window.addEventListener('resize',unlockSparseLessonWidth,{passive:true});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

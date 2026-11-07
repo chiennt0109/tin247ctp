@@ -1,19 +1,462 @@
-<article class="roadmap-extra-topic">
-  <h1>Sliding window</h1>
-  <section>
-    <h2>Mục tiêu</h2>
-    <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
-    </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
-    <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
-    </ol>
-  </section>
-</article>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.sw-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+border-radius:0;box-sizing:border-box;position:relative;width:calc(100vw - 24px);
+max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.sw-page *{box-sizing:border-box}.sw-page h1,.sw-page h2,.sw-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:980px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.array-row{display:flex;gap:8px;overflow:auto;padding:8px 0}.cell{min-width:76px;padding:9px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900;position:relative;transition:.2s}.cell small{display:block;color:#64748b;font-size:.72rem}.cell.window{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}.cell.current{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:translateY(-2px)}.cell.best{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.removed{background:#fee2e2;border-color:#ef4444;color:#991b1b}.cell.pointer{outline:3px solid #8b5cf6}
+.pointer-tag{position:absolute;top:-25px;left:50%;transform:translateX(-50%);padding:2px 7px;border-radius:99px;color:#fff;font-size:.7rem}.tag-l{background:#2563eb}.tag-r{background:#0891b2}
+.deque-view{display:flex;gap:9px;min-height:92px;align-items:center;padding:12px;border:1px dashed #94a3b8;border-radius:15px;background:#f8fafc;overflow:auto}.dq-item{min-width:70px;padding:9px;border-radius:12px;background:#eef2ff;border:2px solid #c7d2fe;color:#312e81;text-align:center;font-weight:900}.dq-item.front{background:#dcfce7;border-color:#22c55e;color:#166534}
+.log{min-height:120px;max-height:340px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.sw-page pre{margin:0;padding:20px;max-height:660px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.sw-page p code,.sw-page li code,.sw-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.sw-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.sw-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
+</style>
+
+<div class="sw-page">
+<div class="hero">
+  <span class="badge">Array Technique</span>
+  <h1>🪟 Sliding Window – Cửa sổ trượt</h1>
+  <p>Sliding Window duy trì thông tin của một đoạn liên tiếp khi biên trái và biên phải thay đổi. Nhờ cập nhật phần thêm vào và loại bỏ phần rời khỏi cửa sổ, nhiều bài toán O(nk) hoặc O(n²) được giảm xuống O(n).</p>
+  <div class="stats">
+    <div class="stat"><b>Fixed-size</b><span>Cửa sổ có độ dài k</span></div>
+    <div class="stat"><b>Variable-size</b><span>Co giãn theo điều kiện</span></div>
+    <div class="stat"><b>O(n)</b><span>Mỗi con trỏ chỉ tiến</span></div>
+    <div class="stat"><b>Deque</b><span>Max/min cửa sổ</span></div>
+  </div>
+</div>
+
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#types">Các dạng</a><a href="#fixed">Cố định</a><a href="#variable">Co giãn</a><a href="#frequency">Tần suất</a><a href="#deque">Max/Min</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
+
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Sliding Window là gì và khác brute force thế nào.</li><li>Cửa sổ cố định và cửa sổ co giãn.</li><li>Cách cập nhật tổng/tần suất khi cửa sổ dịch chuyển.</li><li>Điều kiện đơn điệu để dùng cửa sổ co giãn.</li><li>Khi nào cần deque để duy trì max/min.</li></ul></div>
+    <div class="box"><h3>Dấu hiệu nhận biết</h3><ul><li>Đoạn con liên tiếp.</li><li>Mỗi đoạn có độ dài k.</li><li>Đoạn dài nhất/ngắn nhất thỏa điều kiện.</li><li>Tổng, số loại, tần suất trong cửa sổ.</li><li>Hai biên chỉ di chuyển sang phải.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu 1 – cửa sổ cố định.</b><br>
+    Cho mảng n số và số k. Hãy tìm tổng lớn nhất của một đoạn liên tiếp có đúng k phần tử.
+  </div>
+
+  <h3>1.1. Cách làm trực tiếp</h3>
+  <p>Với mỗi vị trí bắt đầu, cộng lại k phần tử. Có khoảng n cửa sổ, mỗi cửa sổ mất O(k), tổng O(nk).</p>
+
+  <h3>1.2. Quan sát khi dịch cửa sổ</h3>
+  <p>Khi cửa sổ <code>[L,R]</code> dịch sang phải thành <code>[L+1,R+1]</code>:</p>
+  <ul>
+    <li>Loại bỏ <code>a[L]</code>.</li>
+    <li>Thêm <code>a[R+1]</code>.</li>
+  </ul>
+
+  <div class="formula">newSum = oldSum - a[L] + a[R+1]</div>
+
+  <div class="call">
+    <b>Bài toán mở đầu 2 – cửa sổ co giãn.</b><br>
+    Cho mảng số không âm và K. Tìm đoạn liên tiếp dài nhất có tổng không vượt quá K.
+  </div>
+
+  <p>Ta mở rộng R. Nếu tổng vượt K, tăng L để thu nhỏ cửa sổ cho đến khi hợp lệ.</p>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Bài toán</th><th>Brute force</th><th>Sliding Window</th></tr>
+    <tr><td>Tổng lớn nhất đoạn dài k</td><td>O(nk)</td><td>O(n)</td></tr>
+    <tr><td>Đoạn dài nhất có tổng ≤ K, số không âm</td><td>O(n²)</td><td>O(n)</td></tr>
+  </table></div>
+
+  <div class="call ok"><b>Bản chất:</b> không tính lại từ đầu; chỉ cập nhật phần tử vừa vào và phần tử vừa ra khỏi cửa sổ.</div>
+</section>
+
+<section class="card" id="types">
+  <h2>2. Các dạng Sliding Window</h2>
+  <div class="g3">
+    <div class="box"><h3>Cửa sổ cố định</h3><p>Độ dài luôn bằng k.</p><p>Ví dụ: tổng/max/min mỗi đoạn k phần tử.</p></div>
+    <div class="box"><h3>Cửa sổ co giãn</h3><p>R mở rộng, L co lại để duy trì điều kiện.</p><p>Ví dụ: đoạn dài nhất có tổng ≤ K.</p></div>
+    <div class="box"><h3>Cửa sổ + cấu trúc phụ</h3><p>Dùng map, mảng đếm, deque.</p><p>Ví dụ: số ký tự khác nhau, max/min cửa sổ.</p></div>
+  </div>
+  <div class="call warn"><b>Điều kiện cốt lõi:</b> cửa sổ co giãn cần tính đơn điệu. Nếu có số âm, tổng có thể thay đổi không dự đoán được và kỹ thuật có thể sai.</div>
+</section>
+
+<section class="card" id="fixed">
+  <h2>3. Mô phỏng cửa sổ cố định</h2>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng</b></label><input class="input" id="fixedArray" value="2 1 5 1 3 2">
+      <label><b>k</b></label><input class="input" id="fixedK" value="3">
+      <div class="controls"><button class="btn" id="fixedNext">Bước tiếp</button><button class="btn alt" id="fixedReset">Làm lại</button><button class="btn orange" id="fixedAuto">Tự chạy</button></div>
+      <div class="array-row" id="fixedRow"></div>
+    </div>
+    <div class="log" id="fixedLog"></div>
+  </div>
+</section>
+
+<section class="card" id="variable">
+  <h2>4. Mô phỏng cửa sổ co giãn</h2>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng số không âm</b></label><input class="input" id="varArray" value="2 1 3 2 4 1 1">
+      <label><b>K</b></label><input class="input" id="varK" value="7">
+      <div class="controls"><button class="btn" id="varNext">Bước tiếp</button><button class="btn alt" id="varReset">Làm lại</button><button class="btn orange" id="varAuto">Tự chạy</button></div>
+      <div class="array-row" id="varRow"></div>
+    </div>
+    <div class="log" id="varLog"></div>
+  </div>
+</section>
+
+<section class="card" id="frequency">
+  <h2>5. Sliding Window với bảng tần suất</h2>
+  <p>Bài toán mẫu: tìm độ dài đoạn dài nhất có không quá K giá trị khác nhau.</p>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng</b></label><input class="input" id="freqArray" value="1 2 1 3 4 2 3">
+      <label><b>K loại khác nhau</b></label><input class="input" id="freqK" value="2">
+      <div class="controls"><button class="btn" id="freqNext">Bước tiếp</button><button class="btn alt" id="freqReset">Làm lại</button></div>
+      <div class="array-row" id="freqRow"></div>
+    </div>
+    <div class="log" id="freqLog"></div>
+  </div>
+</section>
+
+<section class="card" id="deque">
+  <h2>6. Sliding Window Maximum bằng deque</h2>
+  <p>Để lấy max mỗi cửa sổ trong O(1) trung bình, deque lưu chỉ số theo thứ tự giá trị giảm dần.</p>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng</b></label><input class="input" id="maxArray" value="1 3 -1 -3 5 3 6 7">
+      <label><b>k</b></label><input class="input" id="maxK" value="3">
+      <div class="controls"><button class="btn" id="maxNext">Bước tiếp</button><button class="btn alt" id="maxReset">Làm lại</button></div>
+      <div class="array-row" id="maxRow"></div>
+      <h3>Deque chỉ số</h3><div class="deque-view" id="maxDeque"></div>
+    </div>
+    <div class="log" id="maxLog"></div>
+  </div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>7. Phân tích thuật toán</h2>
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Dạng</th><th>Điều kiện</th><th>Độ phức tạp</th><th>Lý do</th></tr>
+    <tr><td>Cửa sổ cố định</td><td>Độ dài k</td><td>O(n)</td><td>Mỗi bước thêm một, bỏ một.</td></tr>
+    <tr><td>Cửa sổ tổng ≤ K</td><td>Phần tử không âm</td><td>O(n)</td><td>L và R chỉ tăng.</td></tr>
+    <tr><td>Không quá K loại</td><td>Duy trì tần suất</td><td>O(n)</td><td>Mỗi phần tử vào/ra tối đa một lần.</td></tr>
+    <tr><td>Max/min mỗi cửa sổ</td><td>Monotonic deque</td><td>O(n)</td><td>Mỗi chỉ số push/pop tối đa một lần.</td></tr>
+  </table></div>
+</section>
+
+<section class="card" id="code">
+  <h2>8. Code mẫu</h2>
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="fixedCode">Cửa sổ cố định</button>
+      <button class="tab-btn" data-tab="varCode">Tổng ≤ K</button>
+      <button class="tab-btn" data-tab="freqCode">Không quá K loại</button>
+      <button class="tab-btn" data-tab="maxCode">Sliding Window Max</button>
+      <button class="tab-btn" data-tab="pyCode">Python</button>
+    </div>
+
+    <div class="panel active" id="fixedCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, k;
+    cin &gt;&gt; n &gt;&gt; k;
+
+    vector&lt;long long&gt; a(n);
+    for (long long &amp;x : a) cin &gt;&gt; x;
+
+    long long windowSum = 0;
+
+    for (int i = 0; i &lt; k; i++) {
+        windowSum += a[i];
+    }
+
+    long long answer = windowSum;
+
+    for (int right = k; right &lt; n; right++) {
+        windowSum += a[right];
+        windowSum -= a[right - k];
+
+        answer = max(answer, windowSum);
+    }
+
+    cout &lt;&lt; answer;
+}</code></pre></div>
+
+    <div class="panel" id="varCode"><button class="copy">Sao chép</button><pre><code>int left = 0;
+int best = 0;
+long long sum = 0;
+
+for (int right = 0; right &lt; n; right++) {
+    sum += a[right];
+
+    while (left &lt;= right &amp;&amp; sum &gt; k) {
+        sum -= a[left];
+        left++;
+    }
+
+    best = max(best, right - left + 1);
+}</code></pre></div>
+
+    <div class="panel" id="freqCode"><button class="copy">Sao chép</button><pre><code>unordered_map&lt;int,int&gt; frequency;
+
+int left = 0;
+int distinct = 0;
+int best = 0;
+
+for (int right = 0; right &lt; n; right++) {
+    if (frequency[a[right]] == 0) {
+        distinct++;
+    }
+
+    frequency[a[right]]++;
+
+    while (distinct &gt; k) {
+        frequency[a[left]]--;
+
+        if (frequency[a[left]] == 0) {
+            distinct--;
+        }
+
+        left++;
+    }
+
+    best = max(best, right - left + 1);
+}</code></pre></div>
+
+    <div class="panel" id="maxCode"><button class="copy">Sao chép</button><pre><code>deque&lt;int&gt; dq;
+
+for (int i = 0; i &lt; n; i++) {
+    while (!dq.empty() &amp;&amp; dq.front() &lt;= i - k) {
+        dq.pop_front();
+    }
+
+    while (!dq.empty() &amp;&amp; a[dq.back()] &lt;= a[i]) {
+        dq.pop_back();
+    }
+
+    dq.push_back(i);
+
+    if (i &gt;= k - 1) {
+        cout &lt;&lt; a[dq.front()] &lt;&lt; ' ';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="pyCode"><button class="copy">Sao chép</button><pre><code>def max_sum_fixed_window(a, k):
+    current = sum(a[:k])
+    answer = current
+
+    for right in range(k, len(a)):
+        current += a[right]
+        current -= a[right - k]
+        answer = max(answer, current)
+
+    return answer</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>9. Giải thích code</h2>
+
+  <h3>9.1. Vì sao cửa sổ cố định chỉ thêm một và bỏ một?</h3>
+  <p>Khi dịch sang phải một vị trí, k−1 phần tử cũ vẫn nằm trong cửa sổ. Chỉ phần tử trái nhất rời đi và phần tử mới bên phải đi vào.</p>
+
+  <h3>9.2. Vì sao while bên trong for vẫn O(n)?</h3>
+  <div class="call ok">Con trỏ left không quay lại. Trong toàn bộ chương trình, left tăng tối đa n lần; right cũng tăng n lần. Tổng là O(n).</div>
+
+  <h3>9.3. Vì sao bài tổng ≤ K cần số không âm?</h3>
+  <p>Nếu có số âm, khi tăng R tổng có thể giảm, và khi tăng L tổng có thể tăng. Khi đó quy tắc co cửa sổ không còn đúng.</p>
+
+  <h3>9.4. Vì sao bảng tần suất cần giảm distinct khi count về 0?</h3>
+  <p>Khi phần tử cuối cùng của một giá trị rời cửa sổ, giá trị đó không còn xuất hiện, nên số loại phải giảm.</p>
+
+  <h3>9.5. Vì sao deque lưu chỉ số?</h3>
+  <p>Cần biết phần tử nào đã ra khỏi cửa sổ. Chỉ số cho phép kiểm tra <code>dq.front() &lt;= i-k</code>.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>10. Lỗi thường gặp</h2>
+  <ul>
+    <li>Nhầm cửa sổ đóng [L,R] với độ dài <code>R-L+1</code>.</li>
+    <li>Quên trừ phần tử rời khỏi cửa sổ cố định.</li>
+    <li>Dùng cửa sổ tổng ≤ K khi mảng có số âm.</li>
+    <li>Co cửa sổ chỉ một lần bằng if thay vì while.</li>
+    <li>Cập nhật đáp án trước khi cửa sổ hợp lệ.</li>
+    <li>Quên giảm distinct khi tần suất về 0.</li>
+    <li>Sliding Window Maximum lưu giá trị thay vì chỉ số.</li>
+    <li>Điều kiện loại chỉ số cũ sai: đúng là <code>dq.front() &lt;= i-k</code>.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>11. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Khi cửa sổ cố định dịch sang phải, cần làm gì?<div class="answers"><button class="answer" data-choice="a">Tính lại toàn bộ</button><button class="answer" data-choice="b">Thêm phần tử mới và bỏ phần tử cũ</button><button class="answer" data-choice="c">Chỉ tăng L</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Cửa sổ tổng ≤ K dạng chuẩn cần điều kiện gì?<div class="answers"><button class="answer" data-choice="a">Mảng giảm dần</button><button class="answer" data-choice="b">K âm</button><button class="answer" data-choice="c">Các phần tử không âm</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> Sliding Window Maximum dùng cấu trúc gì?<div class="answers"><button class="answer" data-choice="a">Deque đơn điệu</button><button class="answer" data-choice="b">Stack thường</button><button class="answer" data-choice="c">DSU</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Tổng lớn nhất đoạn dài k.</li><li>Trung bình lớn nhất đoạn dài k.</li><li>Đếm số chẵn trong mỗi cửa sổ.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Đoạn dài nhất tổng ≤ K.</li><li>Đoạn không quá K loại.</li><li>Chuỗi con dài nhất không lặp.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Sliding Window Max/Min.</li><li>Minimum Window Substring.</li><li>Đếm đoạn có đúng K loại.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>Shortest subarray sum ≥ K có số âm.</li><li>Sliding Window + multiset.</li><li>DP optimization bằng deque.</li></ol></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+function parseNums(id){let t=$(id).value.trim();return t?t.split(/\s+/).map(Number).filter(Number.isFinite):[]}
+
+let fa=[],fk=0,fi=0,fs=0,fbest=-Infinity,fTimer=null;
+function resetFixed(){
+  if(fTimer){clearInterval(fTimer);fTimer=null}
+  fa=parseNums('#fixedArray');fk=Math.max(1,Math.min(fa.length,Math.floor(Number($('#fixedK').value)||1)));$('#fixedK').value=fk;
+  fi=0;fs=0;fbest=-Infinity;$('#fixedAuto').textContent='Tự chạy';renderFixed('Bắt đầu tạo cửa sổ đầu tiên.');
+}
+function renderFixed(msg){
+  let L=Math.max(0,fi-fk),R=fi-1;
+  $('#fixedRow').innerHTML=fa.map((v,i)=>{
+    let cls=i>=L&&i<=R?'window':'';
+    if(i===fi&&fi<fa.length)cls='current';
+    return '<div class="cell '+cls+'"><small>i='+i+'</small>'+v+'</div>';
+  }).join('');
+  $('#fixedLog').innerHTML=msg+'<br><b>sum='+fs+', best='+(fbest===-Infinity?'—':fbest)+'</b>';
+}
+function stepFixed(){
+  if(!fa.length)return;
+  if(fi<fk){
+    fs+=fa[fi];fi++;
+    if(fi===fk)fbest=fs;
+    renderFixed('Thêm a['+(fi-1)+'] = '+fa[fi-1]+' vào cửa sổ đầu tiên.');
+    return;
+  }
+  if(fi>=fa.length){renderFixed('Hoàn tất. Tổng lớn nhất = '+fbest+'.');return}
+  let out=fa[fi-fk],inn=fa[fi];
+  fs=fs-out+inn;fi++;fbest=Math.max(fbest,fs);
+  renderFixed('Dịch cửa sổ: -'+out+' + '+inn+'.');
+}
+function autoFixed(){
+  if(fTimer){clearInterval(fTimer);fTimer=null;$('#fixedAuto').textContent='Tự chạy';return}
+  $('#fixedAuto').textContent='Tạm dừng';
+  fTimer=setInterval(()=>{if(fi>=fa.length){clearInterval(fTimer);fTimer=null;$('#fixedAuto').textContent='Tự chạy'}else stepFixed()},750)
+}
+
+let va=[],vk=0,vl=0,vr=0,vsum=0,vbest=0,vphase='add',vTimer=null;
+function resetVar(){
+  if(vTimer){clearInterval(vTimer);vTimer=null}
+  va=parseNums('#varArray');vk=Number($('#varK').value)||0;vl=0;vr=0;vsum=0;vbest=0;vphase='add';$('#varAuto').textContent='Tự chạy';renderVar('Khởi tạo L=0, R=0.');
+}
+function renderVar(msg){
+  $('#varRow').innerHTML=va.map((v,i)=>{
+    let cls=i>=vl&&i<vr?'window':'';
+    let tags=(i===vl?'<span class="pointer-tag tag-l">L</span>':'')+(i===vr&&vr<va.length?'<span class="pointer-tag tag-r">R</span>':'');
+    return '<div class="cell '+cls+'">'+tags+'<small>i='+i+'</small>'+v+'</div>';
+  }).join('');
+  $('#varLog').innerHTML=msg+'<br><b>sum='+vsum+', best='+vbest+', cửa sổ=['+vl+','+(vr-1)+']</b>';
+}
+function stepVar(){
+  if(vr>=va.length&&vsum<=vk){renderVar('Hoàn tất. Độ dài lớn nhất = '+vbest+'.');return}
+  if(vphase==='add'&&vr<va.length){
+    vsum+=va[vr];vr++;vphase='shrink';renderVar('Mở rộng R, cộng '+va[vr-1]+'.');return;
+  }
+  if(vsum>vk&&vl<vr){
+    let x=va[vl];vsum-=x;vl++;renderVar('sum > K, tăng L và trừ '+x+'.');return;
+  }
+  vbest=Math.max(vbest,vr-vl);vphase='add';renderVar('Cửa sổ hợp lệ, cập nhật best.');
+}
+function autoVar(){
+  if(vTimer){clearInterval(vTimer);vTimer=null;$('#varAuto').textContent='Tự chạy';return}
+  $('#varAuto').textContent='Tạm dừng';
+  vTimer=setInterval(()=>{if(vr>=va.length&&vsum<=vk){clearInterval(vTimer);vTimer=null;$('#varAuto').textContent='Tự chạy'}else stepVar()},750)
+}
+
+let qa=[],qk=0,ql=0,qr=0,qfreq={},qdistinct=0,qbest=0,qphase='add';
+function resetFreq(){qa=parseNums('#freqArray');qk=Math.max(1,Math.floor(Number($('#freqK').value)||1));ql=0;qr=0;qfreq={};qdistinct=0;qbest=0;qphase='add';renderFreq('Khởi tạo bảng tần suất rỗng.')}
+function renderFreq(msg){
+  $('#freqRow').innerHTML=qa.map((v,i)=>'<div class="cell '+(i>=ql&&i<qr?'window':'')+'"><small>i='+i+'</small>'+v+'</div>').join('');
+  $('#freqLog').innerHTML=msg+'<br><b>distinct='+qdistinct+', best='+qbest+', freq='+JSON.stringify(qfreq)+'</b>';
+}
+function stepFreq(){
+  if(qr>=qa.length&&qdistinct<=qk){renderFreq('Hoàn tất. Độ dài lớn nhất = '+qbest+'.');return}
+  if(qphase==='add'&&qr<qa.length){
+    let x=qa[qr++];if(!qfreq[x]){qfreq[x]=0;qdistinct++}qfreq[x]++;qphase='shrink';renderFreq('Thêm '+x+' vào cửa sổ.');return;
+  }
+  if(qdistinct>qk){
+    let x=qa[ql++];qfreq[x]--;if(qfreq[x]===0){delete qfreq[x];qdistinct--}renderFreq('Quá K loại, loại '+x+' khỏi bên trái.');return;
+  }
+  qbest=Math.max(qbest,qr-ql);qphase='add';renderFreq('Cửa sổ hợp lệ, cập nhật best.');
+}
+
+let ma=[],mk=0,mi=0,mdq=[],mres=[];
+function resetMax(){ma=parseNums('#maxArray');mk=Math.max(1,Math.min(ma.length,Math.floor(Number($('#maxK').value)||1)));mi=0;mdq=[];mres=[];renderMax('Bắt đầu từ i=0.')}
+function renderMax(msg){
+  let L=Math.max(0,mi-mk),R=mi-1;
+  $('#maxRow').innerHTML=ma.map((v,i)=>'<div class="cell '+(i>=L&&i<=R?'window':'')+'"><small>i='+i+'</small>'+v+'</div>').join('');
+  $('#maxDeque').innerHTML=mdq.length?mdq.map((idx,j)=>'<div class="dq-item '+(j===0?'front':'')+'"><small>i='+idx+'</small>'+ma[idx]+'</div>').join(''):'<span>Deque rỗng</span>';
+  $('#maxLog').innerHTML=msg+'<br><b>Kết quả: ['+mres.join(', ')+']</b>';
+}
+function stepMax(){
+  if(mi>=ma.length){renderMax('Hoàn tất Sliding Window Maximum.');return}
+  let i=mi++,logs=['<b>Xử lý i='+i+', a[i]='+ma[i]+'</b>'];
+  while(mdq.length&&mdq[0]<=i-mk){logs.push('pop_front chỉ số '+mdq[0]+' vì hết hạn.');mdq.shift()}
+  while(mdq.length&&ma[mdq[mdq.length-1]]<=ma[i]){logs.push('pop_back chỉ số '+mdq[mdq.length-1]+' vì giá trị không còn hữu ích.');mdq.pop()}
+  mdq.push(i);logs.push('push_back('+i+').');
+  if(i>=mk-1){mres.push(ma[mdq[0]]);logs.push('Max cửa sổ = '+ma[mdq[0]]+'.')}
+  renderMax(logs.join('<br>'));
+}
+
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+  $('#fixedNext').onclick=stepFixed;$('#fixedReset').onclick=resetFixed;$('#fixedAuto').onclick=autoFixed;
+  $('#varNext').onclick=stepVar;$('#varReset').onclick=resetVar;$('#varAuto').onclick=autoVar;
+  $('#freqNext').onclick=stepFreq;$('#freqReset').onclick=resetFreq;
+  $('#maxNext').onclick=stepMax;$('#maxReset').onclick=resetMax;
+  resetFixed();resetVar();resetFreq();resetMax();
+
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

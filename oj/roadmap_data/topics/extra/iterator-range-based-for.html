@@ -1,19 +1,162 @@
-<article class="roadmap-extra-topic">
-  <h1>Iterator, range-based for</h1>
-  <section>
-    <h2>Mục tiêu</h2>
-    <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
-    </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
-    <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
-    </ol>
-  </section>
-</article>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.it-page{font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.it-page *{box-sizing:border-box}.it-page h1,.it-page h2,.it-page h3{line-height:1.25}.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1030px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.array-row{display:flex;gap:9px;overflow:auto;padding:30px 4px 10px}.cell{min-width:82px;padding:11px;border:2px solid #cbd5e1;border-radius:13px;background:#f8fafc;text-align:center;font-weight:900;position:relative;transition:.2s}.cell small{display:block;color:#64748b;font-size:.72rem}.cell.current{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:translateY(-3px)}.cell.visited{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.changed{background:#cffafe;border-color:#06b6d4;color:#155e75}.cell.invalid{background:#fee2e2;border-color:#ef4444;color:#991b1b}.it-label{position:absolute;top:-27px;left:50%;transform:translateX(-50%);padding:3px 8px;border-radius:99px;background:#4f46e5;color:#fff;font-size:.72rem;white-space:nowrap}.end-marker{min-width:95px;padding:11px;border:2px dashed #94a3b8;border-radius:13px;background:#fff;text-align:center;font-weight:900;color:#64748b;position:relative}.end-marker.current{border-color:#f97316;background:#ffedd5;color:#9a3412}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}.log{min-height:120px;max-height:370px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}.mode-card{padding:14px;border:2px solid #c7d2fe;border-radius:14px;background:#eef2ff}.mode-card h3{margin-top:0}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}.it-page pre{margin:0;padding:20px;max-height:700px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.it-page p code,.it-page li code,.it-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.it-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.it-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
+</style>
+<div class="it-page">
+<div class="hero"><span class="badge">C++ STL Fundamentals</span><h1>🧭 Iterator và range-based for</h1><p>Iterator là “con trỏ tổng quát” giúp duyệt các container STL theo cùng một cách. Range-based for cung cấp cú pháp ngắn gọn hơn, nhưng bản sao, tham chiếu và tham chiếu hằng tạo ra hành vi khác nhau.</p><div class="stats"><div class="stat"><b>begin / end</b><span>Phạm vi nửa mở</span></div><div class="stat"><b>*it</b><span>Đọc phần tử hiện tại</span></div><div class="stat"><b>++it</b><span>Di chuyển iterator</span></div><div class="stat"><b>auto&amp;</b><span>Sửa phần tử gốc</span></div></div></div>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav"><a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#iterator">Iterator</a><a href="#simulate">Mô phỏng</a><a href="#categories">Phân loại</a><a href="#range">Range-for</a><a href="#reference">Copy/Reference</a><a href="#containers">Container</a><a href="#invalid">Invalidation</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a></div></div>
+
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2"><div class="box"><h3>Cần hiểu</h3><ul><li>Iterator là gì và vì sao STL dùng iterator.</li><li>Ý nghĩa của <code>begin()</code>, <code>end()</code>, <code>*it</code>, <code>++it</code>.</li><li>Phân biệt iterator và chỉ số.</li><li>Khác nhau giữa <code>auto x</code>, <code>auto&amp; x</code>, <code>const auto&amp; x</code>.</li><li>Khái niệm iterator invalidation.</li></ul></div><div class="box"><h3>Cần làm được</h3><ul><li>Duyệt vector, set và map bằng iterator.</li><li>Duyệt bằng range-based for.</li><li>Sửa phần tử qua tham chiếu.</li><li>Dùng <code>find</code>, <code>sort</code>, <code>reverse</code> với phạm vi iterator.</li><li>Xóa phần tử an toàn khi đang duyệt.</li></ul></div></div></section>
+
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2><div class="call"><b>Bài toán mở đầu.</b><br>Ta có nhiều container STL như <code>vector</code>, <code>list</code>, <code>set</code>, <code>map</code>. Cần viết thuật toán duyệt và tìm kiếm mà không phụ thuộc vào cách container lưu dữ liệu bên trong.</div><h3>1.1. Vì sao chỉ số chưa đủ?</h3><p>Vector có <code>a[i]</code>, nhưng set và map không hỗ trợ truy cập bằng chỉ số. Nếu mỗi container dùng một cách duyệt riêng, các thuật toán STL không thể dùng chung.</p><h3>1.2. Ý tưởng “vị trí đang đứng”</h3><ul><li><code>begin()</code>: phần tử đầu tiên.</li><li><code>end()</code>: vị trí ngay sau phần tử cuối.</li><li><code>*it</code>: phần tử hiện tại.</li><li><code>++it</code>: phần tử kế tiếp.</li></ul><div class="formula">Duyệt phạm vi nửa mở [begin, end)</div><div class="call ok"><b>Kết luận:</b> Iterator tạo ra giao diện duyệt chung cho container và thuật toán STL.</div></section>
+
+<section class="card" id="iterator"><h2>2. Iterator cơ bản</h2><div class="g2"><div class="box"><h3>Khai báo đầy đủ</h3><pre><code>vector&lt;int&gt;::iterator it = a.begin();
+
+while (it != a.end()) {
+    cout &lt;&lt; *it &lt;&lt; ' ';
+    ++it;
+}</code></pre></div><div class="box"><h3>Dùng auto</h3><pre><code>for (auto it = a.begin();
+     it != a.end();
+     ++it) {
+    cout &lt;&lt; *it &lt;&lt; ' ';
+}</code></pre></div></div><div class="table-wrap"><table class="tbl"><tr><th>Biểu thức</th><th>Ý nghĩa</th><th>Lưu ý</th></tr><tr><td><code>a.begin()</code></td><td>Iterator tới phần tử đầu.</td><td>Container rỗng: begin == end.</td></tr><tr><td><code>a.end()</code></td><td>Ngay sau phần tử cuối.</td><td>Không được dereference.</td></tr><tr><td><code>*it</code></td><td>Lấy phần tử hiện tại.</td><td>Chỉ hợp lệ khi it != end.</td></tr><tr><td><code>++it</code></td><td>Đi tới phần tử kế tiếp.</td><td>Ưu tiên tiền tố.</td></tr><tr><td><code>it-&gt;first</code></td><td>Truy cập trường của pair/object.</td><td>Tương đương <code>(*it).first</code>.</td></tr></table></div></section>
+
+<section class="card" id="simulate"><h2>3. Mô phỏng iterator trên vector</h2><div class="g2"><div class="visual"><label><b>Vector</b></label><input class="input" id="iteratorInput" value="10 20 30 40 50"><div class="controls"><button class="btn" id="itBegin">it = begin()</button><button class="btn green" id="itDereference">*it</button><button class="btn orange" id="itNext">++it</button><button class="btn red" id="itEndCheck">it == end()?</button><button class="btn alt" id="itReset">Làm lại</button></div><div class="array-row" id="iteratorRow"></div></div><div class="g2"><div class="code-lines"><div class="code-line" data-it="begin">auto it = a.begin();</div><div class="code-line" data-it="cond">while (it != a.end()) {</div><div class="code-line" data-it="read">    cout &lt;&lt; *it;</div><div class="code-line" data-it="next">    ++it;</div><div class="code-line">}</div></div><div class="log" id="iteratorLog"></div></div></div></section>
+
+<section class="card" id="categories"><h2>4. Các nhóm iterator</h2><div class="table-wrap"><table class="tbl"><tr><th>Nhóm</th><th>Di chuyển</th><th>Container tiêu biểu</th><th>Thao tác</th></tr><tr><td>Forward</td><td>Tiến một chiều</td><td><code>forward_list</code>, <code>unordered_set</code></td><td><code>++it</code></td></tr><tr><td>Bidirectional</td><td>Tiến và lùi</td><td><code>list</code>, <code>set</code>, <code>map</code></td><td><code>++it</code>, <code>--it</code></td></tr><tr><td>Random Access</td><td>Nhảy tùy ý</td><td><code>vector</code>, <code>deque</code>, <code>array</code></td><td><code>it+n</code>, <code>it2-it1</code></td></tr></table></div><div class="call warn"><b>Không phải iterator nào cũng cộng được số.</b> <code>it+3</code> dùng được với vector nhưng không dùng được với set/list.</div></section>
+
+<section class="card" id="range"><h2>5. Range-based for</h2><div class="formula">for (khai_báo_phần_tử : container) { ... }</div><div class="g3"><div class="mode-card"><h3>Bản sao</h3><pre><code>for (auto x : a) {
+    x *= 2;
+}</code></pre><p>Không sửa vector.</p></div><div class="mode-card"><h3>Tham chiếu</h3><pre><code>for (auto&amp; x : a) {
+    x *= 2;
+}</code></pre><p>Sửa trực tiếp vector.</p></div><div class="mode-card"><h3>Tham chiếu hằng</h3><pre><code>for (const auto&amp; x : a) {
+    cout &lt;&lt; x;
+}</code></pre><p>Không sao chép, không sửa.</p></div></div><div class="call ok"><b>Quy tắc:</b> Chỉ đọc object lớn → <code>const auto&amp;</code>; cần sửa → <code>auto&amp;</code>; cần bản sao → <code>auto</code>.</div></section>
+
+<section class="card" id="reference"><h2>6. Mô phỏng copy, reference và const reference</h2><div class="g2"><div class="visual"><label><b>Vector</b></label><input class="input" id="rangeInput" value="1 2 3 4"><label><b>Chế độ</b></label><select class="select" id="rangeMode"><option value="copy">for (auto x : a)</option><option value="ref">for (auto&amp; x : a)</option><option value="const">for (const auto&amp; x : a)</option></select><div class="controls"><button class="btn" id="rangeNext">Bước tiếp</button><button class="btn green" id="rangeRun">Chạy hết</button><button class="btn alt" id="rangeReset">Làm lại</button></div><div class="array-row" id="rangeRow"></div></div><div class="log" id="rangeLog"></div></div></section>
+
+<section class="card" id="containers"><h2>7. Duyệt các container</h2><div class="g3"><div class="box"><h3>vector</h3><pre><code>for (auto it = a.begin();
+     it != a.end(); ++it) {
+    cout &lt;&lt; *it;
+}</code></pre></div><div class="box"><h3>set</h3><pre><code>for (const auto&amp; x : s) {
+    cout &lt;&lt; x;
+}</code></pre><p>Không sửa phần tử set.</p></div><div class="box"><h3>map</h3><pre><code>for (const auto&amp; [key, value] : mp) {
+    cout &lt;&lt; key &lt;&lt; value;
+}</code></pre></div></div><div class="call warn"><b>Map:</b> key không được sửa; value có thể sửa nếu dùng iterator/tham chiếu không const.</div></section>
+
+<section class="card" id="invalid"><h2>8. Iterator invalidation</h2><p>Một số thao tác thay đổi cấu trúc container khiến iterator cũ không còn hợp lệ.</p><div class="g2"><div class="visual"><label><b>Vector mẫu</b></label><input class="input" id="invalidInput" value="5 10 15 20"><div class="controls"><button class="btn" id="saveIteratorBtn">Lưu it = begin()+1</button><button class="btn orange" id="pushInvalidBtn">push_back(99)</button><button class="btn red" id="eraseInvalidBtn">erase(begin())</button><button class="btn green" id="useOldIteratorBtn">Dùng iterator cũ</button><button class="btn alt" id="invalidReset">Làm lại</button></div><div class="array-row" id="invalidRow"></div></div><div class="log" id="invalidLog"></div></div><div class="table-wrap"><table class="tbl"><tr><th>Thao tác</th><th>Iterator bị ảnh hưởng</th></tr><tr><td><code>vector::push_back</code> có tái cấp phát</td><td>Tất cả iterator/reference cũ.</td></tr><tr><td><code>vector::erase(pos)</code></td><td>Từ pos trở về sau.</td></tr><tr><td><code>list/set/map::erase(pos)</code></td><td>Chỉ iterator tới phần tử bị xóa.</td></tr></table></div><div class="call bad"><b>Không dereference iterator đã bị vô hiệu hóa.</b> Đây là hành vi không xác định.</div></section>
+
+<section class="card" id="analysis"><h2>9. Phân tích và lựa chọn</h2><div class="table-wrap"><table class="tbl"><tr><th>Nhu cầu</th><th>Cách dùng</th><th>Lý do</th></tr><tr><td>Chỉ đọc số nhỏ</td><td><code>for (int x : a)</code></td><td>Sao chép rẻ.</td></tr><tr><td>Chỉ đọc object lớn</td><td><code>for (const auto&amp; x : a)</code></td><td>Không sao chép.</td></tr><tr><td>Cần sửa</td><td><code>for (auto&amp; x : a)</code></td><td>x là bí danh phần tử.</td></tr><tr><td>Cần vị trí</td><td>Iterator hoặc chỉ số</td><td>Range-for không cho chỉ số trực tiếp.</td></tr><tr><td>Cần xóa khi duyệt</td><td><code>it = c.erase(it)</code></td><td>Nhận iterator kế tiếp hợp lệ.</td></tr></table></div></section>
+
+<section class="card" id="code"><h2>10. Code mẫu</h2><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="iteratorCode">Iterator</button><button class="tab-btn" data-tab="rangeCode">Range-for</button><button class="tab-btn" data-tab="mapCode">Map</button><button class="tab-btn" data-tab="eraseCode">Vừa duyệt vừa xóa</button><button class="tab-btn" data-tab="algoCode">Thuật toán STL</button></div>
+<div class="panel active" id="iteratorCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    vector&lt;int&gt; a = {10, 20, 30, 40};
+
+    for (auto it = a.begin();
+         it != a.end(); ++it) {
+        cout &lt;&lt; *it &lt;&lt; ' ';
+    }
+
+    auto it = find(a.begin(), a.end(), 30);
+    if (it != a.end()) {
+        cout &lt;&lt; "\nVi tri: " &lt;&lt; it - a.begin();
+    }
+}</code></pre></div>
+<div class="panel" id="rangeCode"><button class="copy">Sao chép</button><pre><code>vector&lt;int&gt; a = {1, 2, 3, 4};
+
+for (auto x : a) {
+    x *= 10;          // Không sửa a
+}
+
+for (auto&amp; x : a) {
+    x *= 10;          // Sửa trực tiếp a
+}
+
+for (const auto&amp; x : a) {
+    cout &lt;&lt; x &lt;&lt; ' ';
+}</code></pre></div>
+<div class="panel" id="mapCode"><button class="copy">Sao chép</button><pre><code>map&lt;string,int&gt; frequency = {
+    {"apple", 2}, {"banana", 3}
+};
+
+for (auto&amp; [word, count] : frequency) {
+    count++;
+}
+
+for (const auto&amp; [word, count] : frequency) {
+    cout &lt;&lt; word &lt;&lt; ' ' &lt;&lt; count &lt;&lt; '\n';
+}</code></pre></div>
+<div class="panel" id="eraseCode"><button class="copy">Sao chép</button><pre><code>vector&lt;int&gt; a = {1, 2, 3, 4, 5, 6};
+
+for (auto it = a.begin(); it != a.end(); ) {
+    if (*it % 2 == 0) {
+        it = a.erase(it);
+    } else {
+        ++it;
+    }
+}</code></pre></div>
+<div class="panel" id="algoCode"><button class="copy">Sao chép</button><pre><code>vector&lt;int&gt; a = {5, 2, 9, 2, 7};
+
+sort(a.begin(), a.end());
+reverse(a.begin(), a.end());
+auto it = find(a.begin(), a.end(), 2);
+int cnt = count(a.begin(), a.end(), 2);
+long long sum = accumulate(a.begin(), a.end(), 0LL);</code></pre></div></div></section>
+
+<section class="card" id="explain"><h2>11. Giải thích code</h2><h3>11.1. Vì sao dùng it != end()?</h3><p><code>end()</code> nằm sau phần tử cuối; khi đạt end thì không được dùng <code>*it</code>.</p><h3>11.2. Vì sao ưu tiên ++it?</h3><p>Hậu tố có thể cần tạo bản sao iterator cũ; tiền tố không cần.</p><h3>11.3. Vì sao auto x không sửa phần tử gốc?</h3><p>x là bản sao cục bộ.</p><h3>11.4. auto&amp; và const auto&amp;</h3><p><code>auto&amp;</code> sửa được; <code>const auto&amp;</code> không sao chép và không sửa.</p><h3>11.5. Vì sao erase trả về iterator?</h3><p>Iterator cũ có thể mất hiệu lực; giá trị trả về là iterator kế tiếp hợp lệ.</p><h3>11.6. Vì sao không sửa phần tử set?</h3><p>Thứ tự cây phụ thuộc vào key; sửa trực tiếp có thể phá cấu trúc.</p></section>
+
+<section class="card" id="mistakes"><h2>12. Lỗi thường gặp</h2><ul><li>Dereference <code>end()</code>.</li><li>Dùng iterator sau khi bị invalidation.</li><li>Dùng <code>auto x</code> rồi tưởng sửa được phần tử gốc.</li><li>Xóa rồi vẫn <code>++it</code> không đúng cách.</li><li>Dùng <code>it+n</code> với set/list.</li><li>Tính vị trí bằng <code>it-a.begin()</code> cho container không random access.</li><li>Thay đổi kích thước container trong range-for mà không hiểu invalidation.</li><li>Sửa key của map hoặc phần tử set.</li></ul></section>
+
+<section class="card" id="quiz"><h2>13. Quiz và bài tập</h2><div class="quiz" data-answer="b"><b>Câu 1.</b> <code>end()</code> trỏ tới đâu?<div class="answers"><button class="answer" data-choice="a">Phần tử cuối</button><button class="answer" data-choice="b">Ngay sau phần tử cuối</button><button class="answer" data-choice="c">Phần tử đầu</button></div><div class="feedback"></div></div><div class="quiz" data-answer="c"><b>Câu 2.</b> Muốn sửa trực tiếp phần tử trong range-for?<div class="answers"><button class="answer" data-choice="a">auto x</button><button class="answer" data-choice="b">const auto&amp; x</button><button class="answer" data-choice="c">auto&amp; x</button></div><div class="feedback"></div></div><div class="quiz" data-answer="a"><b>Câu 3.</b> Xóa an toàn khi đang duyệt?<div class="answers"><button class="answer" data-choice="a">it = a.erase(it)</button><button class="answer" data-choice="b">a.erase(it); ++it luôn</button><button class="answer" data-choice="c">*it = 0</button></div><div class="feedback"></div></div><div class="g2"><div class="box"><h3>Cơ bản</h3><ol><li>Duyệt vector bằng iterator.</li><li>In set theo thứ tự.</li><li>Duyệt map bằng structured binding.</li></ol></div><div class="box"><h3>Trung bình</h3><ol><li>Nhân đôi phần tử bằng auto&amp;.</li><li>Xóa số chẵn khi duyệt.</li><li>Tìm vị trí bằng iterator.</li></ol></div></div></section>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const parseNums=id=>{let t=$(id).value.trim();return t?t.split(/\s+/).map(Number).filter(Number.isFinite):[]};
+let itA=[],itPos=0,itReady=false;
+function clearItCode(){$$('[data-it]').forEach(x=>x.classList.remove('hl'))}
+function markIt(k){clearItCode();let e=$('[data-it="'+k+'"]');if(e)e.classList.add('hl')}
+function renderIt(msg){let cells=itA.map((v,i)=>{let cls=i<itPos&&itReady?'visited':i===itPos&&itReady?'current':'';let lab=i===itPos&&itReady?'<span class="it-label">it</span>':'';return '<div class="cell '+cls+'">'+lab+'<small>index '+i+'</small>'+v+'</div>'}).join('');let endCls=itReady&&itPos===itA.length?'current':'';$('#iteratorRow').innerHTML=cells+'<div class="end-marker '+endCls+'">'+(endCls?'<span class="it-label">it</span>':'')+'end()</div>';$('#iteratorLog').innerHTML=msg+'<br><b>Vị trí: '+(itReady?itPos:'chưa khởi tạo')+'</b>'}
+function resetIt(){itA=parseNums('#iteratorInput');itPos=0;itReady=false;clearItCode();renderIt('Chưa khởi tạo iterator.')}
+function beginIt(){itA=parseNums('#iteratorInput');itPos=0;itReady=true;markIt('begin');renderIt('Đã gán <code>it = a.begin()</code>.')}
+function readIt(){if(!itReady)return renderIt('Hãy khởi tạo iterator trước.');markIt('read');renderIt(itPos<itA.length?'<code>*it</code> = '+itA[itPos]:'<b>Lỗi:</b> it == end(), không được dereference.')}
+function nextIt(){if(!itReady)return renderIt('Hãy khởi tạo iterator trước.');if(itPos<itA.length)itPos++;markIt('next');renderIt('Đã thực hiện <code>++it</code>.')}
+function checkEnd(){if(!itReady)return renderIt('Hãy khởi tạo iterator trước.');markIt('cond');renderIt('<code>it == end()</code> → <b>'+(itPos===itA.length)+'</b>.')}
+
+let rA=[],rOrig=[],rI=0,rDone=false;
+function renderRange(msg){$('#rangeRow').innerHTML=rA.map((v,i)=>{let cls=i<rI?'visited':i===rI&&!rDone?'current':'';if(v!==rOrig[i])cls+=' changed';return '<div class="cell '+cls+'"><small>index '+i+'</small>'+v+'</div>'}).join('');$('#rangeLog').innerHTML=msg+'<br><b>Vector: ['+rA.join(', ')+']</b>'}
+function resetRange(){rA=parseNums('#rangeInput');rOrig=rA.slice();rI=0;rDone=false;renderRange('Bắt đầu từ phần tử đầu tiên.')}
+function stepRange(){if(rDone)return;if(rI>=rA.length){rDone=true;return renderRange('Hoàn tất range-based for.')}let mode=$('#rangeMode').value,old=rA[rI],local=old;if(mode==='copy'){local*=2;renderRange('x là bản sao: '+old+' → '+local+', nhưng a['+rI+'] không đổi.')}else if(mode==='ref'){rA[rI]*=2;renderRange('x là tham chiếu: a['+rI+'] đổi '+old+' → '+rA[rI]+'.')}else renderRange('const auto&amp; chỉ đọc '+old+', không sao chép và không sửa.');rI++}
+function runRange(){let t=setInterval(()=>{if(rDone)clearInterval(t);else stepRange()},420)}
+
+let invA=[],saved=null,valid=false,cap=4;
+function renderInvalid(msg){$('#invalidRow').innerHTML=invA.map((v,i)=>{let cls=saved===i?(valid?'current':'invalid'):'';return '<div class="cell '+cls+'">'+(saved===i?'<span class="it-label">iterator cũ</span>':'')+'<small>index '+i+'</small>'+v+'</div>'}).join('');$('#invalidLog').innerHTML=msg+'<br><b>valid='+valid+', capacity minh họa='+cap+'</b>'}
+function resetInvalid(){invA=parseNums('#invalidInput');saved=null;valid=false;cap=Math.max(4,invA.length);renderInvalid('Chưa lưu iterator.')}
+function saveIterator(){if(invA.length<2)return renderInvalid('Cần ít nhất 2 phần tử.');saved=1;valid=true;renderInvalid('Lưu iterator tới a[1] = '+invA[1]+'.')}
+function pushInvalid(){let realloc=invA.length===cap;if(realloc)cap*=2;invA.push(99);if(realloc&&saved!==null)valid=false;renderInvalid('push_back(99). '+(realloc?'Có tái cấp phát → iterator cũ invalid.':'Chưa tái cấp phát trong mô phỏng.'))}
+function eraseInvalid(){if(!invA.length)return;invA.shift();if(saved!==null){saved=Math.max(0,saved-1);valid=false}renderInvalid('erase(begin()) làm iterator tại và sau vị trí xóa bị vô hiệu.')}
+function useOld(){if(saved===null)return renderInvalid('Chưa lưu iterator.');renderInvalid(valid?'Giá trị qua iterator cũ: '+invA[saved]+'.':'<b>Không được dùng:</b> iterator đã bị vô hiệu hóa.')}
+
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();$('#itBegin').onclick=beginIt;$('#itDereference').onclick=readIt;$('#itNext').onclick=nextIt;$('#itEndCheck').onclick=checkEnd;$('#itReset').onclick=resetIt;$('#rangeNext').onclick=stepRange;$('#rangeRun').onclick=runRange;$('#rangeReset').onclick=resetRange;$('#rangeMode').onchange=resetRange;$('#saveIteratorBtn').onclick=saveIterator;$('#pushInvalidBtn').onclick=pushInvalid;$('#eraseInvalidBtn').onclick=eraseInvalid;$('#useOldIteratorBtn').onclick=useOld;$('#invalidReset').onclick=resetInvalid;resetIt();resetRange();resetInvalid();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}})
+})();
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

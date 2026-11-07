@@ -1,472 +1,588 @@
 <style>
-:root {
-  --blue-main: #2563eb;
-  --blue-dark: #1e3a8a;
-  --text-color: #1e293b;
-  --slate-100:#f1f5f9;
-  --slate-200:#e2e8f0;
-  --slate-600:#475569;
-}
-
-h1 { color: var(--blue-dark); font-size: 28px; margin-top: 0; }
-h2 { color: var(--blue-main); border-left: 6px solid var(--blue-main); padding-left: 10px; margin-top: 35px; }
-h3 { color: #334155; margin-top: 25px; }
-p, li { font-size: 16.5px; line-height: 1.7; color: var(--text-color); }
-ul { margin-left: 1.5rem; }
-code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; }
-pre {
-  background: #f1f5f9;
-  border-left: 4px solid var(--blue-main);
-  padding: 14px 18px;
-  font-size: 15px;
-  border-radius: 8px;
-  overflow-x: auto;
-}
-table {
-  border-collapse: collapse; width: 100%; background: #fff; border-radius: 8px; overflow: hidden; margin: 20px 0;
-}
-th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
-th { background: #f0f6ff; color: var(--blue-main); font-weight: 600; }
-
-details {
-  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
-  padding: 12px 14px; margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-summary { font-weight: 600; cursor: pointer; color: var(--blue-main); font-size: 16px; }
-
-.callout {
-  border-left: 6px solid #10b981; background: #ecfeff; padding: 10px 12px; border-radius:8px; margin: 12px 0;
-}
-
-/* Queue visual */
-.queue-demo {
-  display: flex; justify-content: center; align-items: flex-end;
-  gap: 8px; margin: 20px 0; padding: 20px;
-}
-.box {
-  width: 70px; height: 70px; background: var(--blue-main); color: #fff; text-align:center;
-  line-height:70px; border-radius: 8px; font-weight:bold; opacity:0; transform:translateX(-60px);
-  animation: enqueue 0.8s forwards;
-}
-.box:nth-child(2){animation-delay:0.8s;}
-.box:nth-child(3){animation-delay:1.6s;}
-.queue-label {
-  text-align:center; color:var(--blue-main); font-weight:bold; margin-top:10px;
-}
-@keyframes enqueue {
-  from {opacity:0; transform:translateX(-60px);}
-  to {opacity:1; transform:translateX(0);}
-}
-
-.sim-3col {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;
-}
-@media (max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
-
-.col { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; }
-.col h4 { margin-top:0; color: var(--blue-main); }
-
-.queue-visual {
-  height: 220px; display:flex; align-items:center; justify-content:flex-start;
-  border:2px dashed var(--blue-main); border-radius:10px; padding:10px; overflow-x:auto;
-}
-.queue-visual .item {
-  min-width:70px; height:70px; background: var(--blue-main); color:#fff; text-align:center;
-  line-height:70px; border-radius:8px; font-weight:bold; margin-right:6px;
-}
-.queue-visual .item.front { outline:3px solid #22c55e; }
-.badge { background:#111827; color:#fff; padding:3px 8px; border-radius:999px; font-size:12px; display:block; text-align:center; margin-top:8px; }
-
-.btn { border:none; background:var(--blue-main); color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
-.btn.secondary { background:#0ea5e9; }
-.btn.ghost { background:#e5e7eb; color:#111827; }
+:root{--p:#2563eb;--pd:#1e3a8a;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.queue-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+border-radius:0;box-sizing:border-box;position:relative;width:calc(100vw - 24px);
+max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.queue-page *{box-sizing:border-box}.queue-page h1,.queue-page h2,.queue-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#1d4ed8,#0e7490);box-shadow:0 22px 55px rgba(37,99,235,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:980px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.queue-view{display:flex;gap:10px;align-items:center;min-height:108px;padding:18px 12px;border:2px dashed #60a5fa;border-radius:18px;background:#f8fafc;overflow-x:auto}
+.q-item{min-width:76px;height:68px;border-radius:13px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;position:relative;box-shadow:0 7px 16px rgba(37,99,235,.18);transition:.2s}
+.q-item.front::before{content:"front";position:absolute;top:-25px;left:50%;transform:translateX(-50%);padding:2px 7px;border-radius:99px;background:#16a34a;color:#fff;font-size:.72rem}
+.q-item.back::after{content:"back";position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);padding:2px 7px;border-radius:99px;background:#f97316;color:#fff;font-size:.72rem}
+.q-item.active{background:#f97316;transform:translateY(-3px)}.q-item.done{background:#16a34a}.q-item.wait{background:#0891b2}
+.log{min-height:120px;max-height:350px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#1d4ed8;color:#fff}
+.graph-board{position:relative;min-height:370px;border:1px dashed #bfdbfe;border-radius:17px;background:#f8fafc}.graph-board svg{position:absolute;inset:0;width:100%;height:100%}.edge{stroke:#94a3b8;stroke-width:3}.g-node{position:absolute;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eef2ff;border:3px solid #c7d2fe;color:#312e81;font-weight:900}.g-node.current{background:#ffedd5;border-color:#f97316}.g-node.visited{background:#dcfce7;border-color:#22c55e}.g-node.queued{background:#cffafe;border-color:#06b6d4}
+.grid-board{display:grid;gap:5px;overflow:auto}.grid-cell{width:48px;height:48px;border:1px solid #cbd5e1;border-radius:9px;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-weight:900}.grid-cell.wall{background:#334155;color:#fff}.grid-cell.start{background:#dbeafe;border-color:#3b82f6}.grid-cell.target{background:#fef3c7;border-color:#f59e0b}.grid-cell.queued{background:#cffafe;border-color:#06b6d4}.grid-cell.visited{background:#dcfce7;border-color:#22c55e}.grid-cell.current{background:#ffedd5;border-color:#f97316}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.queue-page pre{margin:0;padding:20px;max-height:680px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.queue-page p code,.queue-page li code,.queue-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+details{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin:12px 0}summary{font-weight:900;color:#1d4ed8;cursor:pointer}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.queue-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.queue-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
 </style>
 
-<h1>🚍 Bài giảng: Cấu trúc dữ liệu Queue (Hàng đợi)</h1>
-<p>
-Queue là cấu trúc dữ liệu tuyến tính lưu trữ phần tử theo nguyên tắc <b>FIFO – First In, First Out</b> (vào trước, ra trước).
-Rất nhiều ứng dụng trong đời sống hoạt động giống “hàng chờ”: mua vé, xếp hàng ATM, xử lý tiến trình trong máy tính.
-</p>
-
-<h2>I. Giới thiệu & Ví dụ thực tế</h2>
-<p>Hãy tưởng tượng bạn đang xếp hàng mua trà sữa 🍹. Người vào hàng trước sẽ được phục vụ trước. Người đến sau phải chờ đến lượt mình.</p>
-
-<div class="queue-demo">
-  <div class="box">A</div>
-  <div class="box">B</div>
-  <div class="box">C</div>
+<div class="queue-page">
+<div class="hero">
+  <span class="badge">STL + BFS + Grid Traversal</span>
+  <h1>🚍 Queue – Hàng đợi FIFO</h1>
+  <p>Queue xử lý phần tử theo nguyên tắc vào trước, ra trước. Từ mô phỏng hàng chờ, Queue trở thành cấu trúc trung tâm của BFS, tìm đường đi ngắn nhất trên đồ thị không trọng số, thuật toán loang và BFS đa nguồn.</p>
+  <div class="stats">
+    <div class="stat"><b>FIFO</b><span>First In, First Out</span></div>
+    <div class="stat"><b>push/pop</b><span>O(1) mỗi thao tác</span></div>
+    <div class="stat"><b>BFS</b><span>Duyệt theo từng lớp</span></div>
+    <div class="stat"><b>Shortest path</b><span>Đồ thị không trọng số</span></div>
+  </div>
 </div>
-<div class="queue-label">Front ⟶ A → B → C ⟶ Rear</div>
-<p style="text-align:center;"><i>Nguyên tắc FIFO – “vào trước ra trước”.</i></p>
 
-<h2>II. Lý thuyết cơ bản</h2>
-<ul>
-  <li><b>Enqueue(x):</b> thêm phần tử x vào cuối hàng (rear).</li>
-  <li><b>Dequeue():</b> loại bỏ phần tử ở đầu hàng (front).</li>
-  <li><b>Front():</b> xem phần tử đầu hàng.</li>
-  <li><b>Empty():</b> kiểm tra hàng có rỗng không.</li>
-  <li><b>Size():</b> số phần tử trong hàng.</li>
-</ul>
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#basic">Queue cơ bản</a><a href="#simulate">Mô phỏng</a><a href="#bfs">BFS</a><a href="#grid">BFS lưới</a><a href="#multi">Đa nguồn</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
 
-<pre><code>#include &lt;iostream&gt;
-#include &lt;queue&gt;
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Nguyên tắc FIFO.</li><li>Các thao tác <code>push</code>, <code>front</code>, <code>pop</code>, <code>empty</code>, <code>size</code>.</li><li>Vì sao BFS phải đánh dấu khi đưa vào Queue.</li><li>Vì sao BFS tìm đường ngắn nhất trong đồ thị không trọng số.</li><li>Cách mở rộng sang lưới và BFS đa nguồn.</li></ul></div>
+    <div class="box"><h3>Dấu hiệu nhận biết</h3><ul><li>Xử lý theo thứ tự đến trước.</li><li>Duyệt theo tầng hoặc theo khoảng cách.</li><li>Lan truyền từng bước/phút.</li><li>Đường đi ngắn nhất khi mọi cạnh có cùng trọng số.</li><li>Nhiều nguồn lan đồng thời.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu 1 – hàng chờ.</b><br>
+    Có q người lần lượt đến quầy. Mỗi thao tác là:
+    <ul>
+      <li><code>ADD x</code>: người x vào cuối hàng;</li>
+      <li><code>SERVE</code>: phục vụ người ở đầu hàng;</li>
+      <li><code>FRONT</code>: xem ai đang đứng đầu.</li>
+    </ul>
+  </div>
+
+  <p>Cấu trúc cần bảo đảm người đến trước được phục vụ trước. Stack không phù hợp vì Stack lấy người đến sau nhất ra trước.</p>
+
+  <div class="formula">Queue: push ở cuối, pop ở đầu → FIFO</div>
+
+  <div class="call">
+    <b>Bài toán mở đầu 2 – tìm đường.</b><br>
+    Cho đồ thị không trọng số. Hãy tìm số cạnh ít nhất từ đỉnh S đến mọi đỉnh khác.
+  </div>
+
+  <p>Nếu duyệt theo thứ tự tùy ý, ta có thể tới một đỉnh bằng đường dài trước. Ta cần mở rộng các đỉnh theo từng lớp khoảng cách:</p>
+  <ul>
+    <li>Lớp 0: đỉnh S.</li>
+    <li>Lớp 1: các đỉnh kề S.</li>
+    <li>Lớp 2: các đỉnh chưa thăm kề lớp 1.</li>
+  </ul>
+
+  <div class="call ok"><b>Quan sát:</b> Queue giữ đúng thứ tự các lớp: đỉnh được phát hiện trước sẽ được mở rộng trước.</div>
+</section>
+
+<section class="card" id="basic">
+  <h2>2. Queue cơ bản trong C++</h2>
+
+  <div class="g2">
+    <div class="box"><h3>Thao tác chính</h3><ul><li><code>q.push(x)</code>: thêm cuối.</li><li><code>q.front()</code>: xem đầu.</li><li><code>q.back()</code>: xem cuối.</li><li><code>q.pop()</code>: xóa đầu.</li><li><code>q.empty()</code>: kiểm tra rỗng.</li><li><code>q.size()</code>: số phần tử.</li></ul></div>
+    <div class="box"><h3>Độ phức tạp</h3><ul><li><code>push</code>: O(1).</li><li><code>front/back</code>: O(1).</li><li><code>pop</code>: O(1).</li><li>Không hỗ trợ truy cập <code>q[i]</code>.</li><li>Muốn duyệt toàn bộ thường phải pop hoặc sao chép Queue.</li></ul></div>
+  </div>
+
+  <div class="call warn"><b>Lưu ý:</b> <code>q.pop()</code> không trả về phần tử bị xóa. Muốn lấy giá trị, phải đọc <code>q.front()</code> trước rồi mới <code>q.pop()</code>.</div>
+</section>
+
+<section class="card" id="simulate">
+  <h2>3. Mô phỏng Queue và highlight code</h2>
+
+  <div class="g3">
+    <div class="visual">
+      <label><b>Giá trị x</b></label><input class="input" id="qInput" value="D">
+      <div class="controls">
+        <button class="btn" id="enqueueBtn">Enqueue</button>
+        <button class="btn green" id="frontBtn">Front</button>
+        <button class="btn red" id="dequeueBtn">Dequeue</button>
+        <button class="btn orange" id="sizeBtn">Size</button>
+        <button class="btn alt" id="resetQueueBtn">Làm lại</button>
+      </div>
+      <div class="log" id="queueLog"></div>
+    </div>
+
+    <div class="code-lines" id="queueCode">
+      <div class="code-line" data-k="init">queue&lt;string&gt; q;</div>
+      <div class="code-line" data-k="push">q.push(x);</div>
+      <div class="code-line" data-k="front">if (!q.empty()) cout &lt;&lt; q.front();</div>
+      <div class="code-line" data-k="pop">if (!q.empty()) q.pop();</div>
+      <div class="code-line" data-k="size">cout &lt;&lt; q.size();</div>
+    </div>
+
+    <div class="visual">
+      <div class="queue-view" id="queueView"></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="bfs">
+  <h2>4. BFS trên đồ thị</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <div class="graph-board" id="graphBoard"></div>
+      <div class="controls">
+        <button class="btn" id="bfsNext">Bước tiếp</button>
+        <button class="btn orange" id="bfsAuto">Tự chạy</button>
+        <button class="btn alt" id="bfsReset">Làm lại</button>
+      </div>
+      <h3>Queue BFS</h3>
+      <div class="queue-view" id="bfsQueue"></div>
+    </div>
+
+    <div class="log" id="bfsLog"></div>
+  </div>
+
+  <h3>4.1. Quy trình chuẩn</h3>
+  <ol>
+    <li>Đánh dấu nguồn đã thăm.</li>
+    <li>Đưa nguồn vào Queue.</li>
+    <li>Lặp: lấy đầu Queue, duyệt các đỉnh kề chưa thăm.</li>
+    <li>Đánh dấu đỉnh kề ngay khi đưa vào Queue.</li>
+  </ol>
+
+  <div class="call bad"><b>Không đánh dấu khi pop.</b> Nếu đợi đến lúc lấy ra mới đánh dấu, một đỉnh có thể bị nhiều đỉnh cha đưa vào Queue nhiều lần.</div>
+</section>
+
+<section class="card" id="grid">
+  <h2>5. BFS trên lưới – thuật toán loang</h2>
+
+  <p>Mỗi ô là một đỉnh; hai ô kề nhau tạo thành cạnh nếu được phép di chuyển. Mọi bước đi có cùng chi phí 1 nên BFS tìm được số bước ít nhất.</p>
+
+  <div class="g2">
+    <div class="visual">
+      <div class="grid-board" id="gridBoard"></div>
+      <div class="controls">
+        <button class="btn" id="gridNext">Bước tiếp</button>
+        <button class="btn orange" id="gridAuto">Tự chạy</button>
+        <button class="btn alt" id="gridReset">Làm lại</button>
+      </div>
+      <h3>Queue ô</h3>
+      <div class="queue-view" id="gridQueue"></div>
+    </div>
+
+    <div class="log" id="gridLog"></div>
+  </div>
+</section>
+
+<section class="card" id="multi">
+  <h2>6. BFS đa nguồn</h2>
+
+  <div class="call">
+    <b>Bài toán.</b> Nhiều ô bắt đầu có virus. Mỗi phút, virus lan sang bốn ô kề. Tính thời điểm mỗi ô bị nhiễm.
+  </div>
+
+  <p>Đưa tất cả nguồn vào Queue ngay từ đầu với khoảng cách 0. BFS sẽ mô phỏng các nguồn lan đồng thời.</p>
+
+  <div class="formula">Queue ban đầu = tất cả nguồn, không phải chỉ một nguồn</div>
+
+  <div class="g3">
+    <div class="box"><h3>Virus/lửa</h3><p>Tính thời gian lan đến mọi ô.</p></div>
+    <div class="box"><h3>Khoảng cách gần nhất</h3><p>Khoảng cách từ mỗi ô đến nguồn gần nhất.</p></div>
+    <div class="box"><h3>Nhiều S – nhiều T</h3><p>Tìm khoảng cách ngắn nhất từ bất kỳ S đến một T.</p></div>
+  </div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>7. Phân tích thuật toán</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Bài toán</th><th>Thời gian</th><th>Bộ nhớ</th><th>Giải thích</th></tr>
+    <tr><td>q thao tác Queue</td><td>O(q)</td><td>O(q)</td><td>Mỗi thao tác O(1).</td></tr>
+    <tr><td>BFS đồ thị</td><td>O(V+E)</td><td>O(V)</td><td>Mỗi đỉnh và cạnh được xử lý hữu hạn lần.</td></tr>
+    <tr><td>BFS lưới n×m</td><td>O(nm)</td><td>O(nm)</td><td>Mỗi ô vào Queue tối đa một lần.</td></tr>
+    <tr><td>Multi-source BFS</td><td>O(V+E)</td><td>O(V)</td><td>Chỉ khác bước khởi tạo nhiều nguồn.</td></tr>
+  </table></div>
+
+  <div class="call warn"><b>Giới hạn của BFS:</b> BFS chỉ trực tiếp tìm đường ngắn nhất khi mọi cạnh có cùng trọng số. Cạnh 0/1 dùng 0–1 BFS; trọng số không âm bất kỳ dùng Dijkstra.</div>
+</section>
+
+<section class="card" id="code">
+  <h2>8. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="queueCpp">Queue cơ bản</button>
+      <button class="tab-btn" data-tab="bfsCpp">BFS đồ thị</button>
+      <button class="tab-btn" data-tab="gridCpp">BFS lưới</button>
+      <button class="tab-btn" data-tab="multiCpp">Multi-source BFS</button>
+      <button class="tab-btn" data-tab="pythonCode">Python</button>
+    </div>
+
+    <div class="panel active" id="queueCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
+
 int main() {
     queue&lt;int&gt; q;
-    q.push(10); // enqueue
+
+    q.push(10);
     q.push(20);
-    cout &lt;&lt; q.front() &lt;&lt; "\n"; // 10
-    q.pop();  // dequeue 10
-    cout &lt;&lt; q.size(); // 1
-}</code></pre>
+    q.push(30);
 
-<h2>III. Trình mô phỏng Queue (hình ảnh + mô tả)</h2>
-<p>
-Mô phỏng dưới đây giúp bạn quan sát cách các phần tử đi vào **cuối hàng** và lấy ra **đầu hàng** theo nguyên tắc <b>FIFO – First In, First Out</b>.
-</p>
+    cout &lt;&lt; q.front() &lt;&lt; '\n';
+    cout &lt;&lt; q.back() &lt;&lt; '\n';
 
-<div class="sim-3col">
-  <!-- Cột thao tác -->
-  <div class="col">
-    <h4>🖱 Thao tác</h4>
-    <input type="text" id="valIn" placeholder="Giá trị enqueue..." />
-    <div>
-      <button class="btn" id="enqueue">Enqueue</button>
-      <button class="btn secondary" id="front">Front</button>
-      <button class="btn" id="dequeue">Dequeue</button>
-      <button class="btn ghost" id="size">Size</button>
-    </div>
-    <div class="callout" id="explain">💡 Nhập giá trị và chọn thao tác để quan sát Queue.</div>
-    <div id="log"></div>
+    if (!q.empty()) {
+        int value = q.front();
+        q.pop();
+
+        cout &lt;&lt; "Removed: " &lt;&lt; value &lt;&lt; '\n';
+    }
+
+    cout &lt;&lt; q.size();
+}</code></pre></div>
+
+    <div class="panel" id="bfsCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, m, source;
+    cin &gt;&gt; n &gt;&gt; m &gt;&gt; source;
+
+    vector&lt;vector&lt;int&gt;&gt; graph(n + 1);
+
+    for (int i = 0; i &lt; m; i++) {
+        int u, v;
+        cin &gt;&gt; u &gt;&gt; v;
+
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+
+    vector&lt;int&gt; distance(n + 1, -1);
+    vector&lt;int&gt; parent(n + 1, -1);
+    queue&lt;int&gt; q;
+
+    distance[source] = 0;
+    q.push(source);
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+
+        for (int v : graph[u]) {
+            if (distance[v] != -1) continue;
+
+            distance[v] = distance[u] + 1;
+            parent[v] = u;
+            q.push(v);
+        }
+    }
+}</code></pre></div>
+
+    <div class="panel" id="gridCpp"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int dx[4] = {-1, 1, 0, 0};
+int dy[4] = {0, 0, -1, 1};
+
+int main() {
+    int n, m;
+    cin &gt;&gt; n &gt;&gt; m;
+
+    vector&lt;string&gt; grid(n);
+    for (string &amp;row : grid) cin &gt;&gt; row;
+
+    vector&lt;vector&lt;int&gt;&gt; distance(
+        n,
+        vector&lt;int&gt;(m, -1)
+    );
+
+    queue&lt;pair&lt;int,int&gt;&gt; q;
+
+    if (grid[0][0] != '#') {
+        distance[0][0] = 0;
+        q.push({0, 0});
+    }
+
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+
+        for (int direction = 0; direction &lt; 4; direction++) {
+            int nx = x + dx[direction];
+            int ny = y + dy[direction];
+
+            if (nx &lt; 0 || nx &gt;= n || ny &lt; 0 || ny &gt;= m) {
+                continue;
+            }
+
+            if (grid[nx][ny] == '#') continue;
+            if (distance[nx][ny] != -1) continue;
+
+            distance[nx][ny] = distance[x][y] + 1;
+            q.push({nx, ny});
+        }
+    }
+
+    cout &lt;&lt; distance[n - 1][m - 1];
+}</code></pre></div>
+
+    <div class="panel" id="multiCpp"><button class="copy">Sao chép</button><pre><code>queue&lt;pair&lt;int,int&gt;&gt; q;
+vector&lt;vector&lt;int&gt;&gt; distance(n, vector&lt;int&gt;(m, -1));
+
+for (int i = 0; i &lt; n; i++) {
+    for (int j = 0; j &lt; m; j++) {
+        if (grid[i][j] == 'S') {
+            distance[i][j] = 0;
+            q.push({i, j});
+        }
+    }
+}
+
+while (!q.empty()) {
+    auto [x, y] = q.front();
+    q.pop();
+
+    for (int direction = 0; direction &lt; 4; direction++) {
+        int nx = x + dx[direction];
+        int ny = y + dy[direction];
+
+        if (!inside(nx, ny)) continue;
+        if (grid[nx][ny] == '#') continue;
+        if (distance[nx][ny] != -1) continue;
+
+        distance[nx][ny] = distance[x][y] + 1;
+        q.push({nx, ny});
+    }
+}</code></pre></div>
+
+    <div class="panel" id="pythonCode"><button class="copy">Sao chép</button><pre><code>from collections import deque
+
+def bfs(graph, source):
+    distance = [-1] * len(graph)
+    queue = deque([source])
+
+    distance[source] = 0
+
+    while queue:
+        vertex = queue.popleft()
+
+        for neighbor in graph[vertex]:
+            if distance[neighbor] != -1:
+                continue
+
+            distance[neighbor] = distance[vertex] + 1
+            queue.append(neighbor)
+
+    return distance</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>9. Giải thích code</h2>
+
+  <h3>9.1. Vì sao phải đọc front trước pop?</h3>
+  <p><code>pop()</code> chỉ xóa phần tử, không trả về giá trị. Vì vậy mẫu chuẩn là:</p>
+  <div class="formula">u = q.front(); q.pop();</div>
+
+  <h3>9.2. Vì sao đánh dấu ngay khi push?</h3>
+  <p>Ngay khi một đỉnh được phát hiện, ta đánh dấu để không đỉnh nào khác đưa nó vào Queue lần nữa.</p>
+
+  <h3>9.3. Vì sao BFS cho khoảng cách ngắn nhất?</h3>
+  <p>Queue xử lý các đỉnh theo khoảng cách tăng dần: lớp 0 trước lớp 1, lớp 1 trước lớp 2. Do đó lần đầu một đỉnh được phát hiện chính là bằng số cạnh ít nhất.</p>
+
+  <h3>9.4. Vì sao khoảng cách ban đầu là -1?</h3>
+  <p><code>-1</code> vừa biểu diễn chưa thăm, vừa tránh cần một mảng visited riêng.</p>
+
+  <h3>9.5. Vì sao BFS lưới vẫn là BFS đồ thị?</h3>
+  <p>Mỗi ô là một đỉnh; các phép di chuyển hợp lệ tạo thành cạnh. Ta chỉ không xây danh sách cạnh tường minh mà sinh hàng xóm trực tiếp bằng mảng hướng.</p>
+
+  <h3>9.6. Multi-source BFS khác gì BFS thường?</h3>
+  <p>Chỉ khác bước khởi tạo: đưa tất cả nguồn vào Queue với khoảng cách 0. Phần vòng lặp BFS giữ nguyên.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>10. Lỗi thường gặp</h2>
+
+  <ul>
+    <li>Gọi <code>front()</code> hoặc <code>pop()</code> khi Queue rỗng.</li>
+    <li>Tưởng <code>pop()</code> trả về phần tử.</li>
+    <li>Đánh dấu visited khi pop thay vì khi push.</li>
+    <li>Quên gán khoảng cách cho nguồn bằng 0.</li>
+    <li>Quên kiểm tra biên khi BFS trên lưới.</li>
+    <li>Không kiểm tra tường hoặc ô đã thăm.</li>
+    <li>Dùng BFS thường cho đồ thị có trọng số khác nhau.</li>
+    <li>Multi-source BFS nhưng chạy BFS riêng từ từng nguồn, gây chậm.</li>
+    <li>Muốn in đường đi nhưng không lưu mảng parent.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>11. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Queue tuân theo nguyên tắc nào?<div class="answers"><button class="answer" data-choice="a">LIFO</button><button class="answer" data-choice="b">FIFO</button><button class="answer" data-choice="c">Ngẫu nhiên</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Khi nào nên đánh dấu đỉnh đã thăm trong BFS?<div class="answers"><button class="answer" data-choice="a">Sau khi BFS kết thúc</button><button class="answer" data-choice="b">Khi pop khỏi Queue</button><button class="answer" data-choice="c">Ngay khi push vào Queue</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> BFS thường tìm đường ngắn nhất cho loại đồ thị nào?<div class="answers"><button class="answer" data-choice="a">Không trọng số hoặc mọi cạnh cùng trọng số</button><button class="answer" data-choice="b">Mọi trọng số âm</button><button class="answer" data-choice="c">Mọi đồ thị có trọng số bất kỳ</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Mô phỏng q thao tác Queue.</li><li>In phần tử đầu sau mỗi thao tác.</li><li>Tự cài Queue bằng mảng vòng.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>BFS thứ tự duyệt.</li><li>Khoảng cách từ một nguồn.</li><li>Khôi phục đường đi bằng parent.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>BFS mê cung.</li><li>Multi-source BFS.</li><li>BFS trạng thái.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>0–1 BFS.</li><li>Bidirectional BFS.</li><li>BFS trên không gian trạng thái nén.</li></ol></div>
   </div>
 
-  <!-- Cột code -->
-  <div class="col">
-    <h4>💻 Code đang thực thi</h4>
-    <div class="codebox" id="codebox">
-      <div class="line" data-k="init">queue&lt;int&gt; q;               // tạo hàng rỗng</div>
-      <div class="line" data-k="push1">int x; cin &gt;&gt; x;              // đọc giá trị</div>
-      <div class="line" data-k="push2">q.push(x);                   // enqueue – thêm vào cuối</div>
-      <div class="line" data-k="front1">if(!q.empty())               // kiểm tra rỗng</div>
-      <div class="line" data-k="front2">cout &lt;&lt; q.front();          // xem phần tử đầu</div>
-      <div class="line" data-k="pop1">if(!q.empty())                // kiểm tra rỗng</div>
-      <div class="line" data-k="pop2">q.pop();                      // dequeue – xoá đầu hàng</div>
-      <div class="line" data-k="size">cout &lt;&lt; q.size();            // kích thước hàng</div>
-    </div>
-  </div>
-
-  <!-- Cột kết quả -->
-  <div class="col">
-    <h4>📊 Kết quả Queue</h4>
-    <div class="queue-visual" id="qvis"></div>
-    <span class="badge" id="qs">size=0</span>
-  </div>
+  <details><summary>Bài thực hành 1 – Hàng chờ</summary><p>Xử lý các lệnh <code>E x</code>, <code>D</code>, <code>F</code>. Với thao tác không hợp lệ, in <code>EMPTY</code>.</p></details>
+  <details><summary>Bài thực hành 2 – Mê cung</summary><p>Tìm số bước ít nhất từ S đến T trên lưới có tường.</p></details>
+  <details><summary>Bài thực hành 3 – Virus</summary><p>Nhiều nguồn virus lan đồng thời. Tìm thời gian phủ toàn bộ ô có thể đi.</p></details>
+</section>
 </div>
-
-<style>
-.sim-3col {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-top: 20px;
-}
-@media (max-width: 900px){ .sim-3col { grid-template-columns: 1fr; } }
-
-.col { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; }
-.col h4 { margin-top:0; color: var(--blue-main); }
-
-.queue-visual {
-  height: 180px; display:flex; align-items:center; justify-content:flex-start;
-  border:2px dashed var(--blue-main); border-radius:10px; padding:10px; overflow-x:auto;
-}
-.queue-visual .item {
-  min-width:70px; height:70px; background: var(--blue-main); color:#fff;
-  text-align:center; line-height:70px; border-radius:8px; font-weight:bold; margin-right:6px;
-}
-.queue-visual .item.front { outline:3px solid #22c55e; }
-.badge { background:#111827; color:#fff; padding:3px 8px; border-radius:999px; font-size:12px; display:block; text-align:center; margin-top:8px; }
-
-.codebox { font-family: Consolas, monospace; font-size: 14px; background: #f8fafc; border-radius:8px; padding:10px; }
-.line { padding:3px 6px; border-radius:6px; }
-.line.hl { background:#dbeafe; }
-
-.btn { border:none; background:var(--blue-main); color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; margin:4px; }
-.btn.secondary { background:#0ea5e9; }
-.btn.ghost { background:#e5e7eb; color:#111827; }
-.callout { margin-top:8px; }
-</style>
 
 <script>
 (function(){
-  const q = [];
-  const vis = document.getElementById('qvis');
-  const explain = document.getElementById('explain');
-  const qs = document.getElementById('qs');
-  const val = document.getElementById('valIn');
-  const log = document.getElementById('log');
-  const code = document.getElementById('codebox');
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
 
-  function render(){
-    vis.innerHTML = '';
-    q.forEach((v, i) => {
-      const e = document.createElement('div');
-      e.className = 'item' + (i===0 ? ' front':'');
-      e.textContent = v;
-      vis.appendChild(e);
-    });
-    qs.textContent = 'size=' + q.length;
+/* Queue simulator */
+let qData=['A','B','C'];
+function highlight(keys){$$('.code-line').forEach(x=>x.classList.remove('hl'));keys.forEach(k=>{let e=$('.code-line[data-k="'+k+'"]');if(e)e.classList.add('hl')})}
+function renderQueue(msg,active=-1){
+  $('#queueView').innerHTML=qData.length?qData.map((v,i)=>'<div class="q-item '+(i===0?'front ':'')+(i===qData.length-1?'back ':'')+(i===active?'active':'')+'">'+v+'</div>').join(''):'<span>Queue rỗng</span>';
+  $('#queueLog').innerHTML=msg+'<br><b>size = '+qData.length+'</b>';
+}
+function enqueue(){let x=$('#qInput').value.trim();if(!x){renderQueue('Hãy nhập giá trị.');return}qData.push(x);highlight(['push']);renderQueue('Đã enqueue('+x+') vào cuối Queue.',qData.length-1)}
+function front(){if(!qData.length){renderQueue('Queue rỗng, không có front.');return}highlight(['front']);renderQueue('front = '+qData[0]+'.',0)}
+function dequeue(){if(!qData.length){renderQueue('Queue rỗng, không thể dequeue.');return}let x=qData.shift();highlight(['pop']);renderQueue('Đã dequeue phần tử '+x+'.')}
+function sizeQ(){highlight(['size']);renderQueue('Queue hiện có '+qData.length+' phần tử.')}
+function resetQueue(){qData=['A','B','C'];highlight(['init']);renderQueue('Queue mẫu ban đầu.')}
+
+/* Graph BFS */
+const graphPos={1:[12,48],2:[34,18],3:[34,76],4:[58,16],5:[60,52],6:[82,28],7:[84,76]};
+const graphEdges=[[1,2],[1,3],[2,4],[2,5],[3,5],[4,6],[5,6],[5,7]];
+const adj={1:[2,3],2:[1,4,5],3:[1,5],4:[2,6],5:[2,3,6,7],6:[4,5],7:[5]};
+let bfsQ=[],bfsDist={},bfsVisited={},bfsCurrent=null,bfsTimer=null;
+function drawGraph(){
+  let svg='<svg viewBox="0 0 100 100" preserveAspectRatio="none">';
+  graphEdges.forEach(e=>{let a=graphPos[e[0]],b=graphPos[e[1]];svg+='<line class="edge" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>'});svg+='</svg>';
+  let nodes='';
+  for(let u=1;u<=7;u++){
+    let cls='g-node ';
+    if(u===bfsCurrent)cls+='current ';
+    else if(bfsVisited[u]===2)cls+='visited ';
+    else if(bfsVisited[u]===1)cls+='queued ';
+    nodes+='<div class="'+cls+'" style="left:calc('+graphPos[u][0]+'% - 26px);top:calc('+graphPos[u][1]+'% - 26px)">'+u+'<small style="position:absolute;bottom:-21px">d='+(bfsDist[u]===undefined?'∞':bfsDist[u])+'</small></div>';
   }
-  function record(msg){
-    const p = document.createElement('div');
-    p.textContent = '• ' + msg;
-    log.prepend(p);
+  $('#graphBoard').innerHTML=svg+nodes;
+}
+function renderBfs(msg){
+  drawGraph();
+  $('#bfsQueue').innerHTML=bfsQ.length?bfsQ.map((u,i)=>'<div class="q-item '+(i===0?'front ':'')+(i===bfsQ.length-1?'back':'')+'">'+u+'</div>').join(''):'<span>Queue rỗng</span>';
+  $('#bfsLog').innerHTML=msg+'<br><b>Khoảng cách: '+Object.keys(bfsDist).map(k=>k+':'+bfsDist[k]).join(', ')+'</b>';
+}
+function resetBfs(){
+  if(bfsTimer){clearInterval(bfsTimer);bfsTimer=null}
+  bfsQ=[1];bfsDist={1:0};bfsVisited={1:1};bfsCurrent=null;$('#bfsAuto').textContent='Tự chạy';
+  renderBfs('Khởi tạo nguồn 1: dist[1]=0, push(1).');
+}
+function stepBfs(){
+  if(!bfsQ.length){bfsCurrent=null;renderBfs('Hoàn tất BFS.');return}
+  let u=bfsQ.shift();bfsCurrent=u;bfsVisited[u]=2;let logs=['<b>Lấy '+u+' khỏi đầu Queue.</b>'];
+  for(const v of adj[u]){
+    if(bfsVisited[v]){logs.push('Bỏ qua '+v+' vì đã được phát hiện.');continue}
+    bfsVisited[v]=1;bfsDist[v]=bfsDist[u]+1;bfsQ.push(v);logs.push('Phát hiện '+v+': dist='+bfsDist[v]+', push('+v+').');
   }
-  function hl(keys){
-    code.querySelectorAll('.line').forEach(l=>l.classList.remove('hl'));
-    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
-      const el = code.querySelector(`.line[data-k="${k}"]`);
-      if(el) el.classList.add('hl');
-    });
+  renderBfs(logs.join('<br>'));
+}
+function autoBfs(){
+  if(bfsTimer){clearInterval(bfsTimer);bfsTimer=null;$('#bfsAuto').textContent='Tự chạy';return}
+  $('#bfsAuto').textContent='Tạm dừng';
+  bfsTimer=setInterval(()=>{if(!bfsQ.length){clearInterval(bfsTimer);bfsTimer=null;$('#bfsAuto').textContent='Tự chạy';stepBfs()}else stepBfs()},900)
+}
+
+/* Grid BFS */
+const grid=[
+  "S..#...",
+  ".#...#.",
+  "...#...",
+  "##...#.",
+  "...#..T"
+];
+const GH=grid.length,GW=grid[0].length;
+let gridQ=[],gridDist=[],gridState=[],gridCurrent=null,gridTimer=null;
+const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+function resetGrid(){
+  if(gridTimer){clearInterval(gridTimer);gridTimer=null}
+  gridQ=[[0,0]];gridDist=Array.from({length:GH},()=>Array(GW).fill(-1));gridState=Array.from({length:GH},()=>Array(GW).fill(0));
+  gridDist[0][0]=0;gridState[0][0]=1;gridCurrent=null;$('#gridAuto').textContent='Tự chạy';renderGrid('Khởi tạo ô S vào Queue.');
+}
+function renderGrid(msg){
+  $('#gridBoard').style.gridTemplateColumns='repeat('+GW+',48px)';
+  let html='';
+  for(let i=0;i<GH;i++)for(let j=0;j<GW;j++){
+    let cls='grid-cell ';
+    if(grid[i][j]==='#')cls+='wall ';
+    if(grid[i][j]==='S')cls+='start ';
+    if(grid[i][j]==='T')cls+='target ';
+    if(gridState[i][j]===1)cls+='queued ';
+    if(gridState[i][j]===2)cls+='visited ';
+    if(gridCurrent&&gridCurrent[0]===i&&gridCurrent[1]===j)cls+='current ';
+    html+='<div class="'+cls+'">'+(grid[i][j]==='.'?(gridDist[i][j]===-1?'':gridDist[i][j]):grid[i][j])+'</div>';
   }
+  $('#gridBoard').innerHTML=html;
+  $('#gridQueue').innerHTML=gridQ.length?gridQ.map((p,i)=>'<div class="q-item '+(i===0?'front ':'')+(i===gridQ.length-1?'back':'')+'">('+p[0]+','+p[1]+')</div>').join(''):'<span>Queue rỗng</span>';
+  $('#gridLog').innerHTML=msg;
+}
+function stepGrid(){
+  if(!gridQ.length){gridCurrent=null;renderGrid('BFS kết thúc. Khoảng cách đến T = '+gridDist[GH-1][GW-1]+'.');return}
+  let [x,y]=gridQ.shift();gridCurrent=[x,y];gridState[x][y]=2;let logs=['<b>Lấy ô ('+x+','+y+') khỏi Queue, d='+gridDist[x][y]+'.</b>'];
+  for(const [dx,dy] of dirs){
+    let nx=x+dx,ny=y+dy;
+    if(nx<0||nx>=GH||ny<0||ny>=GW)continue;
+    if(grid[nx][ny]==='#'||gridDist[nx][ny]!==-1)continue;
+    gridDist[nx][ny]=gridDist[x][y]+1;gridState[nx][ny]=1;gridQ.push([nx,ny]);logs.push('Push ('+nx+','+ny+'), d='+gridDist[nx][ny]+'.');
+  }
+  renderGrid(logs.join('<br>'));
+}
+function autoGrid(){
+  if(gridTimer){clearInterval(gridTimer);gridTimer=null;$('#gridAuto').textContent='Tự chạy';return}
+  $('#gridAuto').textContent='Tạm dừng';
+  gridTimer=setInterval(()=>{if(!gridQ.length){clearInterval(gridTimer);gridTimer=null;$('#gridAuto').textContent='Tự chạy';stepGrid()}else stepGrid()},700)
+}
 
-  // enqueue
-  document.getElementById('enqueue').onclick=()=>{
-    const v = val.value.trim();
-    if(!v){ explain.textContent='⚠️ Nhập giá trị trước khi enqueue.'; return; }
-    q.push(v); render();
-    hl(['push1','push2']);
-    explain.innerHTML = `Đã enqueue(<b>${v}</b>) vào cuối hàng.`;
-    record(`enqueue(${v})`);
-    val.value='';
-  };
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
 
-  // front
-  document.getElementById('front').onclick=()=>{
-    if(!q.length){ explain.textContent='⚠️ Queue rỗng, không có phần tử đầu.'; hl(); record('front() thất bại'); return; }
-    hl(['front1','front2']);
-    explain.innerHTML = `<b>front()</b> = <b>${q[0]}</b>`;
-    record(`front()=${q[0]}`);
-  };
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
 
-  // dequeue
-  document.getElementById('dequeue').onclick=()=>{
-    if(!q.length){ explain.textContent='⚠️ Queue rỗng, không thể dequeue.'; hl(); record('dequeue() thất bại'); return; }
-    const x = q.shift(); render();
-    hl(['pop1','pop2']);
-    explain.innerHTML = `<b>dequeue()</b>: xoá phần tử đầu hàng <b>${x}</b>.`;
-    record(`dequeue(${x})`);
-  };
+  $('#enqueueBtn').onclick=enqueue;$('#frontBtn').onclick=front;$('#dequeueBtn').onclick=dequeue;$('#sizeBtn').onclick=sizeQ;$('#resetQueueBtn').onclick=resetQueue;
+  $('#bfsNext').onclick=stepBfs;$('#bfsAuto').onclick=autoBfs;$('#bfsReset').onclick=resetBfs;
+  $('#gridNext').onclick=stepGrid;$('#gridAuto').onclick=autoGrid;$('#gridReset').onclick=resetGrid;
 
-  // size
-  document.getElementById('size').onclick=()=>{
-    hl(['size']);
-    explain.innerHTML = `Queue hiện có <b>${q.length}</b> phần tử.`;
-    record(`size=${q.length}`);
-  };
+  resetQueue();resetBfs();resetGrid();
 
-  render(); hl(['init']);
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
 })();
 </script>
 
-
-<h2>IV. Khi nào dùng Queue</h2>
-<table>
-  <thead>
-    <tr><th>Nhóm bài toán</th><th>Mô tả</th><th>Ví dụ</th><th>Lý do dùng Queue</th></tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><b>1. Xử lý luồng dữ liệu</b></td>
-      <td>Các sự kiện đến và được xử lý theo thứ tự.</td>
-      <td>Máy in, lập lịch tiến trình CPU, xử lý gói mạng.</td>
-      <td>Giúp đảm bảo “đến trước – phục vụ trước”.</td>
-    </tr>
-    <tr>
-      <td><b>2. BFS – duyệt đồ thị theo tầng</b></td>
-      <td>Thuật toán duyệt theo chiều rộng (Breadth-First Search).</td>
-      <td>Duyệt cây, tìm đường đi ngắn nhất trong đồ thị vô hướng.</td>
-      <td>Queue lưu các nút chờ xử lý để mở rộng dần từng lớp.</td>
-    </tr>
-    <tr>
-      <td><b>3. Giải thuật mô phỏng hàng chờ</b></td>
-      <td>Mô phỏng người xếp hàng hoặc tiến trình trong hệ thống.</td>
-      <td>ATM, quầy vé, điều phối tác vụ.</td>
-      <td>Thể hiện đúng bản chất hàng đợi FIFO.</td>
-    </tr>
-    <tr>
-      <td><b>4. Bộ nhớ đệm (Buffer)</b></td>
-      <td>Dữ liệu đến nhanh hơn tốc độ xử lý.</td>
-      <td>Queue lưu tạm gói dữ liệu – ví dụ network buffer, pipeline.</td>
-      <td>Đảm bảo dữ liệu không mất mà vẫn đúng thứ tự.</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2>V. Bài tập luyện tập</h2>
-<p>
-Queue không chỉ dùng để mô phỏng hàng chờ, mà còn là công cụ cực kỳ mạnh trong thuật toán duyệt đồ thị (BFS) và các bài toán "loang" (lan truyền theo lớp).  
-Dưới đây là hệ thống bài tập chia theo cấp độ: từ cơ bản → ứng dụng → thuật toán loang nâng cao.
-</p>
-
-<h3>📘 Egg – Cơ bản</h3>
-
-<details>
-  <summary>1️⃣ Bài 1: Mô phỏng hàng chờ</summary>
-  <p><b>Đề:</b> Có n thao tác “E x” (enqueue x) và “D” (dequeue). Sau khi thực hiện, in các phần tử còn lại trong queue.</p>
-  <p><b>Ý tưởng:</b> Dùng <code>queue&lt;int&gt;</code>, đọc từng thao tác, thực hiện tương ứng.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int main(){
-  int n; cin&gt;&gt;n; queue&lt;int&gt; q;
-  while(n--){
-    char c; cin&gt;&gt;c;
-    if(c=='E'){int x;cin&gt;&gt;x;q.push(x);}
-    else if(c=='D' &amp;&amp; !q.empty()) q.pop();
-  }
-  while(!q.empty()){cout&lt;&lt;q.front()&lt;&lt;' ';q.pop();}
-}</code></pre>
-  <p><b>Ví dụ:</b> 
-  <br>Input:  
-  <code>5<br>E 3<br>E 5<br>D<br>E 2<br>E 1</code>  
-  Output: <code>5 2 1</code></p>
-</details>
-
-
-<h3>📗 Chicken – Ứng dụng Queue trong đồ thị</h3>
-
-<details>
-  <summary>2️⃣ Bài 2: Duyệt đồ thị theo tầng (BFS cơ bản)</summary>
-  <p><b>Đề:</b> Cho đồ thị vô hướng n đỉnh m cạnh. In thứ tự duyệt BFS bắt đầu từ đỉnh 1.</p>
-  <p><b>Ý tưởng:</b> Dùng <code>queue</code> lưu các đỉnh đang chờ duyệt; khi lấy ra thì duyệt toàn bộ đỉnh kề chưa thăm.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int main(){
-  int n,m;cin&gt;&gt;n&gt;&gt;m;
-  vector&lt;vector&lt;int&gt;&gt; g(n+1);
-  for(int i=0,u,v;i&lt;m;i++){cin&gt;&gt;u&gt;&gt;v;g[u].push_back(v);g[v].push_back(u);}
-  vector&lt;int&gt; vis(n+1);
-  queue&lt;int&gt; q;
-  q.push(1); vis[1]=1;
-  while(!q.empty()){
-    int u=q.front(); q.pop(); cout&lt;&lt;u&lt;&lt;' ';
-    for(int v:g[u]) if(!vis[v]){ vis[v]=1; q.push(v); }
-  }
-}</code></pre>
-  <p><b>Kết quả:</b> Thứ tự duyệt theo tầng (1 → các hàng xóm → hàng xóm của hàng xóm...)</p>
-</details>
-
-<details>
-  <summary>3️⃣ Bài 3: Tìm đường đi ngắn nhất trong mê cung (thuật toán loang)</summary>
-  <p><b>Đề:</b> Cho ma trận <code>n x m</code> gồm các ô 0 (đi được) và 1 (tường).  
-  Tìm khoảng cách ngắn nhất từ ô (1,1) đến (n,m), di chuyển 4 hướng.</p>
-  <p><b>Ý tưởng:</b> Dùng <b>thuật toán loang (BFS)</b>: bắt đầu từ (1,1), mỗi bước lan sang 4 ô lân cận hợp lệ, lưu khoảng cách bằng queue.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int dx[4]={-1,1,0,0};
-int dy[4]={0,0,-1,1};
-int main(){
-  int n,m;cin&gt;&gt;n&gt;&gt;m;
-  vector&lt;string&gt; a(n);
-  for(int i=0;i&lt;n;i++) cin&gt;&gt;a[i];
-  vector&lt;vector&lt;int&gt;&gt; d(n, vector&lt;int&gt;(m,-1));
-  queue&lt;pair&lt;int,int&gt;&gt; q;
-  if(a[0][0]=='0'){ q.push({0,0}); d[0][0]=0; }
-  while(!q.empty()){
-    auto [x,y]=q.front(); q.pop();
-    for(int k=0;k&lt;4;k++){
-      int nx=x+dx[k], ny=y+dy[k];
-      if(nx&lt;0||ny&lt;0||nx&gt;=n||ny&gt;=m) continue;
-      if(a[nx][ny]=='1'||d[nx][ny]!=-1) continue;
-      d[nx][ny]=d[x][y]+1;
-      q.push({nx,ny});
-    }
-  }
-  cout&lt;&lt;d[n-1][m-1];
-}</code></pre>
-  <p><b>Ví dụ:</b><br>
-  Input:<br>
-  <code>4 4<br>0001<br>1100<br>0010<br>0000</code><br>
-  Output: <code>6</code></p>
-  <p><b>Giải thích:</b> BFS giúp tìm đường ngắn nhất vì mỗi ô được thăm lần đầu tiên bằng đường đi ngắn nhất.</p>
-</details>
-
-<details>
-  <summary>4️⃣ Bài 4: Lan truyền virus (multi-source BFS)</summary>
-  <p><b>Đề:</b> Cho lưới n×m gồm các ô:  
-  <code>0</code> – chưa nhiễm, <code>1</code> – nhiễm virus ban đầu.  
-  Mỗi phút, virus lan sang 4 hướng. Tính thời gian lan đến toàn bộ ô có thể.</p>
-  <p><b>Ý tưởng:</b> Dùng <b>BFS đa nguồn</b>: ban đầu enqueue tất cả ô có virus (1), sau đó lan đồng thời.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int dx[4]={-1,1,0,0}, dy[4]={0,0,-1,1};
-int main(){
-  int n,m;cin&gt;&gt;n&gt;&gt;m;
-  vector&lt;vector&lt;int&gt;&gt; a(n, vector&lt;int&gt;(m));
-  queue&lt;pair&lt;int,int&gt;&gt; q;
-  for(int i=0;i&lt;n;i++) for(int j=0;j&lt;m;j++){
-    cin&gt;&gt;a[i][j];
-    if(a[i][j]==1) q.push({i,j});
-  }
-  int t=-1;
-  while(!q.empty()){
-    int sz=q.size(); t++;
-    while(sz--){
-      auto [x,y]=q.front(); q.pop();
-      for(int k=0;k&lt;4;k++){
-        int nx=x+dx[k], ny=y+dy[k];
-        if(nx&lt;0||ny&lt;0||nx&gt;=n||ny&gt;=m) continue;
-        if(a[nx][ny]!=0) continue;
-        a[nx][ny]=1; q.push({nx,ny});
-      }
-    }
-  }
-  cout&lt;&lt;t;
-}</code></pre>
-  <p><b>Giải thích:</b> Duyệt từng “lớp” lan truyền trong queue. Mỗi vòng while tương ứng một phút lan toàn mạng.</p>
-</details>
-
-
-<h3>📙 Chicken Farmer – Nâng cao</h3>
-
-<details>
-  <summary>5️⃣ Bài 5: Tìm khoảng cách ngắn nhất giữa nhiều nguồn và nhiều đích</summary>
-  <p><b>Đề:</b> Cho ma trận có các điểm xuất phát (S) và điểm đích (T). Tính khoảng cách ngắn nhất từ bất kỳ S đến bất kỳ T.</p>
-  <p><b>Ý tưởng:</b>  
-  - Đưa tất cả điểm S vào queue ban đầu (multi-source BFS).  
-  - Lan loang đến khi gặp ô T đầu tiên → dừng lại.</p>
-  <pre><code>#include &lt;bits/stdc++.h&gt;
-using namespace std;
-int dx[4]={-1,1,0,0}, dy[4]={0,0,-1,1};
-int main(){
-  int n,m;cin&gt;&gt;n&gt;&gt;m;
-  vector&lt;string&gt; a(n); for(auto &s:a) cin&gt;&gt;s;
-  queue&lt;pair&lt;int,int&gt;&gt; q; vector&lt;vector&lt;int&gt;&gt; d(n,vector&lt;int&gt;(m,-1));
-  for(int i=0;i&lt;n;i++) for(int j=0;j&lt;m;j++) if(a[i][j]=='S'){q.push({i,j}); d[i][j]=0;}
-  while(!q.empty()){
-    auto [x,y]=q.front(); q.pop();
-    if(a[x][y]=='T'){ cout&lt;&lt;d[x][y]; return 0; }
-    for(int k=0;k&lt;4;k++){
-      int nx=x+dx[k], ny=y+dy[k];
-      if(nx&lt;0||ny&lt;0||nx&gt;=n||ny&gt;=m) continue;
-      if(a[nx][ny]=='#'||d[nx][ny]!=-1) continue;
-      d[nx][ny]=d[x][y]+1; q.push({nx,ny});
-    }
-  }
-  cout&lt;&lt;-1;
-}</code></pre>
-  <p><b>Ứng dụng:</b>  
-  Các bài như “Tìm khoảng cách từ nhiều ngọn lửa đến người”, “Thoát khỏi mê cung”, “Lũ lụt lan dần”,... đều dùng dạng này.</p>
-</details>
-
-
-<h2>VI. Tổng kết & Mở rộng</h2>
-<ul>
-  <li><b>Queue</b> phù hợp cho bài toán theo trình tự thời gian.</li>
-  <li><b>Deque</b> (Double-ended Queue) mở rộng cho cả hai đầu – cực kỳ hữu ích cho các bài trượt cửa sổ.</li>
-  <li>Hãy thử tự cài đặt Queue bằng mảng/vòng tròn (circular queue) để hiểu cơ chế sâu hơn.</li>
-</ul>
-
-<p style="text-align:center;color:#555;font-style:italic;">
-🚀 Queue – công cụ mạnh mẽ cho các thuật toán theo luồng và hàng chờ.  
-Hiểu chắc FIFO sẽ giúp bạn nắm vững nền tảng của BFS, hệ thống và mô phỏng thực tế.
-</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

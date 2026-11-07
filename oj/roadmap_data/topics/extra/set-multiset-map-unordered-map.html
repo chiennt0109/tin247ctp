@@ -1,19 +1,436 @@
-<article class="roadmap-extra-topic">
-  <h1>set, multiset, map, unordered_map</h1>
-  <section>
-    <h2>Mục tiêu</h2>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.stl-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+border-radius:0;box-sizing:border-box;position:relative;width:calc(100vw - 24px);
+max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.stl-page *{box-sizing:border-box}.stl-page h1,.stl-page h2,.stl-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1020px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.container-view{display:flex;flex-wrap:wrap;gap:9px;min-height:92px;padding:12px;border:1px dashed #bfdbfe;border-radius:16px;background:#f8fafc}
+.item{min-width:66px;padding:9px 11px;border:2px solid #c7d2fe;border-radius:13px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900;transition:.2s}.item.hot{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:translateY(-3px)}.item.count{background:#dcfce7;border-color:#22c55e;color:#166534}.item.miss{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.map-grid{display:grid;gap:8px}.map-row{display:grid;grid-template-columns:50px 1fr 1fr;gap:8px;align-items:center}.map-cell{padding:8px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;text-align:center}.map-head{background:#eef2ff;color:#312e81;font-weight:900}.map-row.hot .map-cell{background:#ffedd5;border-color:#fb923c}
+.bucket-grid{display:grid;grid-template-columns:repeat(8,minmax(58px,1fr));gap:8px}.bucket{min-height:86px;padding:7px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}.bucket b{display:block;text-align:center;color:#475569}.bucket span{display:block;margin-top:5px;padding:4px;border-radius:8px;background:#cffafe;color:#155e75;text-align:center;font-weight:800}
+.log{min-height:120px;max-height:330px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.stl-page pre{margin:0;padding:20px;max-height:660px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.stl-page p code,.stl-page li code,.stl-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.stl-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.stl-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.bucket-grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+
+<div class="stl-page">
+<div class="hero">
+  <span class="badge">C++ Standard Template Library</span>
+  <h1>🗂️ set, multiset, map và unordered_map</h1>
+  <p>Bốn cấu trúc dữ liệu quan trọng để quản lý phần tử duy nhất, phần tử lặp, ánh xạ khóa–giá trị và tra cứu trung bình O(1). Bài học tập trung vào tư duy chọn đúng container, thao tác thường dùng, độ phức tạp và lỗi dễ gặp.</p>
+  <div class="stats">
+    <div class="stat"><b>set</b><span>Duy nhất + có thứ tự</span></div>
+    <div class="stat"><b>multiset</b><span>Cho phép trùng + có thứ tự</span></div>
+    <div class="stat"><b>map</b><span>key → value, key có thứ tự</span></div>
+    <div class="stat"><b>unordered_map</b><span>Hash table, trung bình O(1)</span></div>
+  </div>
+</div>
+
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#set">Set</a><a href="#multiset">Multiset</a><a href="#map">Map</a><a href="#unordered">Unordered Map</a><a href="#compare">So sánh</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
+
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Khác nhau giữa duy nhất và cho phép lặp.</li><li>Khác nhau giữa container có thứ tự và hash table.</li><li>Các thao tác <code>insert</code>, <code>find</code>, <code>erase</code>, <code>count</code>.</li><li>Cách dùng <code>lower_bound</code>, <code>upper_bound</code> với set/multiset.</li><li>Cách truy cập map bằng <code>[]</code>, <code>at()</code>, <code>find()</code>.</li></ul></div>
+    <div class="box"><h3>Ứng dụng</h3><ul><li>Loại phần tử trùng.</li><li>Đếm tần suất.</li><li>Quản lý tập động có thứ tự.</li><li>Tìm phần tử gần nhất theo giá trị.</li><li>Lưu thông tin theo khóa.</li><li>Tra cứu nhanh bằng hash.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Một chương trình nhận liên tục các giá trị hoặc cặp <code>(khóa, dữ liệu)</code>. Ta cần:
     <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
+      <li>lưu mỗi giá trị đúng một lần;</li>
+      <li>hoặc lưu cả các giá trị lặp;</li>
+      <li>đếm số lần xuất hiện;</li>
+      <li>tìm nhanh dữ liệu theo khóa;</li>
+      <li>đôi khi phải duyệt theo thứ tự tăng dần.</li>
     </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
-    <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
-    </ol>
-  </section>
-</article>
+  </div>
+
+  <h3>1.1. Vì sao vector chưa đủ?</h3>
+  <p>Dùng vector, tìm kiếm hoặc kiểm tra trùng thường mất O(n). Chèn vào giữa để giữ thứ tự cũng mất O(n).</p>
+
+  <h3>1.2. Mỗi yêu cầu cần một cấu trúc khác nhau</h3>
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Nhu cầu</th><th>Container phù hợp</th><th>Lý do</th></tr>
+    <tr><td>Mỗi giá trị xuất hiện một lần, cần thứ tự</td><td><code>set</code></td><td>Duy nhất, tự sắp tăng.</td></tr>
+    <tr><td>Cho phép phần tử trùng, cần thứ tự</td><td><code>multiset</code></td><td>Lưu đầy đủ số lần xuất hiện.</td></tr>
+    <tr><td>Ánh xạ key → value, cần duyệt key tăng dần</td><td><code>map</code></td><td>Key duy nhất, có thứ tự.</td></tr>
+    <tr><td>Ánh xạ key → value, ưu tiên tra cứu nhanh</td><td><code>unordered_map</code></td><td>Hash table, trung bình O(1).</td></tr>
+  </table></div>
+
+  <div class="call ok"><b>Kết luận:</b> Không có container tốt nhất cho mọi bài. Hãy chọn theo: có cần thứ tự không, có cho phép trùng không, dữ liệu là giá trị hay key–value.</div>
+</section>
+
+<section class="card" id="set">
+  <h2>2. set – tập hợp duy nhất có thứ tự</h2>
+  <div class="g2">
+    <div class="box"><h3>Đặc điểm</h3><ul><li>Không lưu phần tử trùng.</li><li>Duyệt theo thứ tự tăng dần mặc định.</li><li>Thường cài bằng cây cân bằng.</li><li><code>insert/find/erase</code> O(log n).</li></ul></div>
+    <div class="box"><h3>Thao tác</h3><ul><li><code>s.insert(x)</code></li><li><code>s.find(x)</code></li><li><code>s.count(x)</code> chỉ trả 0 hoặc 1.</li><li><code>s.erase(x)</code></li><li><code>s.lower_bound(x)</code></li><li><code>s.upper_bound(x)</code></li></ul></div>
+  </div>
+
+  <h3>2.1. Mô phỏng set</h3>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Giá trị x</b></label><input class="input" id="setValue" value="7">
+      <div class="controls"><button class="btn" id="setInsert">insert</button><button class="btn red" id="setErase">erase</button><button class="btn green" id="setFind">find</button><button class="btn orange" id="setLower">lower_bound</button></div>
+      <div class="container-view" id="setView"></div>
+    </div>
+    <div class="log" id="setLog"></div>
+  </div>
+</section>
+
+<section class="card" id="multiset">
+  <h2>3. multiset – tập có thứ tự và cho phép trùng</h2>
+  <div class="g2">
+    <div class="box"><h3>Đặc điểm</h3><ul><li>Cho phép nhiều phần tử bằng nhau.</li><li>Tự giữ thứ tự tăng dần.</li><li><code>count(x)</code> có thể lớn hơn 1.</li><li>Có thể xóa một bản sao hoặc xóa tất cả.</li></ul></div>
+    <div class="box"><h3>Hai kiểu erase</h3><ul><li><code>ms.erase(x)</code>: xóa tất cả phần tử bằng x.</li><li><code>auto it=ms.find(x); ms.erase(it);</code>: xóa đúng một bản sao.</li></ul></div>
+  </div>
+
+  <h3>3.1. Mô phỏng multiset</h3>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Giá trị x</b></label><input class="input" id="msValue" value="5">
+      <div class="controls"><button class="btn" id="msInsert">insert</button><button class="btn orange" id="msEraseOne">erase one</button><button class="btn red" id="msEraseAll">erase all</button><button class="btn green" id="msCount">count</button></div>
+      <div class="container-view" id="msView"></div>
+    </div>
+    <div class="log" id="msLog"></div>
+  </div>
+</section>
+
+<section class="card" id="map">
+  <h2>4. map – ánh xạ key → value có thứ tự</h2>
+  <div class="g2">
+    <div class="box"><h3>Đặc điểm</h3><ul><li>Mỗi key xuất hiện tối đa một lần.</li><li>Key được duyệt tăng dần.</li><li><code>find/insert/erase</code> O(log n).</li><li>Phù hợp đếm tần suất cần thứ tự.</li></ul></div>
+    <div class="box"><h3>Truy cập</h3><ul><li><code>mp[key]</code>: tạo key nếu chưa có.</li><li><code>mp.at(key)</code>: không tạo key, có thể ném ngoại lệ.</li><li><code>mp.find(key)</code>: kiểm tra an toàn.</li><li><code>mp.emplace(key,value)</code>.</li></ul></div>
+  </div>
+
+  <h3>4.1. Mô phỏng map đếm tần suất</h3>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Key</b></label><input class="input" id="mapKey" value="apple">
+      <label><b>Giá trị cộng thêm</b></label><input class="input" id="mapDelta" value="1">
+      <div class="controls"><button class="btn" id="mapAdd">mp[key] += delta</button><button class="btn green" id="mapFind">find</button><button class="btn red" id="mapErase">erase</button></div>
+      <div class="map-grid" id="mapView"></div>
+    </div>
+    <div class="log" id="mapLog"></div>
+  </div>
+</section>
+
+<section class="card" id="unordered">
+  <h2>5. unordered_map – hash table</h2>
+  <div class="g2">
+    <div class="box"><h3>Đặc điểm</h3><ul><li>Không đảm bảo thứ tự duyệt.</li><li>Tra cứu trung bình O(1).</li><li>Trường hợp xấu có thể O(n).</li><li>Key phải có hash phù hợp.</li></ul></div>
+    <div class="box"><h3>Khái niệm hash</h3><ul><li>Hash biến key thành chỉ số bucket.</li><li>Nhiều key có thể vào cùng bucket: collision.</li><li><code>reserve()</code> và <code>max_load_factor()</code> giúp giảm rehash.</li></ul></div>
+  </div>
+
+  <h3>5.1. Mô phỏng bucket</h3>
+  <div class="g2">
+    <div class="visual">
+      <label><b>Key số nguyên</b></label><input class="input" id="hashKey" value="13">
+      <label><b>Value</b></label><input class="input" id="hashValue" value="A">
+      <div class="controls"><button class="btn" id="hashInsert">insert/update</button><button class="btn red" id="hashErase">erase</button><button class="btn green" id="hashFind">find</button></div>
+      <div class="bucket-grid" id="bucketView"></div>
+    </div>
+    <div class="log" id="hashLog"></div>
+  </div>
+
+  <div class="call warn"><b>Không dùng unordered_map nếu cần thứ tự key, lower_bound, phần tử nhỏ nhất/lớn nhất hoặc duyệt có thứ tự.</b></div>
+</section>
+
+<section class="card" id="compare">
+  <h2>6. Bảng so sánh nhanh</h2>
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Container</th><th>Trùng?</th><th>Có thứ tự?</th><th>Find/Insert/Erase</th><th>lower_bound?</th><th>Trường hợp dùng</th></tr>
+    <tr><td><code>set</code></td><td>Không</td><td>Có</td><td>O(log n)</td><td>Có</td><td>Tập duy nhất có thứ tự.</td></tr>
+    <tr><td><code>multiset</code></td><td>Có</td><td>Có</td><td>O(log n)</td><td>Có</td><td>Duy trì nhiều bản sao có thứ tự.</td></tr>
+    <tr><td><code>map</code></td><td>Key không trùng</td><td>Có</td><td>O(log n)</td><td>Có theo key</td><td>Key-value cần thứ tự.</td></tr>
+    <tr><td><code>unordered_map</code></td><td>Key không trùng</td><td>Không</td><td>O(1) trung bình</td><td>Không</td><td>Tra cứu nhanh, không cần thứ tự.</td></tr>
+  </table></div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>7. Phân tích và nguyên tắc chọn</h2>
+  <div class="g3">
+    <div class="box"><h3>Cần thứ tự?</h3><p>Có → set/multiset/map. Không → cân nhắc unordered_map.</p></div>
+    <div class="box"><h3>Có phần tử trùng?</h3><p>Cần giữ trùng → multiset. Chỉ cần duy nhất → set.</p></div>
+    <div class="box"><h3>Dữ liệu key–value?</h3><p>Có → map hoặc unordered_map.</p></div>
+    <div class="box"><h3>Cần lower_bound?</h3><p>Dùng cấu trúc có thứ tự; unordered_map không hỗ trợ.</p></div>
+    <div class="box"><h3>Cần tốc độ trung bình?</h3><p>unordered_map thường nhanh hơn map nhưng không có bảo đảm O(log n).</p></div>
+    <div class="box"><h3>Dữ liệu bị tấn công?</h3><p>Hash xấu có thể làm unordered_map chậm. Trong một số bài, map ổn định hơn.</p></div>
+  </div>
+</section>
+
+<section class="card" id="code">
+  <h2>8. Code mẫu</h2>
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="setCode">set</button>
+      <button class="tab-btn" data-tab="msCode">multiset</button>
+      <button class="tab-btn" data-tab="mapCode">map</button>
+      <button class="tab-btn" data-tab="umapCode">unordered_map</button>
+    </div>
+
+    <div class="panel active" id="setCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    set&lt;int&gt; s = {5, 2, 8, 2};
+
+    s.insert(7);
+    s.insert(5); // không tạo bản sao mới
+
+    if (s.find(7) != s.end()) {
+        cout &lt;&lt; "Ton tai 7\n";
+    }
+
+    auto it = s.lower_bound(6);
+    if (it != s.end()) {
+        cout &lt;&lt; "Phan tu dau tien &gt;= 6: " &lt;&lt; *it &lt;&lt; '\n';
+    }
+
+    s.erase(2);
+
+    for (int x : s) {
+        cout &lt;&lt; x &lt;&lt; ' ';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="msCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    multiset&lt;int&gt; ms = {5, 2, 5, 7, 5};
+
+    cout &lt;&lt; ms.count(5) &lt;&lt; '\n'; // 3
+
+    auto it = ms.find(5);
+    if (it != ms.end()) {
+        ms.erase(it); // xóa đúng một số 5
+    }
+
+    // ms.erase(5); // xóa tất cả số 5
+
+    for (int x : ms) {
+        cout &lt;&lt; x &lt;&lt; ' ';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="mapCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    vector&lt;string&gt; words = {
+        "apple", "banana", "apple", "orange"
+    };
+
+    map&lt;string,int&gt; frequency;
+
+    for (const string&amp; word : words) {
+        frequency[word]++;
+    }
+
+    for (const auto&amp; [word, count] : frequency) {
+        cout &lt;&lt; word &lt;&lt; ' ' &lt;&lt; count &lt;&lt; '\n';
+    }
+
+    if (frequency.find("pear") == frequency.end()) {
+        cout &lt;&lt; "Khong co pear\n";
+    }
+}</code></pre></div>
+
+    <div class="panel" id="umapCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    unordered_map&lt;long long,int&gt; frequency;
+
+    frequency.reserve(200000);
+    frequency.max_load_factor(0.7);
+
+    int n;
+    cin &gt;&gt; n;
+
+    while (n--) {
+        long long x;
+        cin &gt;&gt; x;
+        frequency[x]++;
+    }
+
+    long long value;
+    cin &gt;&gt; value;
+
+    auto it = frequency.find(value);
+    if (it == frequency.end()) {
+        cout &lt;&lt; 0;
+    } else {
+        cout &lt;&lt; it-&gt;second;
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>9. Giải thích code</h2>
+
+  <h3>9.1. insert của set trả về gì?</h3>
+  <p><code>s.insert(x)</code> trả về <code>pair&lt;iterator,bool&gt;</code>. Giá trị bool cho biết phần tử có thực sự được chèn mới hay đã tồn tại.</p>
+
+  <h3>9.2. lower_bound và upper_bound</h3>
+  <ul><li><code>lower_bound(x)</code>: phần tử đầu tiên ≥ x.</li><li><code>upper_bound(x)</code>: phần tử đầu tiên &gt; x.</li></ul>
+
+  <h3>9.3. Vì sao multiset.erase(x) nguy hiểm?</h3>
+  <div class="call bad"><code>ms.erase(x)</code> xóa tất cả bản sao bằng x. Muốn xóa một bản sao, phải tìm iterator rồi gọi <code>erase(it)</code>.</div>
+
+  <h3>9.4. map[key] có tác dụng phụ gì?</h3>
+  <p>Nếu key chưa tồn tại, <code>map[key]</code> sẽ tạo key mới với value mặc định. Vì thế, chỉ để kiểm tra tồn tại thì nên dùng <code>find()</code> hoặc <code>contains()</code> từ C++20.</p>
+
+  <h3>9.5. Vì sao unordered_map chỉ O(1) trung bình?</h3>
+  <p>Nhiều key có thể rơi vào cùng bucket. Nếu collision nhiều, thao tác có thể chậm. Trường hợp xấu lý thuyết là O(n).</p>
+
+  <h3>9.6. reserve và max_load_factor</h3>
+  <p><code>reserve(n)</code> chuẩn bị đủ bucket cho khoảng n phần tử. <code>max_load_factor(x)</code> giới hạn mật độ trung bình trên mỗi bucket, giúp giảm rehash/collision.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>10. Lỗi thường gặp</h2>
+  <ul>
+    <li>Dùng <code>set</code> rồi mong giữ phần tử trùng.</li>
+    <li>Dùng <code>multiset.erase(x)</code> nhưng chỉ muốn xóa một phần tử.</li>
+    <li>Dereference iterator khi iterator bằng <code>end()</code>.</li>
+    <li>Dùng <code>map[key]</code> chỉ để kiểm tra tồn tại và vô tình tạo key.</li>
+    <li>Cho rằng unordered_map luôn O(1).</li>
+    <li>Chờ đợi thứ tự tăng dần khi duyệt unordered_map.</li>
+    <li>Dùng unordered_map với key tự định nghĩa nhưng không viết hash.</li>
+    <li>Giữ iterator rồi erase phần tử đó và tiếp tục dùng iterator cũ.</li>
+    <li>Nhầm <code>count()</code> của set luôn có thể lớn hơn 1.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>11. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b"><b>Câu 1.</b> Container nào giữ phần tử duy nhất và có thứ tự?<div class="answers"><button class="answer" data-choice="a">multiset</button><button class="answer" data-choice="b">set</button><button class="answer" data-choice="c">unordered_map</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="c"><b>Câu 2.</b> Cách xóa đúng một bản sao x trong multiset?<div class="answers"><button class="answer" data-choice="a">ms.erase(x)</button><button class="answer" data-choice="b">ms.clear(x)</button><button class="answer" data-choice="c">auto it=ms.find(x); if(it!=ms.end()) ms.erase(it);</button></div><div class="feedback"></div></div>
+
+  <div class="quiz" data-answer="a"><b>Câu 3.</b> unordered_map có đặc điểm nào?<div class="answers"><button class="answer" data-choice="a">Tra cứu O(1) trung bình, không có thứ tự</button><button class="answer" data-choice="b">Luôn O(log n), có thứ tự</button><button class="answer" data-choice="c">Cho phép key trùng</button></div><div class="feedback"></div></div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Loại phần tử trùng bằng set.</li><li>Đếm tần suất bằng map.</li><li>In key theo thứ tự tăng dần.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Tìm phần tử gần x bằng lower_bound.</li><li>Duy trì median bằng hai multiset.</li><li>Two Sum bằng unordered_map.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Sliding window dùng multiset.</li><li>Đếm đoạn tổng K bằng unordered_map.</li><li>Coordinate compression với set/map.</li></ol></div>
+    <div class="box"><h3>🐉 Định hướng CP</h3><ol><li>Custom comparator cho set.</li><li>Custom hash cho pair.</li><li>So sánh map, unordered_map và gp_hash_table.</li></ol></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+
+let setData=[2,5,8],msData=[2,5,5,7],mapData={apple:2,banana:1,orange:3},hashData=new Map([[3,'C'],[10,'X'],[13,'M']]);
+const BUCKETS=8;
+
+function renderSet(msg,hot=null,miss=false){
+  setData.sort((a,b)=>a-b);
+  $('#setView').innerHTML=setData.length?setData.map(x=>'<div class="item '+(x===hot?(miss?'miss':'hot'):'')+'">'+x+'</div>').join(''):'<span>set rỗng</span>';
+  $('#setLog').innerHTML=msg+'<br><b>size = '+setData.length+'</b>';
+}
+function setInsert(){let x=Number($('#setValue').value);if(!Number.isFinite(x))return;let existed=setData.includes(x);if(!existed)setData.push(x);renderSet(existed?'insert thất bại vì '+x+' đã tồn tại.':'Đã chèn '+x+'.',x)}
+function setErase(){let x=Number($('#setValue').value),i=setData.indexOf(x);if(i>=0){setData.splice(i,1);renderSet('Đã xóa '+x+'.')}else renderSet('Không có '+x+' để xóa.',x,true)}
+function setFind(){let x=Number($('#setValue').value),ok=setData.includes(x);renderSet(ok?'find('+x+') tìm thấy.':'find('+x+') == end().',x,!ok)}
+function setLower(){let x=Number($('#setValue').value),arr=setData.slice().sort((a,b)=>a-b),y=arr.find(v=>v>=x);renderSet(y===undefined?'Không có phần tử >= '+x+'.':'lower_bound('+x+') = '+y+'.',y,y===undefined)}
+
+function renderMS(msg,hot=null){
+  msData.sort((a,b)=>a-b);
+  let counts={};msData.forEach(x=>counts[x]=(counts[x]||0)+1);
+  $('#msView').innerHTML=msData.length?msData.map(x=>'<div class="item '+(x===hot?'count':'')+'">'+x+'</div>').join(''):'<span>multiset rỗng</span>';
+  $('#msLog').innerHTML=msg+'<br><b>size = '+msData.length+'</b>';
+}
+function msInsert(){let x=Number($('#msValue').value);if(!Number.isFinite(x))return;msData.push(x);renderMS('Đã chèn thêm một bản sao '+x+'.',x)}
+function msEraseOne(){let x=Number($('#msValue').value),i=msData.indexOf(x);if(i>=0){msData.splice(i,1);renderMS('Đã xóa đúng một bản sao '+x+'.',x)}else renderMS('Không tìm thấy '+x+'.')}
+function msEraseAll(){let x=Number($('#msValue').value),before=msData.length;msData=msData.filter(v=>v!==x);renderMS('Đã xóa '+(before-msData.length)+' bản sao của '+x+'.')}
+function msCount(){let x=Number($('#msValue').value),c=msData.filter(v=>v===x).length;renderMS('count('+x+') = '+c+'.',x)}
+
+function sortedMapEntries(){return Object.entries(mapData).sort((a,b)=>a[0].localeCompare(b[0]))}
+function renderMap(msg,hot=''){
+  let rows='<div class="map-row"><div class="map-cell map-head">#</div><div class="map-cell map-head">key</div><div class="map-cell map-head">value</div></div>';
+  sortedMapEntries().forEach(([k,v],i)=>rows+='<div class="map-row '+(k===hot?'hot':'')+'"><div class="map-cell">'+i+'</div><div class="map-cell">'+k+'</div><div class="map-cell">'+v+'</div></div>');
+  $('#mapView').innerHTML=rows;$('#mapLog').innerHTML=msg+'<br><b>Các key đang được hiển thị theo thứ tự từ điển.</b>';
+}
+function mapAdd(){let k=$('#mapKey').value.trim(),d=Number($('#mapDelta').value);if(!k||!Number.isFinite(d))return;mapData[k]=(mapData[k]||0)+d;renderMap('mp["'+k+'"] += '+d+' → '+mapData[k]+'.',k)}
+function mapFind(){let k=$('#mapKey').value.trim(),ok=Object.prototype.hasOwnProperty.call(mapData,k);renderMap(ok?'find("'+k+'") tìm thấy value = '+mapData[k]+'.':'find("'+k+'") == end().',k)}
+function mapErase(){let k=$('#mapKey').value.trim(),ok=Object.prototype.hasOwnProperty.call(mapData,k);if(ok)delete mapData[k];renderMap(ok?'Đã erase key "'+k+'".':'Key "'+k+'" không tồn tại.')}
+
+function bucketOf(k){return ((k%BUCKETS)+BUCKETS)%BUCKETS}
+function renderBuckets(msg,hotKey=null){
+  let buckets=Array.from({length:BUCKETS},()=>[]);
+  for(const [k,v] of hashData.entries())buckets[bucketOf(k)].push([k,v]);
+  $('#bucketView').innerHTML=buckets.map((arr,i)=>'<div class="bucket"><b>bucket '+i+'</b>'+arr.map(([k,v])=>'<span style="'+(k===hotKey?'outline:2px solid #f97316':'')+'">'+k+' → '+v+'</span>').join('')+'</div>').join('');
+  $('#hashLog').innerHTML=msg+'<br><b>Hash minh họa: bucket = key mod '+BUCKETS+'.</b>';
+}
+function hashInsert(){let k=Number($('#hashKey').value),v=$('#hashValue').value;if(!Number.isFinite(k))return;hashData.set(k,v);renderBuckets('Đã lưu '+k+' → '+v+' tại bucket '+bucketOf(k)+'.',k)}
+function hashErase(){let k=Number($('#hashKey').value),ok=hashData.delete(k);renderBuckets(ok?'Đã xóa key '+k+'.':'Không có key '+k+'.')}
+function hashFind(){let k=Number($('#hashKey').value),ok=hashData.has(k);renderBuckets(ok?'Tìm thấy '+k+' → '+hashData.get(k)+'.':'Không tìm thấy key '+k+'.',k)}
+
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+
+  $('#setInsert').onclick=setInsert;$('#setErase').onclick=setErase;$('#setFind').onclick=setFind;$('#setLower').onclick=setLower;
+  $('#msInsert').onclick=msInsert;$('#msEraseOne').onclick=msEraseOne;$('#msEraseAll').onclick=msEraseAll;$('#msCount').onclick=msCount;
+  $('#mapAdd').onclick=mapAdd;$('#mapFind').onclick=mapFind;$('#mapErase').onclick=mapErase;
+  $('#hashInsert').onclick=hashInsert;$('#hashErase').onclick=hashErase;$('#hashFind').onclick=hashFind;
+
+  renderSet('Set mẫu ban đầu.');
+  renderMS('Multiset mẫu ban đầu.');
+  renderMap('Map tần suất mẫu.');
+  renderBuckets('Hash table mẫu.');
+
+  addEventListener('scroll',()=>{
+    let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+    $('#bar').style.width=Math.min(100,scrollY/h*100)+'%';
+  },{passive:true});
+
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

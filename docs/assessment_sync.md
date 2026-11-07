@@ -19,8 +19,9 @@ source rõ ràng. Apply bị khóa mặc định và chỉ mở khi `QUESTION_BA
 ## Lệnh vận hành
 
 ```bash
-python manage.py sync_exam_bank --source=/secure/master.xlsx --dry-run
-python manage.py sync_exam_bank --source=/secure/master.xlsx --apply
+export QUESTION_BANK_SYNC_ENABLED=true
+python manage.py sync_exam_bank --source=assessment/data/INDEX_NGAN_HANG_DE_TIN_HOC_TOT_NGHIEP_MASTER.xlsx --dry-run
+python manage.py sync_exam_bank --source=assessment/data/INDEX_NGAN_HANG_DE_TIN_HOC_TOT_NGHIEP_MASTER.xlsx --apply
 python manage.py sync_exam_bank --source=/secure/master.xlsx --question-id=Q_ID --dry-run
 ```
 

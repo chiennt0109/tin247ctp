@@ -1,19 +1,551 @@
-<article class="roadmap-extra-topic">
-  <h1>Difference array</h1>
-  <section>
-    <h2>Mục tiêu</h2>
-    <ul>
-      <li>Nắm khái niệm chính và trường hợp sử dụng trong bài toán thuật toán.</li>
-      <li>Biết liên hệ chủ đề này với chương hiện tại của roadmap.</li>
-      <li>Chuẩn bị cài đặt C++ ngắn gọn khi luyện bài.</li>
-    </ul>
-  </section>
-  <section>
-    <h2>Gợi ý học</h2>
-    <ol>
-      <li>Đọc lại các bài trong cùng chương trước khi học chủ đề này.</li>
-      <li>Tự viết ví dụ nhỏ bằng C++.</li>
-      <li>Luyện 2–3 bài có độ khó tăng dần.</li>
-    </ol>
-  </section>
-</article>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.diff-page{
+font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;
+background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);
+border-radius:0;box-sizing:border-box;position:relative;width:calc(100vw - 24px);
+max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.diff-page *{box-sizing:border-box}.diff-page h1,.diff-page h2,.diff-page h3{line-height:1.25}
+.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}
+.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}
+.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}
+.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}
+.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}
+.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}
+.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:980px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}
+.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.array-row{display:flex;gap:8px;overflow:auto;padding:8px 0}.cell{min-width:76px;padding:9px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900;position:relative;transition:.2s}.cell small{display:block;color:#64748b;font-size:.72rem}.cell.active{background:#ffedd5;border-color:#fb923c;color:#9a3412;transform:translateY(-2px)}.cell.changed{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.range{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}.cell.cancel{background:#fee2e2;border-color:#ef4444;color:#991b1b}.cell.prefix{background:#ede9fe;border-color:#8b5cf6;color:#5b21b6}
+.matrix{display:grid;gap:6px;overflow:auto}.matrix-row{display:flex;gap:6px}.matrix-cell{min-width:58px;padding:8px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;text-align:center;font-weight:900}.matrix-cell.header{background:#eef2ff;color:#312e81}.matrix-cell.sel{background:#dbeafe;border-color:#3b82f6}.matrix-cell.mark{background:#ffedd5;border-color:#fb923c;color:#9a3412}
+.log{min-height:120px;max-height:340px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.diff-page pre{margin:0;padding:20px;max-height:660px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.diff-page p code,.diff-page li code,.diff-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.diff-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}
+@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.diff-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
+</style>
+
+<div class="diff-page">
+<div class="hero">
+  <span class="badge">Array Preprocessing & Range Update</span>
+  <h1>➖ Difference Array – Mảng hiệu</h1>
+  <p>Difference Array biến mỗi phép cộng trên đoạn từ O(n) thành O(1). Sau khi xử lý tất cả cập nhật, ta dùng Prefix Sum để khôi phục mảng kết quả. Đây là kỹ thuật nền tảng cho sweep line, cập nhật đoạn offline và mảng hiệu 2D.</p>
+  <div class="stats">
+    <div class="stat"><b>Range Add</b><span>O(1) mỗi cập nhật</span></div>
+    <div class="stat"><b>Rebuild</b><span>O(n) bằng Prefix Sum</span></div>
+    <div class="stat"><b>Offline</b><span>Xử lý xong rồi mới truy vấn</span></div>
+    <div class="stat"><b>2D</b><span>Cập nhật hình chữ nhật O(1)</span></div>
+  </div>
+</div>
+
+<div class="sticky">
+  <div class="progress"><div id="bar"></div></div>
+  <div class="nav">
+    <a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#idea">Ý tưởng</a><a href="#build">Tạo mảng hiệu</a><a href="#update">Cập nhật đoạn</a><a href="#twoD">Mảng hiệu 2D</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a>
+  </div>
+</div>
+
+<section class="card" id="goals">
+  <h2>🎯 Mục tiêu bài học</h2>
+  <div class="g2">
+    <div class="box"><h3>Cần hiểu</h3><ul><li>Ý nghĩa của <code>diff[i]</code>.</li><li>Cách chuyển mảng gốc thành mảng hiệu.</li><li>Cách cộng x vào đoạn <code>[L,R]</code> bằng hai thay đổi.</li><li>Cách khôi phục mảng bằng Prefix Sum.</li><li>Cách mở rộng sang hình chữ nhật 2D.</li></ul></div>
+    <div class="box"><h3>Khi nào dùng?</h3><ul><li>Nhiều cập nhật cộng trên đoạn.</li><li>Không cần biết kết quả ngay sau từng cập nhật.</li><li>Bài phủ đoạn, số lớp phủ, lịch sự kiện.</li><li>Tô/cộng hình chữ nhật trên ma trận.</li><li>Bước trung gian trước Prefix Sum.</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="problem">
+  <h2>1. Đặt vấn đề</h2>
+
+  <div class="call">
+    <b>Bài toán mở đầu.</b><br>
+    Cho mảng <code>a[0..n-1]</code> và q thao tác. Mỗi thao tác có dạng:
+    <div class="formula">Cộng x vào mọi phần tử trong đoạn [L,R]</div>
+    Sau khi thực hiện toàn bộ q thao tác, hãy in mảng cuối cùng.
+  </div>
+
+  <h3>1.1. Cách làm trực tiếp</h3>
+  <p>Với mỗi thao tác, duyệt từ L đến R và cộng x vào từng phần tử.</p>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Cách làm</th><th>Mỗi cập nhật</th><th>Khôi phục/in kết quả</th><th>Tổng thời gian</th></tr>
+    <tr><td>Duyệt trực tiếp</td><td>O(R-L+1)</td><td>O(n)</td><td>Có thể O(nq)</td></tr>
+    <tr><td>Difference Array</td><td>O(1)</td><td>O(n)</td><td>O(n+q)</td></tr>
+  </table></div>
+
+  <h3>1.2. Quan sát quan trọng</h3>
+  <p>Khi cộng x vào đoạn <code>[L,R]</code>, mức tăng bắt đầu từ L và kết thúc ngay sau R:</p>
+  <ul>
+    <li>Tại L: bắt đầu cộng thêm x.</li>
+    <li>Tại R+1: hủy tác động bằng cách trừ x.</li>
+  </ul>
+
+  <div class="formula">diff[L] += x; &nbsp;&nbsp; diff[R+1] -= x</div>
+
+  <div class="call ok"><b>Bản chất:</b> Difference Array không lưu trực tiếp giá trị từng phần tử, mà lưu sự thay đổi giữa hai vị trí liên tiếp.</div>
+</section>
+
+<section class="card" id="idea">
+  <h2>2. Định nghĩa và công thức</h2>
+
+  <div class="g2">
+    <div class="box">
+      <h3>Từ mảng a sang diff</h3>
+      <div class="formula">diff[0] = a[0]</div>
+      <div class="formula">diff[i] = a[i] - a[i-1]</div>
+    </div>
+    <div class="box">
+      <h3>Từ diff khôi phục a</h3>
+      <div class="formula">a[0] = diff[0]</div>
+      <div class="formula">a[i] = a[i-1] + diff[i]</div>
+    </div>
+  </div>
+
+  <div class="call warn"><b>Liên hệ với Prefix Sum:</b> Mảng gốc chính là Prefix Sum của mảng hiệu.</div>
+</section>
+
+<section class="card" id="build">
+  <h2>3. Mô phỏng tạo mảng hiệu</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>Mảng ban đầu</b></label>
+      <input class="input" id="baseInput" value="5 7 7 10 6 9">
+
+      <div class="controls">
+        <button class="btn" id="buildNext">Bước tiếp</button>
+        <button class="btn alt" id="buildReset">Làm lại</button>
+        <button class="btn orange" id="buildAuto">Tự chạy</button>
+      </div>
+
+      <h3>Mảng a</h3>
+      <div class="array-row" id="baseRow"></div>
+
+      <h3>Mảng diff</h3>
+      <div class="array-row" id="diffRow"></div>
+    </div>
+
+    <div class="log" id="buildLog"></div>
+  </div>
+</section>
+
+<section class="card" id="update">
+  <h2>4. Mô phỏng cập nhật đoạn</h2>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>L</b></label><input class="input" id="lInput" value="1">
+      <label><b>R</b></label><input class="input" id="rInput" value="4">
+      <label><b>x</b></label><input class="input" id="xInput" value="3">
+
+      <div class="controls">
+        <button class="btn green" id="applyUpdate">Áp dụng cập nhật</button>
+        <button class="btn" id="rebuildBtn">Khôi phục mảng</button>
+        <button class="btn alt" id="resetUpdates">Làm lại</button>
+      </div>
+
+      <h3>Mảng hiệu hiện tại</h3>
+      <div class="array-row" id="updateDiffRow"></div>
+
+      <h3>Mảng kết quả</h3>
+      <div class="array-row" id="resultRow"></div>
+    </div>
+
+    <div class="log" id="updateLog"></div>
+  </div>
+
+  <div class="call ok">
+    Cập nhật <code>[L,R] += x</code> chỉ thay đổi tối đa hai vị trí:
+    <div class="formula">diff[L] += x; nếu R+1 &lt; n thì diff[R+1] -= x</div>
+  </div>
+</section>
+
+<section class="card" id="twoD">
+  <h2>5. Difference Array 2D</h2>
+
+  <p>Với ma trận, ta có thể cộng x vào toàn bộ hình chữ nhật từ <code>(x1,y1)</code> đến <code>(x2,y2)</code> bằng bốn mốc:</p>
+
+  <div class="formula">
+    diff[x1][y1] += v<br>
+    diff[x1][y2+1] -= v<br>
+    diff[x2+1][y1] -= v<br>
+    diff[x2+1][y2+1] += v
+  </div>
+
+  <div class="g2">
+    <div class="visual">
+      <label><b>x1 y1 x2 y2 value</b></label>
+      <input class="input" id="rectInput" value="1 1 3 3 5">
+
+      <div class="controls">
+        <button class="btn" id="rectApply">Áp dụng hình chữ nhật</button>
+        <button class="btn green" id="rectBuild">Khôi phục ma trận</button>
+        <button class="btn alt" id="rectReset">Làm lại</button>
+      </div>
+
+      <h3>Ma trận kết quả 5×6</h3>
+      <div class="matrix" id="matrixView"></div>
+    </div>
+
+    <div class="log" id="rectLog"></div>
+  </div>
+
+  <div class="call warn"><b>Khôi phục 2D:</b> cần lấy Prefix Sum theo cả hàng và cột, hoặc dùng công thức bao hàm–loại trừ hai chiều.</div>
+</section>
+
+<section class="card" id="analysis">
+  <h2>6. Phân tích thuật toán</h2>
+
+  <div class="table-wrap"><table class="tbl">
+    <tr><th>Thao tác</th><th>Cách trực tiếp</th><th>Difference Array</th><th>Ghi chú</th></tr>
+    <tr><td>Tạo diff từ a</td><td>—</td><td>O(n)</td><td>Mỗi vị trí tính một hiệu.</td></tr>
+    <tr><td>Cộng x vào [L,R]</td><td>O(R-L+1)</td><td>O(1)</td><td>Đổi tại L và R+1.</td></tr>
+    <tr><td>Khôi phục mảng</td><td>—</td><td>O(n)</td><td>Prefix Sum của diff.</td></tr>
+    <tr><td>Cập nhật hình chữ nhật</td><td>O(diện tích)</td><td>O(1)</td><td>Đổi bốn góc.</td></tr>
+    <tr><td>Khôi phục ma trận</td><td>—</td><td>O(nm)</td><td>Prefix Sum 2D.</td></tr>
+  </table></div>
+
+  <div class="call bad"><b>Giới hạn:</b> Difference Array phù hợp cho cập nhật offline. Nếu cần query và update xen kẽ trực tuyến, nên dùng Fenwick Tree hoặc Segment Tree.</div>
+</section>
+
+<section class="card" id="code">
+  <h2>7. Code mẫu</h2>
+
+  <div class="tabs">
+    <div class="tab-head">
+      <button class="tab-btn active" data-tab="cpp1D">C++ 1D</button>
+      <button class="tab-btn" data-tab="cppZero">C++ mảng ban đầu bằng 0</button>
+      <button class="tab-btn" data-tab="cpp2D">C++ 2D</button>
+      <button class="tab-btn" data-tab="pythonCode">Python</button>
+    </div>
+
+    <div class="panel active" id="cpp1D"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, q;
+    cin &gt;&gt; n &gt;&gt; q;
+
+    vector&lt;long long&gt; a(n);
+    for (long long &amp;x : a) cin &gt;&gt; x;
+
+    vector&lt;long long&gt; diff(n);
+
+    diff[0] = a[0];
+    for (int i = 1; i &lt; n; i++) {
+        diff[i] = a[i] - a[i - 1];
+    }
+
+    while (q--) {
+        int left, right;
+        long long value;
+        cin &gt;&gt; left &gt;&gt; right &gt;&gt; value;
+
+        --left;
+        --right;
+
+        diff[left] += value;
+
+        if (right + 1 &lt; n) {
+            diff[right + 1] -= value;
+        }
+    }
+
+    a[0] = diff[0];
+
+    for (int i = 1; i &lt; n; i++) {
+        a[i] = a[i - 1] + diff[i];
+    }
+
+    for (long long x : a) {
+        cout &lt;&lt; x &lt;&lt; ' ';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="cppZero"><button class="copy">Sao chép</button><pre><code>int n, q;
+cin &gt;&gt; n &gt;&gt; q;
+
+vector&lt;long long&gt; diff(n + 1, 0);
+
+while (q--) {
+    int left, right;
+    long long value;
+
+    cin &gt;&gt; left &gt;&gt; right &gt;&gt; value;
+    --left;
+    --right;
+
+    diff[left] += value;
+    diff[right + 1] -= value;
+}
+
+vector&lt;long long&gt; a(n, 0);
+long long current = 0;
+
+for (int i = 0; i &lt; n; i++) {
+    current += diff[i];
+    a[i] = current;
+}</code></pre></div>
+
+    <div class="panel" id="cpp2D"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main() {
+    int n, m, q;
+    cin &gt;&gt; n &gt;&gt; m &gt;&gt; q;
+
+    vector&lt;vector&lt;long long&gt;&gt; diff(
+        n + 2,
+        vector&lt;long long&gt;(m + 2, 0)
+    );
+
+    while (q--) {
+        int x1, y1, x2, y2;
+        long long value;
+
+        cin &gt;&gt; x1 &gt;&gt; y1 &gt;&gt; x2 &gt;&gt; y2 &gt;&gt; value;
+
+        diff[x1][y1] += value;
+        diff[x1][y2 + 1] -= value;
+        diff[x2 + 1][y1] -= value;
+        diff[x2 + 1][y2 + 1] += value;
+    }
+
+    for (int i = 1; i &lt;= n; i++) {
+        for (int j = 1; j &lt;= m; j++) {
+            diff[i][j]
+                += diff[i - 1][j]
+                + diff[i][j - 1]
+                - diff[i - 1][j - 1];
+        }
+    }
+
+    for (int i = 1; i &lt;= n; i++) {
+        for (int j = 1; j &lt;= m; j++) {
+            cout &lt;&lt; diff[i][j] &lt;&lt; ' ';
+        }
+        cout &lt;&lt; '\n';
+    }
+}</code></pre></div>
+
+    <div class="panel" id="pythonCode"><button class="copy">Sao chép</button><pre><code>def apply_range_updates(a, updates):
+    n = len(a)
+    diff = [0] * n
+
+    diff[0] = a[0]
+
+    for i in range(1, n):
+        diff[i] = a[i] - a[i - 1]
+
+    for left, right, value in updates:
+        diff[left] += value
+
+        if right + 1 &lt; n:
+            diff[right + 1] -= value
+
+    result = [0] * n
+    result[0] = diff[0]
+
+    for i in range(1, n):
+        result[i] = result[i - 1] + diff[i]
+
+    return result</code></pre></div>
+  </div>
+</section>
+
+<section class="card" id="explain">
+  <h2>8. Giải thích code</h2>
+
+  <h3>8.1. Vì sao diff[i] = a[i] - a[i-1]?</h3>
+  <p><code>diff[i]</code> biểu diễn mức thay đổi khi đi từ vị trí i−1 sang i. Khi cộng dồn các mức thay đổi, ta nhận lại giá trị ban đầu.</p>
+
+  <h3>8.2. Vì sao chỉ sửa L và R+1?</h3>
+  <p><code>diff[L] += x</code> làm mọi prefix từ L trở đi tăng x. <code>diff[R+1] -= x</code> hủy mức tăng từ vị trí R+1, nên chỉ đoạn L đến R bị ảnh hưởng.</p>
+
+  <h3>8.3. Vì sao phải kiểm tra R+1 &lt; n?</h3>
+  <p>Nếu R là phần tử cuối, không có vị trí R+1 trong mảng diff kích thước n. Có thể tránh nhánh này bằng cách cấp phát diff kích thước n+1.</p>
+
+  <h3>8.4. Vì sao dùng long long?</h3>
+  <div class="call warn">Một phần tử có thể nhận nhiều lần cộng. Tổng cuối cùng có thể vượt giới hạn int dù mỗi x riêng lẻ không lớn.</div>
+
+  <h3>8.5. Tại sao cập nhật 2D dùng bốn góc?</h3>
+  <p>Hai dấu cộng bắt đầu vùng tác động; hai dấu trừ hủy tác động theo hàng và cột. Góc dưới phải bị trừ hai lần nên phải cộng lại một lần.</p>
+
+  <h3>8.6. Có thể query ngay sau mỗi update không?</h3>
+  <p>Không hiệu quả nếu phải khôi phục toàn bộ mảng sau từng cập nhật. Difference Array phù hợp khi gom tất cả update trước rồi dựng kết quả một lần.</p>
+</section>
+
+<section class="card" id="mistakes">
+  <h2>9. Lỗi thường gặp</h2>
+  <ul>
+    <li>Quên đổi chỉ số 1-based của đề sang 0-based trong code.</li>
+    <li>Quên kiểm tra <code>R+1 &lt; n</code>.</li>
+    <li>Dùng dấu cộng tại R+1 thay vì dấu trừ.</li>
+    <li>Khôi phục mảng bằng công thức sai.</li>
+    <li>Nhầm Difference Array với Prefix Sum.</li>
+    <li>Dùng Difference Array khi cần query xen kẽ update.</li>
+    <li>Dùng <code>int</code> cho dữ liệu tổng lớn.</li>
+    <li>Trong 2D, quên cộng lại góc <code>(x2+1,y2+1)</code>.</li>
+    <li>Với mảng ban đầu khác 0, quên tạo diff từ a trước khi update.</li>
+  </ul>
+</section>
+
+<section class="card" id="quiz">
+  <h2>10. Quiz và bài tập</h2>
+
+  <div class="quiz" data-answer="b">
+    <b>Câu 1.</b> Để cộng x vào đoạn [L,R], cần làm gì?
+    <div class="answers">
+      <button class="answer" data-choice="a">diff[L]-=x, diff[R]+=x</button>
+      <button class="answer" data-choice="b">diff[L]+=x, diff[R+1]-=x</button>
+      <button class="answer" data-choice="c">diff[L]+=x, diff[R]+=x</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" data-answer="c">
+    <b>Câu 2.</b> Khôi phục mảng từ diff bằng kỹ thuật nào?
+    <div class="answers">
+      <button class="answer" data-choice="a">Binary Search</button>
+      <button class="answer" data-choice="b">Two Pointers</button>
+      <button class="answer" data-choice="c">Prefix Sum</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="quiz" data-answer="a">
+    <b>Câu 3.</b> Khi nào Difference Array phù hợp nhất?
+    <div class="answers">
+      <button class="answer" data-choice="a">Nhiều cập nhật đoạn offline, lấy kết quả cuối</button>
+      <button class="answer" data-choice="b">Query và update xen kẽ trực tuyến</button>
+      <button class="answer" data-choice="c">Tìm kiếm nhị phân</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="g2">
+    <div class="box"><h3>📘 Cơ bản</h3><ol><li>Cộng q đoạn rồi in mảng.</li><li>Đếm số lớp phủ tại mỗi vị trí.</li><li>Tìm vị trí được phủ nhiều nhất.</li></ol></div>
+    <div class="box"><h3>📗 Trung bình</h3><ol><li>Lịch tăng giảm số người theo thời gian.</li><li>Cập nhật đoạn và tìm max cuối cùng.</li><li>Phủ đoạn trên trục tọa độ nén.</li></ol></div>
+    <div class="box"><h3>📙 Nâng cao</h3><ol><li>Difference Array 2D.</li><li>Cập nhật cấp số cộng trên đoạn.</li><li>Difference bậc hai.</li></ol></div>
+    <div class="box"><h3>🐉 HSG</h3><ol><li>Sweep line bằng event difference.</li><li>Imos Method.</li><li>Difference + coordinate compression.</li></ol></div>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+
+let base=[],diff=[],bi=0,bTimer=null;
+function parseNums(id){let t=$(id).value.trim();return t?t.split(/\s+/).map(Number).filter(Number.isFinite):[]}
+function makeDiff(a){let d=Array(a.length).fill(0);if(a.length){d[0]=a[0];for(let i=1;i<a.length;i++)d[i]=a[i]-a[i-1]}return d}
+function resetBuild(){
+  if(bTimer){clearInterval(bTimer);bTimer=null}
+  base=parseNums('#baseInput');diff=makeDiff(base);bi=0;$('#buildAuto').textContent='Tự chạy';renderBuild('Khởi tạo. diff[0] = a[0].');
+  resetUpdateState();
+}
+function renderBuild(msg){
+  $('#baseRow').innerHTML=base.map((v,i)=>'<div class="cell '+(i===bi?'active':'')+'"><small>a['+i+']</small>'+v+'</div>').join('');
+  $('#diffRow').innerHTML=diff.map((v,i)=>'<div class="cell '+(i<bi?'changed':i===bi?'active':'')+'"><small>diff['+i+']</small>'+(i<=bi?v:'—')+'</div>').join('');
+  $('#buildLog').innerHTML=msg;
+}
+function stepBuild(){
+  if(!base.length){renderBuild('Mảng rỗng.');return}
+  if(bi>=base.length){renderBuild('Hoàn tất tạo mảng hiệu.');return}
+  let i=bi++;
+  if(i===0)renderBuild('<b>i=0</b><br>diff[0] = a[0] = '+base[0]);
+  else renderBuild('<b>i='+i+'</b><br>diff['+i+'] = a['+i+'] - a['+(i-1)+'] = '+base[i]+' - '+base[i-1]+' = '+diff[i]);
+}
+function autoBuild(){
+  if(bTimer){clearInterval(bTimer);bTimer=null;$('#buildAuto').textContent='Tự chạy';return}
+  $('#buildAuto').textContent='Tạm dừng';bTimer=setInterval(()=>{if(bi>=base.length){clearInterval(bTimer);bTimer=null;$('#buildAuto').textContent='Tự chạy'}else stepBuild()},700)
+}
+
+let updateDiff=[],result=[],updates=[];
+function resetUpdateState(){
+  updateDiff=makeDiff(base);result=base.slice();updates=[];renderUpdate('Chưa có cập nhật.');
+}
+function rebuildFromDiff(d){let a=Array(d.length).fill(0);if(d.length){a[0]=d[0];for(let i=1;i<d.length;i++)a[i]=a[i-1]+d[i]}return a}
+function renderUpdate(msg,marks={}){
+  $('#updateDiffRow').innerHTML=updateDiff.map((v,i)=>{
+    let cls=marks.start===i?'changed':marks.stop===i?'cancel':'';
+    return '<div class="cell '+cls+'"><small>diff['+i+']</small>'+v+'</div>';
+  }).join('');
+  $('#resultRow').innerHTML=result.map((v,i)=>'<div class="cell '+(marks.L<=i&&i<=marks.R?'range':'')+'"><small>a['+i+']</small>'+v+'</div>').join('');
+  $('#updateLog').innerHTML=msg+'<br><b>Số cập nhật đã áp dụng: '+updates.length+'</b>';
+}
+function applyUpdate(){
+  if(!updateDiff.length)return;
+  let L=Math.floor(Number($('#lInput').value)||0),R=Math.floor(Number($('#rInput').value)||0),x=Number($('#xInput').value)||0;
+  if(L>R)[L,R]=[R,L];
+  L=Math.max(0,Math.min(updateDiff.length-1,L));R=Math.max(L,Math.min(updateDiff.length-1,R));
+  $('#lInput').value=L;$('#rInput').value=R;
+  updateDiff[L]+=x;
+  if(R+1<updateDiff.length)updateDiff[R+1]-=x;
+  updates.push([L,R,x]);
+  renderUpdate('<b>Cập nhật ['+L+','+R+'] += '+x+'</b><br>diff['+L+'] += '+x+(R+1<updateDiff.length?'<br>diff['+(R+1)+'] -= '+x:'<br>Không có vị trí R+1 trong mảng.'),{start:L,stop:R+1,L,R});
+}
+function rebuildResult(){
+  result=rebuildFromDiff(updateDiff);
+  renderUpdate('Đã lấy Prefix Sum của diff để khôi phục mảng kết quả.');
+}
+
+const H=5,W=6;
+let diff2D=Array.from({length:H+1},()=>Array(W+1).fill(0)),mat2D=Array.from({length:H},()=>Array(W).fill(0)),rects=[];
+function resetRect(){diff2D=Array.from({length:H+1},()=>Array(W+1).fill(0));mat2D=Array.from({length:H},()=>Array(W).fill(0));rects=[];renderMatrix();$('#rectLog').innerHTML='Chưa có cập nhật hình chữ nhật.'}
+function renderMatrix(sel=null){
+  let rows=['<div class="matrix-row"><div class="matrix-cell header">#</div>'+Array.from({length:W},(_,j)=>'<div class="matrix-cell header">c'+j+'</div>').join('')+'</div>'];
+  for(let i=0;i<H;i++){
+    rows.push('<div class="matrix-row"><div class="matrix-cell header">r'+i+'</div>'+mat2D[i].map((v,j)=>'<div class="matrix-cell '+(sel&&i>=sel[0]&&i<=sel[2]&&j>=sel[1]&&j<=sel[3]?'sel':'')+'">'+v+'</div>').join('')+'</div>');
+  }
+  $('#matrixView').innerHTML=rows.join('');
+}
+function applyRect(){
+  let v=$('#rectInput').value.trim().split(/\s+/).map(Number);if(v.length<5)return;
+  let [x1,y1,x2,y2,val]=v.map(Number);x1=Math.floor(x1);y1=Math.floor(y1);x2=Math.floor(x2);y2=Math.floor(y2);
+  if(x1>x2)[x1,x2]=[x2,x1];if(y1>y2)[y1,y2]=[y2,y1];
+  x1=Math.max(0,Math.min(H-1,x1));x2=Math.max(x1,Math.min(H-1,x2));y1=Math.max(0,Math.min(W-1,y1));y2=Math.max(y1,Math.min(W-1,y2));
+  diff2D[x1][y1]+=val;diff2D[x1][y2+1]-=val;diff2D[x2+1][y1]-=val;diff2D[x2+1][y2+1]+=val;
+  rects.push([x1,y1,x2,y2,val]);renderMatrix([x1,y1,x2,y2]);
+  $('#rectLog').innerHTML='<b>Cập nhật hình chữ nhật ('+x1+','+y1+') → ('+x2+','+y2+') += '+val+'</b><br>Đã đổi bốn góc trong diff 2D.';
+}
+function buildRect(){
+  let p=diff2D.map(row=>row.slice());
+  for(let i=0;i<H;i++)for(let j=0;j<W;j++){
+    p[i][j]+=(i?p[i-1][j]:0)+(j?p[i][j-1]:0)-(i&&j?p[i-1][j-1]:0);
+    mat2D[i][j]=p[i][j];
+  }
+  renderMatrix();$('#rectLog').innerHTML='Đã lấy Prefix Sum 2D. Ma trận kết quả đã được khôi phục.';
+}
+
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  tabs();copies();quizzes();
+  $('#buildNext').onclick=stepBuild;$('#buildReset').onclick=resetBuild;$('#buildAuto').onclick=autoBuild;
+  $('#applyUpdate').onclick=applyUpdate;$('#rebuildBtn').onclick=rebuildResult;$('#resetUpdates').onclick=resetUpdateState;
+  $('#rectApply').onclick=applyRect;$('#rectBuild').onclick=buildRect;$('#rectReset').onclick=resetRect;
+
+  resetBuild();resetRect();
+
+  addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});
+  if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}
+});
+})();
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

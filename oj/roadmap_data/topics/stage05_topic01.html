@@ -1,35 +1,122 @@
-<article class="space-y-6">
-  <nav aria-label="Breadcrumb" class="text-sm text-gray-500">
-    <a class="text-indigo-600 font-semibold hover:underline" href="/#roadmap">Roadmap</a>
-    <span class="mx-2">/</span>
-    <a class="text-indigo-600 font-semibold hover:underline" href="/roadmap/stage/5/">Chương 5</a>
-    <span class="mx-2">/</span>
-    <span>5.1</span>
-  </nav>
+<style>
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.rec-page{font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}.rec-page *{box-sizing:border-box}.rec-page h1,.rec-page h2,.rec-page h3{line-height:1.25}.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1160px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.88);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:1040px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}.stack-view{display:flex;flex-direction:column-reverse;gap:8px;min-height:260px;padding:12px;border:2px dashed #60a5fa;border-radius:16px;background:#f8fafc}.frame{padding:10px 12px;border:2px solid #c7d2fe;border-radius:12px;background:#eef2ff;color:#312e81;font-weight:900}.frame.active{background:#ffedd5;border-color:#fb923c;color:#9a3412}.frame.done{background:#dcfce7;border-color:#22c55e;color:#166534}.frame small{display:block;color:#64748b}.tree-area{min-height:330px;padding:14px;border:2px dashed #bfdbfe;border-radius:16px;background:#f8fafc;overflow:auto}.tree-level{display:flex;justify-content:center;gap:14px;margin:14px 0}.tree-node{min-width:92px;padding:9px 12px;border:2px solid #c7d2fe;border-radius:12px;background:#eef2ff;text-align:center;font-weight:900;color:#312e81}.tree-node.active{background:#ffedd5;border-color:#fb923c;color:#9a3412}.tree-node.ok{background:#dcfce7;border-color:#22c55e;color:#166534}.tree-node small{display:block;color:#64748b;font-size:.72rem}.array-row{display:flex;gap:8px;overflow:auto;padding:10px 0}.cell{min-width:70px;padding:9px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-weight:900}.cell.active{background:#ffedd5;border-color:#fb923c;color:#9a3412}.cell.chosen{background:#dcfce7;border-color:#22c55e;color:#166534}.cell.skip{background:#fee2e2;border-color:#ef4444;color:#991b1b}.cell small{display:block;color:#64748b;font-size:.72rem}.path-box{min-height:54px;padding:12px;border:1px dashed #94a3b8;border-radius:13px;background:#fff;font-family:Consolas,monospace;font-weight:900}.code-lines{background:#0f172a;color:#e2e8f0;border-radius:15px;padding:12px;overflow:auto}.code-line{padding:5px 8px;border-radius:7px;white-space:pre;font-family:Consolas,monospace}.code-line.hl{background:#4338ca;color:#fff}.log{min-height:130px;max-height:390px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}.rec-page pre{margin:0;padding:20px;max-height:720px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.rec-page p code,.rec-page li code,.rec-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}@media(min-width:1800px){.rec-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.rec-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}.tree-level{justify-content:flex-start}}
+</style>
+<div class="rec-page"><div class="hero"><span class="badge">Chương 5.1 • Recursion & Search Tree</span><h1>🌳 Đệ quy và cây tìm kiếm</h1><p>Đệ quy là cách giải bài toán bằng cách gọi lại chính nó trên bài toán nhỏ hơn. Khi mỗi bước có nhiều lựa chọn, các lời gọi tạo thành một cây tìm kiếm. Đây là nền tảng cho quay lui, liệt kê tổ hợp, sinh hoán vị, DFS và nhiều thuật toán HSG.</p><div class="stats"><div class="stat"><b>Base case</b><span>Điểm dừng bắt buộc</span></div><div class="stat"><b>Call stack</b><span>Máy tính nhớ lời gọi</span></div><div class="stat"><b>Search tree</b><span>Mỗi nhánh là một lựa chọn</span></div><div class="stat"><b>Backtracking</b><span>Chọn → gọi → bỏ chọn</span></div></div></div>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav"><a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#recursion">Đệ quy</a><a href="#stack">Call stack</a><a href="#tree">Cây tìm kiếm</a><a href="#subset">Mô phỏng tập con</a><a href="#backtracking">Quay lui</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a></div></div>
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2"><div class="box"><h3>Cần hiểu</h3><ul><li>Đệ quy gồm <code>base case</code> và <code>recursive case</code>.</li><li>Call stack lưu các lời gọi đang chờ kết quả.</li><li>Cây đệ quy mô tả các lời gọi phát sinh.</li><li>Cây tìm kiếm mô tả các trạng thái và lựa chọn.</li><li>Độ sâu, hệ số phân nhánh và số trạng thái.</li></ul></div><div class="box"><h3>Cần làm được</h3><ul><li>Viết hàm đệ quy đơn giản.</li><li>Mô phỏng call stack bằng tay.</li><li>Liệt kê tập con bằng chọn/không chọn.</li><li>Viết quay lui có chọn và hoàn tác.</li><li>Chuyển một DFS đệ quy sang dùng stack.</li></ul></div></div></section>
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2><div class="call"><b>Bài toán mở đầu.</b><br>Cho n đồ vật nhỏ. Hãy liệt kê mọi cách chọn một số đồ vật trong đó.</div><p>Với mỗi đồ vật, ta có hai lựa chọn: <b>không chọn</b> hoặc <b>chọn</b>. Sau khi quyết định cho đồ vật hiện tại, phần còn lại vẫn là cùng một dạng bài toán nhưng nhỏ hơn.</p><div class="formula">Mỗi vị trí sinh 2 nhánh → tổng cộng 2ⁿ khả năng</div><h3>1.1. Vì sao vòng lặp thường khó viết?</h3><p>Nếu n = 3, ta có thể viết 3 vòng hoặc dùng bitmask. Nhưng khi n thay đổi, số vòng lặp cũng thay đổi. Đệ quy cho phép mô tả thống nhất: xử lý vị trí hiện tại rồi giao phần còn lại cho lời gọi sau.</p><h3>1.2. Cây tìm kiếm xuất hiện như thế nào?</h3><p>Ở vị trí i, ta rẽ thành hai nhánh. Mỗi nhánh lại tiếp tục rẽ ở vị trí i+1. Các nhánh này tạo thành một cây trạng thái.</p><div class="call ok"><b>Kết luận:</b> Đệ quy phù hợp khi bài toán có cấu trúc “bài toán nhỏ hơn” hoặc “mỗi bước có nhiều lựa chọn giống nhau”.</div></section>
+<section class="card" id="recursion"><h2>2. Đệ quy cơ bản</h2><div class="g2"><div class="box"><h3>Base case</h3><p>Trường hợp đủ nhỏ để trả lời ngay, không gọi tiếp.</p><pre><code>if (n == 0) return 1;</code></pre></div><div class="box"><h3>Recursive case</h3><p>Gọi lại chính hàm với dữ liệu nhỏ hơn hoặc trạng thái tiến gần điểm dừng.</p><pre><code>return n * factorial(n - 1);</code></pre></div></div><div class="call bad"><b>Nếu thiếu base case hoặc trạng thái không tiến gần base case, chương trình có thể gọi vô hạn cho đến khi tràn stack.</b></div><h3>2.1. Mẫu suy nghĩ</h3><ol><li>Định nghĩa hàm đang giải bài toán gì.</li><li>Xác định trường hợp dừng.</li><li>Giả sử lời gọi nhỏ hơn đã đúng.</li><li>Ghép kết quả lời gọi nhỏ hơn để giải bài toán hiện tại.</li></ol></section>
+<section class="card" id="stack"><h2>3. Mô phỏng Call Stack với factorial</h2><div class="g2"><div class="visual"><label><b>n</b></label><input class="input" id="factN" value="4"><div class="controls"><button class="btn" id="factCallBtn">Gọi tiếp</button><button class="btn orange" id="factReturnBtn">Trả về</button><button class="btn green" id="factAutoBtn">Tự chạy</button><button class="btn alt" id="factResetBtn">Làm lại</button></div><h3>Call stack</h3><div class="stack-view" id="stackView"></div></div><div class="g2"><div class="code-lines"><div class="code-line" data-fact="base">if (n == 0) return 1;</div><div class="code-line" data-fact="call">long long sub = factorial(n - 1);</div><div class="code-line" data-fact="return">return n * sub;</div></div><div class="log" id="factLog"></div></div></div><div class="call warn"><b>Call stack hoạt động LIFO:</b> lời gọi vào sau cùng được trả về trước tiên.</div></section>
+<section class="card" id="tree"><h2>4. Cây đệ quy và cây tìm kiếm</h2><div class="g2"><div class="box"><h3>Cây đệ quy</h3><p>Mô tả các lời gọi hàm phát sinh. Ví dụ Fibonacci có hai lời gọi con: <code>f(n-1)</code> và <code>f(n-2)</code>.</p></div><div class="box"><h3>Cây tìm kiếm</h3><p>Mỗi node là một trạng thái; mỗi cạnh là một lựa chọn. Ví dụ liệt kê tập con: chọn hoặc không chọn phần tử i.</p></div></div><div class="table-wrap"><table class="tbl"><tr><th>Khái niệm</th><th>Ý nghĩa</th><th>Ảnh hưởng</th></tr><tr><td>Độ sâu</td><td>Số quyết định liên tiếp tối đa</td><td>Ảnh hưởng bộ nhớ stack.</td></tr><tr><td>Hệ số phân nhánh</td><td>Số lựa chọn tại mỗi trạng thái</td><td>Ảnh hưởng số trạng thái.</td></tr><tr><td>Lá</td><td>Trạng thái hoàn chỉnh hoặc điểm dừng</td><td>Thường là nơi ghi nhận đáp án.</td></tr><tr><td>Cắt nhánh</td><td>Bỏ qua nhánh chắc chắn không cần xét</td><td>Giảm thời gian chạy.</td></tr></table></div></section>
+<section class="card" id="subset"><h2>5. Mô phỏng cây tìm kiếm: liệt kê tập con</h2><div class="g2"><div class="visual"><label><b>Các phần tử</b></label><input class="input" id="subsetInput" value="A B C"><div class="controls"><button class="btn" id="subsetNextBtn">Bước tiếp</button><button class="btn orange" id="subsetAutoBtn">Tự chạy</button><button class="btn alt" id="subsetResetBtn">Làm lại</button></div><h3>Phần tử đang xét</h3><div class="array-row" id="subsetRow"></div><h3>Đường đi hiện tại</h3><div class="path-box" id="pathBox"></div></div><div class="log" id="subsetLog"></div></div><div class="tree-area" id="subsetTree"></div></section>
+<section class="card" id="backtracking"><h2>6. Quay lui: chọn → gọi → bỏ chọn</h2><p>Quay lui là mẫu đệ quy dùng để thử các lựa chọn. Sau khi thử một lựa chọn, ta phải hoàn tác để thử lựa chọn khác.</p><div class="formula">Chọn phương án → gọi đệ quy → bỏ chọn phương án</div><div class="g2"><div class="box"><h3>Mẫu chọn / không chọn</h3><pre><code>void backtrack(int i) {
+    if (i == n) {
+        print(current);
+        return;
+    }
 
-  <header>
-    <p class="text-sm font-bold uppercase tracking-wide text-indigo-600">Mục 5.1</p>
-    <h1 class="text-3xl font-bold text-gray-900 mt-2">Đệ quy và cây tìm kiếm</h1>
-    <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 mt-4">Đang biên soạn</span>
-  </header>
+    backtrack(i + 1);
 
-  <section class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-gray-700">
-    <p>Nội dung bài học đang được biên soạn. Trang này được tạo tạm để bảo đảm liên kết trong lộ trình hoạt động.</p>
-  </section>
+    current.push_back(a[i]);
+    backtrack(i + 1);
+    current.pop_back();
+}</code></pre></div><div class="box"><h3>Mẫu hoán vị</h3><pre><code>for (int value = 1; value <= n; value++) {
+    if (!used[value]) {
+        used[value] = true;
+        permutation.push_back(value);
+        backtrack(position + 1);
+        permutation.pop_back();
+        used[value] = false;
+    }
+}</code></pre></div></div><div class="call warn"><b>Điểm mấu chốt:</b> nếu có thay đổi trạng thái trước khi gọi đệ quy, thường phải hoàn tác sau khi lời gọi kết thúc.</div></section>
+<section class="card" id="analysis"><h2>7. Phân tích thuật toán</h2><div class="table-wrap"><table class="tbl"><tr><th>Bài toán</th><th>Số nhánh</th><th>Độ sâu</th><th>Số trạng thái gần đúng</th><th>Ghi chú</th></tr><tr><td>Factorial</td><td>1</td><td>n</td><td>O(n)</td><td>Mỗi mức gọi một lần.</td></tr><tr><td>Fibonacci đệ quy thô</td><td>2</td><td>n</td><td>O(2ⁿ)</td><td>Nhiều lời gọi trùng lặp.</td></tr><tr><td>Liệt kê tập con</td><td>2</td><td>n</td><td>O(2ⁿ)</td><td>Mỗi phần tử chọn hoặc không chọn.</td></tr><tr><td>Liệt kê hoán vị</td><td>Giảm dần</td><td>n</td><td>O(n!)</td><td>Mỗi vị trí chọn một phần tử chưa dùng.</td></tr><tr><td>DFS cây/đồ thị</td><td>Bậc node</td><td>Tùy cấu trúc</td><td>O(V+E)</td><td>Mỗi cạnh và đỉnh xét hữu hạn lần.</td></tr></table></div><div class="call ok"><b>Quy tắc ước lượng:</b> Nếu mỗi mức có b lựa chọn và độ sâu d, số lá có thể khoảng bᵈ.</div></section>
+<section class="card" id="code"><h2>8. Code mẫu</h2><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="factCode">Factorial</button><button class="tab-btn" data-tab="subsetCode">Tập con</button><button class="tab-btn" data-tab="permCode">Hoán vị</button><button class="tab-btn" data-tab="dfsCode">DFS</button><button class="tab-btn" data-tab="pythonCode">Python</button></div><div class="panel active" id="factCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
 
-  <section>
-    <h2 class="text-xl font-semibold text-gray-800 mb-3">Nội dung dự kiến</h2>
-    <ul class="list-disc pl-6 space-y-2 text-gray-700">
-      <li>Base case và recursive case</li>
-      <li>Call stack</li>
-      <li>Cây đệ quy</li>
-      <li>Độ sâu và hệ số phân nhánh</li>
-      <li>Chuyển đệ quy sang stack</li>
-      <li>Đệ quy trên cây và bài toán liệt kê</li>
-    </ul>
-  </section>
+long long factorial(int n) {
+    if (n == 0) return 1;
+    return 1LL * n * factorial(n - 1);
+}
 
-  <p>
-    <a class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700" href="/roadmap/stage/5/">⬅️ Quay lại Chương 5</a>
-  </p>
-</article>
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    cout &lt;&lt; factorial(n);
+}</code></pre></div><div class="panel" id="subsetCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
+using namespace std;
+
+vector&lt;int&gt; a;
+vector&lt;int&gt; current;
+
+void generateSubsets(int index) {
+    if (index == (int)a.size()) {
+        for (int value : current) cout &lt;&lt; value &lt;&lt; ' ';
+        cout &lt;&lt; '\n';
+        return;
+    }
+
+    generateSubsets(index + 1);
+
+    current.push_back(a[index]);
+    generateSubsets(index + 1);
+    current.pop_back();
+}
+
+int main() {
+    a = {1, 2, 3};
+    generateSubsets(0);
+}</code></pre></div><div class="panel" id="permCode"><button class="copy">Sao chép</button><pre><code>int n;
+vector&lt;int&gt; permutation;
+vector&lt;bool&gt; used;
+
+void backtrack(int position) {
+    if (position == n) {
+        for (int value : permutation) cout &lt;&lt; value &lt;&lt; ' ';
+        cout &lt;&lt; '\n';
+        return;
+    }
+
+    for (int value = 1; value &lt;= n; value++) {
+        if (!used[value]) {
+            used[value] = true;
+            permutation.push_back(value);
+            backtrack(position + 1);
+            permutation.pop_back();
+            used[value] = false;
+        }
+    }
+}</code></pre></div><div class="panel" id="dfsCode"><button class="copy">Sao chép</button><pre><code>vector&lt;vector&lt;int&gt;&gt; adj;
+vector&lt;bool&gt; visited;
+
+void dfs(int u) {
+    visited[u] = true;
+    cout &lt;&lt; u &lt;&lt; ' ';
+
+    for (int v : adj[u]) {
+        if (!visited[v]) dfs(v);
+    }
+}</code></pre></div><div class="panel" id="pythonCode"><button class="copy">Sao chép</button><pre><code>def generate_subsets(a):
+    current = []
+
+    def backtrack(index):
+        if index == len(a):
+            print(current)
+            return
+
+        backtrack(index + 1)
+        current.append(a[index])
+        backtrack(index + 1)
+        current.pop()
+
+    backtrack(0)</code></pre></div></div></section>
+<section class="card" id="explain"><h2>9. Giải thích code</h2><h3>9.1. Vì sao factorial phải có n == 0?</h3><p>Đó là điểm dừng. Nếu không có điểm dừng, hàm tiếp tục gọi <code>factorial(n-1)</code> mãi và làm tràn call stack.</p><h3>9.2. Vì sao tập con có hai lời gọi?</h3><p>Với mỗi phần tử, ta có đúng hai lựa chọn: không chọn hoặc chọn. Hai lựa chọn này tạo hai nhánh trong cây tìm kiếm.</p><h3>9.3. Vì sao phải current.pop_back()?</h3><p>Sau khi thử nhánh chọn phần tử, ta phải hoàn tác để trạng thái hiện tại trở về như trước khi thử nhánh đó.</p><h3>9.4. Khi nào chuyển sang stack thủ công?</h3><p>Khi độ sâu lớn, môi trường giới hạn stack, hoặc cần kiểm soát thứ tự xử lý trạng thái rõ hơn.</p></section>
+<section class="card" id="mistakes"><h2>10. Lỗi thường gặp</h2><ul><li>Quên base case.</li><li>Recursive case không làm bài toán nhỏ hơn.</li><li>Không return kết quả của lời gọi đệ quy.</li><li>Quên hoàn tác trạng thái khi quay lui.</li><li>Dùng đệ quy Fibonacci thô cho n lớn.</li><li>Không ước lượng số trạng thái của cây tìm kiếm.</li><li>Gọi đệ quy quá sâu gây stack overflow.</li><li>DFS đồ thị nhưng không đánh dấu visited đúng thời điểm.</li></ul></section>
+<section class="card" id="quiz"><h2>11. Quiz và bài tập</h2><div class="quiz" data-answer="b"><b>Câu 1.</b> Base case dùng để làm gì?<div class="answers"><button class="answer" data-choice="a">Tăng tốc nhập xuất</button><button class="answer" data-choice="b">Dừng đệ quy ở trường hợp nhỏ nhất</button><button class="answer" data-choice="c">Sắp xếp dữ liệu</button></div><div class="feedback"></div></div><div class="quiz" data-answer="c"><b>Câu 2.</b> Liệt kê tập con của n phần tử có bao nhiêu khả năng?<div class="answers"><button class="answer" data-choice="a">n</button><button class="answer" data-choice="b">n!</button><button class="answer" data-choice="c">2^n</button></div><div class="feedback"></div></div><div class="quiz" data-answer="a"><b>Câu 3.</b> Trong quay lui, sau khi chọn và gọi đệ quy thường cần làm gì?<div class="answers"><button class="answer" data-choice="a">Hoàn tác lựa chọn</button><button class="answer" data-choice="b">Dừng toàn bộ chương trình</button><button class="answer" data-choice="c">Sắp xếp lại mảng</button></div><div class="feedback"></div></div><div class="g2"><div class="box"><h3>📘 Cơ bản</h3><ol><li>Tính n!.</li><li>Tính tổng mảng bằng đệ quy.</li><li>In từ 1 đến n và từ n về 1.</li></ol></div><div class="box"><h3>📗 Trung bình</h3><ol><li>Liệt kê tập con.</li><li>Liệt kê xâu nhị phân độ dài n.</li><li>DFS trên cây.</li></ol></div><div class="box"><h3>📙 Nâng cao</h3><ol><li>Liệt kê hoán vị.</li><li>N-Queens bản nhỏ.</li><li>Chọn k phần tử có tổng bằng S.</li></ol></div><div class="box"><h3>🐉 HSG</h3><ol><li>Cắt nhánh bài tối ưu.</li><li>Meet-in-the-middle từ cây tìm kiếm.</li><li>DFS trạng thái có memoization.</li></ol></div></div></section></div>
+<script>
+(function(){'use strict';function $(s,r){return(r||document).querySelector(s)}function $$(s,r){return Array.from((r||document).querySelectorAll(s))}function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+let fact={n:4,next:4,stack:[],returnValue:1,phase:'call',timer:null,done:false};function clearFactCode(){$$('[data-fact]').forEach(x=>x.classList.remove('hl'))}function markFactCode(k){clearFactCode();let e=$('[data-fact="'+k+'"]');if(e)e.classList.add('hl')}function resetFact(){if(fact.timer){clearInterval(fact.timer);fact.timer=null}fact.n=Math.max(0,Math.min(12,Math.trunc(Number($('#factN').value)||0)));fact.next=fact.n;fact.stack=[];fact.returnValue=1;fact.phase='call';fact.done=false;$('#factAutoBtn').textContent='Tự chạy';clearFactCode();renderFact('Sẵn sàng gọi factorial('+fact.n+').')}function renderFact(msg){$('#stackView').innerHTML=fact.stack.length?fact.stack.map((frame,i)=>'<div class="frame '+(i===fact.stack.length-1?'active':'')+'"><small>frame '+i+'</small>factorial('+frame.n+')</div>').join(''):'<span>Call stack rỗng</span>';$('#factLog').innerHTML=msg+'<br><b>returnValue = '+fact.returnValue+', phase = '+fact.phase+'</b>'}function factCall(){if(fact.done)return;if(fact.phase!=='call')return renderFact('Đang ở giai đoạn trả về. Hãy bấm Trả về.');fact.stack.push({n:fact.next});markFactCode(fact.next===0?'base':'call');if(fact.next===0){fact.phase='return';fact.returnValue=1;renderFact('Gọi factorial(0). Gặp base case nên chuẩn bị trả về 1.')}else{renderFact('Gọi factorial('+fact.next+'), cần tính factorial('+(fact.next-1)+') trước.');fact.next--}}function factReturn(){if(fact.done)return;if(!fact.stack.length)return renderFact('Chưa có lời gọi nào trong stack.');if(fact.phase!=='return')return renderFact('Chưa tới base case. Hãy tiếp tục gọi xuống.');let frame=fact.stack.pop();if(frame.n===0){fact.returnValue=1;markFactCode('base');renderFact('factorial(0) trả về 1.')}else{let old=fact.returnValue;fact.returnValue=frame.n*old;markFactCode('return');renderFact('factorial('+frame.n+') = '+frame.n+' × '+old+' = '+fact.returnValue+'.')}if(!fact.stack.length){fact.done=true;renderFact('Hoàn tất: factorial('+fact.n+') = '+fact.returnValue+'.')}}function factAuto(){if(fact.timer){clearInterval(fact.timer);fact.timer=null;$('#factAutoBtn').textContent='Tự chạy';return}$('#factAutoBtn').textContent='Tạm dừng';fact.timer=setInterval(()=>{if(fact.done){clearInterval(fact.timer);fact.timer=null;$('#factAutoBtn').textContent='Tự chạy';return}if(fact.phase==='call')factCall();else factReturn()},650)}
+let subset={items:[],states:[],idx:0,timer:null};function makeSubsetStates(items){let states=[];function dfs(i,path,decisions){states.push({i,path:path.slice(),decisions:decisions.slice(),leaf:i===items.length});if(i===items.length)return;dfs(i+1,path,decisions.concat({i,choose:false}));path.push(items[i]);dfs(i+1,path,decisions.concat({i,choose:true}));path.pop()}dfs(0,[],[]);return states}function resetSubset(){if(subset.timer){clearInterval(subset.timer);subset.timer=null}subset.items=$('#subsetInput').value.trim().split(/\s+/).filter(Boolean);subset.states=makeSubsetStates(subset.items);subset.idx=0;$('#subsetAutoBtn').textContent='Tự chạy';renderSubset('Bắt đầu tại gốc cây tìm kiếm.')}function renderSubset(msg){let st=subset.states[subset.idx]||{i:0,path:[],decisions:[],leaf:false};$('#subsetRow').innerHTML=subset.items.map((it,i)=>{let d=st.decisions.find(x=>x.i===i),cls=i===st.i?'active':d?(d.choose?'chosen':'skip'):'';return '<div class="cell '+cls+'"><small>i='+i+'</small>'+esc(it)+'</div>'}).join('');$('#pathBox').textContent='{ '+st.path.join(', ')+' }';$('#subsetLog').innerHTML=msg+'<br><b>i='+st.i+', current={'+st.path.join(', ')+'}</b>';let levels=[];subset.states.forEach((state,index)=>{let level=state.i;if(!levels[level])levels[level]=[];if(index<=subset.idx)levels[level].push({state,index})});$('#subsetTree').innerHTML=levels.map(level=>'<div class="tree-level">'+level.map(({state,index})=>{let cls=index===subset.idx?'active':state.leaf?'ok':'';return '<div class="tree-node '+cls+'"><small>#'+index+', i='+state.i+'</small>{'+state.path.join(',')+'}</div>'}).join('')+'</div>').join('')}function stepSubset(){if(subset.idx>=subset.states.length-1){renderSubset('Đã duyệt hết mọi trạng thái.');return}subset.idx++;let st=subset.states[subset.idx],last=st.decisions[st.decisions.length-1];let msg=st.leaf?'Tới lá: ghi nhận một tập con.':last?(last.choose?'Chọn '+subset.items[last.i]+'.':'Không chọn '+subset.items[last.i]+'.'):'Bắt đầu.';renderSubset(msg)}function autoSubset(){if(subset.timer){clearInterval(subset.timer);subset.timer=null;$('#subsetAutoBtn').textContent='Tự chạy';return}$('#subsetAutoBtn').textContent='Tạm dừng';subset.timer=setInterval(()=>{if(subset.idx>=subset.states.length-1){clearInterval(subset.timer);subset.timer=null;$('#subsetAutoBtn').textContent='Tự chạy'}else stepSubset()},650)}
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(button=>button.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));button.classList.add('active');$('#'+button.dataset.tab).classList.add('active')}))}function copies(){$$('.copy').forEach(button=>button.onclick=()=>{let text=button.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(text):Promise.resolve()).then(()=>{let old=button.textContent;button.textContent='Đã chép';setTimeout(()=>button.textContent=old,1000)})})}function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(button=>button.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(button.dataset.choice===q.dataset.answer){button.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{button.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();$('#factCallBtn').onclick=factCall;$('#factReturnBtn').onclick=factReturn;$('#factAutoBtn').onclick=factAuto;$('#factResetBtn').onclick=resetFact;$('#subsetNextBtn').onclick=stepSubset;$('#subsetAutoBtn').onclick=autoSubset;$('#subsetResetBtn').onclick=resetSubset;resetFact();resetSubset();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(error){}})})();
+</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"><script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="if(window.hljs)hljs.highlightAll()"></script>

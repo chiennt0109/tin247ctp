@@ -1,782 +1,104 @@
 <style>
-  * { box-sizing: border-box; }
-  :root {
-    --bg: #f4f8ff;
-    --card: #ffffff;
-    --text: #1f2937;
-    --muted: #64748b;
-    --primary: #2563eb;
-    --accent: #7c3aed;
-    --success: #16a34a;
-    --warning: #d97706;
-    --danger: #dc2626;
-  }
-
-  .lesson-page {
-    font-family: Inter, Roboto, Arial, sans-serif;
-    color: var(--text);
-    background: linear-gradient(180deg, #f8fbff, #eef5ff 70%);
-    border-radius: 16px;
-    padding: 20px;
-    line-height: 1.65;
-  }
-
-  .header {
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: #fff;
-    padding: 18px;
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
-    margin-bottom: 16px;
-  }
-
-  .header h1 { margin: 0 0 6px; font-size: 29px; }
-  .header p { margin: 0; opacity: 0.95; }
-
-  .progress-wrap {
-    position: sticky;
-    top: 8px;
-    z-index: 10;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.08);
-    padding: 10px;
-    margin-bottom: 16px;
-  }
-
-  .progress-head { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
-  .progress-track { width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-  .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width .3s ease; }
-
-  .card {
-    background: var(--card);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
-    margin-bottom: 16px;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(16px);
-    transition: .55s ease;
-  }
-
-  .card.show { opacity: 1; transform: translateY(0); }
-
-  .card-head {
-    padding: 10px 14px;
-    font-weight: 700;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f8fafc;
-  }
-
-  .card-body { padding: 14px; }
-  .small-muted { color: var(--muted); font-size: 14px; }
-
-  .table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  .table th, .table td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
-  .table th { background: #eff6ff; }
-
-  .code {
-    background: #111827;
-    color: #e5e7eb;
-    border-radius: 10px;
-    padding: 12px;
-    overflow: auto;
-    font-size: 14px;
-    font-family: Consolas, Monaco, 'Courier New', monospace;
-    position: relative;
-    margin-top: 8px;
-  }
-
-  .copy-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    border: 0;
-    border-radius: 6px;
-    background: #374151;
-    color: #fff;
-    font-size: 12px;
-    padding: 4px 8px;
-    cursor: pointer;
-  }
-
-  .copy-btn:hover { background: #4b5563; }
-
-  .flow {
-    border: 1px dashed #93c5fd;
-    background: #eff6ff;
-    border-radius: 10px;
-    padding: 10px;
-    font-family: Consolas, Monaco, monospace;
-    white-space: pre;
-  }
-
-  .box-demo {
-    display: inline-block;
-    margin-top: 8px;
-    border: 1px dashed #94a3b8;
-    border-radius: 8px;
-    background: #f8fafc;
-    padding: 10px;
-    white-space: pre;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; color: #fff; font-size: 12px; font-weight: 700; }
-  .chip-int { background: #2563eb; }
-  .chip-long { background: #0f766e; }
-  .chip-ll { background: #7c3aed; }
-  .chip-double { background: #16a34a; }
-  .chip-char { background: #ea580c; }
-  .chip-string { background: #9333ea; }
-
-  .real-box {
-    border-left: 4px solid var(--warning);
-    border-radius: 8px;
-    background: #fff7ed;
-    padding: 10px;
-    margin-top: 10px;
-  }
-
-  .row { display: flex; flex-wrap: wrap; gap: 10px; }
-  .col { flex: 1 1 230px; min-width: 220px; }
-  .input, .btn {
-    width: 100%;
-    border-radius: 8px;
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  .input { border: 1px solid #cbd5e1; }
-  .btn { border: 0; background: var(--primary); color: #fff; font-weight: 600; cursor: pointer; }
-  .btn:hover { background: #1d4ed8; }
-  .alert {
-    margin-top: 10px;
-    border-radius: 8px;
-    border: 1px solid #bfdbfe;
-    background: #eff6ff;
-    padding: 10px;
-  }
-
-  .quiz-option {
-    width: 100%;
-    text-align: left;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 10px;
-    background: #fff;
-    margin-bottom: 8px;
-    cursor: pointer;
-  }
-
-  .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
-  .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
-
-  .warning-box {
-    border-left: 4px solid #ef4444;
-    background: #fef2f2;
-    border-radius: 8px;
-    padding: 10px;
-    margin-top: 10px;
-  }
-
-  .practice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  .practice-item { border: 1px solid #dbeafe; border-radius: 10px; background: #f8fafc; padding: 10px; }
-
-  .step-box {
-    margin-top: 8px;
-    border: 2px solid #93c5fd;
-    border-radius: 10px;
-    background: #eff6ff;
-    width: 120px;
-    text-align: center;
-    padding: 8px;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .step-box .label { font-size: 13px; color: #1e3a8a; }
-  .step-box .value {
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1.1;
-    color: #1e40af;
-  }
-
-  .step-explain {
-    margin-top: 8px;
-    border: 1px dashed #93c5fd;
-    border-radius: 8px;
-    background: #f8fbff;
-    padding: 10px;
-    min-height: 44px;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .fade-in {
-    animation: fadeIn .45s ease;
-  }
-
-  .highlight-change {
-    animation: highlightChange .7s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes highlightChange {
-    0% { transform: scale(1); background: #dbeafe; }
-    45% { transform: scale(1.08); background: #bbf7d0; }
-    100% { transform: scale(1); background: transparent; }
-  }
-
-
-
-  .lesson-card { }
-
-  .demo-container {
-    border: 1px solid #dbeafe;
-    border-radius: 10px;
-    background: #f8fbff;
-    padding: 12px;
-    margin-top: 10px;
-  }
-
-  .variable-box {
-    display: inline-block;
-    border: 2px solid #60a5fa;
-    border-radius: 10px;
-    background: #eff6ff;
-    padding: 8px 12px;
-    min-width: 120px;
-    text-align: center;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .variable-box .var-name { font-size: 13px; color: #1e3a8a; }
-  .variable-box .var-value { font-size: 30px; font-weight: 700; color: #1d4ed8; }
-
-  .step-explanation {
-    margin-top: 8px;
-    border: 1px dashed #93c5fd;
-    border-radius: 8px;
-    background: #ffffff;
-    padding: 10px;
-    min-height: 48px;
-    font-family: Consolas, Monaco, monospace;
-  }
-
-  .fade-in { animation: fadeIn .45s ease; }
-  .pulse { animation: pulse .55s ease; }
-  .highlight { animation: highlight .7s ease; }
-
-  .overflow-danger {
-    border-color: #ef4444 !important;
-    background: #fee2e2 !important;
-    color: #991b1b !important;
-  }
-
-
-
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.06); }
-    100% { transform: scale(1); }
-  }
-
-  @keyframes highlight {
-    0% { box-shadow: 0 0 0 rgba(34,197,94,0); }
-    50% { box-shadow: 0 0 0 8px rgba(34,197,94,0.25); }
-    100% { box-shadow: 0 0 0 rgba(34,197,94,0); }
-  }
-
-  @media (max-width: 980px) {
-    .practice-grid { grid-template-columns: 1fr; }
-    .header h1 { font-size: 24px; }
-  }
-
-  @media (max-width: 768px) {
-    .lesson-page { padding: 12px; }
-    .header h1 { font-size: 22px; }
-  }
+:root{--p:#4f46e5;--pd:#3730a3;--a:#0891b2;--g:#16a34a;--o:#f97316;--r:#dc2626;--ink:#1e293b;--line:#dbe4ff;--code:#0f172a}
+.cpp-page{font-family:Inter,system-ui,"Segoe UI",sans-serif;color:var(--ink);line-height:1.72;background:linear-gradient(180deg,#f8fbff,#eef4ff);padding:clamp(16px,2.2vw,34px);box-sizing:border-box;position:relative;width:calc(100vw - 24px);max-width:none!important;margin-left:calc(50% - 50vw + 12px);margin-right:calc(50% - 50vw + 12px);overflow-x:clip}
+.cpp-page *{box-sizing:border-box}.cpp-page h1,.cpp-page h2,.cpp-page h3{line-height:1.25}.hero{padding:clamp(26px,3vw,46px);border-radius:28px;color:#fff;background:linear-gradient(135deg,#4338ca,#0e7490);box-shadow:0 22px 55px rgba(67,56,202,.22)}.hero h1{font-size:clamp(1.8rem,4vw,3rem);margin:8px 0;font-weight:900}.hero p{max-width:1140px;color:#e0f2fe}.badge{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.15);font-weight:800}.stats,.g2,.g3{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr);margin-top:22px}.stat{padding:13px;border:1px solid rgba(255,255,255,.22);border-radius:16px;background:rgba(255,255,255,.13)}.stat b{display:block;font-size:1.15rem}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.sticky{position:sticky;top:0;z-index:10;padding:10px 0;background:rgba(248,251,255,.86);backdrop-filter:blur(9px)}.progress{height:9px;border-radius:99px;background:#dbeafe;overflow:hidden}.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--a))}.nav{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.nav a{padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#eef2ff;color:var(--pd);text-decoration:none;font-weight:800;font-size:.88rem}
+.card{width:100%;max-width:none;margin:20px 0;padding:clamp(18px,2.5vw,28px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 14px 36px rgba(30,64,175,.07)}.card h2{margin-top:0;color:var(--pd);font-weight:900}.box{padding:15px;border:1px solid #e2e8f0;border-radius:17px;background:#f8fafc}.call{margin:13px 0;padding:13px 15px;border-left:6px solid var(--a);border-radius:14px;background:#ecfeff}.call.ok{border-color:var(--g);background:#f0fdf4}.call.warn{border-color:var(--o);background:#fff7ed}.call.bad{border-color:var(--r);background:#fff1f2}.formula{padding:13px;border:1px solid #c7d2fe;border-radius:15px;background:#eef2ff;color:#312e81;text-align:center;font-weight:900}
+.table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:16px}.tbl{width:100%;min-width:980px;border-collapse:collapse}.tbl th,.tbl td{padding:11px 13px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}.tbl th{background:#eef2ff;color:#312e81}.visual{padding:16px;border:1px solid var(--line);border-radius:20px;background:#fbfdff}.input,.select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit}.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.btn{border:0;border-radius:99px;padding:9px 13px;background:var(--p);color:#fff;font-weight:900;cursor:pointer}.btn.alt{background:#fff;color:#334155;border:1px solid #cbd5e1}.btn.green{background:var(--g)}.btn.orange{background:var(--o)}.btn.red{background:var(--r)}
+.var-wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center;min-height:130px;padding:14px;border:1px dashed #bfdbfe;border-radius:16px;background:#f8fafc}.var-box{min-width:150px;padding:10px;border:2px solid #60a5fa;border-radius:14px;background:#eff6ff;text-align:center;transition:.25s}.var-box .name{font-family:Consolas,monospace;color:#1e3a8a;font-weight:900}.var-box .type{font-size:.76rem;color:#64748b}.var-box .value{font-size:1.65rem;font-weight:900;color:#1d4ed8}.var-box.active{background:#ffedd5;border-color:#fb923c;transform:scale(1.04)}.var-box.error{background:#fee2e2;border-color:#ef4444}.memory{display:flex;gap:8px;flex-wrap:wrap}.byte{width:42px;height:42px;border:1px solid #94a3b8;border-radius:8px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font:700 .8rem Consolas;color:#166534}.pipeline{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:14px}.stage{min-width:145px;padding:13px;border:2px solid #c7d2fe;border-radius:14px;background:#eef2ff;text-align:center;font-weight:900;color:#312e81}.stage.active{background:#ffedd5;border-color:#fb923c;color:#9a3412}.arrow{font-size:1.6rem;color:#64748b}.log{min-height:120px;max-height:340px;overflow:auto;padding:13px;border:1px solid #e2e8f0;border-radius:15px;background:#f8fafc;font-family:Consolas,monospace}
+.tabs{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:var(--code);margin-top:13px}.tab-head{display:flex;flex-wrap:wrap;background:#edf2ff}.tab-btn{border:0;background:transparent;padding:11px 14px;font-weight:900;cursor:pointer}.tab-btn.active{background:var(--p);color:#fff}.panel{display:none;position:relative}.panel.active{display:block}.copy{position:absolute;right:9px;top:9px;border:0;border-radius:99px;padding:5px 9px;background:rgba(255,255,255,.14);color:#fff;cursor:pointer}.cpp-page pre{margin:0;padding:20px;max-height:680px;overflow:auto;background:var(--code);color:#f8fafc;white-space:pre;font:14px/1.65 Consolas,monospace}.cpp-page p code,.cpp-page li code,.cpp-page td code{padding:2px 6px;border-radius:6px;background:#fdf2f8;color:#be185d;font-weight:800}
+.quiz{margin:11px 0;padding:14px;border:1px solid #e2e8f0;border-radius:16px}.answers{display:grid;gap:7px;margin-top:9px}.answer{text-align:left;padding:9px 11px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc;font-weight:800;cursor:pointer}.answer.right{background:#dcfce7;border-color:#22c55e}.answer.wrong{background:#fee2e2;border-color:#ef4444}.feedback{font-weight:800;margin-top:7px}
+@media(min-width:1800px){.cpp-page{padding-left:max(40px,calc((100vw - 1720px)/2));padding-right:max(40px,calc((100vw - 1720px)/2))}}@media(max-width:900px){.stats,.g2,.g3{grid-template-columns:1fr}.cpp-page{width:100%;margin-left:0;margin-right:0;padding:12px}.hero{border-radius:20px}}
 </style>
-
-<div class="lesson-page">
-  <div class="header">
-    <h1>📘 Khan Style: Biến – Kiểu dữ liệu – Nhập xuất trong C++</h1>
-    <p>Bài học tương tác cho học sinh mới học lập trình: trực quan, ví dụ gần gũi, có demo và quiz.</p>
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-head">
-      <strong>📊 Tiến trình bài học</strong>
-      <span id="progressText">0%</span>
-    </div>
-    <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
-  </div>
-
-  <section class="card"><div class="card-head">🎯 1. Mục tiêu bài học</div><div class="card-body">
-    <ul>
-      <li>Hiểu <b>cấu trúc chương trình C++</b>.</li>
-      <li>Hiểu <b>biến là gì</b> và cách dùng biến.</li>
-      <li>Biết <b>các kiểu dữ liệu</b> và giới hạn kiểu số.</li>
-      <li>Hiểu hiện tượng <b>tràn số (overflow)</b>.</li>
-      <li>Biết <b>nhập dữ liệu</b> bằng <code>cin</code> và <b>xuất dữ liệu</b> bằng <code>cout</code>.</li>
-      <li>Viết được chương trình C++ đầu tiên.</li>
-    </ul>
-  </div></section>
-
-  <section class="card"><div class="card-head">🧱 2. Bắt đầu một chương trình C++ (Program template)</div><div class="card-body">
-    <pre class="code"><button class="copy-btn" data-copy="#code-template">Copy</button><code id="code-template">#include &lt;bits/stdc++.h&gt;
+<div class="cpp-page">
+<div class="hero"><span class="badge">C++ Fundamentals</span><h1>📦 Biến – Kiểu dữ liệu – Nhập xuất trong C++</h1><p>Bài học giúp học sinh hiểu chương trình nhận dữ liệu, lưu dữ liệu trong biến, xử lý theo đúng kiểu và xuất kết quả. Có mô phỏng phép gán, kiểu dữ liệu, chia nguyên, chuyển kiểu, overflow và cin/getline.</p><div class="stats"><div class="stat"><b>Variable</b><span>Ô nhớ có tên</span></div><div class="stat"><b>Data type</b><span>Quy định miền giá trị</span></div><div class="stat"><b>cin / cout</b><span>Nhập và xuất chuẩn</span></div><div class="stat"><b>Overflow</b><span>Chọn kiểu đủ lớn</span></div></div></div>
+<div class="sticky"><div class="progress"><div id="bar"></div></div><div class="nav"><a href="#goals">Mục tiêu</a><a href="#problem">Đặt vấn đề</a><a href="#program">Chương trình</a><a href="#variables">Biến</a><a href="#types">Kiểu dữ liệu</a><a href="#operators">Phép toán</a><a href="#io">Nhập xuất</a><a href="#overflow">Overflow</a><a href="#analysis">Phân tích</a><a href="#code">Code mẫu</a><a href="#explain">Giải thích code</a><a href="#mistakes">Lỗi thường gặp</a><a href="#quiz">Quiz</a></div></div>
+<section class="card" id="goals"><h2>🎯 Mục tiêu bài học</h2><div class="g2"><div class="box"><h3>Cần hiểu</h3><ul><li>Cấu trúc tối thiểu của chương trình C++.</li><li>Biến, khai báo, khởi tạo và phép gán.</li><li>Chọn kiểu dữ liệu phù hợp.</li><li>Chia nguyên và chia thực.</li><li><code>cin</code>, <code>cout</code>, <code>getline</code>.</li></ul></div><div class="box"><h3>Cần làm được</h3><ul><li>Đọc nhiều giá trị từ input.</li><li>Tính toán và in đúng định dạng.</li><li>Tránh overflow trong biểu thức.</li><li>Ép kiểu khi cần.</li><li>Đọc họ tên có khoảng trắng.</li></ul></div></div></section>
+<section class="card" id="problem"><h2>1. Đặt vấn đề</h2><div class="call"><b>Bài toán mở đầu.</b><br>Một cửa hàng bán n sản phẩm, mỗi sản phẩm có giá p đồng. Nhập n và p, tính tổng tiền phải trả.</div><div class="pipeline"><div class="stage">Input<br><small>đọc n, p</small></div><div class="arrow">→</div><div class="stage">Process<br><small>total = n × p</small></div><div class="arrow">→</div><div class="stage">Output<br><small>in total</small></div></div><h3>1.1. Những câu hỏi phải trả lời</h3><ul><li>Dùng biến nào để lưu n, p và total?</li><li>Dùng <code>int</code> hay <code>long long</code>?</li><li>Nếu n và p đều lớn, phép nhân có bị tràn không?</li><li>Đọc input và in output bằng lệnh nào?</li></ul><div class="call warn">Nếu <code>n = 10^6</code> và <code>p = 10^6</code>, tổng là <code>10^12</code>. Kiểu <code>int</code> không đủ.</div><div class="call ok"><b>Kết luận:</b> Trước khi viết phép tính, phải xác định dữ liệu, miền giá trị và kiểu phù hợp.</div></section>
+<section class="card" id="program"><h2>2. Cấu trúc chương trình C++</h2><div class="g2"><div class="box"><h3>Khung chương trình</h3><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
-int main(){
-    // code ở đây
+int main() {
+    // Các câu lệnh
     return 0;
-}</code></pre>
-    <table class="table">
-      <thead><tr><th>Phần</th><th>Ý nghĩa</th></tr></thead>
-      <tbody>
-        <tr><td>include</td><td>mở thư viện</td></tr>
-        <tr><td>namespace</td><td>viết lệnh ngắn gọn</td></tr>
-        <tr><td>main()</td><td>nơi chương trình bắt đầu</td></tr>
-        <tr><td>return 0</td><td>kết thúc chương trình</td></tr>
-      </tbody>
-    </table>
-  </div></section>
-
-  <section class="card"><div class="card-head">🔄 3. Mô hình hoạt động chương trình (Program workflow)</div><div class="card-body">
-    <div class="flow">Input → Process → Output
-5 7   →   cộng   →   12</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">⌨️ 4. Nhập và xuất dữ liệu (Input / Output)</div><div class="card-body">
-    <p><b>Nhập dữ liệu</b> bằng <code>cin</code>:</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-input">Copy</button><code id="code-input">int age;
-cin >> age;</code></pre>
-    <p><b>Xuất dữ liệu</b> bằng <code>cout</code>:</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-output">Copy</button><code id="code-output">cout << age;
-cout << age << endl;</code></pre>
-  </div></section>
-
-  <section class="card"><div class="card-head">📦 5. Biến là gì?</div><div class="card-body">
-    <p>Biến giống như <b>một chiếc hộp để chứa dữ liệu</b>.</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-var">Copy</button><code id="code-var">int a = 5;</code></pre>
-    <div class="box-demo">a
-┌───────┐
-│   5   │
-└───────┘</div>
-    <div class="real-box">Ví dụ đời sống: ví tiền chứa số tiền, bình nước chứa lượng nước — biến cũng tương tự như vậy.</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">🏷️ 6. Kiểu dữ liệu</div><div class="card-body">
-    <table class="table">
-      <thead><tr><th>Kiểu</th><th>Ý nghĩa</th></tr></thead>
-      <tbody>
-        <tr><td><span class="chip chip-int">int</span></td><td>số nguyên</td></tr>
-        <tr><td><span class="chip chip-long">long</span></td><td>số nguyên lớn</td></tr>
-        <tr><td><span class="chip chip-ll">long long</span></td><td>số nguyên rất lớn</td></tr>
-        <tr><td><span class="chip chip-double">double</span></td><td>số thực</td></tr>
-        <tr><td><span class="chip chip-char">char</span></td><td>ký tự</td></tr>
-        <tr><td><span class="chip chip-string">string</span></td><td>chuỗi</td></tr>
-      </tbody>
-    </table>
-  </div></section>
-
-  <section class="card"><div class="card-head">📏 7. Giới hạn của số nguyên</div><div class="card-body">
-    <table class="table">
-      <thead><tr><th>Kiểu</th><th>Giới hạn gần đúng</th></tr></thead>
-      <tbody>
-        <tr><td>int</td><td>khoảng ±10⁹</td></tr>
-        <tr><td>long</td><td>khoảng ±10¹²</td></tr>
-        <tr><td>long long</td><td>khoảng ±10¹⁸</td></tr>
-      </tbody>
-    </table>
-    <div class="real-box">
-      <b>Ví dụ thực tế</b><br>
-      2000 học sinh → <code>int</code><br>
-      1000000000 dân số → <code>int</code><br>
-      1000000000000 khoảng cách lớn → <code>long</code><br>
-      1000000000000000000 số cực lớn → <code>long long</code>
-    </div>
-  </div></section>
-
-  <section class="card"><div class="card-head">⚠️ 8. Tràn số (Overflow)</div><div class="card-body">
-    <p>Tràn số xảy ra khi giá trị vượt quá giới hạn của kiểu dữ liệu.</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-over">Copy</button><code id="code-over">int a = 2000000000;
-int b = 2000000000;
-cout << a + b;</code></pre>
-    <div class="warning-box">
-      <b>Vì sao sai?</b><br>
-      2000000000 + 2000000000 = 4000000000, nhưng <code>int</code> chỉ khoảng 2.1 tỷ.<br>
-      Mốc tối đa của int ≈ <code>2147483647</code>. Nếu <code>2147483647 + 1</code> sẽ overflow.
-    </div>
-    <p><b>Cách khắc phục:</b> dùng kiểu lớn hơn.</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-fix">Copy</button><code id="code-fix">long long a = 2000000000;
-long long b = 2000000000;
-cout << a + b;</code></pre>
-
-    <div class="row" style="margin-top:10px;">
-      <div class="col">
-        <label for="overflowInput">Overflow visualizer (nhập gần 2147483647)</label>
-        <input id="overflowInput" class="input" type="number" value="2147483647">
-      </div>
-      <div class="col">
-        <label>&nbsp;</label>
-        <button class="btn" onclick="simulateOverflow()">+1 và kiểm tra overflow</button>
-      </div>
-    </div>
-    <div id="overflowResult" class="alert">Nhấn nút để xem mô phỏng overflow.</div>
-  </div></section>
-
-  <section class="card"><div class="card-head">🌍 9. Phạm vi của biến (Scope)</div><div class="card-body">
-    <p><b>Biến toàn cục</b> khai báo ngoài hàm:</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-global">Copy</button><code id="code-global">int x = 10;</code></pre>
-    <p><b>Biến cục bộ</b> khai báo trong hàm:</p>
-    <pre class="code"><button class="copy-btn" data-copy="#code-local">Copy</button><code id="code-local">int main(){
-    int a = 5;
-}</code></pre>
-  </div></section>
-
-  <section class="card"><div class="card-head">➕ 10. Các phép toán</div><div class="card-body">
-    <table class="table">
-      <thead><tr><th>Phép toán</th><th>Ký hiệu</th></tr></thead>
-      <tbody>
-        <tr><td>cộng</td><td>+</td></tr>
-        <tr><td>trừ</td><td>-</td></tr>
-        <tr><td>nhân</td><td>*</td></tr>
-        <tr><td>chia</td><td>/</td></tr>
-        <tr><td>chia dư</td><td>%</td></tr>
-      </tbody>
-    </table>
-    <p><b>Tăng giảm:</b> <code>a++</code>, <code>a--</code>.</p>
-  </div></section>
-
-  <section class="card"><div class="card-head">🧪 11. Ví dụ chương trình đầu tiên</div><div class="card-body">
-    <pre class="code"><button class="copy-btn" data-copy="#code-example">Copy</button><code id="code-example">#include &lt;bits/stdc++.h&gt;
+}</code></pre></div><div class="box"><h3>Ý nghĩa</h3><ul><li><code>#include</code>: đưa thư viện vào.</li><li><code>using namespace std;</code>: dùng tên chuẩn ngắn gọn.</li><li><code>main()</code>: điểm bắt đầu chạy.</li><li><code>return 0;</code>: kết thúc bình thường.</li></ul></div></div><div class="call warn"><code>#include &lt;bits/stdc++.h&gt;</code> phổ biến trong thi đấu với GCC nhưng không phải header chuẩn trên mọi trình biên dịch.</div></section>
+<section class="card" id="variables"><h2>3. Biến và phép gán</h2><div class="g3"><div class="box"><h3>Khai báo</h3><p><code>int age;</code></p><p>Tạo biến.</p></div><div class="box"><h3>Khởi tạo</h3><p><code>int age = 15;</code></p><p>Tạo và gán giá trị đầu.</p></div><div class="box"><h3>Gán lại</h3><p><code>age = age + 1;</code></p><p>Tính vế phải rồi ghi đè.</p></div></div><h3>3.1. Mô phỏng biến như một ô nhớ</h3><div class="g2"><div class="visual"><label><b>Giá trị khởi tạo a</b></label><input class="input" id="varStart" value="5"><label><b>Giá trị cộng thêm</b></label><input class="input" id="varAdd" value="1"><div class="controls"><button class="btn" id="varNext">Bước tiếp</button><button class="btn alt" id="varReset">Làm lại</button></div><div class="var-wrap" id="varWrap"></div></div><div class="log" id="varLog"></div></div><div class="call bad"><code>a = a + 1</code> không phải phương trình toán học. Dấu <code>=</code> trong C++ là phép gán.</div></section>
+<section class="card" id="types"><h2>4. Kiểu dữ liệu</h2><div class="table-wrap"><table class="tbl"><tr><th>Kiểu</th><th>Dùng để lưu</th><th>Kích thước thường gặp</th><th>Miền/độ chính xác</th><th>Ví dụ</th></tr><tr><td><code>bool</code></td><td>Đúng/sai</td><td>Thường 1 byte</td><td><code>false</code>, <code>true</code></td><td><code>bool ok=true;</code></td></tr><tr><td><code>char</code></td><td>Một ký tự</td><td>1 byte</td><td>Phụ thuộc signed/unsigned</td><td><code>char c='A';</code></td></tr><tr><td><code>int</code></td><td>Số nguyên</td><td>Thường 4 byte</td><td>Khoảng ±2.1×10⁹</td><td><code>int n=100;</code></td></tr><tr><td><code>long long</code></td><td>Số nguyên lớn</td><td>Thường 8 byte</td><td>Khoảng ±9.22×10¹⁸</td><td><code>long long sum=0;</code></td></tr><tr><td><code>double</code></td><td>Số thực</td><td>Thường 8 byte</td><td>Khoảng 15 chữ số có nghĩa</td><td><code>double x=3.14;</code></td></tr><tr><td><code>string</code></td><td>Chuỗi</td><td>Động</td><td>Phụ thuộc bộ nhớ</td><td><code>string name="An";</code></td></tr></table></div><div class="call warn"><b>Không ghi nhớ <code>long</code> luôn là 64-bit.</b> Kích thước <code>long</code> phụ thuộc nền tảng. Khi cần khoảng 10<sup>18</sup>, ưu tiên <code>long long</code>.</div><h3>4.1. Mô phỏng số byte</h3><div class="g2"><div class="visual"><select class="select" id="typeSelect"><option value="bool">bool</option><option value="char">char</option><option value="int" selected>int</option><option value="longlong">long long</option><option value="double">double</option></select><div class="controls"><button class="btn green" id="typeBtn">Hiển thị</button></div><div class="memory" id="memory"></div></div><div class="log" id="typeLog"></div></div></section>
+<section class="card" id="operators"><h2>5. Phép toán và chuyển kiểu</h2><div class="g2"><div class="box"><h3>Số nguyên</h3><ul><li><code>+</code>, <code>-</code>, <code>*</code></li><li><code>/</code>: chia nguyên nếu hai toán hạng nguyên.</li><li><code>%</code>: phần dư.</li></ul></div><div class="box"><h3>Số thực</h3><ul><li><code>5 / 2 = 2</code></li><li><code>5.0 / 2 = 2.5</code></li><li><code>static_cast&lt;double&gt;(5) / 2 = 2.5</code></li></ul></div></div><h3>5.1. Mô phỏng phép chia</h3><div class="g2"><div class="visual"><label><b>a</b></label><input class="input" id="divA" value="5"><label><b>b</b></label><input class="input" id="divB" value="2"><div class="controls"><button class="btn" id="divBtn">So sánh</button></div></div><div class="log" id="divLog"></div></div><div class="call warn"><code>double x = 5 / 2;</code> vẫn cho 2.0 vì phép chia nguyên xảy ra trước phép gán.</div></section>
+<section class="card" id="io"><h2>6. Nhập và xuất dữ liệu</h2><div class="g2"><div class="box"><h3>cin và cout</h3><pre><code>int age;
+string name;
+cin &gt;&gt; age;
+cin &gt;&gt; name;
+cout &lt;&lt; name &lt;&lt; ' ' &lt;&lt; age &lt;&lt; '\n';</code></pre><p><code>cin &gt;&gt; name</code> chỉ đọc đến khoảng trắng.</p></div><div class="box"><h3>getline</h3><pre><code>int age;
+string fullName;
+cin &gt;&gt; age;
+cin.ignore(numeric_limits&lt;streamsize&gt;::max(), '\n');
+getline(cin, fullName);</code></pre></div></div><h3>6.1. Mô phỏng Input → Process → Output</h3><div class="g2"><div class="visual"><label><b>n</b></label><input class="input" id="shopN" value="1000000"><label><b>p</b></label><input class="input" id="shopP" value="1000000"><div class="controls"><button class="btn" id="shopRun">Chạy</button><button class="btn alt" id="shopReset">Làm lại</button></div><div class="pipeline"><div class="stage" id="sInput">Input</div><div class="arrow">→</div><div class="stage" id="sProcess">Process</div><div class="arrow">→</div><div class="stage" id="sOutput">Output</div></div></div><div class="log" id="shopLog"></div></div></section>
+<section class="card" id="overflow"><h2>7. Overflow và cách phòng tránh</h2><div class="g2"><div class="box"><h3>Lỗi trung gian</h3><pre><code>int a = 1000000000;
+int b = 1000000000;
+long long product = a * b; // có thể sai</code></pre></div><div class="box"><h3>Cách đúng</h3><pre><code>long long product = 1LL * a * b;</code></pre><p><code>1LL</code> nâng kiểu biểu thức trước khi nhân.</p></div></div><h3>7.1. Mô phỏng kiểm tra miền int32</h3><div class="g2"><div class="visual"><label><b>a</b></label><input class="input" id="ovA" value="2000000000"><label><b>b</b></label><input class="input" id="ovB" value="2000000000"><select class="select" id="ovOp"><option value="+">a + b</option><option value="*">a × b</option></select><div class="controls"><button class="btn red" id="ovBtn">Kiểm tra</button></div><div class="var-wrap" id="ovWrap"></div></div><div class="log" id="ovLog"></div></div><div class="call bad"><b>Chuẩn C++:</b> signed integer overflow là undefined behavior. Không nên dựa vào việc giá trị chắc chắn “quay vòng” sang âm.</div></section>
+<section class="card" id="analysis"><h2>8. Phân tích trước khi viết code</h2><div class="table-wrap"><table class="tbl"><tr><th>Bước</th><th>Câu hỏi</th><th>Ví dụ tổng tiền</th></tr><tr><td>1</td><td>Input là gì?</td><td>n, p.</td></tr><tr><td>2</td><td>Output là gì?</td><td>n×p.</td></tr><tr><td>3</td><td>Giá trị lớn nhất?</td><td>10⁶×10⁶=10¹².</td></tr><tr><td>4</td><td>Chọn kiểu?</td><td><code>long long</code>.</td></tr><tr><td>5</td><td>Biểu thức có nâng kiểu trước?</td><td>Cả n và p là long long.</td></tr><tr><td>6</td><td>Định dạng output?</td><td>Một số và xuống dòng.</td></tr></table></div></section>
+<section class="card" id="code"><h2>9. Code mẫu</h2><div class="tabs"><div class="tab-head"><button class="tab-btn active" data-tab="basicCode">Biến và I/O</button><button class="tab-btn" data-tab="typesCode">Các kiểu</button><button class="tab-btn" data-tab="getlineCode">cin + getline</button><button class="tab-btn" data-tab="castCode">Chia và ép kiểu</button><button class="tab-btn" data-tab="safeCode">Nhân an toàn</button></div><div class="panel active" id="basicCode"><button class="copy">Sao chép</button><pre><code>#include &lt;bits/stdc++.h&gt;
 using namespace std;
 
-int main(){
-    long long a,b;
-    cin >> a >> b;
-    cout << a + b;
-}</code></pre>
-  </div></section>
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-  <section class="card"><div class="card-head">🎮 12. Interactive demo</div><div class="card-body">
-    <div class="row">
-      <div class="col">
-        <label for="demoA">Input A</label>
-        <input id="demoA" class="input" type="number" placeholder="Ví dụ: 5">
-      </div>
-      <div class="col">
-        <label for="demoB">Input B</label>
-        <input id="demoB" class="input" type="number" placeholder="Ví dụ: 7">
-      </div>
-      <div class="col">
-        <label>&nbsp;</label>
-        <button class="btn" onclick="calcSum()">Tính tổng</button>
-      </div>
-    </div>
-    <div id="sumResult" class="alert">Kết quả sẽ hiển thị ở đây.</div>
+    long long quantity, price;
+    cin &gt;&gt; quantity &gt;&gt; price;
 
-    <div class="row" style="margin-top:10px;">
-      <div class="col">
-        <p><b>Demo biến theo từng bước:</b> a = 5; a = a + 1;</p>
-        <div id="stepTitle" class="small-muted">Bấm <b>Next Step</b> để bắt đầu mô phỏng.</div>
-        <div class="step-box" id="varBox">
-          <div class="label">a =</div>
-          <div class="value" id="varValue">?</div>
-        </div>
-        <div id="stepExplain" class="step-explain">Chưa bắt đầu.</div>
-        <div class="row" style="margin-top:8px;">
-          <div class="col" style="min-width:160px;">
-            <button class="btn" onclick="nextVarStep()">Next Step</button>
-          </div>
-          <div class="col" style="min-width:160px;">
-            <button class="btn" style="background:#475569;" onclick="resetVarDemo()">Reset</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div></section>
+    long long total = quantity * price;
+    cout &lt;&lt; total &lt;&lt; '\n';
+}</code></pre></div><div class="panel" id="typesCode"><button class="copy">Sao chép</button><pre><code>bool passed = true;
+char grade = 'A';
+int age = 15;
+long long population = 10000000000LL;
+double average = 8.75;
+string fullName = "Nguyen Van An";
 
+cout &lt;&lt; boolalpha &lt;&lt; passed &lt;&lt; '\n';
+cout &lt;&lt; fixed &lt;&lt; setprecision(2) &lt;&lt; average;</code></pre></div><div class="panel" id="getlineCode"><button class="copy">Sao chép</button><pre><code>int age;
+string fullName;
 
+cin &gt;&gt; age;
+cin.ignore(numeric_limits&lt;streamsize&gt;::max(), '\n');
+getline(cin, fullName);
 
-  <section class="card lesson-card"><div class="card-head">🎮 Demo 1: Biến hoạt động như một chiếc hộp</div><div class="card-body">
-    <p class="small-muted">Mô phỏng từng bước, học sinh bấm nút để đi tiếp (không tự chạy).</p>
-    <div class="demo-container">
-      <div id="variable-box" class="variable-box">
-        <div class="var-name">a</div>
-        <div class="var-value" id="demo1VarValue">?</div>
-      </div>
-      <div id="stepText" class="step-explanation">Bấm Next Step để bắt đầu.</div>
-      <div class="row" style="margin-top:8px;">
-        <div class="col" style="min-width:180px;"><button id="nextStepButton" class="btn" onclick="demo1NextStep()">Next Step</button></div>
-        <div class="col" style="min-width:180px;"><button class="btn" style="background:#475569;" onclick="demo1Reset()">Reset</button></div>
-      </div>
-    </div>
-  </div></section>
+cout &lt;&lt; fullName &lt;&lt; '\n' &lt;&lt; age;</code></pre></div><div class="panel" id="castCode"><button class="copy">Sao chép</button><pre><code>int a = 5, b = 2;
+int integerResult = a / b;
+double realResult = static_cast&lt;double&gt;(a) / b;
 
-  <section class="card lesson-card"><div class="card-head">⚠️ Demo 2: Tràn số (Integer Overflow)</div><div class="card-body">
-    <p><code>int max = 2147483647</code></p>
-    <div class="demo-container">
-      <div id="overflowBoxDemo" class="variable-box" style="min-width:190px;">
-        <div class="var-name">int value</div>
-        <div class="var-value" id="overflowValue">2147483647</div>
-      </div>
-      <div id="overflowStepText" class="step-explanation">Giá trị đang ở mức tối đa của kiểu int.</div>
-      <div class="row" style="margin-top:8px;">
-        <div class="col" style="min-width:150px;"><button class="btn" onclick="demo2AddOne()">+1</button></div>
-        <div class="col" style="min-width:150px;"><button class="btn" style="background:#475569;" onclick="demo2Reset()">Reset</button></div>
-      </div>
-    </div>
-  </div></section>
-
-  <section class="card lesson-card"><div class="card-head">💻 Demo 3: Chạy chương trình C++ trực tiếp</div><div class="card-body">
-    <pre class="code"><code>int a,b;
-cin >> a >> b;
-cout << a + b;</code></pre>
-    <div class="demo-container">
-      <div class="row">
-        <div class="col"><label for="simA">Input A</label><input id="simA" class="input" type="number" placeholder="Ví dụ: 5"></div>
-        <div class="col"><label for="simB">Input B</label><input id="simB" class="input" type="number" placeholder="Ví dụ: 7"></div>
-        <div class="col"><label>&nbsp;</label><button class="btn" onclick="runCinCoutDemo()">Run Program</button></div>
-      </div>
-      <div id="simOutput" class="alert">Output: ...</div>
-      <div id="simExplain" class="small-muted">Nhập 2 số rồi bấm Run Program.</div>
-    </div>
-  </div></section>
-
-  <section class="card"><div class="card-head">🧩 13. Bài tập luyện tập</div><div class="card-body">
-    <div class="practice-grid">
-      <div class="practice-item"><b>🧩 Bài 1</b><p>Nhập a, b. In:</p><pre>a+b
-a-b
-a*b</pre></div>
-      <div class="practice-item"><b>🎯 Bài 2</b><p>30 học sinh, mỗi người đóng 20000. Tính tổng tiền.</p></div>
-      <div class="practice-item"><b>🚀 Bài 3</b><p>Nhập n ≤ 10^18, in n+1.</p></div>
-    </div>
-  </div></section>
-
-  <section class="card"><div class="card-head">❓ 14. Quiz nhanh</div><div class="card-body">
-    <p><b>Kiểu nào lưu được số 10^18?</b></p>
-    <button class="quiz-option" data-correct="false">A. int</button>
-    <button class="quiz-option" data-correct="false">B. long</button>
-    <button class="quiz-option" data-correct="true">C. long long</button>
-    <div id="quizFeedback" class="small-muted">Chọn một đáp án để xem phản hồi.</div>
-  </div></section>
+cout &lt;&lt; integerResult &lt;&lt; '\n';
+cout &lt;&lt; fixed &lt;&lt; setprecision(2) &lt;&lt; realResult;</code></pre></div><div class="panel" id="safeCode"><button class="copy">Sao chép</button><pre><code>int a = 1000000000;
+int b = 1000000000;
+long long correct = 1LL * a * b;
+cout &lt;&lt; correct;</code></pre></div></div></section>
+<section class="card" id="explain"><h2>10. Giải thích code</h2><h3>10.1. Vì sao dùng long long?</h3><p>Để cả toán hạng và kết quả đều được tính trong miền đủ lớn.</p><h3>10.2. Vì sao có hậu tố LL?</h3><p><code>10000000000LL</code> tạo literal kiểu <code>long long</code>.</p><h3>10.3. Vì sao dùng '\n'?</h3><p><code>endl</code> còn flush bộ đệm; <code>'\n'</code> thường nhanh hơn khi in nhiều.</p><h3>10.4. Vì sao ignore trước getline?</h3><p>Ký tự xuống dòng còn lại sau <code>cin &gt;&gt;</code> có thể khiến <code>getline</code> đọc dòng rỗng.</p><h3>10.5. Vì sao gán vào double chưa đủ?</h3><p>Phép chia xảy ra trước phép gán. Phải ép kiểu một toán hạng trước khi chia.</p><h3>10.6. Vì sao long long result = a*b vẫn có thể sai?</h3><div class="call bad">Nếu a và b là int, phép nhân int xảy ra trước. Dùng <code>1LL*a*b</code> hoặc ép kiểu trước.</div></section>
+<section class="card" id="mistakes"><h2>11. Lỗi thường gặp</h2><ul><li>Dùng biến cục bộ chưa khởi tạo.</li><li>Nhầm <code>=</code> với <code>==</code>.</li><li>Dùng <code>int</code> cho tổng/tích lớn.</li><li>Gán sang long long nhưng biểu thức vẫn tính bằng int.</li><li>Mong <code>5/2</code> bằng 2.5.</li><li>Dùng <code>cin &gt;&gt; name</code> cho họ tên có khoảng trắng.</li><li>Dùng <code>getline</code> ngay sau <code>cin &gt;&gt;</code> mà không xử lý newline.</li><li>Cho rằng <code>long</code> luôn 64-bit.</li><li>Dựa vào signed overflow quay vòng.</li></ul></section>
+<section class="card" id="quiz"><h2>12. Quiz và bài tập</h2><div class="quiz" data-answer="c"><b>Câu 1.</b> Kiểu phù hợp để lưu khoảng 10¹⁸?<div class="answers"><button class="answer" data-choice="a">char</button><button class="answer" data-choice="b">int</button><button class="answer" data-choice="c">long long</button></div><div class="feedback"></div></div><div class="quiz" data-answer="b"><b>Câu 2.</b> Kết quả của <code>5/2</code> với hai int?<div class="answers"><button class="answer" data-choice="a">2.5</button><button class="answer" data-choice="b">2</button><button class="answer" data-choice="c">3</button></div><div class="feedback"></div></div><div class="quiz" data-answer="a"><b>Câu 3.</b> Cách tính tích hai int lớn an toàn hơn?<div class="answers"><button class="answer" data-choice="a">long long x = 1LL*a*b;</button><button class="answer" data-choice="b">int x=a*b;</button><button class="answer" data-choice="c">double x=a/b;</button></div><div class="feedback"></div></div><div class="g2"><div class="box"><h3>📘 Cơ bản</h3><ol><li>Nhập hai số, in tổng, hiệu, tích.</li><li>Đổi giây thành giờ–phút–giây.</li><li>Tính chu vi, diện tích.</li></ol></div><div class="box"><h3>📗 Luyện kiểu dữ liệu</h3><ol><li>Tính n×p với n,p≤10⁹.</li><li>Tính trung bình ba số.</li><li>Đọc họ tên bằng getline.</li></ol></div><div class="box"><h3>📙 Sửa lỗi</h3><ol><li>Sửa lỗi chia nguyên.</li><li>Sửa overflow trung gian.</li><li>Sửa lỗi cin + getline.</li></ol></div><div class="box"><h3>🐣 Học tiếp</h3><ol><li>Câu lệnh điều kiện.</li><li>Vòng lặp.</li><li>Mảng một chiều.</li></ol></div></div></section>
 </div>
-
 <script>
-  function calcSum() {
-    var a = Number(document.getElementById('demoA').value || 0);
-    var b = Number(document.getElementById('demoB').value || 0);
-    document.getElementById('sumResult').innerText = 'Kết quả: ' + a + ' + ' + b + ' = ' + (a + b);
-  }
-
-  var varDemoStep = 0;
-
-  function clearStepAnimations() {
-    document.getElementById('varBox').classList.remove('fade-in', 'highlight-change');
-    document.getElementById('stepExplain').classList.remove('fade-in');
-  }
-
-  function resetVarDemo() {
-    varDemoStep = 0;
-    document.getElementById('stepTitle').innerHTML = 'Bấm <b>Next Step</b> để bắt đầu mô phỏng.';
-    document.getElementById('varValue').innerText = '?';
-    document.getElementById('stepExplain').innerText = 'Chưa bắt đầu.';
-    clearStepAnimations();
-  }
-
-  function nextVarStep() {
-    varDemoStep += 1;
-
-    var varBox = document.getElementById('varBox');
-    var varValue = document.getElementById('varValue');
-    var stepExplain = document.getElementById('stepExplain');
-    var stepTitle = document.getElementById('stepTitle');
-
-    clearStepAnimations();
-
-    if (varDemoStep === 1) {
-      stepTitle.innerText = 'Step 1: Khởi tạo biến';
-      varValue.innerText = '5';
-      stepExplain.innerText = 'a = 5 (hộp biến đang chứa giá trị 5).';
-      varBox.classList.add('fade-in');
-      stepExplain.classList.add('fade-in');
-      return;
-    }
-
-    if (varDemoStep === 2) {
-      stepTitle.innerText = 'Step 2: Tính biểu thức';
-      stepExplain.innerText = 'a + 1 = 5 + 1 = 6';
-      stepExplain.classList.add('fade-in');
-      return;
-    }
-
-    if (varDemoStep === 3) {
-      stepTitle.innerText = 'Step 3: Gán lại cho biến';
-      varValue.innerText = '6';
-      stepExplain.innerText = 'Cập nhật hộp biến: a = 6 ✅';
-      varBox.classList.add('highlight-change');
-      stepExplain.classList.add('fade-in');
-      return;
-    }
-
-    varDemoStep = 1;
-    stepTitle.innerText = 'Step 1: Khởi tạo biến';
-    varValue.innerText = '5';
-    stepExplain.innerText = 'a = 5 (bắt đầu lại vòng mô phỏng).';
-    varBox.classList.add('fade-in');
-    stepExplain.classList.add('fade-in');
-  }
-
-  function simulateOverflow() {
-    var maxInt = 2147483647;
-    var val = Number(document.getElementById('overflowInput').value || 0);
-    var next = val + 1;
-    var el = document.getElementById('overflowResult');
-    if (next > maxInt) {
-      el.innerHTML = '⚠️ ' + val + ' + 1 = ' + next + ' vượt quá 2147483647 → <b>Overflow với int</b>. Hãy dùng <code>long long</code>.';
-      el.style.borderColor = '#fecaca';
-      el.style.background = '#fef2f2';
-    } else {
-      el.innerHTML = '✅ ' + val + ' + 1 = ' + next + ' vẫn nằm trong giới hạn int.';
-      el.style.borderColor = '#bbf7d0';
-      el.style.background = '#f0fdf4';
-    }
-  }
-
-
-
-  var demo1Step = 0;
-  function demo1Reset() {
-    demo1Step = 0;
-    document.getElementById('demo1VarValue').innerText = '?';
-    document.getElementById('stepText').innerText = 'Bấm Next Step để bắt đầu.';
-    document.getElementById('variable-box').classList.remove('pulse', 'highlight', 'fade-in');
-  }
-
-  function demo1NextStep() {
-    demo1Step += 1;
-    var box = document.getElementById('variable-box');
-    var val = document.getElementById('demo1VarValue');
-    var txt = document.getElementById('stepText');
-    box.classList.remove('pulse', 'highlight', 'fade-in');
-
-    if (demo1Step === 1) {
-      val.innerText = '5';
-      txt.innerText = 'Step 1: a = 5';
-      box.classList.add('fade-in');
-      return;
-    }
-    if (demo1Step === 2) {
-      txt.innerText = 'Step 2: a + 1 = 5 + 1';
-      txt.classList.remove('fade-in');
-      void txt.offsetWidth;
-      txt.classList.add('fade-in');
-      return;
-    }
-    if (demo1Step === 3) {
-      val.innerText = '6';
-      txt.innerText = 'Step 3: cập nhật hộp biến → a = 6';
-      box.classList.add('highlight');
-      return;
-    }
-
-    demo1Step = 1;
-    val.innerText = '5';
-    txt.innerText = 'Step 1: a = 5';
-    box.classList.add('pulse');
-  }
-
-  var demo2Value = 2147483647;
-  function toInt32(n) { return n | 0; }
-
-  function demo2Reset() {
-    demo2Value = 2147483647;
-    var box = document.getElementById('overflowBoxDemo');
-    box.classList.remove('overflow-danger', 'highlight');
-    document.getElementById('overflowValue').innerText = String(demo2Value);
-    document.getElementById('overflowStepText').innerText = 'Giá trị đang ở mức tối đa của kiểu int.';
-  }
-
-  function demo2AddOne() {
-    var old = demo2Value;
-    demo2Value = toInt32(demo2Value + 1);
-    var box = document.getElementById('overflowBoxDemo');
-    var text = document.getElementById('overflowStepText');
-    document.getElementById('overflowValue').innerText = String(demo2Value);
-    box.classList.remove('highlight');
-    void box.offsetWidth;
-    box.classList.add('highlight');
-
-    if (old === 2147483647) {
-      box.classList.add('overflow-danger');
-      text.innerHTML = '2147483647 → overflow → -2147483648<br><b>⚠️ Giá trị vượt quá giới hạn của kiểu int</b>';
-    } else {
-      text.innerText = 'Giá trị hiện tại sau khi +1 (mô phỏng số nguyên 32-bit).';
-    }
-  }
-
-  function runCinCoutDemo() {
-    var a = Number(document.getElementById('simA').value || 0);
-    var b = Number(document.getElementById('simB').value || 0);
-    var sum = a + b;
-    document.getElementById('simOutput').innerText = 'Output: ' + sum;
-    document.getElementById('simExplain').innerText = 'Chương trình đã đọc 2 số từ bàn phím và in tổng ra màn hình.';
-  }
-
-  document.querySelectorAll('.quiz-option').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var ok = btn.getAttribute('data-correct') === 'true';
-      document.querySelectorAll('.quiz-option').forEach(function (i) { i.classList.remove('correct', 'wrong'); });
-      btn.classList.add(ok ? 'correct' : 'wrong');
-      document.getElementById('quizFeedback').innerHTML = ok
-        ? '<span style="color:#15803d;font-weight:700;">✅ Đúng! 10^18 nên dùng long long.</span>'
-        : '<span style="color:#b91c1c;font-weight:700;">❌ Chưa đúng. Hãy chọn lại.</span>';
-    });
-  });
-
-  document.querySelectorAll('.copy-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var selector = btn.getAttribute('data-copy');
-      var text = document.querySelector(selector).innerText;
-      navigator.clipboard.writeText(text).then(function () {
-        var old = btn.innerText;
-        btn.innerText = 'Copied';
-        setTimeout(function () { btn.innerText = old; }, 900);
-      });
-    });
-  });
-
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
-  var progressBar = document.getElementById('progressBar');
-  var progressText = document.getElementById('progressText');
-
-  function updateProgress() {
-    var visible = cards.filter(function (c) {
-      var r = c.getBoundingClientRect();
-      return r.top < window.innerHeight * 0.78;
-    }).length;
-    var percent = Math.min(100, Math.round((visible / cards.length) * 100));
-    progressBar.style.width = percent + '%';
-    progressText.textContent = percent + '%';
-  }
-
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) e.target.classList.add('show');
-    });
-    updateProgress();
-  }, { threshold: 0.15 });
-
-  cards.forEach(function (c) { observer.observe(c); });
-  window.addEventListener('scroll', updateProgress);
-  window.addEventListener('load', function () {
-    if (cards[0]) cards[0].classList.add('show');
-    updateProgress();
-  });
+(function(){
+'use strict';
+function $(s,r){return(r||document).querySelector(s)}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s))}
+let vStep=0,vValue=0;
+function resetVar(){vStep=0;$('#varWrap').innerHTML='<div class="var-box"><div class="name">int a</div><div class="type">chưa khởi tạo trong mô phỏng</div><div class="value">?</div></div>';$('#varLog').innerHTML='Bước 0: chưa chạy câu lệnh.'}
+function stepVar(){let start=Number($('#varStart').value)||0,add=Number($('#varAdd').value)||0;vStep++;if(vStep===1){vValue=start;$('#varWrap').innerHTML='<div class="var-box active"><div class="name">int a</div><div class="type">khởi tạo</div><div class="value">'+vValue+'</div></div>';$('#varLog').innerHTML='<b>int a = '+start+';</b><br>Tạo biến a và lưu '+start+'.';return}if(vStep===2){$('#varWrap').innerHTML='<div class="var-box"><div class="name">a cũ</div><div class="value">'+vValue+'</div></div><div class="var-box active"><div class="name">a + '+add+'</div><div class="type">tính vế phải</div><div class="value">'+(vValue+add)+'</div></div>';$('#varLog').innerHTML='Tính vế phải: '+vValue+' + '+add+' = '+(vValue+add)+'.';return}if(vStep===3){vValue+=add;$('#varWrap').innerHTML='<div class="var-box active"><div class="name">int a</div><div class="type">giá trị mới</div><div class="value">'+vValue+'</div></div>';$('#varLog').innerHTML='Ghi đè kết quả vào a. Bây giờ a = '+vValue+'.';return}resetVar()}
+const info={bool:[1,'bool thường chiếm 1 byte; về logic chỉ biểu diễn true/false.'],char:[1,'char luôn có kích thước 1 byte theo định nghĩa C++.'],int:[4,'int thường 4 byte, khoảng ±2.1×10⁹.'],longlong:[8,'long long thường 8 byte, khoảng ±9.22×10¹⁸.'],double:[8,'double thường 8 byte, khoảng 15 chữ số có nghĩa.']};
+function showType(){let x=info[$('#typeSelect').value];$('#memory').innerHTML=Array.from({length:x[0]},(_,i)=>'<div class="byte">B'+i+'</div>').join('');$('#typeLog').innerHTML='<b>Minh họa '+x[0]+' byte.</b><br>'+x[1]+'<br><small>Dùng sizeof để kiểm tra trên trình biên dịch thực tế.</small>'}
+function divide(){let a=Number($('#divA').value),b=Number($('#divB').value);if(!Number.isFinite(a)||!Number.isFinite(b)||b===0){$('#divLog').innerHTML='Dữ liệu không hợp lệ hoặc chia cho 0.';return}let ai=Math.trunc(a),bi=Math.trunc(b);$('#divLog').innerHTML='<b>Chia nguyên:</b> '+ai+' / '+bi+' = '+Math.trunc(ai/bi)+'<br><b>Chia thực:</b> '+a+' / '+b+' = '+(a/b)+'<br><b>Phần dư:</b> '+ai+' % '+bi+' = '+(ai%bi)}
+function clearStages(){$$('.stage').forEach(x=>x.classList.remove('active'))}
+function runShop(){let n=BigInt($('#shopN').value||'0'),p=BigInt($('#shopP').value||'0');clearStages();$('#sInput').classList.add('active');$('#shopLog').innerHTML='<b>Input:</b> n='+n+', p='+p;setTimeout(()=>{clearStages();$('#sProcess').classList.add('active');$('#shopLog').innerHTML+='<br><b>Process:</b> total='+n+'×'+p+'='+(n*p)},400);setTimeout(()=>{clearStages();$('#sOutput').classList.add('active');$('#shopLog').innerHTML+='<br><b>Output:</b> '+(n*p)},800)}
+function resetShop(){clearStages();$('#shopLog').innerHTML='Nhấn Chạy để xem luồng dữ liệu.'}
+const IMIN=-2147483648n,IMAX=2147483647n;
+function overflow(){let a=BigInt($('#ovA').value||'0'),b=BigInt($('#ovB').value||'0'),op=$('#ovOp').value,r=op==='+'?a+b:a*b,bad=r<IMIN||r>IMAX;$('#ovWrap').innerHTML='<div class="var-box"><div class="name">a</div><div class="value">'+a+'</div></div><div class="var-box"><div class="name">b</div><div class="value">'+b+'</div></div><div class="var-box '+(bad?'error':'active')+'"><div class="name">kết quả</div><div class="value" style="font-size:1.2rem">'+r+'</div></div>';$('#ovLog').innerHTML=bad?'<b>Vượt miền int32.</b><br>Nếu tính bằng signed int trong C++, đây là undefined behavior.':'<b>Nằm trong miền int32.</b>'}
+function tabs(){$$('.tabs').forEach(box=>$$('.tab-btn',box).forEach(b=>b.onclick=()=>{$$('.tab-btn',box).forEach(x=>x.classList.remove('active'));$$('.panel',box).forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active')}))}
+function copies(){$$('.copy').forEach(b=>b.onclick=()=>{let t=b.parentElement.querySelector('code').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.resolve()).then(()=>{let o=b.textContent;b.textContent='Đã chép';setTimeout(()=>b.textContent=o,1000)})})}
+function quizzes(){$$('.quiz').forEach(q=>$$('.answer',q).forEach(b=>b.onclick=()=>{$$('.answer',q).forEach(x=>x.classList.remove('right','wrong'));if(b.dataset.choice===q.dataset.answer){b.classList.add('right');$('.feedback',q).textContent='Đúng rồi!'}else{b.classList.add('wrong');$('[data-choice="'+q.dataset.answer+'"]',q).classList.add('right');$('.feedback',q).textContent='Chưa đúng.'}}))}
+document.addEventListener('DOMContentLoaded',()=>{tabs();copies();quizzes();$('#varNext').onclick=stepVar;$('#varReset').onclick=resetVar;$('#typeBtn').onclick=showType;$('#divBtn').onclick=divide;$('#shopRun').onclick=runShop;$('#shopReset').onclick=resetShop;$('#ovBtn').onclick=overflow;resetVar();showType();divide();resetShop();overflow();addEventListener('scroll',()=>{let h=Math.max(1,document.documentElement.scrollHeight-innerHeight);$('#bar').style.width=Math.min(100,scrollY/h*100)+'%'},{passive:true});if(window.hljs&&hljs.highlightAll)try{hljs.highlightAll()}catch(e){}})
+})();
 </script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
