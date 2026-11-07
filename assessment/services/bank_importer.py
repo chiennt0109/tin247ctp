@@ -468,7 +468,21 @@ class WorkbookBankImporter:
         statements = defaultdict(list)
         for row in rows["STATEMENTS"]:
             statements[str(row.get("QUESTION_ID"))].append(row)
-        mappings = {str(row.get("QUESTION_ID")): row for row in rows["QUESTION_CURRICULUM"]}
+        mapping_rows = defaultdict(list)
+        for mapping_row in rows["QUESTION_CURRICULUM"]:
+            mapping_rows[str(mapping_row.get("QUESTION_ID"))].append(mapping_row)
+        mappings = {}
+        for question_id, question_mappings in mapping_rows.items():
+            primary_mappings = [
+                mapping_row for mapping_row in question_mappings
+                if "PRIMARY=TRUE" in str(mapping_row.get("NOTE") or "").upper()
+            ]
+            # PRIMARY=TRUE is authoritative when present.  Fall back to the
+            # historical "last row wins" behavior for legacy masters that do
+            # not yet mark a primary curriculum mapping explicitly.
+            mappings[question_id] = (
+                primary_mappings[-1] if primary_mappings else question_mappings[-1]
+            )
         sources = defaultdict(list)
         for row in rows["QUESTION_SOURCES"]:
             sources[str(row.get("QUESTION_ID"))].append(row)
